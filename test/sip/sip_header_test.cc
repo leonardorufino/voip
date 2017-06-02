@@ -109,7 +109,7 @@ void SIP_Header_Test::run()
 
         assert(SIP_Header::decode_headers(header_input_output._input, headers));
         assert(headers.count(header_input_output._header_type) > 0);
-        assert(headers.at(header_input_output._header_type).size() == header_input_output._header_nb);
+        assert(header_input_output._header_nb == ((short) headers.at(header_input_output._header_type).size()));
 
         std::string msg;
         assert(SIP_Header::encode_headers(msg, headers));

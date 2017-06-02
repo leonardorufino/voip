@@ -23,7 +23,6 @@ int main()
     SIP_Message_Test::init();
 
     std::cout << "SIP test completed successfully.\n";
-    getchar();
     return 0;
 }
 
