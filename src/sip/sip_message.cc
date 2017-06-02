@@ -217,7 +217,7 @@ SIP_Header *SIP_Message::get_header(SIP_Header_Type header_type, unsigned short 
 unsigned int SIP_Message::get_num_header(SIP_Header_Type header_type)
 {
     if (_headers.count(header_type) == 0)
-        return NULL;
+        return 0;
 
     std::list<SIP_Header *> &header_list = _headers.at(header_type);
     return (unsigned int) header_list.size();

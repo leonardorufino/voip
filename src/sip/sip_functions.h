@@ -13,6 +13,7 @@
 
 #include "sip_defs.h"
 #include <string>
+#include <cstdlib>
 #include <time.h>
 
 class SIP_Functions
