@@ -28,9 +28,8 @@ std::string SIP_Functions::get_transport_type(SIP_Transport_Type transport)
     switch (transport)
     {
         case SIP_TRANSPORT_UDP: return "UDP";
+        default:                return "";
     }
-
-    return "";
 }
 
 //-------------------------------------------
@@ -68,9 +67,8 @@ std::string SIP_Functions::get_method_type(SIP_Method_Type method)
         case SIP_REQUEST_NOTIFY:    return "NOTIFY";
         case SIP_REQUEST_SUBSCRIBE: return "SUBSCRIBE";
         case SIP_RESPONSE:          return SIP_VERSION;
+        default:                    return "";
     }
-
-    return "";
 }
 
 //-------------------------------------------
@@ -162,9 +160,8 @@ std::string SIP_Functions::get_header_type(SIP_Header_Type header)
         case SIP_HEADER_TO:                     return "To";
         case SIP_HEADER_UNSUPPORTED:            return "Unsupported";
         case SIP_HEADER_VIA:                    return "Via";
+        default:                                return "";
     }
-
-    return "";
 }
 
 //-------------------------------------------

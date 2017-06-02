@@ -45,7 +45,7 @@ SIP_Header *SIP_Header::create_header(SIP_Header_Type header_type, const SIP_Hea
         case SIP_HEADER_TO:                  header = (!copy) ? new SIP_Header_To()                  : new SIP_Header_To(*((SIP_Header_To *) copy));                                    break;
         case SIP_HEADER_UNSUPPORTED:         header = (!copy) ? new SIP_Header_Unsupported()         : new SIP_Header_Unsupported(*((SIP_Header_Unsupported *) copy));                  break;
         case SIP_HEADER_VIA:                 header = (!copy) ? new SIP_Header_Via()                 : new SIP_Header_Via(*((SIP_Header_Via *) copy));                                  break;
-        default: break;
+        default:                                                                                                                                                                        break;
     }
 
     return header;
@@ -147,6 +147,7 @@ bool SIP_Header::encode_headers(std::string &sip_msg, std::map<SIP_Header_Type, 
                     case SIP_HEADER_SEPARATOR_COMMA:    sip_msg += ", ";                    break;
                     case SIP_HEADER_SEPARATOR_CRLF:     sip_msg += "\r\n" + type + ": ";    break;
                     case SIP_HEADER_SEPARATOR_SPACE:    sip_msg += " ";                     break;
+                    default:                                                                break;
                 }
             }
 
@@ -283,6 +284,7 @@ void SIP_URI::set_scheme(SIP_Address_Scheme scheme)
     {
         case SIP_ADDRESS_SCHEME_SIP:    _scheme = "sip";    break;
         case SIP_ADDRESS_SCHEME_SIPS:   _scheme = "sips";   break;
+        default:                                            break;
     }
 }
 
@@ -364,6 +366,7 @@ void SIP_Media_Range::set_type(SIP_Media_Type type)
         case SIP_MEDIA_VIDEO:           _type += "video";           break;
         case SIP_MEDIA_APPLICATION:     _type += "application";     break;
         case SIP_MEDIA_TYPE_ASTERISK:   _type += "*";               break;
+        default:                                                    break;
     }
 }
 
@@ -397,6 +400,7 @@ void SIP_Media_Range::set_subtype(SIP_Media_Subtype subtype)
         case SIP_MEDIA_APPLICATION_PIDF_XML:    _subtype = "pidf+xml";  break;
         case SIP_MEDIA_TEXT_PLAIN:              _subtype = "plain";     break;
         case SIP_MEDIA_SUBTYPE_ASTERISK:        _subtype = "*";         break;
+        default:                                                        break;
     }
 }
 
@@ -472,6 +476,7 @@ void SIP_Event_Type::set_package(SIP_Event_Package package)
     switch (package)
     {
         case SIP_EVENT_PRESENCE: _package = "presence"; break;
+        default:                                        break;
     }
 }
 
@@ -808,6 +813,7 @@ void SIP_Header_Content_Disposition::set_type(SIP_Disposition_Type type)
         case SIP_DISPOSITION_SESSION:   _type = "session";  break;
         case SIP_DISPOSITION_ICON:      _type = "icon";     break;
         case SIP_DISPOSITION_ALERT:     _type = "alert";    break;
+        default:                                            break;
     }
 }
 
@@ -835,6 +841,7 @@ void SIP_Header_Content_Disposition::set_handling(SIP_Disposition_Handling handl
     {
         case SIP_DISPOSITION_HANDLING_OPTIONAL: _handling = "optional"; break;
         case SIP_DISPOSITION_HANDLING_REQUIRED: _handling = "required"; break;
+        default:                                                        break;
     }
 }
 
@@ -1161,10 +1168,11 @@ void SIP_Header_Priority::set_priority(SIP_Priority_Value priority)
 {
     switch (priority)
     {
-        case SIP_PRIORITY_EMERGENCY:    _priority = "emergency";     break;
-        case SIP_PRIORITY_URGENT:       _priority = "urgent";        break;
-        case SIP_PRIORITY_NORMAL:       _priority = "normal";        break;
-        case SIP_PRIORITY_NON_URGENT:   _priority = "non-urgent";    break;
+        case SIP_PRIORITY_EMERGENCY:    _priority = "emergency";    break;
+        case SIP_PRIORITY_URGENT:       _priority = "urgent";       break;
+        case SIP_PRIORITY_NORMAL:       _priority = "normal";       break;
+        case SIP_PRIORITY_NON_URGENT:   _priority = "non-urgent";   break;
+        default:                                                    break;
     }
 }
 
@@ -1353,6 +1361,7 @@ void SIP_Header_Subscription_State::set_state(SIP_Subscription_State state)
         case SIP_SUBSCRIPTION_STATE_ACTIVE:     _state = "active";      break;
         case SIP_SUBSCRIPTION_STATE_PENDING:    _state = "pending";     break;
         case SIP_SUBSCRIPTION_STATE_TERMINATED: _state = "terminated";  break;
+        default:                                                        break;
     }
 }
 
