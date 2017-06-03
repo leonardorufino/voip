@@ -17,12 +17,21 @@
 
 int main()
 {
-    std::cout << "SIP test initialized.\n";
+    std::cout << "SIP test initialized\n";
 
-    SIP_Header_Test::init();
-    SIP_Message_Test::init();
+    if (!SIP_Header_Test::init())
+    {
+        std::cout << "SIP header test FAILED!\n";
+        return 1;
+    }
 
-    std::cout << "SIP test completed successfully.\n";
+    if (!SIP_Message_Test::init())
+    {
+        std::cout << "SIP message test FAILED!\n";
+        return 1;
+    }
+
+    std::cout << "SIP test completed successfully\n";
     return 0;
 }
 

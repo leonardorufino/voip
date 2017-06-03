@@ -14,6 +14,7 @@
 #include "sip/sip_header.h"
 #include <list>
 #include <utility>
+#include <iomanip>
 
 class SIP_Header_Test
 {
@@ -21,9 +22,9 @@ public:
     SIP_Header_Test() {}
     virtual ~SIP_Header_Test() {}
 
-    static void init();
+    static bool init();
 
-    void run();
+    bool run();
     void clear(std::map<SIP_Header_Type, std::list<SIP_Header *>> &headers);
 
 protected:
@@ -36,7 +37,7 @@ protected:
         SIP_Header_Type _header_type;
         std::string _input;
         std::string _output;
-        short _header_nb;
+        unsigned short _header_nb;
     };
 
     std::list<SIP_Header_Input_Output> _header_input_output;

@@ -154,7 +154,8 @@ bool SIP_Message::encode(std::string &sip_msg)
 
 bool SIP_Message::encode_header(std::string &sip_msg, std::string &body_msg)
 {
-    SIP_Header::encode_headers(sip_msg, _headers);
+    if (!SIP_Header::encode_headers(sip_msg, _headers))
+        return false;
 
     sip_msg += "\r\n";
     sip_msg += body_msg;

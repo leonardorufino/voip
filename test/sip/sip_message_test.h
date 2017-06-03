@@ -17,6 +17,7 @@
 #include "sip/sip_header.h"
 #include <list>
 #include <utility>
+#include <iomanip>
 
 class SIP_Message_Test
 {
@@ -24,9 +25,9 @@ public:
     SIP_Message_Test() {}
     virtual ~SIP_Message_Test() {}
 
-    static void init();
+    static bool init();
 
-    void run();
+    bool run();
 
 protected:
     class SIP_Message_Input_Output

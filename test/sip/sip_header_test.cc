@@ -10,98 +10,124 @@
  */
 
 #include "sip_header_test.h"
-#include <assert.h>
 
 //-------------------------------------------
 
-void SIP_Header_Test::init()
+bool SIP_Header_Test::init()
 {
-    std::cout << "SIP header test initialized.\n";
+    std::cout << "SIP header test initialized\n";
 
     SIP_Header_Accept_Test header_accept;
-    header_accept.run();
+    if (!header_accept.run())
+        return false;
 
     SIP_Header_Accept_Encoding_Test header_accept_encoding;
-    header_accept_encoding.run();
+    if (!header_accept_encoding.run())
+        return false;
 
     SIP_Header_Accept_Language_Test header_accept_language;
-    header_accept_language.run();
+    if (!header_accept_language.run())
+        return false;
 
     SIP_Header_Allow_Test header_allow;
-    header_allow.run();
+    if (!header_allow.run())
+        return false;
 
     SIP_Header_Allow_Events_Test header_allow_events;
-    header_allow_events.run();
+    if (!header_allow_events.run())
+        return false;
 
     SIP_Header_Call_ID_Test header_call_id;
-    header_call_id.run();
+    if (!header_call_id.run())
+        return false;
 
     SIP_Header_Contact_Test header_contact;
-    header_contact.run();
+    if (!header_contact.run())
+        return false;
 
     SIP_Header_Content_Disposition_Test header_content_disposition;
-    header_content_disposition.run();
+    if (!header_content_disposition.run())
+        return false;
 
     SIP_Header_Content_Encoding_Test header_content_encoding;
-    header_content_encoding.run();
+    if (!header_content_encoding.run())
+        return false;
 
     SIP_Header_Content_Language_Test header_content_language;
-    header_content_language.run();
+    if (!header_content_language.run())
+        return false;
 
     SIP_Header_Content_Length_Test header_content_length;
-    header_content_length.run();
+    if (!header_content_length.run())
+        return false;
 
     SIP_Header_Content_Type_Test header_content_type;
-    header_content_type.run();
+    if (!header_content_type.run())
+        return false;
 
     SIP_Header_CSeq_Test header_cseq;
-    header_cseq.run();
+    if (!header_cseq.run())
+        return false;
 
     SIP_Header_Date_Test header_date;
-    header_date.run();
+    if (!header_date.run())
+        return false;
 
     SIP_Header_Event_Test header_event;
-    header_event.run();
+    if (!header_event.run())
+        return false;
 
     SIP_Header_Expires_Test header_expires;
-    header_expires.run();
+    if (!header_expires.run())
+        return false;
 
     SIP_Header_From_Test header_from;
-    header_from.run();
+    if (!header_from.run())
+        return false;
 
     SIP_Header_Max_Forwards_Test header_max_forwards;
-    header_max_forwards.run();
+    if (!header_max_forwards.run())
+        return false;
 
     SIP_Header_Priority_Test header_priority;
-    header_priority.run();
+    if (!header_priority.run())
+        return false;
 
     SIP_Header_Record_Route_Test header_record_route;
-    header_record_route.run();
+    if (!header_record_route.run())
+        return false;
 
     SIP_Header_Require_Test header_require;
-    header_require.run();
+    if (!header_require.run())
+        return false;
 
     SIP_Header_Route_Test header_route;
-    header_route.run();
+    if (!header_route.run())
+        return false;
 
     SIP_Header_Subscription_State_Test header_subscription_state;
-    header_subscription_state.run();
+    if (!header_subscription_state.run())
+        return false;
 
     SIP_Header_To_Test header_to;
-    header_to.run();
+    if (!header_to.run())
+        return false;
 
     SIP_Header_Unsupported_Test header_unsupported;
-    header_unsupported.run();
+    if (!header_unsupported.run())
+        return false;
 
     SIP_Header_Via_Test header_via;
-    header_via.run();
+    if (!header_via.run())
+        return false;
 
-    std::cout << "SIP header test completed successfully.\n";
+    std::cout << "SIP header test completed successfully\n";
+    return true;
 }
 
 //-------------------------------------------
 
-void SIP_Header_Test::run()
+bool SIP_Header_Test::run()
 {
     std::list<SIP_Header_Input_Output>::iterator it = _header_input_output.begin();
     while (it != _header_input_output.end())
@@ -110,16 +136,51 @@ void SIP_Header_Test::run()
 
         std::map<SIP_Header_Type, std::list<SIP_Header *>> headers;
 
-        assert(SIP_Header::decode_headers(header_input_output._input, headers));
-        assert(headers.count(header_input_output._header_type) > 0);
-        assert(header_input_output._header_nb == ((short) headers.at(header_input_output._header_type).size()));
+        std::string input = header_input_output._input;
+        if (!SIP_Header::decode_headers(input, headers))
+        {
+            std::cout << "SIP_Header_Test::run -> Failed to decode headers:\n";
+            std::cout << std::setw(12) << "Type: " << header_input_output._header_type << "\n";
+            std::cout << std::setw(12) << "Input: " << header_input_output._input.c_str() << "\n";
+            return false;
+        }
 
-        std::string msg;
-        assert(SIP_Header::encode_headers(msg, headers));
-        assert(msg == header_input_output._output);
+        unsigned short size = (headers.count(header_input_output._header_type) ?
+            (unsigned short) headers.at(header_input_output._header_type).size() : 0);
+
+        if (header_input_output._header_nb != size)
+        {
+            std::cout << "SIP_Header_Test::run -> Invalid size of headers:\n";
+            std::cout << std::setw(12) << "Type: " << header_input_output._header_type << "\n";
+            std::cout << std::setw(12) << "Input: " << header_input_output._input.c_str() << "\n";
+            std::cout << std::setw(12) << "Expected: " << header_input_output._header_nb << "\n";
+            std::cout << std::setw(12) << "Size: " << size << "\n";
+            return false;
+        }
+
+        std::string output;
+        if (!SIP_Header::encode_headers(output, headers))
+        {
+            std::cout << "SIP_Header_Test::run -> Failed to encode headers:\n";
+            std::cout << std::setw(12) << "Type: " << header_input_output._header_type << "\n";
+            std::cout << std::setw(12) << "Input: " << header_input_output._input.c_str() << "\n";
+            return false;
+        }
+
+        if (output != header_input_output._output)
+        {
+            std::cout << "SIP_Header_Test::run -> Invalid encoded header:\n";
+            std::cout << std::setw(12) << "Type: " << header_input_output._header_type << "\n";
+            std::cout << std::setw(12) << "Input: " << header_input_output._input.c_str() << "\n";
+            std::cout << std::setw(12) << "Expected: " << header_input_output._output.c_str() << "\n";
+            std::cout << std::setw(12) << "Output: " << output.c_str() << "\n";
+            return false;
+        }
 
         clear(headers);
     }
+
+    return true;
 }
 
 //-------------------------------------------
