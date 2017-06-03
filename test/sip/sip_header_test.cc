@@ -85,6 +85,10 @@ bool SIP_Header_Test::init()
     if (!header_from.run())
         return false;
 
+    SIP_Header_In_Reply_To_Test header_in_reply_to;
+    if (!header_in_reply_to.run())
+        return false;
+
     SIP_Header_Max_Forwards_Test header_max_forwards;
     if (!header_max_forwards.run())
         return false;
@@ -465,6 +469,21 @@ SIP_Header_From_Test::SIP_Header_From_Test()
     _header_input_output.push_back(hdr2);
 
     SIP_Header_Input_Output hdr3(SIP_HEADER_FROM, "From:  \"Nikola Tesla\"   <sip:n.tesla@high-voltage.org;par1  ; par2  ;par3>;parameter1;tag=76341 ", "From: \"Nikola Tesla\" <sip:n.tesla@high-voltage.org;par1;par2;par3>;tag=76341;parameter1\r\n", 1);
+    _header_input_output.push_back(hdr3);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+SIP_Header_In_Reply_To_Test::SIP_Header_In_Reply_To_Test()
+{
+    SIP_Header_Input_Output hdr1(SIP_HEADER_IN_REPLY_TO, "In-Reply-To: 70710@saturn.bell-tel.com, 17320@saturn.bell-tel.com", "In-Reply-To: 70710@saturn.bell-tel.com, 17320@saturn.bell-tel.com\r\n", 2);
+    _header_input_output.push_back(hdr1);
+
+    SIP_Header_Input_Output hdr2(SIP_HEADER_IN_REPLY_TO, "In-Reply-To: 123456789", "In-Reply-To: 123456789\r\n", 1);
+    _header_input_output.push_back(hdr2);
+
+    SIP_Header_Input_Output hdr3(SIP_HEADER_IN_REPLY_TO, "In-Reply-To:my-domain.org , test@domain.com:1234", "In-Reply-To: my-domain.org, test@domain.com:1234\r\n", 2);
     _header_input_output.push_back(hdr3);
 }
 

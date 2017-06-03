@@ -609,6 +609,28 @@ private:
 
 //-------------------------------------------
 
+class SIP_Header_In_Reply_To : public SIP_Header
+{
+public:
+    SIP_Header_In_Reply_To() {}
+    SIP_Header_In_Reply_To(const SIP_Header_In_Reply_To &header) { *this = header; }
+    ~SIP_Header_In_Reply_To() {}
+
+    // Virtual pure functions
+    SIP_Header_Type get_header_type() { return SIP_HEADER_IN_REPLY_TO; }
+    SIP_Header_Separator encode_separator() { return SIP_HEADER_SEPARATOR_COMMA; }
+    bool parse(std::string &sip_msg);
+    bool encode(std::string &sip_msg);
+
+    void set_call_id(std::string call_id) { _call_id = call_id; }
+    std::string get_call_id() { return _call_id; }
+
+private:
+    std::string _call_id;
+};
+
+//-------------------------------------------
+
 class SIP_Header_Max_Forwards : public SIP_Header
 {
 public:

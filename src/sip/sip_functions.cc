@@ -109,6 +109,8 @@ SIP_Header_Type SIP_Functions::get_header_type(std::string header)
         return SIP_HEADER_EXPIRES;
     else if ((header == "From") || (header == "f"))
         return SIP_HEADER_FROM;
+    else if (header == "In-Reply-To")
+        return SIP_HEADER_IN_REPLY_TO;
     else if (header == "Max-Forwards")
         return SIP_HEADER_MAX_FORWARDS;
     else if (header == "Priority")
@@ -154,6 +156,7 @@ std::string SIP_Functions::get_header_type(SIP_Header_Type header)
         case SIP_HEADER_EVENT:                  return "Event";
         case SIP_HEADER_EXPIRES:                return "Expires";
         case SIP_HEADER_FROM:                   return "From";
+        case SIP_HEADER_IN_REPLY_TO:            return "In-Reply-To";
         case SIP_HEADER_MAX_FORWARDS:           return "Max-Forwards";
         case SIP_HEADER_PRIORITY:               return "Priority";
         case SIP_HEADER_RECORD_ROUTE:           return "Record-Route";

@@ -37,6 +37,7 @@ SIP_Header *SIP_Header::create_header(SIP_Header_Type header_type, const SIP_Hea
         case SIP_HEADER_EVENT:               header = (!copy) ? new SIP_Header_Event()               : new SIP_Header_Event(*((SIP_Header_Event *) copy));                              break;
         case SIP_HEADER_EXPIRES:             header = (!copy) ? new SIP_Header_Expires()             : new SIP_Header_Expires(*((SIP_Header_Expires *) copy));                          break;
         case SIP_HEADER_FROM:                header = (!copy) ? new SIP_Header_From()                : new SIP_Header_From(*((SIP_Header_From *) copy));                                break;
+        case SIP_HEADER_IN_REPLY_TO:         header = (!copy) ? new SIP_Header_In_Reply_To()         : new SIP_Header_In_Reply_To(*((SIP_Header_In_Reply_To *) copy));                  break;
         case SIP_HEADER_MAX_FORWARDS:        header = (!copy) ? new SIP_Header_Max_Forwards()        : new SIP_Header_Max_Forwards(*((SIP_Header_Max_Forwards *) copy));                break;
         case SIP_HEADER_PRIORITY:            header = (!copy) ? new SIP_Header_Priority()            : new SIP_Header_Priority(*((SIP_Header_Priority *) copy));                        break;
         case SIP_HEADER_RECORD_ROUTE:        header = (!copy) ? new SIP_Header_Record_Route()        : new SIP_Header_Record_Route(*((SIP_Header_Record_Route *) copy));                break;
@@ -81,8 +82,9 @@ bool SIP_Header::decode_headers(std::string &sip_msg, std::map<SIP_Header_Type, 
         // Can have multiple of these headers
         if ((header_type == SIP_HEADER_ACCEPT) || (header_type == SIP_HEADER_ACCEPT_ENCODING) || (header_type == SIP_HEADER_ACCEPT_LANGUAGE) ||
             (header_type == SIP_HEADER_ALLOW) || (header_type == SIP_HEADER_ALLOW_EVENTS) || (header_type == SIP_HEADER_CONTACT) ||
-            (header_type == SIP_HEADER_CONTENT_ENCODING) || (header_type == SIP_HEADER_CONTENT_LANGUAGE) || (header_type == SIP_HEADER_RECORD_ROUTE) ||
-            (header_type == SIP_HEADER_REQUIRE) || (header_type == SIP_HEADER_ROUTE) || (header_type == SIP_HEADER_UNSUPPORTED) || (header_type == SIP_HEADER_VIA))
+            (header_type == SIP_HEADER_CONTENT_ENCODING) || (header_type == SIP_HEADER_CONTENT_LANGUAGE) || (header_type == SIP_HEADER_IN_REPLY_TO) ||
+            (header_type == SIP_HEADER_RECORD_ROUTE) || (header_type == SIP_HEADER_REQUIRE) || (header_type == SIP_HEADER_ROUTE) ||
+            (header_type == SIP_HEADER_UNSUPPORTED) || (header_type == SIP_HEADER_VIA))
             matched = SIP_Functions::match(sip_msg, ",", result);
         else
             result = sip_msg;
@@ -1355,7 +1357,31 @@ bool SIP_Header_From::encode(std::string &sip_msg)
 }
 
 //-------------------------------------------
-//--------------------------------------------------------------------
+//-------------------------------------------
+
+bool SIP_Header_In_Reply_To::parse(std::string &sip_msg)
+{
+    SIP_Functions::trim(sip_msg);
+    if (sip_msg.empty())
+        return false;
+
+    _call_id = sip_msg;
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_In_Reply_To::encode(std::string &sip_msg)
+{
+    if (_call_id.empty())
+        return false;
+
+    sip_msg += _call_id;
+    return true;
+}
+
+//-------------------------------------------
+//-------------------------------------------
 
 bool SIP_Header_Max_Forwards::parse(std::string &sip_msg)
 {
