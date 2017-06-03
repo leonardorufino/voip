@@ -1138,95 +1138,95 @@ bool SIP_Header_Date::encode(std::string &sip_msg)
 
 //-------------------------------------------
 
-void SIP_Header_Date::set_weekday(SIP_Data_Weekday weekday)
+void SIP_Header_Date::set_weekday(SIP_Date_Weekday weekday)
 {
     switch (weekday)
     {
-        case SIP_DATA_WEEKDAY_MON: _weekday = "Mon"; break;
-        case SIP_DATA_WEEKDAY_TUE: _weekday = "Tue"; break;
-        case SIP_DATA_WEEKDAY_WED: _weekday = "Wed"; break;
-        case SIP_DATA_WEEKDAY_THU: _weekday = "Thu"; break;
-        case SIP_DATA_WEEKDAY_FRI: _weekday = "Fri"; break;
-        case SIP_DATA_WEEKDAY_SAT: _weekday = "Sat"; break;
-        case SIP_DATA_WEEKDAY_SUN: _weekday = "Sun"; break;
+        case SIP_DATE_WEEKDAY_MON: _weekday = "Mon"; break;
+        case SIP_DATE_WEEKDAY_TUE: _weekday = "Tue"; break;
+        case SIP_DATE_WEEKDAY_WED: _weekday = "Wed"; break;
+        case SIP_DATE_WEEKDAY_THU: _weekday = "Thu"; break;
+        case SIP_DATE_WEEKDAY_FRI: _weekday = "Fri"; break;
+        case SIP_DATE_WEEKDAY_SAT: _weekday = "Sat"; break;
+        case SIP_DATE_WEEKDAY_SUN: _weekday = "Sun"; break;
         default:                                     break;
     }
 }
 
 //-------------------------------------------
 
-SIP_Data_Weekday SIP_Header_Date::get_weekday()
+SIP_Date_Weekday SIP_Header_Date::get_weekday()
 {
     if (_weekday == "Mon")
-        return SIP_DATA_WEEKDAY_MON;
+        return SIP_DATE_WEEKDAY_MON;
     else if (_weekday == "Tue")
-        return SIP_DATA_WEEKDAY_TUE;
+        return SIP_DATE_WEEKDAY_TUE;
     else if (_weekday == "Wed")
-        return SIP_DATA_WEEKDAY_WED;
+        return SIP_DATE_WEEKDAY_WED;
     else if (_weekday == "Thu")
-        return SIP_DATA_WEEKDAY_THU;
+        return SIP_DATE_WEEKDAY_THU;
     else if (_weekday == "Fri")
-        return SIP_DATA_WEEKDAY_FRI;
+        return SIP_DATE_WEEKDAY_FRI;
     else if (_weekday == "Sat")
-        return SIP_DATA_WEEKDAY_SAT;
+        return SIP_DATE_WEEKDAY_SAT;
     else if (_weekday == "Sun")
-        return SIP_DATA_WEEKDAY_SUN;
+        return SIP_DATE_WEEKDAY_SUN;
 
-    return SIP_DATA_WEEKDAY_INVALID;
+    return SIP_DATE_WEEKDAY_INVALID;
 }
 
 //-------------------------------------------
 
-void SIP_Header_Date::set_month(SIP_Data_Month month)
+void SIP_Header_Date::set_month(SIP_Date_Month month)
 {
     switch (month)
     {
-        case SIP_DATA_MONTH_JAN: _month = "Jan"; break;
-        case SIP_DATA_MONTH_FEB: _month = "Feb"; break;
-        case SIP_DATA_MONTH_MAR: _month = "Mar"; break;
-        case SIP_DATA_MONTH_APR: _month = "Apr"; break;
-        case SIP_DATA_MONTH_MAY: _month = "May"; break;
-        case SIP_DATA_MONTH_JUN: _month = "Jun"; break;
-        case SIP_DATA_MONTH_JUL: _month = "Jul"; break;
-        case SIP_DATA_MONTH_AUG: _month = "Aug"; break;
-        case SIP_DATA_MONTH_SEP: _month = "Sep"; break;
-        case SIP_DATA_MONTH_OCT: _month = "Oct"; break;
-        case SIP_DATA_MONTH_NOV: _month = "Nov"; break;
-        case SIP_DATA_MONTH_DEC: _month = "Dec"; break;
+        case SIP_DATE_MONTH_JAN: _month = "Jan"; break;
+        case SIP_DATE_MONTH_FEB: _month = "Feb"; break;
+        case SIP_DATE_MONTH_MAR: _month = "Mar"; break;
+        case SIP_DATE_MONTH_APR: _month = "Apr"; break;
+        case SIP_DATE_MONTH_MAY: _month = "May"; break;
+        case SIP_DATE_MONTH_JUN: _month = "Jun"; break;
+        case SIP_DATE_MONTH_JUL: _month = "Jul"; break;
+        case SIP_DATE_MONTH_AUG: _month = "Aug"; break;
+        case SIP_DATE_MONTH_SEP: _month = "Sep"; break;
+        case SIP_DATE_MONTH_OCT: _month = "Oct"; break;
+        case SIP_DATE_MONTH_NOV: _month = "Nov"; break;
+        case SIP_DATE_MONTH_DEC: _month = "Dec"; break;
         default:                                 break;
     }
 }
 
 //-------------------------------------------
 
-SIP_Data_Month SIP_Header_Date::get_month()
+SIP_Date_Month SIP_Header_Date::get_month()
 {
     if (_month == "Jan")
-        return SIP_DATA_MONTH_JAN;
+        return SIP_DATE_MONTH_JAN;
     else if (_month == "Feb")
-        return SIP_DATA_MONTH_FEB;
+        return SIP_DATE_MONTH_FEB;
     else if (_month == "Mar")
-        return SIP_DATA_MONTH_MAR;
+        return SIP_DATE_MONTH_MAR;
     else if (_month == "Apr")
-        return SIP_DATA_MONTH_APR;
+        return SIP_DATE_MONTH_APR;
     else if (_month == "May")
-        return SIP_DATA_MONTH_MAY;
+        return SIP_DATE_MONTH_MAY;
     else if (_month == "Jun")
-        return SIP_DATA_MONTH_JUN;
+        return SIP_DATE_MONTH_JUN;
     else if (_month == "Jul")
-        return SIP_DATA_MONTH_JUL;
+        return SIP_DATE_MONTH_JUL;
     else if (_month == "Aug")
-        return SIP_DATA_MONTH_AUG;
+        return SIP_DATE_MONTH_AUG;
     else if (_month == "Sep")
-        return SIP_DATA_MONTH_SEP;
+        return SIP_DATE_MONTH_SEP;
     else if (_month == "Oct")
-        return SIP_DATA_MONTH_OCT;
+        return SIP_DATE_MONTH_OCT;
     else if (_month == "Nov")
-        return SIP_DATA_MONTH_NOV;
+        return SIP_DATE_MONTH_NOV;
     else if (_month == "Dec")
-        return SIP_DATA_MONTH_DEC;
+        return SIP_DATE_MONTH_DEC;
 
-    return SIP_DATA_MONTH_INVALID;
+    return SIP_DATE_MONTH_INVALID;
 }
 
 //-------------------------------------------

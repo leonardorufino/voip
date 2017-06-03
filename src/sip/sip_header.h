@@ -487,17 +487,17 @@ public:
     bool parse(std::string &sip_msg);
     bool encode(std::string &sip_msg);
 
-    void set_weekday(SIP_Data_Weekday weekday);
+    void set_weekday(SIP_Date_Weekday weekday);
     void set_weekday(std::string weekday) { _weekday = weekday; }
-    SIP_Data_Weekday get_weekday();
+    SIP_Date_Weekday get_weekday();
     std::string get_weekday_str() { return _weekday; }
 
     void set_day(unsigned short day) { _day = day; }
     unsigned short get_day() { return _day; }
 
-    void set_month(SIP_Data_Month month);
+    void set_month(SIP_Date_Month month);
     void set_month(std::string month) { _month = month; }
-    SIP_Data_Month get_month();
+    SIP_Date_Month get_month();
     std::string get_month_str() { return _month; }
 
     void set_year(unsigned short year) { _year = year; }
