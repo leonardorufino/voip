@@ -149,6 +149,14 @@ public:
 
 //-------------------------------------------
 
+class SIP_Header_Date_Test : public SIP_Header_Test
+{
+public:
+    SIP_Header_Date_Test();
+};
+
+//-------------------------------------------
+
 class SIP_Header_Event_Test : public SIP_Header_Test
 {
 public:

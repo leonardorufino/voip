@@ -467,6 +467,67 @@ private:
 
 //-------------------------------------------
 
+class SIP_Header_Date : public SIP_Header
+{
+public:
+    static const unsigned short INVALID_DAY = 0xFFFF;
+    static const unsigned short INVALID_YEAR = 0xFFFF;
+    static const unsigned short INVALID_HOUR = 0xFFFF;
+    static const unsigned short INVALID_MINUTE = 0xFFFF;
+    static const unsigned short INVALID_SECOND = 0xFFFF;
+
+public:
+    SIP_Header_Date();
+    SIP_Header_Date(const SIP_Header_CSeq &header) { *this = header; }
+    ~SIP_Header_Date() {}
+
+    // Virtual pure functions
+    SIP_Header_Type get_header_type() { return SIP_HEADER_DATE; }
+    SIP_Header_Separator encode_separator() { return SIP_HEADER_SEPARATOR_NONE; }
+    bool parse(std::string &sip_msg);
+    bool encode(std::string &sip_msg);
+
+    void set_weekday(SIP_Data_Weekday weekday);
+    void set_weekday(std::string weekday) { _weekday = weekday; }
+    SIP_Data_Weekday get_weekday();
+    std::string get_weekday_str() { return _weekday; }
+
+    void set_day(unsigned short day) { _day = day; }
+    unsigned short get_day() { return _day; }
+
+    void set_month(SIP_Data_Month month);
+    void set_month(std::string month) { _month = month; }
+    SIP_Data_Month get_month();
+    std::string get_month_str() { return _month; }
+
+    void set_year(unsigned short year) { _year = year; }
+    unsigned short get_year() { return _year; }
+
+    void set_hour(unsigned short hour) { _hour = hour; }
+    unsigned short get_hour() { return _hour; }
+
+    void set_minute(unsigned short minute) { _minute = minute; }
+    unsigned short get_minute() { return _minute; }
+
+    void set_second(unsigned short second) { _second = second; }
+    unsigned short get_second() { return _second; }
+
+    void set_time_zone(std::string time_zone) { _time_zone = time_zone; }
+    std::string get_time_zone() { return _time_zone; }
+
+private:
+    std::string _weekday;
+    unsigned short _day;
+    std::string _month;
+    unsigned short _year;
+    unsigned short _hour;
+    unsigned short _minute;
+    unsigned short _second;
+    std::string _time_zone;
+};
+
+//-------------------------------------------
+
 class SIP_Header_Event : public SIP_Header
 {
 public:

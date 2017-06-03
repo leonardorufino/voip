@@ -33,6 +33,7 @@ SIP_Header *SIP_Header::create_header(SIP_Header_Type header_type, const SIP_Hea
         case SIP_HEADER_CONTENT_LENGTH:      header = (!copy) ? new SIP_Header_Content_Length()      : new SIP_Header_Content_Length(*((SIP_Header_Content_Length *) copy));            break;
         case SIP_HEADER_CONTENT_TYPE:        header = (!copy) ? new SIP_Header_Content_Type()        : new SIP_Header_Content_Type(*((SIP_Header_Content_Type *) copy));                break;
         case SIP_HEADER_CSEQ:                header = (!copy) ? new SIP_Header_CSeq()                : new SIP_Header_CSeq(*((SIP_Header_CSeq *) copy));                                break;
+        case SIP_HEADER_DATE:                header = (!copy) ? new SIP_Header_Date()                : new SIP_Header_Date(*((SIP_Header_Date *) copy));                                break;
         case SIP_HEADER_EVENT:               header = (!copy) ? new SIP_Header_Event()               : new SIP_Header_Event(*((SIP_Header_Event *) copy));                              break;
         case SIP_HEADER_EXPIRES:             header = (!copy) ? new SIP_Header_Expires()             : new SIP_Header_Expires(*((SIP_Header_Expires *) copy));                          break;
         case SIP_HEADER_FROM:                header = (!copy) ? new SIP_Header_From()                : new SIP_Header_From(*((SIP_Header_From *) copy));                                break;
@@ -990,6 +991,242 @@ void SIP_Header_CSeq::set_method(SIP_Method_Type method)
 SIP_Method_Type SIP_Header_CSeq::get_method()
 {
     return SIP_Functions::get_method_type(_method);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+SIP_Header_Date::SIP_Header_Date()
+{
+    _day = INVALID_DAY;
+    _year = INVALID_YEAR;
+    _hour = INVALID_HOUR;
+    _minute = INVALID_MINUTE;
+    _second = INVALID_SECOND;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Date::parse(std::string &sip_msg)
+{
+    std::string result;
+
+    SIP_Functions::trim(sip_msg);
+    if (!SIP_Functions::match(sip_msg, ",", result))
+        return false;
+
+    SIP_Functions::trim(result);
+    if (result.empty())
+        return false;
+
+    _weekday = result;
+
+    SIP_Functions::trim(sip_msg);
+    if (!SIP_Functions::match(sip_msg, " ", result))
+        return false;
+
+    SIP_Functions::trim(result);
+    if (result.empty())
+        return false;
+
+    _day = (unsigned short) atol(result.c_str());
+
+    SIP_Functions::trim(sip_msg);
+    if (!SIP_Functions::match(sip_msg, " ", result))
+        return false;
+
+    SIP_Functions::trim(result);
+    if (result.empty())
+        return false;
+
+    _month = result;
+
+    SIP_Functions::trim(sip_msg);
+    if (!SIP_Functions::match(sip_msg, " ", result))
+        return false;
+
+    SIP_Functions::trim(result);
+    if (result.empty())
+        return false;
+
+    _year = (unsigned short) atol(result.c_str());
+
+    SIP_Functions::trim(sip_msg);
+    if (!SIP_Functions::match(sip_msg, ":", result))
+        return false;
+
+    SIP_Functions::trim(result);
+    if (result.empty())
+        return false;
+
+    _hour = (unsigned short) atol(result.c_str());
+
+    SIP_Functions::trim(sip_msg);
+    if (!SIP_Functions::match(sip_msg, ":", result))
+        return false;
+
+    SIP_Functions::trim(result);
+    if (result.empty())
+        return false;
+
+    _minute = (unsigned short) atol(result.c_str());
+
+    SIP_Functions::trim(sip_msg);
+    if (!SIP_Functions::match(sip_msg, " ", result))
+        return false;
+
+    SIP_Functions::trim(result);
+    if (result.empty())
+        return false;
+
+    _second = (unsigned short) atol(result.c_str());
+
+    SIP_Functions::trim(sip_msg);
+    if (sip_msg.empty())
+        return false;
+
+    _time_zone = sip_msg;
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Date::encode(std::string &sip_msg)
+{
+    if ((_weekday.empty()) || (_day == INVALID_DAY) || (_month.empty()) || (_year == INVALID_YEAR) ||
+        (_hour == INVALID_HOUR) || (_minute == INVALID_MINUTE) || (_second == INVALID_SECOND) ||
+        (_time_zone.empty()))
+        return false;
+
+    std::string day = std::to_string(_day);
+    if (day.size() < 2)
+        day.insert(0, 2 - day.size(), '0');
+
+    std::string year = std::to_string(_year);
+    if (year.size() < 4)
+        year.insert(0, 4 - year.size(), '0');
+
+    std::string hour = std::to_string(_hour);
+    if (hour.size() < 2)
+        hour.insert(0, 2 - hour.size(), '0');
+
+    std::string minute = std::to_string(_minute);
+    if (minute.size() < 2)
+        minute.insert(0, 2 - minute.size(), '0');
+
+    std::string second = std::to_string(_second);
+    if (second.size() < 2)
+        second.insert(0, 2 - second.size(), '0');
+
+    sip_msg += _weekday;
+    sip_msg += ", ";
+    sip_msg += day;
+    sip_msg += " ";
+    sip_msg += _month;
+    sip_msg += " ";
+    sip_msg += year;
+    sip_msg += " ";
+    sip_msg += hour;
+    sip_msg += ":";
+    sip_msg += minute;
+    sip_msg += ":";
+    sip_msg += second;
+    sip_msg += " ";
+    sip_msg += _time_zone;
+    return true;
+}
+
+//-------------------------------------------
+
+void SIP_Header_Date::set_weekday(SIP_Data_Weekday weekday)
+{
+    switch (weekday)
+    {
+        case SIP_DATA_WEEKDAY_MON: _weekday = "Mon"; break;
+        case SIP_DATA_WEEKDAY_TUE: _weekday = "Tue"; break;
+        case SIP_DATA_WEEKDAY_WED: _weekday = "Wed"; break;
+        case SIP_DATA_WEEKDAY_THU: _weekday = "Thu"; break;
+        case SIP_DATA_WEEKDAY_FRI: _weekday = "Fri"; break;
+        case SIP_DATA_WEEKDAY_SAT: _weekday = "Sat"; break;
+        case SIP_DATA_WEEKDAY_SUN: _weekday = "Sun"; break;
+        default:                                     break;
+    }
+}
+
+//-------------------------------------------
+
+SIP_Data_Weekday SIP_Header_Date::get_weekday()
+{
+    if (_weekday == "Mon")
+        return SIP_DATA_WEEKDAY_MON;
+    else if (_weekday == "Tue")
+        return SIP_DATA_WEEKDAY_TUE;
+    else if (_weekday == "Wed")
+        return SIP_DATA_WEEKDAY_WED;
+    else if (_weekday == "Thu")
+        return SIP_DATA_WEEKDAY_THU;
+    else if (_weekday == "Fri")
+        return SIP_DATA_WEEKDAY_FRI;
+    else if (_weekday == "Sat")
+        return SIP_DATA_WEEKDAY_SAT;
+    else if (_weekday == "Sun")
+        return SIP_DATA_WEEKDAY_SUN;
+
+    return SIP_DATA_WEEKDAY_INVALID;
+}
+
+//-------------------------------------------
+
+void SIP_Header_Date::set_month(SIP_Data_Month month)
+{
+    switch (month)
+    {
+        case SIP_DATA_MONTH_JAN: _month = "Jan"; break;
+        case SIP_DATA_MONTH_FEB: _month = "Feb"; break;
+        case SIP_DATA_MONTH_MAR: _month = "Mar"; break;
+        case SIP_DATA_MONTH_APR: _month = "Apr"; break;
+        case SIP_DATA_MONTH_MAY: _month = "May"; break;
+        case SIP_DATA_MONTH_JUN: _month = "Jun"; break;
+        case SIP_DATA_MONTH_JUL: _month = "Jul"; break;
+        case SIP_DATA_MONTH_AUG: _month = "Aug"; break;
+        case SIP_DATA_MONTH_SEP: _month = "Sep"; break;
+        case SIP_DATA_MONTH_OCT: _month = "Oct"; break;
+        case SIP_DATA_MONTH_NOV: _month = "Nov"; break;
+        case SIP_DATA_MONTH_DEC: _month = "Dec"; break;
+        default:                                 break;
+    }
+}
+
+//-------------------------------------------
+
+SIP_Data_Month SIP_Header_Date::get_month()
+{
+    if (_month == "Jan")
+        return SIP_DATA_MONTH_JAN;
+    else if (_month == "Feb")
+        return SIP_DATA_MONTH_FEB;
+    else if (_month == "Mar")
+        return SIP_DATA_MONTH_MAR;
+    else if (_month == "Apr")
+        return SIP_DATA_MONTH_APR;
+    else if (_month == "May")
+        return SIP_DATA_MONTH_MAY;
+    else if (_month == "Jun")
+        return SIP_DATA_MONTH_JUN;
+    else if (_month == "Jul")
+        return SIP_DATA_MONTH_JUL;
+    else if (_month == "Aug")
+        return SIP_DATA_MONTH_AUG;
+    else if (_month == "Sep")
+        return SIP_DATA_MONTH_SEP;
+    else if (_month == "Oct")
+        return SIP_DATA_MONTH_OCT;
+    else if (_month == "Nov")
+        return SIP_DATA_MONTH_NOV;
+    else if (_month == "Dec")
+        return SIP_DATA_MONTH_DEC;
+
+    return SIP_DATA_MONTH_INVALID;
 }
 
 //-------------------------------------------

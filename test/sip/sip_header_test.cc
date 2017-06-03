@@ -57,6 +57,9 @@ void SIP_Header_Test::init()
     SIP_Header_CSeq_Test header_cseq;
     header_cseq.run();
 
+    SIP_Header_Date_Test header_date;
+    header_date.run();
+
     SIP_Header_Event_Test header_event;
     header_event.run();
 
@@ -341,6 +344,21 @@ SIP_Header_CSeq_Test::SIP_Header_CSeq_Test()
     _header_input_output.push_back(hdr2);
 
     SIP_Header_Input_Output hdr3(SIP_HEADER_CSEQ, "CSeq:0    ACK   ", "CSeq: 0 ACK\r\n", 1);
+    _header_input_output.push_back(hdr3);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+SIP_Header_Date_Test::SIP_Header_Date_Test()
+{
+    SIP_Header_Input_Output hdr1(SIP_HEADER_DATE, "Date: Fri, 1 Oct 1990 00:10:59 GMT", "Date: Fri, 01 Oct 1990 00:10:59 GMT\r\n", 1);
+    _header_input_output.push_back(hdr1);
+
+    SIP_Header_Input_Output hdr2(SIP_HEADER_DATE, "Date: Wed, 10 Feb 2001 23:00:20 GMT", "Date: Wed, 10 Feb 2001 23:00:20 GMT\r\n", 1);
+    _header_input_output.push_back(hdr2);
+
+    SIP_Header_Input_Output hdr3(SIP_HEADER_DATE, "Date: Mon, 31 Dec 2010 12:59:05 GM", "Date: Mon, 31 Dec 2010 12:59:05 GM\r\n", 1);
     _header_input_output.push_back(hdr3);
 }
 
