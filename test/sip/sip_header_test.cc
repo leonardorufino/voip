@@ -157,6 +157,10 @@ bool SIP_Header_Test::init()
     if (!header_via.run())
         return false;
 
+    SIP_Header_Warning_Test header_warning;
+    if (!header_warning.run())
+        return false;
+
     std::cout << "SIP header test completed successfully\n";
     return true;
 }
@@ -786,6 +790,21 @@ SIP_Header_Via_Test::SIP_Header_Via_Test()
     _header_input_output.push_back(hdr2);
 
     SIP_Header_Input_Output hdr3(SIP_HEADER_VIA, "v: SIP/2.0/UDP lab.high-voltage.org;received=10.10.10.10;branch=z9hG4bKfw19b,SIP/2.0/UDP 11.11.11.11:5070;branch=z9hG4bKfw19b;parameter1 ", "Via: SIP/2.0/UDP lab.high-voltage.org;branch=z9hG4bKfw19b;received=10.10.10.10\r\nVia: SIP/2.0/UDP 11.11.11.11:5070;branch=z9hG4bKfw19b;parameter1\r\n", 2);
+    _header_input_output.push_back(hdr3);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+SIP_Header_Warning_Test::SIP_Header_Warning_Test()
+{
+    SIP_Header_Input_Output hdr1(SIP_HEADER_WARNING, "Warning: 370 devnull \"Choose a bigger pipe\"", "Warning: 370 devnull \"Choose a bigger pipe\"\r\n", 1);
+    _header_input_output.push_back(hdr1);
+
+    SIP_Header_Input_Output hdr2(SIP_HEADER_WARNING, "Warning: 307 isi.edu \"Session parameter ’foo’ not understood\", 301 isi.edu \"Incompatible network address type ’E.164’\"", "Warning: 307 isi.edu \"Session parameter ’foo’ not understood\"\r\nWarning: 301 isi.edu \"Incompatible network address type ’E.164’\"\r\n", 2);
+    _header_input_output.push_back(hdr2);
+
+    SIP_Header_Input_Output hdr3(SIP_HEADER_WARNING, "Warning:  600 10.10.10.10 \"text\" ", "Warning: 600 10.10.10.10 \"text\"\r\n", 1);
     _header_input_output.push_back(hdr3);
 }
 

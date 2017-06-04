@@ -1073,3 +1073,36 @@ private:
 };
 
 //-------------------------------------------
+
+class SIP_Header_Warning : public SIP_Header
+{
+public:
+    static const unsigned short INVALID_CODE = 0xFFFF;
+
+public:
+    SIP_Header_Warning() : _code(INVALID_CODE) {}
+    SIP_Header_Warning(const SIP_Header_Warning &header) { *this = header; }
+    ~SIP_Header_Warning() {}
+
+    // Virtual pure functions
+    SIP_Header_Type get_header_type() { return SIP_HEADER_WARNING; }
+    SIP_Header_Separator encode_separator() { return SIP_HEADER_SEPARATOR_CRLF; }
+    bool parse(std::string &sip_msg);
+    bool encode(std::string &sip_msg);
+
+    void set_code(unsigned short code) { _code = code; }
+    unsigned short get_code() { return _code; }
+
+    void set_agent(std::string agent) { _agent = agent; }
+    std::string get_agent() { return _agent; }
+
+    void set_text(std::string text) { _text = text; }
+    std::string get_text() { return _text; }
+
+private:
+    unsigned short _code;
+    std::string _agent;
+    std::string _text;
+};
+
+//-------------------------------------------

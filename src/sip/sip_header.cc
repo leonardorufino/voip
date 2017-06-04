@@ -55,6 +55,7 @@ SIP_Header *SIP_Header::create_header(SIP_Header_Type header_type, const SIP_Hea
         case SIP_HEADER_UNSUPPORTED:         header = (!copy) ? new SIP_Header_Unsupported()         : new SIP_Header_Unsupported(*((SIP_Header_Unsupported *) copy));                  break;
         case SIP_HEADER_USER_AGENT:          header = (!copy) ? new SIP_Header_User_Agent()          : new SIP_Header_User_Agent(*((SIP_Header_User_Agent *) copy));                    break;
         case SIP_HEADER_VIA:                 header = (!copy) ? new SIP_Header_Via()                 : new SIP_Header_Via(*((SIP_Header_Via *) copy));                                  break;
+        case SIP_HEADER_WARNING:             header = (!copy) ? new SIP_Header_Warning()             : new SIP_Header_Warning(*((SIP_Header_Warning *) copy));                          break;
         default:                                                                                                                                                                        break;
     }
 
@@ -93,7 +94,7 @@ bool SIP_Header::decode_headers(std::string &sip_msg, std::map<SIP_Header_Type, 
             (header_type == SIP_HEADER_CONTENT_ENCODING) || (header_type == SIP_HEADER_CONTENT_LANGUAGE) || (header_type == SIP_HEADER_IN_REPLY_TO) ||
             (header_type == SIP_HEADER_PROXY_REQUIRE) || (header_type == SIP_HEADER_RECORD_ROUTE) || (header_type == SIP_HEADER_REQUIRE) ||
             (header_type == SIP_HEADER_ROUTE) || (header_type == SIP_HEADER_SUPPORTED) || (header_type == SIP_HEADER_UNSUPPORTED) ||
-            (header_type == SIP_HEADER_VIA))
+            (header_type == SIP_HEADER_VIA) || (header_type == SIP_HEADER_WARNING))
             matched = SIP_Functions::match(sip_msg, ",", result);
         else
             result = sip_msg;
@@ -1395,7 +1396,7 @@ bool SIP_Header_In_Reply_To::encode(std::string &sip_msg)
 bool SIP_Header_Max_Forwards::parse(std::string &sip_msg)
 {
     SIP_Functions::trim(sip_msg);
-    _max_forwards = (int) atol(sip_msg.c_str());
+    _max_forwards = (unsigned int) atol(sip_msg.c_str());
     return true;
 }
 
@@ -1431,7 +1432,7 @@ bool SIP_Header_Mime_Version::parse(std::string &sip_msg)
     if (sip_msg.empty())
         return false;
 
-    _minor_version = (int) atol(sip_msg.c_str());
+    _minor_version = (unsigned int) atol(sip_msg.c_str());
     return true;
 }
 
@@ -2047,6 +2048,60 @@ void SIP_Header_Via::set_transport(SIP_Transport_Type transport)
 SIP_Transport_Type SIP_Header_Via::get_transport()
 {
     return SIP_Functions::get_transport_type(_transport);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+bool SIP_Header_Warning::parse(std::string &sip_msg)
+{
+    std::string result;
+
+    SIP_Functions::trim(sip_msg);
+    if (!SIP_Functions::match(sip_msg, " ", result))
+        return false;
+
+    SIP_Functions::trim(result);
+    if (result.empty())
+        return false;
+
+    _code = (unsigned short) atol(result.c_str());
+
+    SIP_Functions::trim(sip_msg);
+    if (!SIP_Functions::match(sip_msg, " ", result))
+        return false;
+
+    SIP_Functions::trim(result);
+    if (result.empty())
+        return false;
+
+    _agent = result;
+
+    SIP_Functions::trim(sip_msg);
+    if (sip_msg.empty())
+        return false;
+
+    _text = sip_msg;
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Warning::encode(std::string &sip_msg)
+{
+    if ((_code == INVALID_CODE) || (_agent.empty()) || (_text.empty()))
+        return false;
+
+    std::string code = std::to_string(_code);
+    if (code.size() < 3)
+        code.insert(0, 3 - code.size(), '0');
+
+    sip_msg += code;
+    sip_msg += " ";
+    sip_msg += _agent;
+    sip_msg += " ";
+    sip_msg += _text;
+    return true;
 }
 
 //-------------------------------------------
