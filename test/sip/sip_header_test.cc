@@ -137,6 +137,10 @@ bool SIP_Header_Test::init()
     if (!header_subscription_state.run())
         return false;
 
+    SIP_Header_Supported_Test header_supported;
+    if (!header_supported.run())
+        return false;
+
     SIP_Header_To_Test header_to;
     if (!header_to.run())
         return false;
@@ -701,6 +705,24 @@ SIP_Header_Subscription_State_Test::SIP_Header_Subscription_State_Test()
 
     SIP_Header_Input_Output hdr3(SIP_HEADER_SUBSCRIPTION_STATE, "Subscription-State: terminated; reason=timeout ; retry-after=400 ", "Subscription-State: terminated;reason=timeout;retry-after=400\r\n", 1);
     _header_input_output.push_back(hdr3);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+SIP_Header_Supported_Test::SIP_Header_Supported_Test()
+{
+    SIP_Header_Input_Output hdr1(SIP_HEADER_SUPPORTED, "Supported: 100rel, foo", "Supported: 100rel, foo\r\n", 2);
+    _header_input_output.push_back(hdr1);
+
+    SIP_Header_Input_Output hdr2(SIP_HEADER_SUPPORTED, "Supported:foo1", "Supported: foo1\r\n", 1);
+    _header_input_output.push_back(hdr2);
+
+    SIP_Header_Input_Output hdr3(SIP_HEADER_SUPPORTED, "Supported: 100rel, foo, bar  ", "Supported: 100rel, foo, bar\r\n", 3);
+    _header_input_output.push_back(hdr3);
+
+    SIP_Header_Input_Output hdr4(SIP_HEADER_SUPPORTED, "k:", "Supported: \r\n", 1);
+    _header_input_output.push_back(hdr4);
 }
 
 //-------------------------------------------

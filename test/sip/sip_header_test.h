@@ -286,6 +286,14 @@ public:
 
 //-------------------------------------------
 
+class SIP_Header_Supported_Test : public SIP_Header_Test
+{
+public:
+    SIP_Header_Supported_Test();
+};
+
+//-------------------------------------------
+
 class SIP_Header_To_Test : public SIP_Header_Test
 {
 public:

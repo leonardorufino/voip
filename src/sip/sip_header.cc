@@ -50,6 +50,7 @@ SIP_Header *SIP_Header::create_header(SIP_Header_Type header_type, const SIP_Hea
         case SIP_HEADER_SERVER:              header = (!copy) ? new SIP_Header_Server()              : new SIP_Header_Server(*((SIP_Header_Server *) copy));                            break;
         case SIP_HEADER_SUBJECT:             header = (!copy) ? new SIP_Header_Subject()             : new SIP_Header_Subject(*((SIP_Header_Subject *) copy));                          break;
         case SIP_HEADER_SUBSCRIPTION_STATE:  header = (!copy) ? new SIP_Header_Subscription_State()  : new SIP_Header_Subscription_State(*((SIP_Header_Subscription_State *) copy));    break;
+        case SIP_HEADER_SUPPORTED:           header = (!copy) ? new SIP_Header_Supported()           : new SIP_Header_Supported(*((SIP_Header_Supported *) copy));                      break;
         case SIP_HEADER_TO:                  header = (!copy) ? new SIP_Header_To()                  : new SIP_Header_To(*((SIP_Header_To *) copy));                                    break;
         case SIP_HEADER_UNSUPPORTED:         header = (!copy) ? new SIP_Header_Unsupported()         : new SIP_Header_Unsupported(*((SIP_Header_Unsupported *) copy));                  break;
         case SIP_HEADER_VIA:                 header = (!copy) ? new SIP_Header_Via()                 : new SIP_Header_Via(*((SIP_Header_Via *) copy));                                  break;
@@ -90,7 +91,8 @@ bool SIP_Header::decode_headers(std::string &sip_msg, std::map<SIP_Header_Type, 
             (header_type == SIP_HEADER_ALLOW) || (header_type == SIP_HEADER_ALLOW_EVENTS) || (header_type == SIP_HEADER_CONTACT) ||
             (header_type == SIP_HEADER_CONTENT_ENCODING) || (header_type == SIP_HEADER_CONTENT_LANGUAGE) || (header_type == SIP_HEADER_IN_REPLY_TO) ||
             (header_type == SIP_HEADER_PROXY_REQUIRE) || (header_type == SIP_HEADER_RECORD_ROUTE) || (header_type == SIP_HEADER_REQUIRE) ||
-            (header_type == SIP_HEADER_ROUTE) || (header_type == SIP_HEADER_UNSUPPORTED) || (header_type == SIP_HEADER_VIA))
+            (header_type == SIP_HEADER_ROUTE) || (header_type == SIP_HEADER_SUPPORTED) || (header_type == SIP_HEADER_UNSUPPORTED) ||
+            (header_type == SIP_HEADER_VIA))
             matched = SIP_Functions::match(sip_msg, ",", result);
         else
             result = sip_msg;
@@ -1789,6 +1791,24 @@ SIP_Subscription_State SIP_Header_Subscription_State::get_state()
         return SIP_SUBSCRIPTION_STATE_TERMINATED;
 
     return SIP_SUBSCRIPTION_STATE_INVALID;
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+bool SIP_Header_Supported::parse(std::string &sip_msg)
+{
+    SIP_Functions::trim(sip_msg);
+    _option_tag = sip_msg;
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Supported::encode(std::string &sip_msg)
+{
+    sip_msg += _option_tag;
+    return true;
 }
 
 //-------------------------------------------

@@ -926,6 +926,28 @@ private:
 
 //-------------------------------------------
 
+class SIP_Header_Supported : public SIP_Header
+{
+public:
+    SIP_Header_Supported() {}
+    SIP_Header_Supported(const SIP_Header_Supported &header) { *this = header; }
+    ~SIP_Header_Supported() {}
+
+    // Virtual pure functions
+    SIP_Header_Type get_header_type() { return SIP_HEADER_SUPPORTED; }
+    SIP_Header_Separator encode_separator() { return SIP_HEADER_SEPARATOR_COMMA; }
+    bool parse(std::string &sip_msg);
+    bool encode(std::string &sip_msg);
+
+    void set_option_tag(std::string option_tag) { _option_tag = option_tag; }
+    std::string get_option_tag() { return _option_tag; }
+
+private:
+    std::string _option_tag;
+};
+
+//-------------------------------------------
+
 class SIP_Header_To : public SIP_Header
 {
 public:
