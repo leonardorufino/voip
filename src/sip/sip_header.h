@@ -998,6 +998,28 @@ private:
 
 //-------------------------------------------
 
+class SIP_Header_User_Agent : public SIP_Header
+{
+public:
+    SIP_Header_User_Agent() {}
+    SIP_Header_User_Agent(const SIP_Header_User_Agent &header) { *this = header; }
+    ~SIP_Header_User_Agent() {}
+
+    // Virtual pure functions
+    SIP_Header_Type get_header_type() { return SIP_HEADER_USER_AGENT; }
+    SIP_Header_Separator encode_separator() { return SIP_HEADER_SEPARATOR_NONE; }
+    bool parse(std::string &sip_msg);
+    bool encode(std::string &sip_msg);
+
+    void set_user_agent(std::string user_agent) { _user_agent = user_agent; }
+    std::string get_user_agent() { return _user_agent; }
+
+private:
+    std::string _user_agent;
+};
+
+//-------------------------------------------
+
 class SIP_Header_Via : public SIP_Header
 {
 public:

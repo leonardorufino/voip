@@ -149,6 +149,10 @@ bool SIP_Header_Test::init()
     if (!header_unsupported.run())
         return false;
 
+    SIP_Header_User_Agent_Test header_user_agent;
+    if (!header_user_agent.run())
+        return false;
+
     SIP_Header_Via_Test header_via;
     if (!header_via.run())
         return false;
@@ -752,6 +756,21 @@ SIP_Header_Unsupported_Test::SIP_Header_Unsupported_Test()
     _header_input_output.push_back(hdr2);
 
     SIP_Header_Input_Output hdr3(SIP_HEADER_UNSUPPORTED, "Unsupported: 100rel, foo, bar  ", "Unsupported: 100rel, foo, bar\r\n", 3);
+    _header_input_output.push_back(hdr3);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+SIP_Header_User_Agent_Test::SIP_Header_User_Agent_Test()
+{
+    SIP_Header_Input_Output hdr1(SIP_HEADER_USER_AGENT, "User-Agent: Softphone Beta1.5", "User-Agent: Softphone Beta1.5\r\n", 1);
+    _header_input_output.push_back(hdr1);
+
+    SIP_Header_Input_Output hdr2(SIP_HEADER_USER_AGENT, "User-Agent:UA/1.5.0 Pro", "User-Agent: UA/1.5.0 Pro\r\n", 1);
+    _header_input_output.push_back(hdr2);
+
+    SIP_Header_Input_Output hdr3(SIP_HEADER_USER_AGENT, "User-Agent:  user agent 1 ", "User-Agent: user agent 1\r\n", 1);
     _header_input_output.push_back(hdr3);
 }
 

@@ -310,6 +310,14 @@ public:
 
 //-------------------------------------------
 
+class SIP_Header_User_Agent_Test : public SIP_Header_Test
+{
+public:
+    SIP_Header_User_Agent_Test();
+};
+
+//-------------------------------------------
+
 class SIP_Header_Via_Test : public SIP_Header_Test
 {
 public:

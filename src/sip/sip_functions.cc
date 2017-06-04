@@ -141,6 +141,8 @@ SIP_Header_Type SIP_Functions::get_header_type(std::string header)
         return SIP_HEADER_TO;
     else if (header == "Unsupported")
         return SIP_HEADER_UNSUPPORTED;
+    else if (header == "User-Agent")
+        return SIP_HEADER_USER_AGENT;
     else if ((header == "Via") || (header == "v"))
         return SIP_HEADER_VIA;
 
@@ -186,6 +188,7 @@ std::string SIP_Functions::get_header_type(SIP_Header_Type header)
         case SIP_HEADER_SUPPORTED:              return "Supported";
         case SIP_HEADER_TO:                     return "To";
         case SIP_HEADER_UNSUPPORTED:            return "Unsupported";
+        case SIP_HEADER_USER_AGENT:             return "User-Agent";
         case SIP_HEADER_VIA:                    return "Via";
         default:                                return "";
     }

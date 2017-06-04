@@ -53,6 +53,7 @@ SIP_Header *SIP_Header::create_header(SIP_Header_Type header_type, const SIP_Hea
         case SIP_HEADER_SUPPORTED:           header = (!copy) ? new SIP_Header_Supported()           : new SIP_Header_Supported(*((SIP_Header_Supported *) copy));                      break;
         case SIP_HEADER_TO:                  header = (!copy) ? new SIP_Header_To()                  : new SIP_Header_To(*((SIP_Header_To *) copy));                                    break;
         case SIP_HEADER_UNSUPPORTED:         header = (!copy) ? new SIP_Header_Unsupported()         : new SIP_Header_Unsupported(*((SIP_Header_Unsupported *) copy));                  break;
+        case SIP_HEADER_USER_AGENT:          header = (!copy) ? new SIP_Header_User_Agent()          : new SIP_Header_User_Agent(*((SIP_Header_User_Agent *) copy));                    break;
         case SIP_HEADER_VIA:                 header = (!copy) ? new SIP_Header_Via()                 : new SIP_Header_Via(*((SIP_Header_Via *) copy));                                  break;
         default:                                                                                                                                                                        break;
     }
@@ -1884,6 +1885,30 @@ bool SIP_Header_Unsupported::encode(std::string &sip_msg)
         return false;
 
     sip_msg += _option_tag;
+    return true;
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+bool SIP_Header_User_Agent::parse(std::string &sip_msg)
+{
+    SIP_Functions::trim(sip_msg);
+    if (sip_msg.empty())
+        return false;
+
+    _user_agent = sip_msg;
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_User_Agent::encode(std::string &sip_msg)
+{
+    if (_user_agent.empty())
+        return false;
+
+    sip_msg += _user_agent;
     return true;
 }
 
