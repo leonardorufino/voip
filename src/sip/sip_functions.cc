@@ -117,6 +117,8 @@ SIP_Header_Type SIP_Functions::get_header_type(std::string header)
         return SIP_HEADER_MIME_VERSION;
     else if (header == "Min-Expires")
         return SIP_HEADER_MIN_EXPIRES;
+    else if (header == "Organization")
+        return SIP_HEADER_ORGANIZATION;
     else if (header == "Priority")
         return SIP_HEADER_PRIORITY;
     else if (header == "Record-Route")
@@ -164,6 +166,7 @@ std::string SIP_Functions::get_header_type(SIP_Header_Type header)
         case SIP_HEADER_MAX_FORWARDS:           return "Max-Forwards";
         case SIP_HEADER_MIME_VERSION:           return "MIME-Version";
         case SIP_HEADER_MIN_EXPIRES:            return "Min-Expires";
+        case SIP_HEADER_ORGANIZATION:           return "Organization";
         case SIP_HEADER_PRIORITY:               return "Priority";
         case SIP_HEADER_RECORD_ROUTE:           return "Record-Route";
         case SIP_HEADER_REQUIRE:                return "Require";

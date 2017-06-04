@@ -710,6 +710,28 @@ private:
 
 //-------------------------------------------
 
+class SIP_Header_Organization : public SIP_Header
+{
+public:
+    SIP_Header_Organization() {}
+    SIP_Header_Organization(const SIP_Header_Organization &header) { *this = header; }
+    ~SIP_Header_Organization() {}
+
+    // Virtual pure functions
+    SIP_Header_Type get_header_type() { return SIP_HEADER_ORGANIZATION; }
+    SIP_Header_Separator encode_separator() { return SIP_HEADER_SEPARATOR_NONE; }
+    bool parse(std::string &sip_msg);
+    bool encode(std::string &sip_msg);
+
+    void set_organization(std::string organization) { _organization = organization; }
+    std::string get_organization() { return _organization; }
+
+private:
+    std::string _organization;
+};
+
+//-------------------------------------------
+
 class SIP_Header_Priority : public SIP_Header
 {
 public:

@@ -214,6 +214,14 @@ public:
 
 //-------------------------------------------
 
+class SIP_Header_Organization_Test : public SIP_Header_Test
+{
+public:
+    SIP_Header_Organization_Test();
+};
+
+//-------------------------------------------
+
 class SIP_Header_Priority_Test : public SIP_Header_Test
 {
 public:

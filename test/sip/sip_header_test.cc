@@ -101,6 +101,10 @@ bool SIP_Header_Test::init()
     if (!header_min_expires.run())
         return false;
 
+    SIP_Header_Organization_Test header_organization;
+    if (!header_organization.run())
+        return false;
+
     SIP_Header_Priority_Test header_priority;
     if (!header_priority.run())
         return false;
@@ -537,6 +541,21 @@ SIP_Header_Min_Expires_Test::SIP_Header_Min_Expires_Test()
     _header_input_output.push_back(hdr2);
 
     SIP_Header_Input_Output hdr3(SIP_HEADER_MIN_EXPIRES, "Min-Expires:    567890 ", "Min-Expires: 567890\r\n", 1);
+    _header_input_output.push_back(hdr3);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+SIP_Header_Organization_Test::SIP_Header_Organization_Test()
+{
+    SIP_Header_Input_Output hdr1(SIP_HEADER_ORGANIZATION, "Organization: Boxes by Bob", "Organization: Boxes by Bob\r\n", 1);
+    _header_input_output.push_back(hdr1);
+
+    SIP_Header_Input_Output hdr2(SIP_HEADER_ORGANIZATION, "Organization:", "Organization: \r\n", 1);
+    _header_input_output.push_back(hdr2);
+
+    SIP_Header_Input_Output hdr3(SIP_HEADER_ORGANIZATION, "Organization:   ABC ", "Organization: ABC\r\n", 1);
     _header_input_output.push_back(hdr3);
 }
 

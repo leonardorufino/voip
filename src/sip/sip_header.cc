@@ -41,6 +41,7 @@ SIP_Header *SIP_Header::create_header(SIP_Header_Type header_type, const SIP_Hea
         case SIP_HEADER_MAX_FORWARDS:        header = (!copy) ? new SIP_Header_Max_Forwards()        : new SIP_Header_Max_Forwards(*((SIP_Header_Max_Forwards *) copy));                break;
         case SIP_HEADER_MIME_VERSION:        header = (!copy) ? new SIP_Header_Mime_Version()        : new SIP_Header_Mime_Version(*((SIP_Header_Mime_Version *) copy));                break;
         case SIP_HEADER_MIN_EXPIRES:         header = (!copy) ? new SIP_Header_Min_Expires()         : new SIP_Header_Min_Expires(*((SIP_Header_Min_Expires *) copy));                  break;
+        case SIP_HEADER_ORGANIZATION:        header = (!copy) ? new SIP_Header_Organization()        : new SIP_Header_Organization(*((SIP_Header_Organization *) copy));                break;
         case SIP_HEADER_PRIORITY:            header = (!copy) ? new SIP_Header_Priority()            : new SIP_Header_Priority(*((SIP_Header_Priority *) copy));                        break;
         case SIP_HEADER_RECORD_ROUTE:        header = (!copy) ? new SIP_Header_Record_Route()        : new SIP_Header_Record_Route(*((SIP_Header_Record_Route *) copy));                break;
         case SIP_HEADER_REQUIRE:             header = (!copy) ? new SIP_Header_Require()             : new SIP_Header_Require(*((SIP_Header_Require *) copy));                          break;
@@ -1459,6 +1460,24 @@ bool SIP_Header_Min_Expires::encode(std::string &sip_msg)
         return false;
 
     sip_msg += std::to_string(_min_expires);
+    return true;
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+bool SIP_Header_Organization::parse(std::string &sip_msg)
+{
+    SIP_Functions::trim(sip_msg);
+    _organization = sip_msg;
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Organization::encode(std::string &sip_msg)
+{
+    sip_msg += _organization;
     return true;
 }
 
