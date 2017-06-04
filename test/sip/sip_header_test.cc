@@ -129,6 +129,10 @@ bool SIP_Header_Test::init()
     if (!header_server.run())
         return false;
 
+    SIP_Header_Subject_Test header_subject;
+    if (!header_subject.run())
+        return false;
+
     SIP_Header_Subscription_State_Test header_subscription_state;
     if (!header_subscription_state.run())
         return false;
@@ -565,6 +569,9 @@ SIP_Header_Organization_Test::SIP_Header_Organization_Test()
 
     SIP_Header_Input_Output hdr3(SIP_HEADER_ORGANIZATION, "Organization:   ABC ", "Organization: ABC\r\n", 1);
     _header_input_output.push_back(hdr3);
+
+    SIP_Header_Input_Output hdr4(SIP_HEADER_ORGANIZATION, "Organization:   ", "Organization: \r\n", 1);
+    _header_input_output.push_back(hdr4);
 }
 
 //-------------------------------------------
@@ -661,6 +668,24 @@ SIP_Header_Server_Test::SIP_Header_Server_Test()
 
     SIP_Header_Input_Output hdr3(SIP_HEADER_SERVER, "Server:  server1 ", "Server: server1\r\n", 1);
     _header_input_output.push_back(hdr3);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+SIP_Header_Subject_Test::SIP_Header_Subject_Test()
+{
+    SIP_Header_Input_Output hdr1(SIP_HEADER_SUBJECT, "Subject : lunch", "Subject: lunch\r\n", 1);
+    _header_input_output.push_back(hdr1);
+
+    SIP_Header_Input_Output hdr2(SIP_HEADER_SUBJECT, "Subject:Need more boxes ", "Subject: Need more boxes\r\n", 1);
+    _header_input_output.push_back(hdr2);
+
+    SIP_Header_Input_Output hdr3(SIP_HEADER_SUBJECT, "s: Tech Support ", "Subject: Tech Support\r\n", 1);
+    _header_input_output.push_back(hdr3);
+
+    SIP_Header_Input_Output hdr4(SIP_HEADER_SUBJECT, "s:", "Subject: \r\n", 1);
+    _header_input_output.push_back(hdr4);
 }
 
 //-------------------------------------------

@@ -870,6 +870,28 @@ private:
 
 //-------------------------------------------
 
+class SIP_Header_Subject : public SIP_Header
+{
+public:
+    SIP_Header_Subject() {}
+    SIP_Header_Subject(const SIP_Header_Subject &header) { *this = header; }
+    ~SIP_Header_Subject() {}
+
+    // Virtual pure functions
+    SIP_Header_Type get_header_type() { return SIP_HEADER_SUBJECT; }
+    SIP_Header_Separator encode_separator() { return SIP_HEADER_SEPARATOR_NONE; }
+    bool parse(std::string &sip_msg);
+    bool encode(std::string &sip_msg);
+
+    void set_subject(std::string subject) { _subject = subject; }
+    std::string get_subject() { return _subject; }
+
+private:
+    std::string _subject;
+};
+
+//-------------------------------------------
+
 class SIP_Header_Subscription_State : public SIP_Header
 {
 public:

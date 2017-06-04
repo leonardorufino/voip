@@ -270,6 +270,14 @@ public:
 
 //-------------------------------------------
 
+class SIP_Header_Subject_Test : public SIP_Header_Test
+{
+public:
+    SIP_Header_Subject_Test();
+};
+
+//-------------------------------------------
+
 class SIP_Header_Subscription_State_Test : public SIP_Header_Test
 {
 public:
