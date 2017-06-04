@@ -656,6 +656,35 @@ private:
 
 //-------------------------------------------
 
+class SIP_Header_Mime_Version : public SIP_Header
+{
+public:
+    static const unsigned int INVALID_MIME_VERSION = 0xFFFFFFFF;
+
+public:
+    SIP_Header_Mime_Version() : _major_version(INVALID_MIME_VERSION), _minor_version(INVALID_MIME_VERSION) {}
+    SIP_Header_Mime_Version(const SIP_Header_Mime_Version &header) { *this = header; }
+    ~SIP_Header_Mime_Version() {}
+
+    // Virtual pure functions
+    SIP_Header_Type get_header_type() { return SIP_HEADER_MIME_VERSION; }
+    SIP_Header_Separator encode_separator() { return SIP_HEADER_SEPARATOR_NONE; }
+    bool parse(std::string &sip_msg);
+    bool encode(std::string &sip_msg);
+
+    void set_major_version(unsigned int major_version) { _major_version = major_version; }
+    unsigned int get_major_version() { return _major_version; }
+
+    void set_minor_version(unsigned int minor_version) { _minor_version = minor_version; }
+    unsigned int get_minor_version() { return _minor_version; }
+
+private:
+    unsigned int _major_version;
+    unsigned int _minor_version;
+};
+
+//-------------------------------------------
+
 class SIP_Header_Priority : public SIP_Header
 {
 public:

@@ -93,6 +93,10 @@ bool SIP_Header_Test::init()
     if (!header_max_forwards.run())
         return false;
 
+    SIP_Header_Mime_Version_Test header_mime_version;
+    if (!header_mime_version.run())
+        return false;
+
     SIP_Header_Priority_Test header_priority;
     if (!header_priority.run())
         return false;
@@ -499,6 +503,21 @@ SIP_Header_Max_Forwards_Test::SIP_Header_Max_Forwards_Test()
     _header_input_output.push_back(hdr2);
 
     SIP_Header_Input_Output hdr3(SIP_HEADER_MAX_FORWARDS, "Max-Forwards:1", "Max-Forwards: 1\r\n", 1);
+    _header_input_output.push_back(hdr3);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+SIP_Header_Mime_Version_Test::SIP_Header_Mime_Version_Test()
+{
+    SIP_Header_Input_Output hdr1(SIP_HEADER_MIME_VERSION, "MIME-Version: 1.0", "MIME-Version: 1.0\r\n", 1);
+    _header_input_output.push_back(hdr1);
+
+    SIP_Header_Input_Output hdr2(SIP_HEADER_MIME_VERSION, "MIME-Version:   2.5  ", "MIME-Version: 2.5\r\n", 1);
+    _header_input_output.push_back(hdr2);
+
+    SIP_Header_Input_Output hdr3(SIP_HEADER_MIME_VERSION, "MIME-Version:0.0", "MIME-Version: 0.0\r\n", 1);
     _header_input_output.push_back(hdr3);
 }
 

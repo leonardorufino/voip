@@ -198,6 +198,14 @@ public:
 
 //-------------------------------------------
 
+class SIP_Header_Mime_Version_Test : public SIP_Header_Test
+{
+public:
+    SIP_Header_Mime_Version_Test();
+};
+
+//-------------------------------------------
+
 class SIP_Header_Priority_Test : public SIP_Header_Test
 {
 public:

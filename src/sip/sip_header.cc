@@ -39,6 +39,7 @@ SIP_Header *SIP_Header::create_header(SIP_Header_Type header_type, const SIP_Hea
         case SIP_HEADER_FROM:                header = (!copy) ? new SIP_Header_From()                : new SIP_Header_From(*((SIP_Header_From *) copy));                                break;
         case SIP_HEADER_IN_REPLY_TO:         header = (!copy) ? new SIP_Header_In_Reply_To()         : new SIP_Header_In_Reply_To(*((SIP_Header_In_Reply_To *) copy));                  break;
         case SIP_HEADER_MAX_FORWARDS:        header = (!copy) ? new SIP_Header_Max_Forwards()        : new SIP_Header_Max_Forwards(*((SIP_Header_Max_Forwards *) copy));                break;
+        case SIP_HEADER_MIME_VERSION:        header = (!copy) ? new SIP_Header_Mime_Version()        : new SIP_Header_Mime_Version(*((SIP_Header_Mime_Version *) copy));                break;
         case SIP_HEADER_PRIORITY:            header = (!copy) ? new SIP_Header_Priority()            : new SIP_Header_Priority(*((SIP_Header_Priority *) copy));                        break;
         case SIP_HEADER_RECORD_ROUTE:        header = (!copy) ? new SIP_Header_Record_Route()        : new SIP_Header_Record_Route(*((SIP_Header_Record_Route *) copy));                break;
         case SIP_HEADER_REQUIRE:             header = (!copy) ? new SIP_Header_Require()             : new SIP_Header_Require(*((SIP_Header_Require *) copy));                          break;
@@ -1398,6 +1399,44 @@ bool SIP_Header_Max_Forwards::encode(std::string &sip_msg)
         return false;
 
     sip_msg += std::to_string(_max_forwards);
+    return true;
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+bool SIP_Header_Mime_Version::parse(std::string &sip_msg)
+{
+    std::string result;
+
+    SIP_Functions::trim(sip_msg);
+    if (!SIP_Functions::match(sip_msg, ".", result))
+        return false;
+
+    SIP_Functions::trim(result);
+    if (result.empty())
+        return false;
+
+    _major_version = (unsigned int) atol(result.c_str());
+
+    SIP_Functions::trim(sip_msg);
+    if (sip_msg.empty())
+        return false;
+
+    _minor_version = (int) atol(sip_msg.c_str());
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Mime_Version::encode(std::string &sip_msg)
+{
+    if ((_major_version == INVALID_MIME_VERSION) || (_minor_version == INVALID_MIME_VERSION))
+        return false;
+
+    sip_msg += std::to_string(_major_version);
+    sip_msg += ".";
+    sip_msg += std::to_string(_minor_version);
     return true;
 }
 
