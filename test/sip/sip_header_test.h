@@ -206,6 +206,14 @@ public:
 
 //-------------------------------------------
 
+class SIP_Header_Min_Expires_Test : public SIP_Header_Test
+{
+public:
+    SIP_Header_Min_Expires_Test();
+};
+
+//-------------------------------------------
+
 class SIP_Header_Priority_Test : public SIP_Header_Test
 {
 public:

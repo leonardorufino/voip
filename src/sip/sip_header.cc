@@ -40,6 +40,7 @@ SIP_Header *SIP_Header::create_header(SIP_Header_Type header_type, const SIP_Hea
         case SIP_HEADER_IN_REPLY_TO:         header = (!copy) ? new SIP_Header_In_Reply_To()         : new SIP_Header_In_Reply_To(*((SIP_Header_In_Reply_To *) copy));                  break;
         case SIP_HEADER_MAX_FORWARDS:        header = (!copy) ? new SIP_Header_Max_Forwards()        : new SIP_Header_Max_Forwards(*((SIP_Header_Max_Forwards *) copy));                break;
         case SIP_HEADER_MIME_VERSION:        header = (!copy) ? new SIP_Header_Mime_Version()        : new SIP_Header_Mime_Version(*((SIP_Header_Mime_Version *) copy));                break;
+        case SIP_HEADER_MIN_EXPIRES:         header = (!copy) ? new SIP_Header_Min_Expires()         : new SIP_Header_Min_Expires(*((SIP_Header_Min_Expires *) copy));                  break;
         case SIP_HEADER_PRIORITY:            header = (!copy) ? new SIP_Header_Priority()            : new SIP_Header_Priority(*((SIP_Header_Priority *) copy));                        break;
         case SIP_HEADER_RECORD_ROUTE:        header = (!copy) ? new SIP_Header_Record_Route()        : new SIP_Header_Record_Route(*((SIP_Header_Record_Route *) copy));                break;
         case SIP_HEADER_REQUIRE:             header = (!copy) ? new SIP_Header_Require()             : new SIP_Header_Require(*((SIP_Header_Require *) copy));                          break;
@@ -699,7 +700,7 @@ bool SIP_Header_Contact::parse(std::string &sip_msg)
             if (exp.empty())
                 return false;
 
-            _expires = (int) atol(exp.c_str());
+            _expires = (unsigned int) atol(exp.c_str());
 
         }else if (SIP_Functions::start_with(result, "q="))
         {
@@ -1290,7 +1291,7 @@ bool SIP_Header_Event::encode(std::string &sip_msg)
 bool SIP_Header_Expires::parse(std::string &sip_msg)
 {
     SIP_Functions::trim(sip_msg);
-    _expires = (int) atol(sip_msg.c_str());
+    _expires = (unsigned int) atol(sip_msg.c_str());
     return true;
 }
 
@@ -1437,6 +1438,27 @@ bool SIP_Header_Mime_Version::encode(std::string &sip_msg)
     sip_msg += std::to_string(_major_version);
     sip_msg += ".";
     sip_msg += std::to_string(_minor_version);
+    return true;
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+bool SIP_Header_Min_Expires::parse(std::string &sip_msg)
+{
+    SIP_Functions::trim(sip_msg);
+    _min_expires = (unsigned int) atol(sip_msg.c_str());
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Min_Expires::encode(std::string &sip_msg)
+{
+    if (_min_expires == INVALID_MIN_EXPIRES)
+        return false;
+
+    sip_msg += std::to_string(_min_expires);
     return true;
 }
 
@@ -1621,7 +1643,7 @@ bool SIP_Header_Subscription_State::parse(std::string &sip_msg)
             if (exp.empty())
                 return false;
 
-            _expires = (int) atol(exp.c_str());
+            _expires = (unsigned int) atol(exp.c_str());
         }else
             _parameters.push_back(result);
     }

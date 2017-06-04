@@ -685,6 +685,31 @@ private:
 
 //-------------------------------------------
 
+class SIP_Header_Min_Expires : public SIP_Header
+{
+public:
+    static const unsigned int INVALID_MIN_EXPIRES = 0xFFFFFFFF;
+
+public:
+    SIP_Header_Min_Expires() : _min_expires(INVALID_MIN_EXPIRES) {}
+    SIP_Header_Min_Expires(const SIP_Header_Min_Expires &header) { *this = header; }
+    ~SIP_Header_Min_Expires() {}
+
+    // Virtual pure functions
+    SIP_Header_Type get_header_type() { return SIP_HEADER_MIN_EXPIRES; }
+    SIP_Header_Separator encode_separator() { return SIP_HEADER_SEPARATOR_NONE; }
+    bool parse(std::string &sip_msg);
+    bool encode(std::string &sip_msg);
+
+    void set_min_expires(unsigned int min_expires) { _min_expires = min_expires; }
+    unsigned int get_min_expires() { return _min_expires; }
+
+private:
+    unsigned int _min_expires;
+};
+
+//-------------------------------------------
+
 class SIP_Header_Priority : public SIP_Header
 {
 public:
