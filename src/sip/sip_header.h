@@ -848,6 +848,28 @@ private:
 
 //-------------------------------------------
 
+class SIP_Header_Server : public SIP_Header
+{
+public:
+    SIP_Header_Server() {}
+    SIP_Header_Server(const SIP_Header_Server &header) { *this = header; }
+    ~SIP_Header_Server() {}
+
+    // Virtual pure functions
+    SIP_Header_Type get_header_type() { return SIP_HEADER_SERVER; }
+    SIP_Header_Separator encode_separator() { return SIP_HEADER_SEPARATOR_NONE; }
+    bool parse(std::string &sip_msg);
+    bool encode(std::string &sip_msg);
+
+    void set_server(std::string server) { _server = server; }
+    std::string get_server() { return _server; }
+
+private:
+    std::string _server;
+};
+
+//-------------------------------------------
+
 class SIP_Header_Subscription_State : public SIP_Header
 {
 public:

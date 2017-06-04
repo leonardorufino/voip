@@ -262,6 +262,14 @@ public:
 
 //-------------------------------------------
 
+class SIP_Header_Server_Test : public SIP_Header_Test
+{
+public:
+    SIP_Header_Server_Test();
+};
+
+//-------------------------------------------
+
 class SIP_Header_Subscription_State_Test : public SIP_Header_Test
 {
 public:

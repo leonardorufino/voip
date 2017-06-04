@@ -47,6 +47,7 @@ SIP_Header *SIP_Header::create_header(SIP_Header_Type header_type, const SIP_Hea
         case SIP_HEADER_RECORD_ROUTE:        header = (!copy) ? new SIP_Header_Record_Route()        : new SIP_Header_Record_Route(*((SIP_Header_Record_Route *) copy));                break;
         case SIP_HEADER_REQUIRE:             header = (!copy) ? new SIP_Header_Require()             : new SIP_Header_Require(*((SIP_Header_Require *) copy));                          break;
         case SIP_HEADER_ROUTE:               header = (!copy) ? new SIP_Header_Route()               : new SIP_Header_Route(*((SIP_Header_Route *) copy));                              break;
+        case SIP_HEADER_SERVER:              header = (!copy) ? new SIP_Header_Server()              : new SIP_Header_Server(*((SIP_Header_Server *) copy));                            break;
         case SIP_HEADER_SUBSCRIPTION_STATE:  header = (!copy) ? new SIP_Header_Subscription_State()  : new SIP_Header_Subscription_State(*((SIP_Header_Subscription_State *) copy));    break;
         case SIP_HEADER_TO:                  header = (!copy) ? new SIP_Header_To()                  : new SIP_Header_To(*((SIP_Header_To *) copy));                                    break;
         case SIP_HEADER_UNSUPPORTED:         header = (!copy) ? new SIP_Header_Unsupported()         : new SIP_Header_Unsupported(*((SIP_Header_Unsupported *) copy));                  break;
@@ -1657,6 +1658,30 @@ bool SIP_Header_Route::encode(std::string &sip_msg)
         sip_msg += *it++;
     }
 
+    return true;
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+bool SIP_Header_Server::parse(std::string &sip_msg)
+{
+    SIP_Functions::trim(sip_msg);
+    if (sip_msg.empty())
+        return false;
+
+    _server = sip_msg;
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Server::encode(std::string &sip_msg)
+{
+    if (_server.empty())
+        return false;
+
+    sip_msg += _server;
     return true;
 }
 

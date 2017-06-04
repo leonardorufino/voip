@@ -125,6 +125,10 @@ bool SIP_Header_Test::init()
     if (!header_route.run())
         return false;
 
+    SIP_Header_Server_Test header_server;
+    if (!header_server.run())
+        return false;
+
     SIP_Header_Subscription_State_Test header_subscription_state;
     if (!header_subscription_state.run())
         return false;
@@ -642,6 +646,21 @@ SIP_Header_Route_Test::SIP_Header_Route_Test()
 
     SIP_Header_Input_Output hdr5(SIP_HEADER_ROUTE, "Route: <sip:server3.atlanta.com ; transport=udp;lr> ; teste ; lr ", "Route: <sip:server3.atlanta.com;lr;transport=udp>;teste;lr\r\n", 1);
     _header_input_output.push_back(hdr5);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+SIP_Header_Server_Test::SIP_Header_Server_Test()
+{
+    SIP_Header_Input_Output hdr1(SIP_HEADER_SERVER, "Server: HomeServer v2", "Server: HomeServer v2\r\n", 1);
+    _header_input_output.push_back(hdr1);
+
+    SIP_Header_Input_Output hdr2(SIP_HEADER_SERVER, "Server:My Server/1.5.0 Pro", "Server: My Server/1.5.0 Pro\r\n", 1);
+    _header_input_output.push_back(hdr2);
+
+    SIP_Header_Input_Output hdr3(SIP_HEADER_SERVER, "Server:  server1 ", "Server: server1\r\n", 1);
+    _header_input_output.push_back(hdr3);
 }
 
 //-------------------------------------------
