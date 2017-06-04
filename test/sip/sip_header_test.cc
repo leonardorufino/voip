@@ -109,6 +109,10 @@ bool SIP_Header_Test::init()
     if (!header_priority.run())
         return false;
 
+    SIP_Header_Proxy_Require_Test header_proxy_require;
+    if (!header_proxy_require.run())
+        return false;
+
     SIP_Header_Record_Route_Test header_record_route;
     if (!header_record_route.run())
         return false;
@@ -571,6 +575,21 @@ SIP_Header_Priority_Test::SIP_Header_Priority_Test()
     _header_input_output.push_back(hdr2);
 
     SIP_Header_Input_Output hdr3(SIP_HEADER_PRIORITY, "Priority:my-priority", "Priority: my-priority\r\n", 1);
+    _header_input_output.push_back(hdr3);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+SIP_Header_Proxy_Require_Test::SIP_Header_Proxy_Require_Test()
+{
+    SIP_Header_Input_Output hdr1(SIP_HEADER_PROXY_REQUIRE, "Proxy-Require: foo", "Proxy-Require: foo\r\n", 1);
+    _header_input_output.push_back(hdr1);
+
+    SIP_Header_Input_Output hdr2(SIP_HEADER_PROXY_REQUIRE, "Proxy-Require: req1, req2,req3", "Proxy-Require: req1, req2, req3\r\n", 3);
+    _header_input_output.push_back(hdr2);
+
+    SIP_Header_Input_Output hdr3(SIP_HEADER_PROXY_REQUIRE, "Proxy-Require:req1,req2", "Proxy-Require: req1, req2\r\n", 2);
     _header_input_output.push_back(hdr3);
 }
 

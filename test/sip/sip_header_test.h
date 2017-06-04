@@ -230,6 +230,14 @@ public:
 
 //-------------------------------------------
 
+class SIP_Header_Proxy_Require_Test : public SIP_Header_Test
+{
+public:
+    SIP_Header_Proxy_Require_Test();
+};
+
+//-------------------------------------------
+
 class SIP_Header_Record_Route_Test : public SIP_Header_Test
 {
 public:

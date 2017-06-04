@@ -43,6 +43,7 @@ SIP_Header *SIP_Header::create_header(SIP_Header_Type header_type, const SIP_Hea
         case SIP_HEADER_MIN_EXPIRES:         header = (!copy) ? new SIP_Header_Min_Expires()         : new SIP_Header_Min_Expires(*((SIP_Header_Min_Expires *) copy));                  break;
         case SIP_HEADER_ORGANIZATION:        header = (!copy) ? new SIP_Header_Organization()        : new SIP_Header_Organization(*((SIP_Header_Organization *) copy));                break;
         case SIP_HEADER_PRIORITY:            header = (!copy) ? new SIP_Header_Priority()            : new SIP_Header_Priority(*((SIP_Header_Priority *) copy));                        break;
+        case SIP_HEADER_PROXY_REQUIRE:       header = (!copy) ? new SIP_Header_Proxy_Require()       : new SIP_Header_Proxy_Require(*((SIP_Header_Proxy_Require *) copy));              break;
         case SIP_HEADER_RECORD_ROUTE:        header = (!copy) ? new SIP_Header_Record_Route()        : new SIP_Header_Record_Route(*((SIP_Header_Record_Route *) copy));                break;
         case SIP_HEADER_REQUIRE:             header = (!copy) ? new SIP_Header_Require()             : new SIP_Header_Require(*((SIP_Header_Require *) copy));                          break;
         case SIP_HEADER_ROUTE:               header = (!copy) ? new SIP_Header_Route()               : new SIP_Header_Route(*((SIP_Header_Route *) copy));                              break;
@@ -86,8 +87,8 @@ bool SIP_Header::decode_headers(std::string &sip_msg, std::map<SIP_Header_Type, 
         if ((header_type == SIP_HEADER_ACCEPT) || (header_type == SIP_HEADER_ACCEPT_ENCODING) || (header_type == SIP_HEADER_ACCEPT_LANGUAGE) ||
             (header_type == SIP_HEADER_ALLOW) || (header_type == SIP_HEADER_ALLOW_EVENTS) || (header_type == SIP_HEADER_CONTACT) ||
             (header_type == SIP_HEADER_CONTENT_ENCODING) || (header_type == SIP_HEADER_CONTENT_LANGUAGE) || (header_type == SIP_HEADER_IN_REPLY_TO) ||
-            (header_type == SIP_HEADER_RECORD_ROUTE) || (header_type == SIP_HEADER_REQUIRE) || (header_type == SIP_HEADER_ROUTE) ||
-            (header_type == SIP_HEADER_UNSUPPORTED) || (header_type == SIP_HEADER_VIA))
+            (header_type == SIP_HEADER_PROXY_REQUIRE) || (header_type == SIP_HEADER_RECORD_ROUTE) || (header_type == SIP_HEADER_REQUIRE) ||
+            (header_type == SIP_HEADER_ROUTE) || (header_type == SIP_HEADER_UNSUPPORTED) || (header_type == SIP_HEADER_VIA))
             matched = SIP_Functions::match(sip_msg, ",", result);
         else
             result = sip_msg;
@@ -1533,6 +1534,30 @@ SIP_Priority_Value SIP_Header_Priority::get_priority()
         return SIP_PRIORITY_NON_URGENT;
 
     return SIP_PRIORITY_VALUE_INVALID;
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+bool SIP_Header_Proxy_Require::parse(std::string &sip_msg)
+{
+    SIP_Functions::trim(sip_msg);
+    if (sip_msg.empty())
+        return false;
+
+    _option_tag = sip_msg;
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Proxy_Require::encode(std::string &sip_msg)
+{
+    if (_option_tag.empty())
+        return false;
+
+    sip_msg += _option_tag;
+    return true;
 }
 
 //-------------------------------------------
