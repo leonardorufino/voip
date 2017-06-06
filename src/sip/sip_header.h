@@ -207,10 +207,14 @@ public:
     void set_language(std::string language) { _language = language; }
     std::string get_language() { return _language; }
 
+    void set_q(std::string q) { _q = q; }
+    std::string get_q() { return _q; }
+
     std::list<std::string> &get_parameters() { return _parameters; }
 
 private:
     std::string _language;
+    std::string _q;
     std::list<std::string> _parameters;
 };
 

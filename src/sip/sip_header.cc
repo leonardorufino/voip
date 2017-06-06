@@ -610,7 +610,15 @@ bool SIP_Header_Accept_Language::parse(std::string &sip_msg)
     {
         matched = SIP_Functions::match(sip_msg, ";", result);
         SIP_Functions::trim(result);
-        _parameters.push_back(result);
+
+        if (SIP_Functions::start_with(result, "q="))
+        {
+            _q = result.substr(2);
+            SIP_Functions::trim(_q);
+            if (_q.empty())
+                return false;
+        }else
+            _parameters.push_back(result);
     }
 
     return true;
@@ -620,7 +628,19 @@ bool SIP_Header_Accept_Language::parse(std::string &sip_msg)
 
 bool SIP_Header_Accept_Language::encode(std::string &sip_msg)
 {
+    if (_language.empty())
+    {
+        // Accept-Language header can be empty
+        return true;
+    }
+
     sip_msg += _language;
+
+    if (!_q.empty())
+    {
+        sip_msg += ";q=";
+        sip_msg += _q;
+    }
 
     std::list<std::string>::iterator it = _parameters.begin();
     while (it != _parameters.end())

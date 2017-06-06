@@ -290,6 +290,9 @@ SIP_Header_Accept_Language_Test::SIP_Header_Accept_Language_Test()
 
     SIP_Header_Input_Output hdr3(SIP_HEADER_ACCEPT_LANGUAGE, "Accept-Language: da, en-gb;q=0.8, en ;q=0.7, *", "Accept-Language: da, en-gb;q=0.8, en;q=0.7, *\r\n", 4);
     _header_input_output.push_back(hdr3);
+
+    SIP_Header_Input_Output hdr4(SIP_HEADER_ACCEPT_LANGUAGE, "Accept-Language: en-us, en-gb; par1 = test ; q=0.8;par2", "Accept-Language: en-us, en-gb;q=0.8;par1 = test;par2\r\n", 2);
+    _header_input_output.push_back(hdr4);
 }
 
 //-------------------------------------------
