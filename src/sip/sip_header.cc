@@ -508,6 +508,13 @@ SIP_Event_Package SIP_Event_Type::get_package()
 
 bool SIP_Header_Accept::parse(std::string &sip_msg)
 {
+    SIP_Functions::trim(sip_msg);
+    if (sip_msg.empty())
+    {
+        // Accept header can be empty
+        return true;
+    }
+
     return _media_range.parse(sip_msg);
 }
 
@@ -515,6 +522,12 @@ bool SIP_Header_Accept::parse(std::string &sip_msg)
 
 bool SIP_Header_Accept::encode(std::string &sip_msg)
 {
+    if ((_media_range.get_type_str().empty()) && (_media_range.get_subtype_str().empty()))
+    {
+        // Accept header can be empty
+        return true;
+    }
+
     if (!_media_range.encode(sip_msg))
         return false;
 
@@ -531,7 +544,7 @@ bool SIP_Header_Accept_Encoding::parse(std::string &sip_msg)
     bool matched = SIP_Functions::match(sip_msg, ";", result);
     SIP_Functions::trim(result);
 
-    // Accept-Encoding can be empty
+    // Accept-Encoding header can be empty
     _coding = result;
 
     while (matched)
@@ -570,7 +583,7 @@ bool SIP_Header_Accept_Language::parse(std::string &sip_msg)
     bool matched = SIP_Functions::match(sip_msg, ";", result);
     SIP_Functions::trim(result);
 
-    // Accept-Language can be empty
+    // Accept-Language header can be empty
     _language = result;
 
     while (matched)
@@ -606,7 +619,7 @@ bool SIP_Header_Allow::parse(std::string &sip_msg)
 {
     SIP_Functions::trim(sip_msg);
 
-    // Allow can be empty
+    // Allow header can be empty
     _method = sip_msg;
     return true;
 }

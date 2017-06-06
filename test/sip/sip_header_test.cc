@@ -254,6 +254,9 @@ SIP_Header_Accept_Test::SIP_Header_Accept_Test()
 
     SIP_Header_Input_Output hdr3(SIP_HEADER_ACCEPT, "Accept: */*;q=0.75,application/*,   text/html,test1/test2", "Accept: */*;q=0.75, application/*, text/html, test1/test2\r\n", 4);
     _header_input_output.push_back(hdr3);
+
+    SIP_Header_Input_Output hdr4(SIP_HEADER_ACCEPT, "Accept:", "Accept: \r\n", 1);
+    _header_input_output.push_back(hdr4);
 }
 
 //-------------------------------------------
