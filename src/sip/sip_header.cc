@@ -340,7 +340,14 @@ bool SIP_Media_Range::parse(std::string &sip_msg)
         matched = SIP_Functions::match(sip_msg, ";", result);
         SIP_Functions::trim(result);
 
-        _parameters.push_back(result);
+        if (SIP_Functions::start_with(result, "q="))
+        {
+            _q = result.substr(2);
+            SIP_Functions::trim(_q);
+            if (_q.empty())
+                return false;
+        }else
+            _parameters.push_back(result);
     }
 
     return true;
@@ -356,6 +363,12 @@ bool SIP_Media_Range::encode(std::string &sip_msg)
     sip_msg += _type;
     sip_msg += "/";
     sip_msg += _subtype;
+
+    if (!_q.empty())
+    {
+        sip_msg += ";q=";
+        sip_msg += _q;
+    }
 
     std::list<std::string>::iterator it = _parameters.begin();
     while (it != _parameters.end())
@@ -378,6 +391,8 @@ void SIP_Media_Range::set_type(SIP_Media_Type type)
         case SIP_MEDIA_AUDIO:           _type += "audio";           break;
         case SIP_MEDIA_VIDEO:           _type += "video";           break;
         case SIP_MEDIA_APPLICATION:     _type += "application";     break;
+        case SIP_MEDIA_MESSAGE:         _type += "message";         break;
+        case SIP_MEDIA_MULTIPART:       _type += "multipart";       break;
         case SIP_MEDIA_TYPE_ASTERISK:   _type += "*";               break;
         default:                                                    break;
     }
@@ -397,6 +412,10 @@ SIP_Media_Type SIP_Media_Range::get_type()
         return SIP_MEDIA_VIDEO;
     else if (_type == "application")
         return SIP_MEDIA_APPLICATION;
+    else if (_type == "message")
+        return SIP_MEDIA_MESSAGE;
+    else if (_type == "multipart")
+        return SIP_MEDIA_MULTIPART;
     else if (_type == "*")
         return SIP_MEDIA_TYPE_ASTERISK;
 
