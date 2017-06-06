@@ -272,6 +272,9 @@ SIP_Header_Accept_Encoding_Test::SIP_Header_Accept_Encoding_Test()
 
     SIP_Header_Input_Output hdr3(SIP_HEADER_ACCEPT_ENCODING, "Accept-Encoding: *;q=0.75,code1,   code2;par1,code3", "Accept-Encoding: *;q=0.75, code1, code2;par1, code3\r\n", 4);
     _header_input_output.push_back(hdr3);
+
+    SIP_Header_Input_Output hdr4(SIP_HEADER_ACCEPT_ENCODING, "Accept-Encoding: *;par1=test; q=1.000  ; par2=test", "Accept-Encoding: *;q=1.000;par1=test;par2=test\r\n", 1);
+    _header_input_output.push_back(hdr4);
 }
 
 //-------------------------------------------

@@ -178,10 +178,14 @@ public:
     void set_coding(std::string coding) { _coding = coding; }
     std::string get_coding() { return _coding; }
 
+    void set_q(std::string q) { _q = q; }
+    std::string get_q() { return _q; }
+
     std::list<std::string> &get_parameters() { return _parameters; }
 
 private:
     std::string _coding;
+    std::string _q;
     std::list<std::string> _parameters;
 };
 
