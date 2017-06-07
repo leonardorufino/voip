@@ -40,12 +40,18 @@ SIP_Method_Type SIP_Functions::get_method_type(const std::string method)
         return SIP_REQUEST_ACK;
     else if (method == "BYE")
         return SIP_REQUEST_BYE;
+    else if (method == "CANCEL")
+        return SIP_REQUEST_CANCEL;
     else if (method == "INVITE")
         return SIP_REQUEST_INVITE;
     else if (method == "MESSAGE")
         return SIP_REQUEST_MESSAGE;
     else if (method == "NOTIFY")
         return SIP_REQUEST_NOTIFY;
+    else if (method == "OPTIONS")
+        return SIP_REQUEST_OPTIONS;
+    else if (method == "REGISTER")
+        return SIP_REQUEST_REGISTER;
     else if (method == "SUBSCRIBE")
         return SIP_REQUEST_SUBSCRIBE;
     else if (method == SIP_VERSION)
@@ -62,9 +68,12 @@ std::string SIP_Functions::get_method_type(SIP_Method_Type method)
     {
         case SIP_REQUEST_ACK:       return "ACK";
         case SIP_REQUEST_BYE:       return "BYE";
+        case SIP_REQUEST_CANCEL:    return "CANCEL";
         case SIP_REQUEST_INVITE:    return "INVITE";
         case SIP_REQUEST_MESSAGE:   return "MESSAGE";
         case SIP_REQUEST_NOTIFY:    return "NOTIFY";
+        case SIP_REQUEST_OPTIONS:   return "OPTIONS";
+        case SIP_REQUEST_REGISTER:  return "REGISTER";
         case SIP_REQUEST_SUBSCRIBE: return "SUBSCRIBE";
         case SIP_RESPONSE:          return SIP_VERSION;
         default:                    return "";

@@ -687,6 +687,12 @@ bool SIP_Header_Allow::parse(std::string &sip_msg)
 
 bool SIP_Header_Allow::encode(std::string &sip_msg)
 {
+    if (_method.empty())
+    {
+        // Allow header can be empty
+        return true;
+    }
+
     sip_msg += _method;
     return true;
 }
