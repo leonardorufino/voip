@@ -51,14 +51,6 @@ public:
     bool parse(std::string &sip_msg);
     bool encode(std::string &sip_msg);
 
-    void set_display_name(std::string display_name) { _display_name = display_name; }
-    std::string get_display_name() { return _display_name; }
-
-    void set_scheme(SIP_Address_Scheme scheme);
-    void set_scheme(std::string scheme) { _scheme = scheme; }
-    SIP_Address_Scheme get_scheme();
-    std::string get_scheme_str() { return _scheme; }
-
     void set_user(std::string user) { _user = user; }
     std::string get_user() { return _user; }
 
@@ -74,14 +66,63 @@ public:
     std::list<std::string> &get_parameters() { return _parameters; }
 
 private:
-    std::string _display_name;
-    std::string _scheme;
     std::string _user;
     std::string _host;
     unsigned short _port;
 
     bool _lr;
     std::list<std::string> _parameters;
+};
+
+//-------------------------------------------
+//-------------------------------------------
+
+class SIP_Absolute_URI
+{
+public:
+    SIP_Absolute_URI() {}
+    SIP_Absolute_URI(const SIP_Absolute_URI &value) { *this = value; }
+    ~SIP_Absolute_URI() {}
+
+    bool parse(std::string &sip_msg);
+    bool encode(std::string &sip_msg);
+
+    void set_address(std::string address) { _address = address; }
+    std::string get_address() { return _address; }
+
+private:
+    std::string _address;
+};
+
+//-------------------------------------------
+
+class SIP_Address
+{
+public:
+    SIP_Address() {}
+    SIP_Address(const SIP_Address &value) { *this = value; }
+    ~SIP_Address() {}
+
+    bool parse(std::string &sip_msg);
+    bool encode(std::string &sip_msg);
+
+    void set_display_name(std::string display_name) { _display_name = display_name; }
+    std::string get_display_name() { return _display_name; }
+
+    void set_scheme(SIP_Address_Scheme scheme);
+    void set_scheme(std::string scheme) { _scheme = scheme; }
+    SIP_Address_Scheme get_scheme();
+    std::string get_scheme_str() { return _scheme; }
+
+    SIP_URI &get_sip_uri() { return _sip_uri; }
+    SIP_Absolute_URI &get_absolute_uri() { return _absolute_uri; }
+
+private:
+    std::string _display_name;
+    std::string _scheme;
+
+    SIP_URI _sip_uri;
+    SIP_Absolute_URI _absolute_uri;
 };
 
 //-------------------------------------------
@@ -309,17 +350,21 @@ public:
     void set_star(bool star) { _star = star; }
     bool is_star() { return _star; }
 
-    SIP_URI &get_address() { return _address; }
+    SIP_Address &get_address() { return _address; }
+
+    void set_expires(unsigned int expires) { _expires = expires; }
+    unsigned int get_expires() { return _expires; }
+
+    void set_q(std::string q) { _q = q; }
+    std::string get_q() { return _q; }
 
     std::list<std::string> &get_parameters() { return _parameters; }
 
 private:
     bool _star;
-    SIP_URI _address;
-
+    SIP_Address _address;
     unsigned int _expires;
     std::string _q;
-
     std::list<std::string> _parameters;
 };
 
@@ -606,7 +651,7 @@ public:
     bool parse(std::string &sip_msg);
     bool encode(std::string &sip_msg);
 
-    SIP_URI &get_address() { return _address; }
+    SIP_Address &get_address() { return _address; }
 
     void set_tag(std::string tag) { _tag = tag; }
     std::string get_tag() { return _tag; }
@@ -614,7 +659,7 @@ public:
     std::list<std::string> &get_parameters() { return _parameters; }
 
 private:
-    SIP_URI _address;
+    SIP_Address _address;
     std::string _tag;
     std::list<std::string> _parameters;
 };
@@ -803,12 +848,12 @@ public:
     bool parse(std::string &sip_msg);
     bool encode(std::string &sip_msg);
 
-    SIP_URI &get_address() { return _address; }
+    SIP_Address &get_address() { return _address; }
 
     std::list<std::string> &get_parameters() { return _parameters; }
 
 private:
-    SIP_URI _address;
+    SIP_Address _address;
     std::list<std::string> _parameters;
 };
 
@@ -849,12 +894,12 @@ public:
     bool parse(std::string &sip_msg);
     bool encode(std::string &sip_msg);
 
-    SIP_URI &get_address() { return _address; }
+    SIP_Address &get_address() { return _address; }
 
     std::list<std::string> &get_parameters() { return _parameters; }
 
 private:
-    SIP_URI _address;
+    SIP_Address _address;
     std::list<std::string> _parameters;
 };
 
@@ -973,7 +1018,7 @@ public:
     bool parse(std::string &sip_msg);
     bool encode(std::string &sip_msg);
 
-    SIP_URI &get_address() { return _address; }
+    SIP_Address &get_address() { return _address; }
 
     void set_tag(std::string tag) { _tag = tag; }
     std::string get_tag() { return _tag; }
@@ -981,7 +1026,7 @@ public:
     std::list<std::string> &get_parameters() { return _parameters; }
 
 private:
-    SIP_URI _address;
+    SIP_Address _address;
     std::string _tag;
     std::list<std::string> _parameters;
 };

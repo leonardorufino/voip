@@ -179,28 +179,10 @@ bool SIP_Header::encode_headers(std::string &sip_msg, std::map<SIP_Header_Type, 
 
 bool SIP_URI::parse(std::string &sip_msg)
 {
-    std::string display_name;
-    std::string uri;
-    if (SIP_Functions::match(sip_msg, "<", display_name, true))
-    {
-        SIP_Functions::trim(display_name);
-        _display_name = display_name;
-
-        if (!SIP_Functions::match(sip_msg, ">", uri, true))
-            return false;
-    }else
-        uri = sip_msg;
-
-    SIP_Functions::trim(uri);
-
-    std::string scheme;
-    if (!SIP_Functions::match(uri, ":", scheme))
-        return false;
-
-    _scheme = scheme;
+    SIP_Functions::trim(sip_msg);
 
     std::string user_host;
-    bool has_parameter = SIP_Functions::match(uri, ";", user_host);
+    bool has_parameter = SIP_Functions::match(sip_msg, ";", user_host);
     SIP_Functions::trim(user_host);
 
     std::string user;
@@ -231,7 +213,7 @@ bool SIP_URI::parse(std::string &sip_msg)
     while (has_parameter)
     {
         std::string param;
-        has_parameter = SIP_Functions::match(uri, ";", param);
+        has_parameter = SIP_Functions::match(sip_msg, ";", param);
         SIP_Functions::trim(param);
 
         if (param == "lr")
@@ -247,18 +229,8 @@ bool SIP_URI::parse(std::string &sip_msg)
 
 bool SIP_URI::encode(std::string &sip_msg)
 {
-    if (_scheme.empty())
+    if (_host.empty())
         return false;
-
-    if (!_display_name.empty())
-    {
-        sip_msg += _display_name;
-        sip_msg += " ";
-    }
-
-    sip_msg += "<";
-    sip_msg += _scheme;
-    sip_msg += ":";
 
     if (!_user.empty())
     {
@@ -266,8 +238,7 @@ bool SIP_URI::encode(std::string &sip_msg)
         sip_msg += "@";
     }
 
-    if (!_host.empty())
-        sip_msg += _host;
+    sip_msg += _host;
 
     if (_port != INVALID_PORT)
     {
@@ -285,13 +256,126 @@ bool SIP_URI::encode(std::string &sip_msg)
         sip_msg += *it++;
     }
 
+    return true;
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+bool SIP_Absolute_URI::parse(std::string &sip_msg)
+{
+    SIP_Functions::trim(sip_msg);
+    if (sip_msg.empty())
+        return false;
+
+    _address = sip_msg;
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Absolute_URI::encode(std::string &sip_msg)
+{
+    if (_address.empty())
+        return false;
+
+    sip_msg += _address;
+    return true;
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+bool SIP_Address::parse(std::string &sip_msg)
+{
+    std::string display_name;
+    std::string uri;
+
+    if (SIP_Functions::match(sip_msg, "<", display_name, true))
+    {
+        SIP_Functions::trim(display_name);
+        _display_name = display_name;
+
+        if (!SIP_Functions::match(sip_msg, ">", uri, true))
+            return false;
+    }else
+        uri = sip_msg;
+
+    SIP_Functions::trim(uri);
+
+    std::string scheme;
+    if (!SIP_Functions::match(uri, ":", scheme))
+        return false;
+
+    SIP_Functions::trim(scheme);
+    if (scheme.empty())
+        return false;
+
+    _scheme = scheme;
+
+    switch (get_scheme())
+    {
+        case SIP_ADDRESS_SCHEME_SIP:
+        case SIP_ADDRESS_SCHEME_SIPS:
+        {
+            if (!_sip_uri.parse(uri))
+                return false;
+            break;
+        }
+
+        default:
+        {
+            if (!_absolute_uri.parse(uri))
+                return false;
+            break;
+        }
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Address::encode(std::string &sip_msg)
+{
+    if (_scheme.empty())
+        return false;
+
+    if (!_display_name.empty())
+    {
+        sip_msg += _display_name;
+        sip_msg += " ";
+    }
+
+    sip_msg += "<";
+    sip_msg += _scheme;
+    sip_msg += ":";
+
+    switch (get_scheme())
+    {
+        case SIP_ADDRESS_SCHEME_SIP:
+        case SIP_ADDRESS_SCHEME_SIPS:
+        {
+            if (!_sip_uri.encode(sip_msg))
+                return false;
+            break;
+        }
+
+        default:
+        {
+            if (!_absolute_uri.encode(sip_msg))
+                return false;
+            break;
+        }
+    }
+
     sip_msg += ">";
     return true;
 }
 
 //-------------------------------------------
 
-void SIP_URI::set_scheme(SIP_Address_Scheme scheme)
+void SIP_Address::set_scheme(SIP_Address_Scheme scheme)
 {
     switch (scheme)
     {
@@ -303,7 +387,7 @@ void SIP_URI::set_scheme(SIP_Address_Scheme scheme)
 
 //-------------------------------------------
 
-SIP_Address_Scheme SIP_URI::get_scheme()
+SIP_Address_Scheme SIP_Address::get_scheme()
 {
     if (_scheme == "sip")
         return SIP_ADDRESS_SCHEME_SIP;
@@ -761,7 +845,7 @@ bool SIP_Header_Contact::parse(std::string &sip_msg)
 {
     SIP_Functions::trim(sip_msg);
 
-    // Contact can be just a star (*)
+    // Contact can be an asterisk
     if (sip_msg == "*")
     {
         _star = true;
