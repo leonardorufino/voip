@@ -459,24 +459,25 @@ SIP_Media_Subtype SIP_Media_Range::get_subtype()
 
 bool SIP_Event_Type::parse(std::string &sip_msg)
 {
-    bool matched = SIP_Functions::match(sip_msg, ".", _package);
-    SIP_Functions::trim(_package);
-    if (_package.empty())
+    std::string result;
+
+    bool matched = SIP_Functions::match(sip_msg, ".", result);
+    SIP_Functions::trim(result);
+
+    if (result.empty())
         return false;
 
-    if (matched)
-    {
-        bool matched2;
-        do
-        {
-            std::string event_template;
-            matched2 = SIP_Functions::match(sip_msg, ".", event_template);
-            SIP_Functions::trim(event_template);
-            if (event_template.empty())
-                return false;
+    _package = result;
 
-            _templates.push_back(event_template);
-        }while (matched2);
+    while (matched)
+    {
+        matched = SIP_Functions::match(sip_msg, ".", result);
+        SIP_Functions::trim(result);
+
+        if (result.empty())
+            return false;
+
+        _templates.push_back(result);
     }
 
     return true;
