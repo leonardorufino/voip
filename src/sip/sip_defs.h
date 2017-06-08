@@ -93,6 +93,13 @@ enum SIP_Address_Scheme
     SIP_ADDRESS_SCHEME_INVALID,
 };
 
+enum SIP_User_Param
+{
+    SIP_USER_PARAM_PHONE,
+    SIP_USER_PARAM_IP,
+    SIP_USER_PARAM_INVALID,
+};
+
 enum SIP_Body_Type
 {
     SIP_BODY_APPLICATION_SDP,
@@ -190,6 +197,11 @@ enum SIP_Transaction_Type
 enum SIP_Transport_Type
 {
     SIP_TRANSPORT_UDP,
+    SIP_TRANSPORT_TCP,
+    SIP_TRANSPORT_TLS,
+    SIP_TRANSPORT_WS,
+    SIP_TRANSPORT_WSS,
+    SIP_TRANSPORT_SCTP,
     SIP_TRANSPORT_TYPE_INVALID
 };
 

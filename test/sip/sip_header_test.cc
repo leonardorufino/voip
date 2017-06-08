@@ -354,14 +354,17 @@ SIP_Header_Contact_Test::SIP_Header_Contact_Test()
     SIP_Header_Input_Output hdr2(SIP_HEADER_CONTACT, "Contact: sips:my-domain.org:5060;parameter1;parameter2;expires=60;parameter3;q=1.0", "Contact: <sips:my-domain.org:5060>;expires=60;q=1.0;parameter1;parameter2;parameter3\r\n", 1);
     _header_input_output.push_back(hdr2);
 
-    SIP_Header_Input_Output hdr3(SIP_HEADER_CONTACT, "Contact:   Display name here <sip:my-domain.org;par;lr>;parameter1  ;q=0.5;  parameter2,tel:+123456789;par", "Contact: Display name here <sip:my-domain.org;lr;par>;q=0.5;parameter1;parameter2\r\nContact: <tel:+123456789>;par\r\n", 2);
+    SIP_Header_Input_Output hdr3(SIP_HEADER_CONTACT, "Contact:   Display name here <sip:my-domain.org;par;lr;ttl=160>;parameter1  ;q=0.5;  parameter2,tel:+123456789;par", "Contact: Display name here <sip:my-domain.org;ttl=160;lr;par>;q=0.5;parameter1;parameter2\r\nContact: <tel:+123456789>;par\r\n", 2);
     _header_input_output.push_back(hdr3);
 
-    SIP_Header_Input_Output hdr4(SIP_HEADER_CONTACT, "Contact: \"Mr. Watson\" <sip:watson@worcester.bell-telephone.com;lr;par1> ;q=0.7 ;expires=3600, \"Mr. Watson\" <mailto:watson@bell-telephone.com> ;q=0.1", "Contact: \"Mr. Watson\" <sip:watson@worcester.bell-telephone.com;lr;par1>;expires=3600;q=0.7\r\nContact: \"Mr. Watson\" <mailto:watson@bell-telephone.com>;q=0.1\r\n", 2);
+    SIP_Header_Input_Output hdr4(SIP_HEADER_CONTACT, "Contact: \"Mr. Watson\" <sip:watson@worcester.bell-telephone.com;lr;par1? header=hdr1 > ;q=0.7 ;expires=3600, \"Mr. Watson\" <mailto:watson@bell-telephone.com> ;q=0.1", "Contact: \"Mr. Watson\" <sip:watson@worcester.bell-telephone.com;lr;par1?header=hdr1>;expires=3600;q=0.7\r\nContact: \"Mr. Watson\" <mailto:watson@bell-telephone.com>;q=0.1\r\n", 2);
     _header_input_output.push_back(hdr4);
 
     SIP_Header_Input_Output hdr5(SIP_HEADER_CONTACT, "m: *", "Contact: *\r\n", 1);
     _header_input_output.push_back(hdr5);
+
+    SIP_Header_Input_Output hdr6(SIP_HEADER_CONTACT, "Contact: sip:123456789:password@my-domain.org", "Contact: <sip:123456789:password@my-domain.org>\r\n", 1);
+    _header_input_output.push_back(hdr6);
 }
 
 //-------------------------------------------
@@ -513,8 +516,11 @@ SIP_Header_From_Test::SIP_Header_From_Test()
     SIP_Header_Input_Output hdr2(SIP_HEADER_FROM, "f: Anonymous <sip:c8oqz84zk7z@privacy.org>", "From: Anonymous <sip:c8oqz84zk7z@privacy.org>\r\n", 1);
     _header_input_output.push_back(hdr2);
 
-    SIP_Header_Input_Output hdr3(SIP_HEADER_FROM, "From:  \"Nikola Tesla\"   <sip:n.tesla@high-voltage.org;par1  ; par2  ;par3>;parameter1;tag=76341 ", "From: \"Nikola Tesla\" <sip:n.tesla@high-voltage.org;par1;par2;par3>;tag=76341;parameter1\r\n", 1);
+    SIP_Header_Input_Output hdr3(SIP_HEADER_FROM, "From:  \"Nikola Tesla\"   <sip:n.tesla@high-voltage.org;par1 ;transport=tcp ; par2  ;par3>;parameter1;tag=76341 ", "From: \"Nikola Tesla\" <sip:n.tesla@high-voltage.org;transport=tcp;par1;par2;par3>;tag=76341;parameter1\r\n", 1);
     _header_input_output.push_back(hdr3);
+
+    SIP_Header_Input_Output hdr4(SIP_HEADER_FROM, "f: Anonymous <sip: c8oqz84zk7z:pass123@privacy.org;method=INVITE ? header=hdr1 & name=value&name2=value2>", "From: Anonymous <sip:c8oqz84zk7z:pass123@privacy.org;method=INVITE?header=hdr1&name=value&name2=value2>\r\n", 1);
+    _header_input_output.push_back(hdr4);
 }
 
 //-------------------------------------------
@@ -633,10 +639,10 @@ SIP_Header_Record_Route_Test::SIP_Header_Record_Route_Test()
     SIP_Header_Input_Output hdr1(SIP_HEADER_RECORD_ROUTE, "Record-Route: <sip:server10.biloxi.com;lr>, <sip:bigbox3.site3.atlanta.com;lr>", "Record-Route: <sip:server10.biloxi.com;lr>\r\nRecord-Route: <sip:bigbox3.site3.atlanta.com;lr>\r\n", 2);
     _header_input_output.push_back(hdr1);
 
-    SIP_Header_Input_Output hdr2(SIP_HEADER_RECORD_ROUTE, "Record-Route:   <sip:user@server10.biloxi.com;par1>;parameter1, <sip:bigbox3.site3.atlanta.com;par1;lr;par2>", "Record-Route: <sip:user@server10.biloxi.com;par1>;parameter1\r\nRecord-Route: <sip:bigbox3.site3.atlanta.com;lr;par1;par2>\r\n", 2);
+    SIP_Header_Input_Output hdr2(SIP_HEADER_RECORD_ROUTE, "Record-Route:   <sip:user@server10.biloxi.com;par1;user= phone >;parameter1, <sip:bigbox3.site3.atlanta.com;par1;lr;par2>", "Record-Route: <sip:user@server10.biloxi.com;user=phone;par1>;parameter1\r\nRecord-Route: <sip:bigbox3.site3.atlanta.com;lr;par1;par2>\r\n", 2);
     _header_input_output.push_back(hdr2);
 
-    SIP_Header_Input_Output hdr3(SIP_HEADER_RECORD_ROUTE, "Record-Route: <sip:n.tesla@high-voltage.org;par1  ; par2  ;par3> ;  parameter1;parameter2 , <sip:c8oqz84zk7z@privacy.org> ; parameter1", "Record-Route: <sip:n.tesla@high-voltage.org;par1;par2;par3>;parameter1;parameter2\r\nRecord-Route: <sip:c8oqz84zk7z@privacy.org>;parameter1\r\n", 2);
+    SIP_Header_Input_Output hdr3(SIP_HEADER_RECORD_ROUTE, "Record-Route: <sip:n.tesla@high-voltage.org;par1 ; maddr= 10.0.0.10 ; par2  ;par3> ;  parameter1;parameter2 , <sip:c8oqz84zk7z@privacy.org> ; parameter1", "Record-Route: <sip:n.tesla@high-voltage.org;maddr=10.0.0.10;par1;par2;par3>;parameter1;parameter2\r\nRecord-Route: <sip:c8oqz84zk7z@privacy.org>;parameter1\r\n", 2);
     _header_input_output.push_back(hdr3);
 }
 
@@ -666,13 +672,13 @@ SIP_Header_Route_Test::SIP_Header_Route_Test()
     SIP_Header_Input_Output hdr2(SIP_HEADER_ROUTE, "Route: <sip:server13.atlanta.com;lr>", "Route: <sip:server13.atlanta.com;lr>\r\n", 1);
     _header_input_output.push_back(hdr2);
 
-    SIP_Header_Input_Output hdr3(SIP_HEADER_ROUTE, "Route:   <sip:server1.atlanta.com ; transport=udp ; user=phone  ;  lr > ", "Route: <sip:server1.atlanta.com;lr;transport=udp;user=phone>\r\n", 1);
+    SIP_Header_Input_Output hdr3(SIP_HEADER_ROUTE, "Route:   <sip:server1.atlanta.com ; transport=udp ; user=phone  ;  lr > ", "Route: <sip:server1.atlanta.com;transport=udp;user=phone;lr>\r\n", 1);
     _header_input_output.push_back(hdr3);
 
     SIP_Header_Input_Output hdr4(SIP_HEADER_ROUTE, "Route: <sip:server2.atlanta.com;transport=udp;user=phone>;lr", "Route: <sip:server2.atlanta.com;transport=udp;user=phone>;lr\r\n", 1);
     _header_input_output.push_back(hdr4);
 
-    SIP_Header_Input_Output hdr5(SIP_HEADER_ROUTE, "Route: <sip:server3.atlanta.com ; transport=udp;lr> ; teste ; lr ", "Route: <sip:server3.atlanta.com;lr;transport=udp>;teste;lr\r\n", 1);
+    SIP_Header_Input_Output hdr5(SIP_HEADER_ROUTE, "Route: <sip:server3.atlanta.com ; transport=udp;lr?header=hdr1& name=value > ; teste ; lr ", "Route: <sip:server3.atlanta.com;transport=udp;lr?header=hdr1&name=value>;teste;lr\r\n", 1);
     _header_input_output.push_back(hdr5);
 }
 
@@ -755,6 +761,9 @@ SIP_Header_To_Test::SIP_Header_To_Test()
 
     SIP_Header_Input_Output hdr3(SIP_HEADER_TO, "To: \"Name\" <sip:+12125551212@server.phone2net.com ;par1 ;par2> ; tag=287447;parameter1 ", "To: \"Name\" <sip:+12125551212@server.phone2net.com;par1;par2>;tag=287447;parameter1\r\n", 1);
     _header_input_output.push_back(hdr3);
+
+    SIP_Header_Input_Output hdr4(SIP_HEADER_TO, "To: <sip:server.phone2net.com ;par1 ; lr ; maddr= 10.10.10.10 ;ttl=20; method= BYE; user=ip;transport= udp ;par2> ; tag=287447;parameter1 ", "To: <sip:server.phone2net.com;transport=udp;user=ip;method=BYE;ttl=20;maddr=10.10.10.10;lr;par1;par2>;tag=287447;parameter1\r\n", 1);
+    _header_input_output.push_back(hdr4);
 }
 
 //-------------------------------------------

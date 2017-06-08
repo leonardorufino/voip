@@ -17,6 +17,16 @@ SIP_Transport_Type SIP_Functions::get_transport_type(std::string transport)
 {
     if (transport == "UDP")
         return SIP_TRANSPORT_UDP;
+    else if (transport == "TCP")
+        return SIP_TRANSPORT_TCP;
+    else if (transport == "TLS")
+        return SIP_TRANSPORT_TLS;
+    else if (transport == "WS")
+        return SIP_TRANSPORT_WS;
+    else if (transport == "WSS")
+        return SIP_TRANSPORT_WSS;
+    else if (transport == "SCTP")
+        return SIP_TRANSPORT_SCTP;
 
     return SIP_TRANSPORT_TYPE_INVALID;
 }
@@ -27,8 +37,13 @@ std::string SIP_Functions::get_transport_type(SIP_Transport_Type transport)
 {
     switch (transport)
     {
-        case SIP_TRANSPORT_UDP: return "UDP";
-        default:                return "";
+        case SIP_TRANSPORT_UDP:     return "UDP";
+        case SIP_TRANSPORT_TCP:     return "TCP";
+        case SIP_TRANSPORT_TLS:     return "TLS";
+        case SIP_TRANSPORT_WS:      return "WS";
+        case SIP_TRANSPORT_WSS:     return "WSS";
+        case SIP_TRANSPORT_SCTP:    return "SCTP";
+        default:                    return "";
     }
 }
 

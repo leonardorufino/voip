@@ -22,9 +22,30 @@ bool SIP_URI::parse(std::string &sip_msg)
     bool has_parameter = SIP_Functions::match(sip_msg, ";", user_host);
     SIP_Functions::trim(user_host);
 
-    std::string user;
-    if (SIP_Functions::match(user_host, "@", user))
-        _user = user;
+    std::string parameters;
+    bool has_headers = SIP_Functions::match(sip_msg, "?", parameters);
+
+    std::string user_password;
+    if (SIP_Functions::match(user_host, "@", user_password))
+    {
+        SIP_Functions::trim(user_password);
+        if (user_password.empty())
+            return false;
+
+        std::string user;
+        if (SIP_Functions::match(user_password, ":", user))
+        {
+            SIP_Functions::trim(user);
+            if (user.empty())
+                return false;
+
+            SIP_Functions::trim(user_password);
+
+            _user = user;
+            _password = user_password;
+        }else
+            _user = user_password;
+    }
 
     std::string host;
     if (SIP_Functions::match(user_host, ":", host))
@@ -40,7 +61,7 @@ bool SIP_URI::parse(std::string &sip_msg)
     }else
     {
         SIP_Functions::trim(user_host);
-        if (host.empty())
+        if (user_host.empty())
             return false;
 
         _host = user_host;
@@ -50,13 +71,58 @@ bool SIP_URI::parse(std::string &sip_msg)
     while (has_parameter)
     {
         std::string param;
-        has_parameter = SIP_Functions::match(sip_msg, ";", param);
+        has_parameter = SIP_Functions::match(parameters, ";", param);
         SIP_Functions::trim(param);
 
-        if (param == "lr")
+        if (SIP_Functions::start_with(param, "transport="))
+        {
+            _transport = param.substr(10);
+            SIP_Functions::trim(_transport);
+            if (_transport.empty())
+                return false;
+
+        }else if (SIP_Functions::start_with(param, "user="))
+        {
+            _user_param = param.substr(5);
+            SIP_Functions::trim(_user_param);
+            if (_user_param.empty())
+                return false;
+
+        }else if (SIP_Functions::start_with(param, "method="))
+        {
+            _method = param.substr(7);
+            SIP_Functions::trim(_method);
+            if (_method.empty())
+                return false;
+
+        }else if (SIP_Functions::start_with(param, "ttl="))
+        {
+            std::string ttl = param.substr(4);
+            SIP_Functions::trim(ttl);
+            if (ttl.empty())
+                return false;
+
+            _ttl = (unsigned short) atol(ttl.c_str());
+
+        }else if (SIP_Functions::start_with(param, "maddr="))
+        {
+            _maddr = param.substr(6);
+            SIP_Functions::trim(_maddr);
+            if (_maddr.empty())
+                return false;
+
+        }else if (param == "lr")
             _lr = true;
         else
             _parameters.push_back(param);
+    }
+
+    while (has_headers)
+    {
+        std::string header;
+        has_headers = SIP_Functions::match(sip_msg, "&", header);
+        SIP_Functions::trim(header);
+        _headers.push_back(header);
     }
 
     return true;
@@ -72,6 +138,13 @@ bool SIP_URI::encode(std::string &sip_msg)
     if (!_user.empty())
     {
         sip_msg += _user;
+
+        if (!_password.empty())
+        {
+            sip_msg += ":";
+            sip_msg += _password;
+        }
+
         sip_msg += "@";
     }
 
@@ -83,17 +156,110 @@ bool SIP_URI::encode(std::string &sip_msg)
         sip_msg += std::to_string(_port);
     }
 
+    if (!_transport.empty())
+    {
+        sip_msg += ";transport=";
+        sip_msg += _transport;
+    }
+
+    if (!_user_param.empty())
+    {
+        sip_msg += ";user=";
+        sip_msg += _user_param;
+    }
+
+    if (!_method.empty())
+    {
+        sip_msg += ";method=";
+        sip_msg += _method;
+    }
+
+    if (_ttl != INVALID_TTL)
+    {
+        sip_msg += ";ttl=";
+        sip_msg += std::to_string(_ttl);
+    }
+
+    if (!_maddr.empty())
+    {
+        sip_msg += ";maddr=";
+        sip_msg += _maddr;
+    }
+
     if (_lr)
         sip_msg += ";lr";
 
-    std::list<std::string>::iterator it = _parameters.begin();
-    while (it != _parameters.end())
+    std::list<std::string>::iterator it_params = _parameters.begin();
+    while (it_params != _parameters.end())
     {
         sip_msg += ";";
-        sip_msg += *it++;
+        sip_msg += *it_params++;
+    }
+
+    std::list<std::string>::iterator it_headers = _headers.begin();
+    while (it_headers != _headers.end())
+    {
+        if (it_headers == _headers.begin())
+            sip_msg += "?";
+        else
+            sip_msg += "&";
+
+        sip_msg += *it_headers++;
     }
 
     return true;
+}
+
+//-------------------------------------------
+
+void SIP_URI::set_transport(SIP_Transport_Type transport)
+{
+    _transport = SIP_Functions::get_transport_type(transport);
+}
+
+//-------------------------------------------
+
+SIP_Transport_Type SIP_URI::get_transport()
+{
+    return SIP_Functions::get_transport_type(_transport);
+}
+
+//-------------------------------------------
+
+void SIP_URI::set_user_param(SIP_User_Param user_param)
+{
+    switch (user_param)
+    {
+        case SIP_USER_PARAM_PHONE:  _user_param = "phone";  break;
+        case SIP_USER_PARAM_IP:     _user_param = "ip";     break;
+        default:                                            break;
+    }
+}
+
+//-------------------------------------------
+
+SIP_User_Param SIP_URI::get_user_param()
+{
+    if (_user_param == "phone")
+        return SIP_USER_PARAM_PHONE;
+    else if (_user_param == "ip")
+        return SIP_USER_PARAM_IP;
+
+    return SIP_USER_PARAM_INVALID;
+}
+
+//-------------------------------------------
+
+void SIP_URI::set_method(SIP_Method_Type method)
+{
+    _method = SIP_Functions::get_method_type(method);
+}
+
+//-------------------------------------------
+
+SIP_Method_Type SIP_URI::get_method()
+{
+    return SIP_Functions::get_method_type(_method);
 }
 
 //-------------------------------------------

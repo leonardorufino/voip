@@ -18,9 +18,10 @@ class SIP_URI
 {
 public:
     static const unsigned short INVALID_PORT = 0xFFFF;
+    static const unsigned short INVALID_TTL = 0xFFFF;
 
 public:
-    SIP_URI() : _port(INVALID_PORT), _lr(false) {}
+    SIP_URI() : _port(INVALID_PORT), _ttl(INVALID_TTL), _lr(false) {}
     SIP_URI(const SIP_URI &value) { *this = value; }
     ~SIP_URI() {}
 
@@ -30,24 +31,57 @@ public:
     void set_user(std::string user) { _user = user; }
     std::string get_user() { return _user; }
 
+    void set_password(std::string password) { _password = password; }
+    std::string get_password() { return _password; }
+
     void set_host(std::string host) { _host = host; }
     std::string get_host() { return _host; }
 
     void set_port(unsigned short port) { _port = port; }
     unsigned short get_port() { return _port; }
 
+    void set_transport(SIP_Transport_Type transport);
+    void set_transport(std::string transport) { _transport = transport; }
+    SIP_Transport_Type get_transport();
+    std::string get_transport_str() { return _transport; }
+
+    void set_user_param(SIP_User_Param user_param);
+    void set_user_param(std::string user_param) { _user_param = user_param; }
+    SIP_User_Param get_user_param();
+    std::string get_user_param_str() { return _user_param; }
+
+    void set_method(SIP_Method_Type method);
+    void set_method(std::string method) { _method = method; }
+    SIP_Method_Type get_method();
+    std::string get_method_str() { return _method; }
+
+    void set_ttl(unsigned short ttl) { _ttl = ttl; }
+    unsigned short get_ttl() { return _ttl; }
+
+    void set_maddr(std::string maddr) { _maddr = maddr; }
+    std::string get_maddr() { return _maddr; }
+
     void set_lr(bool lr) { _lr = lr; }
     bool is_lr() { return _lr; }
 
     std::list<std::string> &get_parameters() { return _parameters; }
 
+    std::list<std::string> &get_headers() { return _headers; }
+
 private:
     std::string _user;
+    std::string _password;
     std::string _host;
     unsigned short _port;
 
+    std::string _transport;
+    std::string _user_param;
+    std::string _method;
+    unsigned short _ttl;
+    std::string _maddr;
     bool _lr;
     std::list<std::string> _parameters;
+    std::list<std::string> _headers;
 };
 
 //-------------------------------------------
