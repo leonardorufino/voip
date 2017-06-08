@@ -29,6 +29,10 @@ bool SIP_Header_Test::init()
     if (!header_accept_language.run())
         return false;
 
+    SIP_Header_Alert_Info_Test header_alert_info;
+    if (!header_alert_info.run())
+        return false;
+
     SIP_Header_Allow_Test header_allow;
     if (!header_allow.run())
         return false;
@@ -293,6 +297,21 @@ SIP_Header_Accept_Language_Test::SIP_Header_Accept_Language_Test()
 
     SIP_Header_Input_Output hdr4(SIP_HEADER_ACCEPT_LANGUAGE, "Accept-Language: en-us, en-gb; par1 = test ; q=0.8;par2", "Accept-Language: en-us, en-gb;q=0.8;par1 = test;par2\r\n", 2);
     _header_input_output.push_back(hdr4);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+SIP_Header_Alert_Info_Test::SIP_Header_Alert_Info_Test()
+{
+    SIP_Header_Input_Output hdr1(SIP_HEADER_ALERT_INFO, "Alert-Info: <http://www.example.com/sounds/moo.wav>", "Alert-Info: <http://www.example.com/sounds/moo.wav>\r\n", 1);
+    _header_input_output.push_back(hdr1);
+
+    SIP_Header_Input_Output hdr2(SIP_HEADER_ALERT_INFO, "Alert-Info: <mailto:user@host.com;par1; par2 ;par3>;param1 ; param2 ;param3 ", "Alert-Info: <mailto:user@host.com;par1; par2 ;par3>;param1;param2;param3\r\n", 1);
+    _header_input_output.push_back(hdr2);
+
+    SIP_Header_Input_Output hdr3(SIP_HEADER_ALERT_INFO, "Alert-Info: <sips:user@host.com;par1> ; param1 ; param2 ;param3, <abc:user;par1> ; param2", "Alert-Info: <sips:user@host.com;par1>;param1;param2;param3, <abc:user;par1>;param2\r\n", 2);
+    _header_input_output.push_back(hdr3);
 }
 
 //-------------------------------------------

@@ -23,6 +23,7 @@ SIP_Header *SIP_Header::create_header(SIP_Header_Type header_type, const SIP_Hea
         case SIP_HEADER_ACCEPT:              header = (!copy) ? new SIP_Header_Accept()              : new SIP_Header_Accept(*((SIP_Header_Accept *) copy));                            break;
         case SIP_HEADER_ACCEPT_ENCODING:     header = (!copy) ? new SIP_Header_Accept_Encoding()     : new SIP_Header_Accept_Encoding(*((SIP_Header_Accept_Encoding *) copy));          break;
         case SIP_HEADER_ACCEPT_LANGUAGE:     header = (!copy) ? new SIP_Header_Accept_Language()     : new SIP_Header_Accept_Language(*((SIP_Header_Accept_Language *) copy));          break;
+        case SIP_HEADER_ALERT_INFO:          header = (!copy) ? new SIP_Header_Alert_Info()          : new SIP_Header_Alert_Info(*((SIP_Header_Alert_Info *) copy));                    break;
         case SIP_HEADER_ALLOW:               header = (!copy) ? new SIP_Header_Allow()               : new SIP_Header_Allow(*((SIP_Header_Allow *) copy));                              break;
         case SIP_HEADER_ALLOW_EVENTS:        header = (!copy) ? new SIP_Header_Allow_Events()        : new SIP_Header_Allow_Events(*((SIP_Header_Allow_Events *) copy));                break;
         case SIP_HEADER_CALLID:              header = (!copy) ? new SIP_Header_Call_ID()             : new SIP_Header_Call_ID(*((SIP_Header_Call_ID *) copy));                          break;
@@ -90,11 +91,11 @@ bool SIP_Header::decode_headers(std::string &sip_msg, std::map<SIP_Header_Type, 
     {
         // Can have multiple of these headers
         if ((header_type == SIP_HEADER_ACCEPT) || (header_type == SIP_HEADER_ACCEPT_ENCODING) || (header_type == SIP_HEADER_ACCEPT_LANGUAGE) ||
-            (header_type == SIP_HEADER_ALLOW) || (header_type == SIP_HEADER_ALLOW_EVENTS) || (header_type == SIP_HEADER_CONTACT) ||
-            (header_type == SIP_HEADER_CONTENT_ENCODING) || (header_type == SIP_HEADER_CONTENT_LANGUAGE) || (header_type == SIP_HEADER_IN_REPLY_TO) ||
-            (header_type == SIP_HEADER_PROXY_REQUIRE) || (header_type == SIP_HEADER_RECORD_ROUTE) || (header_type == SIP_HEADER_REQUIRE) ||
-            (header_type == SIP_HEADER_ROUTE) || (header_type == SIP_HEADER_SUPPORTED) || (header_type == SIP_HEADER_UNSUPPORTED) ||
-            (header_type == SIP_HEADER_VIA) || (header_type == SIP_HEADER_WARNING))
+            (header_type == SIP_HEADER_ALERT_INFO) || (header_type == SIP_HEADER_ALLOW) || (header_type == SIP_HEADER_ALLOW_EVENTS) ||
+            (header_type == SIP_HEADER_CONTACT) || (header_type == SIP_HEADER_CONTENT_ENCODING) || (header_type == SIP_HEADER_CONTENT_LANGUAGE) ||
+            (header_type == SIP_HEADER_IN_REPLY_TO) || (header_type == SIP_HEADER_PROXY_REQUIRE) || (header_type == SIP_HEADER_RECORD_ROUTE) ||
+            (header_type == SIP_HEADER_REQUIRE) || (header_type == SIP_HEADER_ROUTE) || (header_type == SIP_HEADER_SUPPORTED) ||
+            (header_type == SIP_HEADER_UNSUPPORTED) || (header_type == SIP_HEADER_VIA) || (header_type == SIP_HEADER_WARNING))
             matched = SIP_Functions::match(sip_msg, ",", result);
         else
             result = sip_msg;
@@ -522,6 +523,44 @@ bool SIP_Header_Accept_Language::encode(std::string &sip_msg)
         sip_msg += ";q=";
         sip_msg += _q;
     }
+
+    std::list<std::string>::iterator it = _parameters.begin();
+    while (it != _parameters.end())
+    {
+        sip_msg += ";";
+        sip_msg += *it++;
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+bool SIP_Header_Alert_Info::parse(std::string &sip_msg)
+{
+    std::string result;
+    bool matched = SIP_Functions::match(sip_msg, ";", result);
+
+    if (!_address.parse(result))
+        return false;
+
+    while (matched)
+    {
+        matched = SIP_Functions::match(sip_msg, ";", result);
+        SIP_Functions::trim(result);
+        _parameters.push_back(result);
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Alert_Info::encode(std::string &sip_msg)
+{
+    if (!_address.encode(sip_msg))
+        return false;
 
     std::list<std::string>::iterator it = _parameters.begin();
     while (it != _parameters.end())

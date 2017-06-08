@@ -105,6 +105,8 @@ SIP_Header_Type SIP_Functions::get_header_type(std::string header)
         return SIP_HEADER_ACCEPT_ENCODING;
     else if (header == "Accept-Language")
         return SIP_HEADER_ACCEPT_LANGUAGE;
+    else if (header == "Alert-Info")
+        return SIP_HEADER_ALERT_INFO;
     else if (header == "Allow")
         return SIP_HEADER_ALLOW;
     else if ((header == "Allow-Events") || (header == "u"))
@@ -184,6 +186,7 @@ std::string SIP_Functions::get_header_type(SIP_Header_Type header)
         case SIP_HEADER_ACCEPT:                 return "Accept";
         case SIP_HEADER_ACCEPT_ENCODING:        return "Accept-Encoding";
         case SIP_HEADER_ACCEPT_LANGUAGE:        return "Accept-Language";
+        case SIP_HEADER_ALERT_INFO:             return "Alert-Info";
         case SIP_HEADER_ALLOW:                  return "Allow";
         case SIP_HEADER_ALLOW_EVENTS:           return "Allow-Events";
         case SIP_HEADER_CALLID:                 return "Call-ID";

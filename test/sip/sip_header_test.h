@@ -70,6 +70,14 @@ public:
 
 //-------------------------------------------
 
+class SIP_Header_Alert_Info_Test : public SIP_Header_Test
+{
+public:
+    SIP_Header_Alert_Info_Test();
+};
+
+//-------------------------------------------
+
 class SIP_Header_Allow_Test : public SIP_Header_Test
 {
 public:

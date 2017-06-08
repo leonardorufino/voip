@@ -177,6 +177,30 @@ private:
 
 //-------------------------------------------
 
+class SIP_Header_Alert_Info : public SIP_Header
+{
+public:
+    SIP_Header_Alert_Info() {}
+    SIP_Header_Alert_Info(const SIP_Header_Alert_Info &header) { *this = header; }
+    ~SIP_Header_Alert_Info() {}
+
+    // Virtual pure functions
+    SIP_Header_Type get_header_type() { return SIP_HEADER_ALERT_INFO; }
+    SIP_Header_Separator encode_separator() { return SIP_HEADER_SEPARATOR_COMMA; }
+    bool parse(std::string &sip_msg);
+    bool encode(std::string &sip_msg);
+
+    SIP_Address &get_address() { return _address; }
+
+    std::list<std::string> &get_parameters() { return _parameters; }
+
+private:
+    SIP_Address _address;
+    std::list<std::string> _parameters;
+};
+
+//-------------------------------------------
+
 class SIP_Header_Allow : public SIP_Header
 {
 public:
