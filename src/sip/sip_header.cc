@@ -26,7 +26,7 @@ SIP_Header *SIP_Header::create_header(SIP_Header_Type header_type, const SIP_Hea
         case SIP_HEADER_ALERT_INFO:          header = (!copy) ? new SIP_Header_Alert_Info()          : new SIP_Header_Alert_Info(*((SIP_Header_Alert_Info *) copy));                    break;
         case SIP_HEADER_ALLOW:               header = (!copy) ? new SIP_Header_Allow()               : new SIP_Header_Allow(*((SIP_Header_Allow *) copy));                              break;
         case SIP_HEADER_ALLOW_EVENTS:        header = (!copy) ? new SIP_Header_Allow_Events()        : new SIP_Header_Allow_Events(*((SIP_Header_Allow_Events *) copy));                break;
-        case SIP_HEADER_CALLID:              header = (!copy) ? new SIP_Header_Call_ID()             : new SIP_Header_Call_ID(*((SIP_Header_Call_ID *) copy));                          break;
+        case SIP_HEADER_CALL_ID:             header = (!copy) ? new SIP_Header_Call_ID()             : new SIP_Header_Call_ID(*((SIP_Header_Call_ID *) copy));                          break;
         case SIP_HEADER_CALL_INFO:           header = (!copy) ? new SIP_Header_Call_Info()           : new SIP_Header_Call_Info(*((SIP_Header_Call_Info *) copy));                      break;
         case SIP_HEADER_CONTACT:             header = (!copy) ? new SIP_Header_Contact()             : new SIP_Header_Contact(*((SIP_Header_Contact *) copy));                          break;
         case SIP_HEADER_CONTENT_DISPOSITION: header = (!copy) ? new SIP_Header_Content_Disposition() : new SIP_Header_Content_Disposition(*((SIP_Header_Content_Disposition *) copy));  break;

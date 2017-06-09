@@ -254,7 +254,7 @@ public:
     ~SIP_Header_Call_ID() {}
 
     // Virtual pure functions
-    SIP_Header_Type get_header_type() { return SIP_HEADER_CALLID; }
+    SIP_Header_Type get_header_type() { return SIP_HEADER_CALL_ID; }
     SIP_Header_Separator encode_separator() { return SIP_HEADER_SEPARATOR_NONE; }
     bool parse(std::string &sip_msg);
     bool encode(std::string &sip_msg);

@@ -356,13 +356,13 @@ SIP_Header_Allow_Events_Test::SIP_Header_Allow_Events_Test()
 
 SIP_Header_Call_ID_Test::SIP_Header_Call_ID_Test()
 {
-    SIP_Header_Input_Output hdr1(SIP_HEADER_CALLID, "Call-ID: 123456789@my-domain.org", "Call-ID: 123456789@my-domain.org\r\n", 1);
+    SIP_Header_Input_Output hdr1(SIP_HEADER_CALL_ID, "Call-ID: 123456789@my-domain.org", "Call-ID: 123456789@my-domain.org\r\n", 1);
     _header_input_output.push_back(hdr1);
 
-    SIP_Header_Input_Output hdr2(SIP_HEADER_CALLID, "Call-ID: 123456789", "Call-ID: 123456789\r\n", 1);
+    SIP_Header_Input_Output hdr2(SIP_HEADER_CALL_ID, "Call-ID: 123456789", "Call-ID: 123456789\r\n", 1);
     _header_input_output.push_back(hdr2);
 
-    SIP_Header_Input_Output hdr3(SIP_HEADER_CALLID, "i:my-domain.org ", "Call-ID: my-domain.org\r\n", 1);
+    SIP_Header_Input_Output hdr3(SIP_HEADER_CALL_ID, "i:my-domain.org ", "Call-ID: my-domain.org\r\n", 1);
     _header_input_output.push_back(hdr3);
 }
 
