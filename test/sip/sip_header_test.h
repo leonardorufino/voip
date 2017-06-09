@@ -102,6 +102,14 @@ public:
 
 //-------------------------------------------
 
+class SIP_Header_Call_Info_Test : public SIP_Header_Test
+{
+public:
+    SIP_Header_Call_Info_Test();
+};
+
+//-------------------------------------------
+
 class SIP_Header_Contact_Test : public SIP_Header_Test
 {
 public:

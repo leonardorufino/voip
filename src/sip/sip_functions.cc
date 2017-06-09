@@ -113,6 +113,8 @@ SIP_Header_Type SIP_Functions::get_header_type(std::string header)
         return SIP_HEADER_ALLOW_EVENTS;
     else if ((header == "Call-ID") || (header == "i"))
         return SIP_HEADER_CALLID;
+    else if (header == "Call-Info")
+        return SIP_HEADER_CALL_INFO;
     else if ((header == "Contact") || (header == "m"))
         return SIP_HEADER_CONTACT;
     else if (header == "Content-Disposition")
@@ -190,6 +192,7 @@ std::string SIP_Functions::get_header_type(SIP_Header_Type header)
         case SIP_HEADER_ALLOW:                  return "Allow";
         case SIP_HEADER_ALLOW_EVENTS:           return "Allow-Events";
         case SIP_HEADER_CALLID:                 return "Call-ID";
+        case SIP_HEADER_CALL_INFO:              return "Call-Info";
         case SIP_HEADER_CONTACT:                return "Contact";
         case SIP_HEADER_CONTENT_DISPOSITION:    return "Content-Disposition";
         case SIP_HEADER_CONTENT_ENCODING:       return "Content-Encoding";

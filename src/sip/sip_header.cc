@@ -27,6 +27,7 @@ SIP_Header *SIP_Header::create_header(SIP_Header_Type header_type, const SIP_Hea
         case SIP_HEADER_ALLOW:               header = (!copy) ? new SIP_Header_Allow()               : new SIP_Header_Allow(*((SIP_Header_Allow *) copy));                              break;
         case SIP_HEADER_ALLOW_EVENTS:        header = (!copy) ? new SIP_Header_Allow_Events()        : new SIP_Header_Allow_Events(*((SIP_Header_Allow_Events *) copy));                break;
         case SIP_HEADER_CALLID:              header = (!copy) ? new SIP_Header_Call_ID()             : new SIP_Header_Call_ID(*((SIP_Header_Call_ID *) copy));                          break;
+        case SIP_HEADER_CALL_INFO:           header = (!copy) ? new SIP_Header_Call_Info()           : new SIP_Header_Call_Info(*((SIP_Header_Call_Info *) copy));                      break;
         case SIP_HEADER_CONTACT:             header = (!copy) ? new SIP_Header_Contact()             : new SIP_Header_Contact(*((SIP_Header_Contact *) copy));                          break;
         case SIP_HEADER_CONTENT_DISPOSITION: header = (!copy) ? new SIP_Header_Content_Disposition() : new SIP_Header_Content_Disposition(*((SIP_Header_Content_Disposition *) copy));  break;
         case SIP_HEADER_CONTENT_ENCODING:    header = (!copy) ? new SIP_Header_Content_Encoding()    : new SIP_Header_Content_Encoding(*((SIP_Header_Content_Encoding *) copy));        break;
@@ -92,10 +93,11 @@ bool SIP_Header::decode_headers(std::string &sip_msg, std::map<SIP_Header_Type, 
         // Can have multiple of these headers
         if ((header_type == SIP_HEADER_ACCEPT) || (header_type == SIP_HEADER_ACCEPT_ENCODING) || (header_type == SIP_HEADER_ACCEPT_LANGUAGE) ||
             (header_type == SIP_HEADER_ALERT_INFO) || (header_type == SIP_HEADER_ALLOW) || (header_type == SIP_HEADER_ALLOW_EVENTS) ||
-            (header_type == SIP_HEADER_CONTACT) || (header_type == SIP_HEADER_CONTENT_ENCODING) || (header_type == SIP_HEADER_CONTENT_LANGUAGE) ||
-            (header_type == SIP_HEADER_IN_REPLY_TO) || (header_type == SIP_HEADER_PROXY_REQUIRE) || (header_type == SIP_HEADER_RECORD_ROUTE) ||
-            (header_type == SIP_HEADER_REQUIRE) || (header_type == SIP_HEADER_ROUTE) || (header_type == SIP_HEADER_SUPPORTED) ||
-            (header_type == SIP_HEADER_UNSUPPORTED) || (header_type == SIP_HEADER_VIA) || (header_type == SIP_HEADER_WARNING))
+            (header_type == SIP_HEADER_CALL_INFO) ||(header_type == SIP_HEADER_CONTACT) || (header_type == SIP_HEADER_CONTENT_ENCODING) ||
+            (header_type == SIP_HEADER_CONTENT_LANGUAGE) || (header_type == SIP_HEADER_IN_REPLY_TO) || (header_type == SIP_HEADER_PROXY_REQUIRE) ||
+            (header_type == SIP_HEADER_RECORD_ROUTE) || (header_type == SIP_HEADER_REQUIRE) || (header_type == SIP_HEADER_ROUTE) ||
+            (header_type == SIP_HEADER_SUPPORTED) || (header_type == SIP_HEADER_UNSUPPORTED) || (header_type == SIP_HEADER_VIA) ||
+            (header_type == SIP_HEADER_WARNING))
             matched = SIP_Functions::match(sip_msg, ",", result);
         else
             result = sip_msg;
@@ -652,6 +654,85 @@ bool SIP_Header_Call_ID::encode(std::string &sip_msg)
 
     sip_msg += _call_id;
     return true;
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+bool SIP_Header_Call_Info::parse(std::string &sip_msg)
+{
+    std::string result;
+    bool matched = SIP_Functions::match(sip_msg, ";", result);
+
+    if (!_address.parse(result))
+        return false;
+
+    while (matched)
+    {
+        matched = SIP_Functions::match(sip_msg, ";", result);
+        SIP_Functions::trim(result);
+
+        if (SIP_Functions::start_with(result, "purpose="))
+        {
+            _purpose = result.substr(8);
+            SIP_Functions::trim(_purpose);
+            if (_purpose.empty())
+                return false;
+        }else
+            _parameters.push_back(result);
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Call_Info::encode(std::string &sip_msg)
+{
+    if (!_address.encode(sip_msg))
+        return false;
+
+    if (!_purpose.empty())
+    {
+        sip_msg += ";purpose=";
+        sip_msg += _purpose;
+    }
+
+    std::list<std::string>::iterator it = _parameters.begin();
+    while (it != _parameters.end())
+    {
+        sip_msg += ";";
+        sip_msg += *it++;
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+
+void SIP_Header_Call_Info::set_purpose(SIP_Call_Info_Purpose purpose)
+{
+    switch (purpose)
+    {
+        case SIP_CALL_INFO_PURPOSE_ICON: _purpose = "icon";  break;
+        case SIP_CALL_INFO_PURPOSE_INFO: _purpose = "info";  break;
+        case SIP_CALL_INFO_PURPOSE_CARD: _purpose = "card";  break;
+        default:                                             break;
+    }
+}
+
+//-------------------------------------------
+
+SIP_Call_Info_Purpose SIP_Header_Call_Info::get_purpose()
+{
+    if (_purpose == "icon")
+        return SIP_CALL_INFO_PURPOSE_ICON;
+    else if (_purpose == "info")
+        return SIP_CALL_INFO_PURPOSE_INFO;
+    else if (_purpose == "card")
+        return SIP_CALL_INFO_PURPOSE_CARD;
+
+    return SIP_CALL_INFO_PURPOSE_INVALID;
 }
 
 //-------------------------------------------

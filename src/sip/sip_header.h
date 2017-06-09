@@ -268,6 +268,36 @@ private:
 
 //-------------------------------------------
 
+class SIP_Header_Call_Info : public SIP_Header
+{
+public:
+    SIP_Header_Call_Info() {}
+    SIP_Header_Call_Info(const SIP_Header_Call_Info &header) { *this = header; }
+    ~SIP_Header_Call_Info() {}
+
+    // Virtual pure functions
+    SIP_Header_Type get_header_type() { return SIP_HEADER_CALL_INFO; }
+    SIP_Header_Separator encode_separator() { return SIP_HEADER_SEPARATOR_COMMA; }
+    bool parse(std::string &sip_msg);
+    bool encode(std::string &sip_msg);
+
+    SIP_Address &get_address() { return _address; }
+
+    void set_purpose(SIP_Call_Info_Purpose type);
+    void set_purpose(std::string purpose) { _purpose = purpose; }
+    SIP_Call_Info_Purpose get_purpose();
+    std::string get_purpose_str() { return _purpose; }
+
+    std::list<std::string> &get_parameters() { return _parameters; }
+
+private:
+    SIP_Address _address;
+    std::string _purpose;
+    std::list<std::string> _parameters;
+};
+
+//-------------------------------------------
+
 class SIP_Header_Contact : public SIP_Header
 {
     static const unsigned int INVALID_EXPIRES = 0xFFFFFFFF;

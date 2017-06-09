@@ -45,6 +45,10 @@ bool SIP_Header_Test::init()
     if (!header_call_id.run())
         return false;
 
+    SIP_Header_Call_Info_Test header_call_info;
+    if (!header_call_info.run())
+        return false;
+
     SIP_Header_Contact_Test header_contact;
     if (!header_contact.run())
         return false;
@@ -359,6 +363,21 @@ SIP_Header_Call_ID_Test::SIP_Header_Call_ID_Test()
     _header_input_output.push_back(hdr2);
 
     SIP_Header_Input_Output hdr3(SIP_HEADER_CALLID, "i:my-domain.org ", "Call-ID: my-domain.org\r\n", 1);
+    _header_input_output.push_back(hdr3);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+SIP_Header_Call_Info_Test::SIP_Header_Call_Info_Test()
+{
+    SIP_Header_Input_Output hdr1(SIP_HEADER_CALL_INFO, "Call-Info: <http://wwww.example.com/alice/photo.jpg> ;purpose=icon, <http://www.example.com/alice/> ;purpose=info", "Call-Info: <http://wwww.example.com/alice/photo.jpg>;purpose=icon, <http://www.example.com/alice/>;purpose=info\r\n", 2);
+    _header_input_output.push_back(hdr1);
+
+    SIP_Header_Input_Output hdr2(SIP_HEADER_CALL_INFO, "Call-Info: <mailto:user@host.com;par1; par2 ;par3>;param1 ; param2 ;param3 ", "Call-Info: <mailto:user@host.com;par1; par2 ;par3>;param1;param2;param3\r\n", 1);
+    _header_input_output.push_back(hdr2);
+
+    SIP_Header_Input_Output hdr3(SIP_HEADER_CALL_INFO, "Call-Info: <sips:user@host.com;par1> ; param1 ; purpose= card; param2 ;param3,<abc:user;par1> ; param2", "Call-Info: <sips:user@host.com;par1>;purpose=card;param1;param2;param3, <abc:user;par1>;param2\r\n", 2);
     _header_input_output.push_back(hdr3);
 }
 
