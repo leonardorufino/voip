@@ -157,6 +157,10 @@ bool SIP_Header_Test::init()
     if (!header_supported.run())
         return false;
 
+    SIP_Header_Timestamp_Test header_timestamp;
+    if (!header_timestamp.run())
+        return false;
+
     SIP_Header_To_Test header_to;
     if (!header_to.run())
         return false;
@@ -821,6 +825,24 @@ SIP_Header_Supported_Test::SIP_Header_Supported_Test()
     _header_input_output.push_back(hdr3);
 
     SIP_Header_Input_Output hdr4(SIP_HEADER_SUPPORTED, "k:", "Supported: \r\n", 1);
+    _header_input_output.push_back(hdr4);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+SIP_Header_Timestamp_Test::SIP_Header_Timestamp_Test()
+{
+    SIP_Header_Input_Output hdr1(SIP_HEADER_TIMESTAMP, "Timestamp: 54", "Timestamp: 54\r\n", 1);
+    _header_input_output.push_back(hdr1);
+
+    SIP_Header_Input_Output hdr2(SIP_HEADER_TIMESTAMP, "Timestamp:10.20", "Timestamp: 10.20\r\n", 1);
+    _header_input_output.push_back(hdr2);
+
+    SIP_Header_Input_Output hdr3(SIP_HEADER_TIMESTAMP, "Timestamp: 10.20   7.90  ", "Timestamp: 10.20 7.90\r\n", 1);
+    _header_input_output.push_back(hdr3);
+
+    SIP_Header_Input_Output hdr4(SIP_HEADER_TIMESTAMP, "Timestamp: 99.88\t77.666  ", "Timestamp: 99.88 77.666\r\n", 1);
     _header_input_output.push_back(hdr4);
 }
 

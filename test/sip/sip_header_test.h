@@ -326,6 +326,14 @@ public:
 
 //-------------------------------------------
 
+class SIP_Header_Timestamp_Test : public SIP_Header_Test
+{
+public:
+    SIP_Header_Timestamp_Test();
+};
+
+//-------------------------------------------
+
 class SIP_Header_To_Test : public SIP_Header_Test
 {
 public:

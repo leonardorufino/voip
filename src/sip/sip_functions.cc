@@ -169,6 +169,8 @@ SIP_Header_Type SIP_Functions::get_header_type(std::string header)
         return SIP_HEADER_SUBSCRIPTION_STATE;
     else if ((header == "Supported") || (header == "k"))
         return SIP_HEADER_SUPPORTED;
+    else if (header == "Timestamp")
+        return SIP_HEADER_TIMESTAMP;
     else if ((header == "To") || (header == "t"))
         return SIP_HEADER_TO;
     else if (header == "Unsupported")
@@ -224,6 +226,7 @@ std::string SIP_Functions::get_header_type(SIP_Header_Type header)
         case SIP_HEADER_SUBJECT:                return "Subject";
         case SIP_HEADER_SUBSCRIPTION_STATE:     return "Subscription-State";
         case SIP_HEADER_SUPPORTED:              return "Supported";
+        case SIP_HEADER_TIMESTAMP:              return "Timestamp";
         case SIP_HEADER_TO:                     return "To";
         case SIP_HEADER_UNSUPPORTED:            return "Unsupported";
         case SIP_HEADER_USER_AGENT:             return "User-Agent";

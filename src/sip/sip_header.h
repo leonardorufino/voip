@@ -1019,6 +1019,32 @@ private:
 
 //-------------------------------------------
 
+class SIP_Header_Timestamp : public SIP_Header
+{
+public:
+    SIP_Header_Timestamp() {}
+    SIP_Header_Timestamp(const SIP_Header_Timestamp &header) { *this = header; }
+    ~SIP_Header_Timestamp() {}
+
+    // Virtual pure functions
+    SIP_Header_Type get_header_type() { return SIP_HEADER_TIMESTAMP; }
+    SIP_Header_Separator encode_separator() { return SIP_HEADER_SEPARATOR_NONE; }
+    bool parse(std::string &sip_msg);
+    bool encode(std::string &sip_msg);
+
+    void set_timestamp(std::string timestamp) { _timestamp = timestamp; }
+    std::string get_timestamp() { return _timestamp; }
+
+    void set_delay(std::string delay) { _delay = delay; }
+    std::string get_delay() { return _delay; }
+
+private:
+    std::string _timestamp;
+    std::string _delay;
+};
+
+//-------------------------------------------
+
 class SIP_Header_To : public SIP_Header
 {
 public:

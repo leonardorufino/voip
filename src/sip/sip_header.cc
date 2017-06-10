@@ -55,6 +55,7 @@ SIP_Header *SIP_Header::create_header(SIP_Header_Type header_type, const SIP_Hea
         case SIP_HEADER_SUBJECT:             header = (!copy) ? new SIP_Header_Subject()             : new SIP_Header_Subject(*((SIP_Header_Subject *) copy));                          break;
         case SIP_HEADER_SUBSCRIPTION_STATE:  header = (!copy) ? new SIP_Header_Subscription_State()  : new SIP_Header_Subscription_State(*((SIP_Header_Subscription_State *) copy));    break;
         case SIP_HEADER_SUPPORTED:           header = (!copy) ? new SIP_Header_Supported()           : new SIP_Header_Supported(*((SIP_Header_Supported *) copy));                      break;
+        case SIP_HEADER_TIMESTAMP:           header = (!copy) ? new SIP_Header_Timestamp()           : new SIP_Header_Timestamp(*((SIP_Header_Timestamp *) copy));                      break;
         case SIP_HEADER_TO:                  header = (!copy) ? new SIP_Header_To()                  : new SIP_Header_To(*((SIP_Header_To *) copy));                                    break;
         case SIP_HEADER_UNSUPPORTED:         header = (!copy) ? new SIP_Header_Unsupported()         : new SIP_Header_Unsupported(*((SIP_Header_Unsupported *) copy));                  break;
         case SIP_HEADER_USER_AGENT:          header = (!copy) ? new SIP_Header_User_Agent()          : new SIP_Header_User_Agent(*((SIP_Header_User_Agent *) copy));                    break;
@@ -1943,6 +1944,50 @@ bool SIP_Header_Supported::parse(std::string &sip_msg)
 bool SIP_Header_Supported::encode(std::string &sip_msg)
 {
     sip_msg += _option_tag;
+    return true;
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+bool SIP_Header_Timestamp::parse(std::string &sip_msg)
+{
+    std::string result;
+    bool matched;
+
+    SIP_Functions::trim(sip_msg);
+
+    matched = SIP_Functions::match(sip_msg, " \t", result);
+    SIP_Functions::trim(result);
+    if (result.empty())
+        return false;
+
+    _timestamp = result;
+
+    if (matched)
+    {
+        SIP_Functions::trim(sip_msg);
+        _delay = sip_msg;
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Timestamp::encode(std::string &sip_msg)
+{
+    if (_timestamp.empty())
+        return false;
+
+    sip_msg += _timestamp;
+
+    if (!_delay.empty())
+    {
+        sip_msg += " ";
+        sip_msg += _delay;
+    }
+
     return true;
 }
 
