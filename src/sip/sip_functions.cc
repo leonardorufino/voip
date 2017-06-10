@@ -155,6 +155,8 @@ SIP_Header_Type SIP_Functions::get_header_type(std::string header)
         return SIP_HEADER_PROXY_REQUIRE;
     else if (header == "Record-Route")
         return SIP_HEADER_RECORD_ROUTE;
+    else if (header == "Reply-To")
+        return SIP_HEADER_REPLY_TO;
     else if (header == "Require")
         return SIP_HEADER_REQUIRE;
     else if (header == "Route")
@@ -215,6 +217,7 @@ std::string SIP_Functions::get_header_type(SIP_Header_Type header)
         case SIP_HEADER_PRIORITY:               return "Priority";
         case SIP_HEADER_PROXY_REQUIRE:          return "Proxy-Require";
         case SIP_HEADER_RECORD_ROUTE:           return "Record-Route";
+        case SIP_HEADER_REPLY_TO:               return "Reply-To";
         case SIP_HEADER_REQUIRE:                return "Require";
         case SIP_HEADER_ROUTE:                  return "Route";
         case SIP_HEADER_SERVER:                 return "Server";

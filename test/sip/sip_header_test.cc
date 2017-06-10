@@ -129,6 +129,10 @@ bool SIP_Header_Test::init()
     if (!header_record_route.run())
         return false;
 
+    SIP_Header_Reply_To_Test header_reply_to;
+    if (!header_reply_to.run())
+        return false;
+
     SIP_Header_Require_Test header_require;
     if (!header_require.run())
         return false;
@@ -700,6 +704,21 @@ SIP_Header_Record_Route_Test::SIP_Header_Record_Route_Test()
     _header_input_output.push_back(hdr2);
 
     SIP_Header_Input_Output hdr3(SIP_HEADER_RECORD_ROUTE, "Record-Route: <sip:n.tesla@high-voltage.org;par1 ; maddr= 10.0.0.10 ; par2  ;par3> ;  parameter1;parameter2 , <sip:c8oqz84zk7z@privacy.org> ; parameter1", "Record-Route: <sip:n.tesla@high-voltage.org;maddr=10.0.0.10;par1;par2;par3>;parameter1;parameter2\r\nRecord-Route: <sip:c8oqz84zk7z@privacy.org>;parameter1\r\n", 2);
+    _header_input_output.push_back(hdr3);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+SIP_Header_Reply_To_Test::SIP_Header_Reply_To_Test()
+{
+    SIP_Header_Input_Output hdr1(SIP_HEADER_REPLY_TO, "Reply-To: Bob <sip:bob@biloxi.com>", "Reply-To: Bob <sip:bob@biloxi.com>\r\n", 1);
+    _header_input_output.push_back(hdr1);
+
+    SIP_Header_Input_Output hdr2(SIP_HEADER_REPLY_TO, "Reply-To:   <sip:user@server10.biloxi.com;par1;user= phone >;parameter1", "Reply-To: <sip:user@server10.biloxi.com;user=phone;par1>;parameter1\r\n", 1);
+    _header_input_output.push_back(hdr2);
+
+    SIP_Header_Input_Output hdr3(SIP_HEADER_REPLY_TO, "Reply-To: <sip:n.tesla@high-voltage.org;par1 ; maddr= 10.0.0.10 ; par2  ;ttl=70;par3> ;  parameter1;parameter2 ", "Reply-To: <sip:n.tesla@high-voltage.org;ttl=70;maddr=10.0.0.10;par1;par2;par3>;parameter1;parameter2\r\n", 1);
     _header_input_output.push_back(hdr3);
 }
 

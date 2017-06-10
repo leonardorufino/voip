@@ -849,6 +849,30 @@ private:
 
 //-------------------------------------------
 
+class SIP_Header_Reply_To : public SIP_Header
+{
+public:
+    SIP_Header_Reply_To() {}
+    SIP_Header_Reply_To(const SIP_Header_Reply_To &header) { *this = header; }
+    ~SIP_Header_Reply_To() {}
+
+    // Virtual pure functions
+    SIP_Header_Type get_header_type() { return SIP_HEADER_REPLY_TO; }
+    SIP_Header_Separator encode_separator() { return SIP_HEADER_SEPARATOR_NONE; }
+    bool parse(std::string &sip_msg);
+    bool encode(std::string &sip_msg);
+
+    SIP_Address &get_address() { return _address; }
+
+    std::list<std::string> &get_parameters() { return _parameters; }
+
+private:
+    SIP_Address _address;
+    std::list<std::string> _parameters;
+};
+
+//-------------------------------------------
+
 class SIP_Header_Require : public SIP_Header
 {
 public:

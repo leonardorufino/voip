@@ -48,6 +48,7 @@ SIP_Header *SIP_Header::create_header(SIP_Header_Type header_type, const SIP_Hea
         case SIP_HEADER_PRIORITY:            header = (!copy) ? new SIP_Header_Priority()            : new SIP_Header_Priority(*((SIP_Header_Priority *) copy));                        break;
         case SIP_HEADER_PROXY_REQUIRE:       header = (!copy) ? new SIP_Header_Proxy_Require()       : new SIP_Header_Proxy_Require(*((SIP_Header_Proxy_Require *) copy));              break;
         case SIP_HEADER_RECORD_ROUTE:        header = (!copy) ? new SIP_Header_Record_Route()        : new SIP_Header_Record_Route(*((SIP_Header_Record_Route *) copy));                break;
+        case SIP_HEADER_REPLY_TO:            header = (!copy) ? new SIP_Header_Reply_To()            : new SIP_Header_Reply_To(*((SIP_Header_Reply_To *) copy));                        break;
         case SIP_HEADER_REQUIRE:             header = (!copy) ? new SIP_Header_Require()             : new SIP_Header_Require(*((SIP_Header_Require *) copy));                          break;
         case SIP_HEADER_ROUTE:               header = (!copy) ? new SIP_Header_Route()               : new SIP_Header_Route(*((SIP_Header_Route *) copy));                              break;
         case SIP_HEADER_SERVER:              header = (!copy) ? new SIP_Header_Server()              : new SIP_Header_Server(*((SIP_Header_Server *) copy));                            break;
@@ -1684,6 +1685,44 @@ bool SIP_Header_Record_Route::parse(std::string &sip_msg)
 //-------------------------------------------
 
 bool SIP_Header_Record_Route::encode(std::string &sip_msg)
+{
+    if (!_address.encode(sip_msg))
+        return false;
+
+    std::list<std::string>::iterator it = _parameters.begin();
+    while (it != _parameters.end())
+    {
+        sip_msg += ";";
+        sip_msg += *it++;
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+bool SIP_Header_Reply_To::parse(std::string &sip_msg)
+{
+    std::string result;
+    bool matched = SIP_Functions::match(sip_msg, ";", result);
+
+    if (!_address.parse(result))
+        return false;
+
+    while (matched)
+    {
+        matched = SIP_Functions::match(sip_msg, ";", result);
+        SIP_Functions::trim(result);
+        _parameters.push_back(result);
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Reply_To::encode(std::string &sip_msg)
 {
     if (!_address.encode(sip_msg))
         return false;
