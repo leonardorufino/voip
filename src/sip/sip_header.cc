@@ -90,21 +90,17 @@ bool SIP_Header::decode_headers(std::string &sip_msg, std::map<SIP_Header_Type, 
 
     do
     {
-        // Can have multiple of these headers
-        if ((header_type == SIP_HEADER_ACCEPT) || (header_type == SIP_HEADER_ACCEPT_ENCODING) || (header_type == SIP_HEADER_ACCEPT_LANGUAGE) ||
-            (header_type == SIP_HEADER_ALERT_INFO) || (header_type == SIP_HEADER_ALLOW) || (header_type == SIP_HEADER_ALLOW_EVENTS) ||
-            (header_type == SIP_HEADER_CALL_INFO) ||(header_type == SIP_HEADER_CONTACT) || (header_type == SIP_HEADER_CONTENT_ENCODING) ||
-            (header_type == SIP_HEADER_CONTENT_LANGUAGE) || (header_type == SIP_HEADER_IN_REPLY_TO) || (header_type == SIP_HEADER_PROXY_REQUIRE) ||
-            (header_type == SIP_HEADER_RECORD_ROUTE) || (header_type == SIP_HEADER_REQUIRE) || (header_type == SIP_HEADER_ROUTE) ||
-            (header_type == SIP_HEADER_SUPPORTED) || (header_type == SIP_HEADER_UNSUPPORTED) || (header_type == SIP_HEADER_VIA) ||
-            (header_type == SIP_HEADER_WARNING))
+        SIP_Header *header = create_header(header_type);
+
+        if (header->encode_separator() != SIP_HEADER_SEPARATOR_NONE)
+        {
+            // There may be more than one of these headers
             matched = SIP_Functions::match(sip_msg, ",", result);
-        else
+        }else
             result = sip_msg;
 
         SIP_Functions::trim(result);
 
-        SIP_Header *header = create_header(header_type);
         header->_header_line = result;
 
         if (!header->parse(result))
@@ -162,7 +158,6 @@ bool SIP_Header::encode_headers(std::string &sip_msg, std::map<SIP_Header_Type, 
                     case SIP_HEADER_SEPARATOR_NONE:     return false;
                     case SIP_HEADER_SEPARATOR_COMMA:    sip_msg += ", ";                    break;
                     case SIP_HEADER_SEPARATOR_CRLF:     sip_msg += "\r\n" + type + ": ";    break;
-                    case SIP_HEADER_SEPARATOR_SPACE:    sip_msg += " ";                     break;
                     default:                                                                break;
                 }
             }
