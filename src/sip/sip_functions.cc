@@ -131,6 +131,8 @@ SIP_Header_Type SIP_Functions::get_header_type(std::string header)
         return SIP_HEADER_CSEQ;
     else if (header == "Date")
         return SIP_HEADER_DATE;
+    else if (header == "Error-Info")
+        return SIP_HEADER_ERROR_INFO;
     else if ((header == "Event") || (header == "o"))
         return SIP_HEADER_EVENT;
     else if (header == "Expires")
@@ -201,6 +203,7 @@ std::string SIP_Functions::get_header_type(SIP_Header_Type header)
         case SIP_HEADER_CONTENT_TYPE:           return "Content-Type";
         case SIP_HEADER_CSEQ:                   return "CSeq";
         case SIP_HEADER_DATE:                   return "Date";
+        case SIP_HEADER_ERROR_INFO:             return "Error-Info";
         case SIP_HEADER_EVENT:                  return "Event";
         case SIP_HEADER_EXPIRES:                return "Expires";
         case SIP_HEADER_FROM:                   return "From";

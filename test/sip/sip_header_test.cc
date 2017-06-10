@@ -81,6 +81,10 @@ bool SIP_Header_Test::init()
     if (!header_date.run())
         return false;
 
+    SIP_Header_Error_Info_Test header_error_info;
+    if (!header_error_info.run())
+        return false;
+
     SIP_Header_Event_Test header_event;
     if (!header_event.run())
         return false;
@@ -510,6 +514,21 @@ SIP_Header_Date_Test::SIP_Header_Date_Test()
     _header_input_output.push_back(hdr2);
 
     SIP_Header_Input_Output hdr3(SIP_HEADER_DATE, "Date: Mon, 31 Dec 2010 12:59:05 GM", "Date: Mon, 31 Dec 2010 12:59:05 GM\r\n", 1);
+    _header_input_output.push_back(hdr3);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+SIP_Header_Error_Info_Test::SIP_Header_Error_Info_Test()
+{
+    SIP_Header_Input_Output hdr1(SIP_HEADER_ERROR_INFO, "Error-Info: <sip:not-in-service-recording@atlanta.com>", "Error-Info: <sip:not-in-service-recording@atlanta.com>\r\n", 1);
+    _header_input_output.push_back(hdr1);
+
+    SIP_Header_Input_Output hdr2(SIP_HEADER_ERROR_INFO, "Error-Info: <mailto:user@host.com;par1; par2 ;par3>;param1 ; param2 ;param3 , <http://wwww.example.com/alice/photo.jpg>", "Error-Info: <mailto:user@host.com;par1; par2 ;par3>;param1;param2;param3, <http://wwww.example.com/alice/photo.jpg>\r\n", 2);
+    _header_input_output.push_back(hdr2);
+
+    SIP_Header_Input_Output hdr3(SIP_HEADER_ERROR_INFO, "Error-Info: <sips:user@host.com;par1> ; param1 ; param2 ;param3,<abc:user;par1> ; param2", "Error-Info: <sips:user@host.com;par1>;param1;param2;param3, <abc:user;par1>;param2\r\n", 2);
     _header_input_output.push_back(hdr3);
 }
 

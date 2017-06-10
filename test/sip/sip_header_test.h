@@ -174,6 +174,14 @@ public:
 
 //-------------------------------------------
 
+class SIP_Header_Error_Info_Test : public SIP_Header_Test
+{
+public:
+    SIP_Header_Error_Info_Test();
+};
+
+//-------------------------------------------
+
 class SIP_Header_Event_Test : public SIP_Header_Test
 {
 public:

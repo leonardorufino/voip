@@ -36,6 +36,7 @@ SIP_Header *SIP_Header::create_header(SIP_Header_Type header_type, const SIP_Hea
         case SIP_HEADER_CONTENT_TYPE:        header = (!copy) ? new SIP_Header_Content_Type()        : new SIP_Header_Content_Type(*((SIP_Header_Content_Type *) copy));                break;
         case SIP_HEADER_CSEQ:                header = (!copy) ? new SIP_Header_CSeq()                : new SIP_Header_CSeq(*((SIP_Header_CSeq *) copy));                                break;
         case SIP_HEADER_DATE:                header = (!copy) ? new SIP_Header_Date()                : new SIP_Header_Date(*((SIP_Header_Date *) copy));                                break;
+        case SIP_HEADER_ERROR_INFO:          header = (!copy) ? new SIP_Header_Error_Info()          : new SIP_Header_Error_Info(*((SIP_Header_Error_Info *) copy));                    break;
         case SIP_HEADER_EVENT:               header = (!copy) ? new SIP_Header_Event()               : new SIP_Header_Event(*((SIP_Header_Event *) copy));                              break;
         case SIP_HEADER_EXPIRES:             header = (!copy) ? new SIP_Header_Expires()             : new SIP_Header_Expires(*((SIP_Header_Expires *) copy));                          break;
         case SIP_HEADER_FROM:                header = (!copy) ? new SIP_Header_From()                : new SIP_Header_From(*((SIP_Header_From *) copy));                                break;
@@ -1294,6 +1295,44 @@ SIP_Date_Month SIP_Header_Date::get_month()
         return SIP_DATE_MONTH_DEC;
 
     return SIP_DATE_MONTH_INVALID;
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+bool SIP_Header_Error_Info::parse(std::string &sip_msg)
+{
+    std::string result;
+    bool matched = SIP_Functions::match(sip_msg, ";", result);
+
+    if (!_address.parse(result))
+        return false;
+
+    while (matched)
+    {
+        matched = SIP_Functions::match(sip_msg, ";", result);
+        SIP_Functions::trim(result);
+        _parameters.push_back(result);
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Error_Info::encode(std::string &sip_msg)
+{
+    if (!_address.encode(sip_msg))
+        return false;
+
+    std::list<std::string>::iterator it = _parameters.begin();
+    while (it != _parameters.end())
+    {
+        sip_msg += ";";
+        sip_msg += *it++;
+    }
+
+    return true;
 }
 
 //-------------------------------------------
