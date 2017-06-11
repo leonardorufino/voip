@@ -137,6 +137,10 @@ bool SIP_Header_Test::init()
     if (!header_require.run())
         return false;
 
+    SIP_Header_Retry_After_Test header_retry_after;
+    if (!header_retry_after.run())
+        return false;
+
     SIP_Header_Route_Test header_route;
     if (!header_route.run())
         return false;
@@ -739,6 +743,24 @@ SIP_Header_Require_Test::SIP_Header_Require_Test()
 
     SIP_Header_Input_Output hdr3(SIP_HEADER_REQUIRE, "Require:req1,req2", "Require: req1, req2\r\n", 2);
     _header_input_output.push_back(hdr3);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+SIP_Header_Retry_After_Test::SIP_Header_Retry_After_Test()
+{
+    SIP_Header_Input_Output hdr1(SIP_HEADER_RETRY_AFTER, "Retry-After: 18000;duration=3600", "Retry-After: 18000;duration=3600\r\n", 1);
+    _header_input_output.push_back(hdr1);
+
+    SIP_Header_Input_Output hdr2(SIP_HEADER_RETRY_AFTER, "Retry-After: 120 (I'm in a meeting)", "Retry-After: 120 (I'm in a meeting)\r\n", 1);
+    _header_input_output.push_back(hdr2);
+
+    SIP_Header_Input_Output hdr3(SIP_HEADER_RETRY_AFTER, "Retry-After:10( I'm in a meeting );par1=test;duration= 100 ; par2", "Retry-After: 10 ( I'm in a meeting );duration=100;par1=test;par2\r\n", 1);
+    _header_input_output.push_back(hdr3);
+
+    SIP_Header_Input_Output hdr4(SIP_HEADER_RETRY_AFTER, "Retry-After: 99999999 (This (\"is a\") comment); par1", "Retry-After: 99999999 (This (\"is a\") comment);par1\r\n", 1);
+    _header_input_output.push_back(hdr4);
 }
 
 //-------------------------------------------

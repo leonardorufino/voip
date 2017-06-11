@@ -50,6 +50,7 @@ SIP_Header *SIP_Header::create_header(SIP_Header_Type header_type, const SIP_Hea
         case SIP_HEADER_RECORD_ROUTE:        header = (!copy) ? new SIP_Header_Record_Route()        : new SIP_Header_Record_Route(*((SIP_Header_Record_Route *) copy));                break;
         case SIP_HEADER_REPLY_TO:            header = (!copy) ? new SIP_Header_Reply_To()            : new SIP_Header_Reply_To(*((SIP_Header_Reply_To *) copy));                        break;
         case SIP_HEADER_REQUIRE:             header = (!copy) ? new SIP_Header_Require()             : new SIP_Header_Require(*((SIP_Header_Require *) copy));                          break;
+        case SIP_HEADER_RETRY_AFTER:         header = (!copy) ? new SIP_Header_Retry_After()         : new SIP_Header_Retry_After(*((SIP_Header_Retry_After *) copy));                  break;
         case SIP_HEADER_ROUTE:               header = (!copy) ? new SIP_Header_Route()               : new SIP_Header_Route(*((SIP_Header_Route *) copy));                              break;
         case SIP_HEADER_SERVER:              header = (!copy) ? new SIP_Header_Server()              : new SIP_Header_Server(*((SIP_Header_Server *) copy));                            break;
         case SIP_HEADER_SUBJECT:             header = (!copy) ? new SIP_Header_Subject()             : new SIP_Header_Subject(*((SIP_Header_Subject *) copy));                          break;
@@ -1759,6 +1760,90 @@ bool SIP_Header_Require::encode(std::string &sip_msg)
         return false;
 
     sip_msg += _option_tag;
+    return true;
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+bool SIP_Header_Retry_After::parse(std::string &sip_msg)
+{
+    std::string result;
+    std::string retry;
+
+    bool has_param = has_param = SIP_Functions::match(sip_msg, ";", result);
+
+    bool has_comment = SIP_Functions::match(result, "(", retry);
+    SIP_Functions::trim(retry);
+    if (retry.empty())
+        return false;
+
+    _retry_after = (unsigned int) atol(retry.c_str());
+
+    if (has_comment)
+    {
+        if (result.empty())
+            return false;
+
+        if (result.back() != ')')
+            return false;
+
+        result.pop_back();
+        if (result.empty())
+            return false;
+
+        _comment = result;
+    }
+
+    while (has_param)
+    {
+        has_param = SIP_Functions::match(sip_msg, ";", result);
+        SIP_Functions::trim(result);
+
+        if (SIP_Functions::start_with(result, "duration="))
+        {
+            std::string duration = result.substr(9);
+            SIP_Functions::trim(duration);
+            if (duration.empty())
+                return false;
+
+            _duration = (unsigned int) atol(duration.c_str());
+        }else
+            _parameters.push_back(result);
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Retry_After::encode(std::string &sip_msg)
+{
+    if (_retry_after == INVALID_RETRY_AFTER)
+        return false;
+
+    sip_msg += std::to_string(_retry_after);
+
+    if (!_comment.empty())
+    {
+        sip_msg += " (";
+        sip_msg += _comment;
+        sip_msg += ")";
+    }
+
+    if (_duration != INVALID_DURATION)
+    {
+        sip_msg += ";duration=";
+        sip_msg += std::to_string(_duration);
+    }
+
+    std::list<std::string>::iterator it = _parameters.begin();
+    while (it != _parameters.end())
+    {
+        sip_msg += ";";
+        sip_msg += *it++;
+    }
+
     return true;
 }
 

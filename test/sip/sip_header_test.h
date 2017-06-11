@@ -286,6 +286,14 @@ public:
 
 //-------------------------------------------
 
+class SIP_Header_Retry_After_Test : public SIP_Header_Test
+{
+public:
+    SIP_Header_Retry_After_Test();
+};
+
+//-------------------------------------------
+
 class SIP_Header_Route_Test : public SIP_Header_Test
 {
 public:

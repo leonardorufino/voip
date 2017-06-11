@@ -159,6 +159,8 @@ SIP_Header_Type SIP_Functions::get_header_type(std::string header)
         return SIP_HEADER_REPLY_TO;
     else if (header == "Require")
         return SIP_HEADER_REQUIRE;
+    else if (header == "Retry-After")
+        return SIP_HEADER_RETRY_AFTER;
     else if (header == "Route")
         return SIP_HEADER_ROUTE;
     else if (header == "Server")
@@ -221,6 +223,7 @@ std::string SIP_Functions::get_header_type(SIP_Header_Type header)
         case SIP_HEADER_RECORD_ROUTE:           return "Record-Route";
         case SIP_HEADER_REPLY_TO:               return "Reply-To";
         case SIP_HEADER_REQUIRE:                return "Require";
+        case SIP_HEADER_RETRY_AFTER:            return "Retry-After";
         case SIP_HEADER_ROUTE:                  return "Route";
         case SIP_HEADER_SERVER:                 return "Server";
         case SIP_HEADER_SUBJECT:                return "Subject";
@@ -300,6 +303,8 @@ bool SIP_Functions::match(std::string &str, const std::string &match, std::strin
     unsigned short counter_double_quotation = 0;
     unsigned short counter_less_than = 0;
     unsigned short counter_greater_than = 0;
+    unsigned short counter_left_parenthesis = 0;
+    unsigned short counter_right_parenthesis = 0;
 
     std::string aux = str.substr(0, pos);
     std::string::size_type found;
@@ -330,7 +335,24 @@ bool SIP_Functions::match(std::string &str, const std::string &match, std::strin
                 counter_greater_than++;
         }while (found != std::string::npos);
 
-        if ((counter_double_quotation % 2 == 0) && (counter_less_than == counter_greater_than))
+        found = -1;
+        do
+        {
+            found = aux.find('(', found + 1);
+            if (found != std::string::npos)
+                counter_left_parenthesis++;
+        }while (found != std::string::npos);
+
+        found = -1;
+        do
+        {
+            found = aux.find(')', found + 1);
+            if (found != std::string::npos)
+                counter_right_parenthesis++;
+        }while (found != std::string::npos);
+
+        if ((counter_double_quotation % 2 == 0) && (counter_less_than == counter_greater_than) &&
+            (counter_left_parenthesis == counter_right_parenthesis))
         {
             result = str.substr(0, pos);
             str.erase(0, pos + 1);

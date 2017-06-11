@@ -895,6 +895,43 @@ private:
 
 //-------------------------------------------
 
+class SIP_Header_Retry_After : public SIP_Header
+{
+public:
+    static const unsigned int INVALID_RETRY_AFTER = 0xFFFFFFFF;
+    static const unsigned int INVALID_DURATION = 0xFFFFFFFF;
+
+public:
+    SIP_Header_Retry_After() : _retry_after(INVALID_RETRY_AFTER), _duration(INVALID_DURATION) {}
+    SIP_Header_Retry_After(const SIP_Header_Retry_After &header) { *this = header; }
+    ~SIP_Header_Retry_After() {}
+
+    // Virtual pure functions
+    SIP_Header_Type get_header_type() { return SIP_HEADER_RETRY_AFTER; }
+    SIP_Header_Separator encode_separator() { return SIP_HEADER_SEPARATOR_NONE; }
+    bool parse(std::string &sip_msg);
+    bool encode(std::string &sip_msg);
+
+    void set_retry_after(unsigned int retry_after) { _retry_after = retry_after; }
+    unsigned int get_retry_after() { return _retry_after; }
+
+    void set_comment(std::string comment) { _comment = comment; }
+    std::string get_comment() { return _comment; }
+
+    void set_duration(unsigned int duration) { _duration = duration; }
+    unsigned int get_duration() { return _duration; }
+
+    std::list<std::string> &get_parameters() { return _parameters; }
+
+private:
+    unsigned int _retry_after;
+    std::string _comment;
+    unsigned int _duration;
+    std::list<std::string> _parameters;
+};
+
+//-------------------------------------------
+
 class SIP_Header_Route : public SIP_Header
 {
 public:
