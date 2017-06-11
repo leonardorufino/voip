@@ -299,6 +299,9 @@ SIP_Header_Accept_Encoding_Test::SIP_Header_Accept_Encoding_Test()
 
     SIP_Header_Input_Output hdr4(SIP_HEADER_ACCEPT_ENCODING, "Accept-Encoding: *;par1=test; q=1.000  ; par2=test", "Accept-Encoding: *;q=1.000;par1=test;par2=test\r\n", 1);
     _header_input_output.push_back(hdr4);
+
+    SIP_Header_Input_Output hdr5(SIP_HEADER_ACCEPT_ENCODING, "Accept-Encoding: gzip", "Accept-Encoding: gzip\r\n", 1);
+    _header_input_output.push_back(hdr5);
 }
 
 //-------------------------------------------
@@ -380,6 +383,12 @@ SIP_Header_Call_ID_Test::SIP_Header_Call_ID_Test()
 
     SIP_Header_Input_Output hdr3(SIP_HEADER_CALL_ID, "i:my-domain.org ", "Call-ID: my-domain.org\r\n", 1);
     _header_input_output.push_back(hdr3);
+
+    SIP_Header_Input_Output hdr4(SIP_HEADER_CALL_ID, "Call-ID: f81d4fae-7dec-11d0-a765-00a0c91e6bf6@biloxi.com", "Call-ID: f81d4fae-7dec-11d0-a765-00a0c91e6bf6@biloxi.com\r\n", 1);
+    _header_input_output.push_back(hdr4);
+
+    SIP_Header_Input_Output hdr5(SIP_HEADER_CALL_ID, "i:f81d4fae-7dec-11d0-a765-00a0c91e6bf6@192.0.2.4", "Call-ID: f81d4fae-7dec-11d0-a765-00a0c91e6bf6@192.0.2.4\r\n", 1);
+    _header_input_output.push_back(hdr5);
 }
 
 //-------------------------------------------
@@ -419,6 +428,9 @@ SIP_Header_Contact_Test::SIP_Header_Contact_Test()
 
     SIP_Header_Input_Output hdr6(SIP_HEADER_CONTACT, "Contact: sip:123456789:password@my-domain.org", "Contact: <sip:123456789:password@my-domain.org>\r\n", 1);
     _header_input_output.push_back(hdr6);
+
+    SIP_Header_Input_Output hdr7(SIP_HEADER_CONTACT, "m: <sips:bob@192.0.2.4>;expires=60", "Contact: <sips:bob@192.0.2.4>;expires=60\r\n", 1);
+    _header_input_output.push_back(hdr7);
 }
 
 //-------------------------------------------
