@@ -823,10 +823,12 @@ bool SIP_Header_Contact::encode(std::string &sip_msg)
 bool SIP_Header_Content_Disposition::parse(std::string &sip_msg)
 {
     std::string result;
-    bool matched;
 
-    matched = SIP_Functions::match(sip_msg, ";", result);
+    bool matched = SIP_Functions::match(sip_msg, ";", result);
     SIP_Functions::trim(result);
+    if (result.empty())
+        return false;
+
     _type = result;
 
     while (matched)
@@ -836,13 +838,10 @@ bool SIP_Header_Content_Disposition::parse(std::string &sip_msg)
 
         if (SIP_Functions::start_with(result, "handling="))
         {
-            std::string handling = result.substr(9);
-            SIP_Functions::trim(handling);
-            if (handling.empty())
+            _handling = result.substr(9);
+            SIP_Functions::trim(_handling);
+            if (_handling.empty())
                 return false;
-
-            SIP_Functions::trim(handling);
-            _handling = handling;
         }else
             _parameters.push_back(result);
     }
