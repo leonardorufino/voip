@@ -119,7 +119,7 @@ SIP_Header_Type SIP_Functions::get_header_type(std::string header)
         return SIP_HEADER_CONTACT;
     else if (header == "Content-Disposition")
         return SIP_HEADER_CONTENT_DISPOSITION;
-    else if (header == "Content-Encoding")
+    else if ((header == "Content-Encoding") || (header == "e"))
         return SIP_HEADER_CONTENT_ENCODING;
     else if (header == "Content-Language")
         return SIP_HEADER_CONTENT_LANGUAGE;

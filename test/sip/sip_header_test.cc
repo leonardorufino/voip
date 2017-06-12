@@ -464,6 +464,12 @@ SIP_Header_Content_Encoding_Test::SIP_Header_Content_Encoding_Test()
 
     SIP_Header_Input_Output hdr3(SIP_HEADER_CONTENT_ENCODING, "Content-Encoding: code1,code2 , code3", "Content-Encoding: code1, code2, code3\r\n", 3);
     _header_input_output.push_back(hdr3);
+
+    SIP_Header_Input_Output hdr4(SIP_HEADER_CONTENT_ENCODING, "e: tar", "Content-Encoding: tar\r\n", 1);
+    _header_input_output.push_back(hdr4);
+
+    SIP_Header_Input_Output hdr5(SIP_HEADER_CONTENT_ENCODING, "Content-Encoding:gzip", "Content-Encoding: gzip\r\n", 1);
+    _header_input_output.push_back(hdr5);
 }
 
 //-------------------------------------------
