@@ -982,6 +982,9 @@ bool SIP_Header_Content_Language::encode(std::string &sip_msg)
 bool SIP_Header_Content_Length::parse(std::string &sip_msg)
 {
     SIP_Functions::trim(sip_msg);
+    if (sip_msg.empty())
+        return false;
+
     _length = (unsigned int) atol(sip_msg.c_str());
     return true;
 }
