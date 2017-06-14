@@ -14,8 +14,8 @@
 #include <iostream>
 
 #define SIP_VERSION             "SIP/2.0"
-#define INVALID_UNSIGNED_SHORT  (unsigned short) ~0
-#define INVALID_UNSIGNED_LONG   (unsigned long) ~0
+#define INVALID_UNSIGNED_SHORT  0xFFFF
+#define INVALID_UNSIGNED_LONG   0xFFFFFFFF
 
 enum SIP_Method_Type
 {
