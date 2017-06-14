@@ -201,12 +201,22 @@ bool SIP_Header_Test::run()
         std::map<SIP_Header_Type, std::list<SIP_Header *>> headers;
 
         std::string input = header_input_output._input;
-        if (!SIP_Header::decode_headers(input, headers))
+        bool decode = SIP_Header::decode_headers(input, headers);
+
+        if (header_input_output._decode_success != decode)
         {
             std::cout << "SIP_Header_Test::run -> Failed to decode headers:\n";
             std::cout << std::setw(12) << "Type: " << header_input_output._header_type << "\n";
             std::cout << std::setw(12) << "Input: " << header_input_output._input.c_str() << "\n";
+            std::cout << std::setw(12) << "Expected: " << (header_input_output._decode_success ? "true" : "false") << "\n";
+            std::cout << std::setw(12) << "Success: " << (decode ? "true" : "false") << "\n";
             return false;
+        }
+
+        if (!decode)
+        {
+            clear(headers);
+            continue;
         }
 
         unsigned short size = (headers.count(header_input_output._header_type) ?
@@ -223,12 +233,22 @@ bool SIP_Header_Test::run()
         }
 
         std::string output;
-        if (!SIP_Header::encode_headers(output, headers))
+        bool encode = SIP_Header::encode_headers(output, headers);
+
+        if (header_input_output._encode_success != encode)
         {
             std::cout << "SIP_Header_Test::run -> Failed to encode headers:\n";
             std::cout << std::setw(12) << "Type: " << header_input_output._header_type << "\n";
             std::cout << std::setw(12) << "Input: " << header_input_output._input.c_str() << "\n";
+            std::cout << std::setw(12) << "Expected: " << (header_input_output._encode_success ? "true" : "false") << "\n";
+            std::cout << std::setw(12) << "Success: " << (encode ? "true" : "false") << "\n";
             return false;
+        }
+
+        if (!encode)
+        {
+            clear(headers);
+            continue;
         }
 
         if (output != header_input_output._output)
@@ -270,16 +290,16 @@ void SIP_Header_Test::clear(std::map<SIP_Header_Type, std::list<SIP_Header *>> &
 
 SIP_Header_Accept_Test::SIP_Header_Accept_Test()
 {
-    SIP_Header_Input_Output hdr1(SIP_HEADER_ACCEPT, "Accept: application/sdp", "Accept: application/sdp\r\n", 1);
+    SIP_Header_Input_Output hdr1(SIP_HEADER_ACCEPT, "Accept: application/sdp", "Accept: application/sdp\r\n", 1, true, true);
     _header_input_output.push_back(hdr1);
 
-    SIP_Header_Input_Output hdr2(SIP_HEADER_ACCEPT, "Accept:application/sdp;level=1, application/x-private, text/html", "Accept: application/sdp;level=1, application/x-private, text/html\r\n", 3);
+    SIP_Header_Input_Output hdr2(SIP_HEADER_ACCEPT, "Accept:application/sdp;level=1, application/x-private, text/html", "Accept: application/sdp;level=1, application/x-private, text/html\r\n", 3, true, true);
     _header_input_output.push_back(hdr2);
 
-    SIP_Header_Input_Output hdr3(SIP_HEADER_ACCEPT, "Accept: */*;q=0.75,application/*,   text/html,test1/test2", "Accept: */*;q=0.75, application/*, text/html, test1/test2\r\n", 4);
+    SIP_Header_Input_Output hdr3(SIP_HEADER_ACCEPT, "Accept: */*;q=0.75,application/*,   text/html,test1/test2", "Accept: */*;q=0.75, application/*, text/html, test1/test2\r\n", 4, true, true);
     _header_input_output.push_back(hdr3);
 
-    SIP_Header_Input_Output hdr4(SIP_HEADER_ACCEPT, "Accept:", "Accept: \r\n", 1);
+    SIP_Header_Input_Output hdr4(SIP_HEADER_ACCEPT, "Accept:", "Accept: \r\n", 1, true, true);
     _header_input_output.push_back(hdr4);
 }
 
@@ -288,19 +308,19 @@ SIP_Header_Accept_Test::SIP_Header_Accept_Test()
 
 SIP_Header_Accept_Encoding_Test::SIP_Header_Accept_Encoding_Test()
 {
-    SIP_Header_Input_Output hdr1(SIP_HEADER_ACCEPT_ENCODING, "Accept-Encoding: gzip, text/plain", "Accept-Encoding: gzip, text/plain\r\n", 2);
+    SIP_Header_Input_Output hdr1(SIP_HEADER_ACCEPT_ENCODING, "Accept-Encoding: gzip, text/plain", "Accept-Encoding: gzip, text/plain\r\n", 2, true, true);
     _header_input_output.push_back(hdr1);
 
-    SIP_Header_Input_Output hdr2(SIP_HEADER_ACCEPT_ENCODING, "Accept-Encoding: ", "Accept-Encoding: \r\n", 1);
+    SIP_Header_Input_Output hdr2(SIP_HEADER_ACCEPT_ENCODING, "Accept-Encoding: ", "Accept-Encoding: \r\n", 1, true, true);
     _header_input_output.push_back(hdr2);
 
-    SIP_Header_Input_Output hdr3(SIP_HEADER_ACCEPT_ENCODING, "Accept-Encoding: *;q=0.75,code1,   code2;par1,code3", "Accept-Encoding: *;q=0.75, code1, code2;par1, code3\r\n", 4);
+    SIP_Header_Input_Output hdr3(SIP_HEADER_ACCEPT_ENCODING, "Accept-Encoding: *;q=0.75,code1,   code2;par1,code3", "Accept-Encoding: *;q=0.75, code1, code2;par1, code3\r\n", 4, true, true);
     _header_input_output.push_back(hdr3);
 
-    SIP_Header_Input_Output hdr4(SIP_HEADER_ACCEPT_ENCODING, "Accept-Encoding: *;par1=test; q=1.000  ; par2=test", "Accept-Encoding: *;q=1.000;par1=test;par2=test\r\n", 1);
+    SIP_Header_Input_Output hdr4(SIP_HEADER_ACCEPT_ENCODING, "Accept-Encoding: *;par1=test; q=1.000  ; par2=test", "Accept-Encoding: *;q=1.000;par1=test;par2=test\r\n", 1, true, true);
     _header_input_output.push_back(hdr4);
 
-    SIP_Header_Input_Output hdr5(SIP_HEADER_ACCEPT_ENCODING, "Accept-Encoding: gzip", "Accept-Encoding: gzip\r\n", 1);
+    SIP_Header_Input_Output hdr5(SIP_HEADER_ACCEPT_ENCODING, "Accept-Encoding: gzip", "Accept-Encoding: gzip\r\n", 1, true, true);
     _header_input_output.push_back(hdr5);
 }
 
@@ -309,16 +329,16 @@ SIP_Header_Accept_Encoding_Test::SIP_Header_Accept_Encoding_Test()
 
 SIP_Header_Accept_Language_Test::SIP_Header_Accept_Language_Test()
 {
-    SIP_Header_Input_Output hdr1(SIP_HEADER_ACCEPT_LANGUAGE, "Accept-Language: pt", "Accept-Language: pt\r\n", 1);
+    SIP_Header_Input_Output hdr1(SIP_HEADER_ACCEPT_LANGUAGE, "Accept-Language: pt", "Accept-Language: pt\r\n", 1, true, true);
     _header_input_output.push_back(hdr1);
 
-    SIP_Header_Input_Output hdr2(SIP_HEADER_ACCEPT_LANGUAGE, "Accept-Language:", "Accept-Language: \r\n", 1);
+    SIP_Header_Input_Output hdr2(SIP_HEADER_ACCEPT_LANGUAGE, "Accept-Language:", "Accept-Language: \r\n", 1, true, true);
     _header_input_output.push_back(hdr2);
 
-    SIP_Header_Input_Output hdr3(SIP_HEADER_ACCEPT_LANGUAGE, "Accept-Language: da, en-gb;q=0.8, en ;q=0.7, *", "Accept-Language: da, en-gb;q=0.8, en;q=0.7, *\r\n", 4);
+    SIP_Header_Input_Output hdr3(SIP_HEADER_ACCEPT_LANGUAGE, "Accept-Language: da, en-gb;q=0.8, en ;q=0.7, *", "Accept-Language: da, en-gb;q=0.8, en;q=0.7, *\r\n", 4, true, true);
     _header_input_output.push_back(hdr3);
 
-    SIP_Header_Input_Output hdr4(SIP_HEADER_ACCEPT_LANGUAGE, "Accept-Language: en-us, en-gb; par1 = test ; q=0.8;par2", "Accept-Language: en-us, en-gb;q=0.8;par1 = test;par2\r\n", 2);
+    SIP_Header_Input_Output hdr4(SIP_HEADER_ACCEPT_LANGUAGE, "Accept-Language: en-us, en-gb; par1 = test ; q=0.8;par2", "Accept-Language: en-us, en-gb;q=0.8;par1 = test;par2\r\n", 2, true, true);
     _header_input_output.push_back(hdr4);
 }
 
@@ -327,13 +347,13 @@ SIP_Header_Accept_Language_Test::SIP_Header_Accept_Language_Test()
 
 SIP_Header_Alert_Info_Test::SIP_Header_Alert_Info_Test()
 {
-    SIP_Header_Input_Output hdr1(SIP_HEADER_ALERT_INFO, "Alert-Info: <http://www.example.com/sounds/moo.wav>", "Alert-Info: <http://www.example.com/sounds/moo.wav>\r\n", 1);
+    SIP_Header_Input_Output hdr1(SIP_HEADER_ALERT_INFO, "Alert-Info: <http://www.example.com/sounds/moo.wav>", "Alert-Info: <http://www.example.com/sounds/moo.wav>\r\n", 1, true, true);
     _header_input_output.push_back(hdr1);
 
-    SIP_Header_Input_Output hdr2(SIP_HEADER_ALERT_INFO, "Alert-Info: <mailto:user@host.com;par1; par2 ;par3>;param1 ; param2 ;param3 ", "Alert-Info: <mailto:user@host.com;par1; par2 ;par3>;param1;param2;param3\r\n", 1);
+    SIP_Header_Input_Output hdr2(SIP_HEADER_ALERT_INFO, "Alert-Info: <mailto:user@host.com;par1; par2 ;par3>;param1 ; param2 ;param3 ", "Alert-Info: <mailto:user@host.com;par1; par2 ;par3>;param1;param2;param3\r\n", 1, true, true);
     _header_input_output.push_back(hdr2);
 
-    SIP_Header_Input_Output hdr3(SIP_HEADER_ALERT_INFO, "Alert-Info: <sips:user@host.com;par1> ; param1 ; param2 ;param3, <abc:user;par1> ; param2", "Alert-Info: <sips:user@host.com;par1>;param1;param2;param3, <abc:user;par1>;param2\r\n", 2);
+    SIP_Header_Input_Output hdr3(SIP_HEADER_ALERT_INFO, "Alert-Info: <sips:user@host.com;par1> ; param1 ; param2 ;param3, <abc:user;par1> ; param2", "Alert-Info: <sips:user@host.com;par1>;param1;param2;param3, <abc:user;par1>;param2\r\n", 2, true, true);
     _header_input_output.push_back(hdr3);
 }
 
@@ -342,16 +362,16 @@ SIP_Header_Alert_Info_Test::SIP_Header_Alert_Info_Test()
 
 SIP_Header_Allow_Test::SIP_Header_Allow_Test()
 {
-    SIP_Header_Input_Output hdr1(SIP_HEADER_ALLOW, "Allow: INVITE", "Allow: INVITE\r\n", 1);
+    SIP_Header_Input_Output hdr1(SIP_HEADER_ALLOW, "Allow: INVITE", "Allow: INVITE\r\n", 1, true, true);
     _header_input_output.push_back(hdr1);
 
-    SIP_Header_Input_Output hdr2(SIP_HEADER_ALLOW, "Allow: INVITE, ACK,  OPTIONS, CANCEL,BYE", "Allow: INVITE, ACK, OPTIONS, CANCEL, BYE\r\n", 5);
+    SIP_Header_Input_Output hdr2(SIP_HEADER_ALLOW, "Allow: INVITE, ACK,  OPTIONS, CANCEL,BYE", "Allow: INVITE, ACK, OPTIONS, CANCEL, BYE\r\n", 5, true, true);
     _header_input_output.push_back(hdr2);
 
-    SIP_Header_Input_Output hdr3(SIP_HEADER_ALLOW, "Allow:NOTIFY,REFER,   TEST  ", "Allow: NOTIFY, REFER, TEST\r\n", 3);
+    SIP_Header_Input_Output hdr3(SIP_HEADER_ALLOW, "Allow:NOTIFY,REFER,   TEST  ", "Allow: NOTIFY, REFER, TEST\r\n", 3, true, true);
     _header_input_output.push_back(hdr3);
 
-    SIP_Header_Input_Output hdr4(SIP_HEADER_ALLOW, "Allow:", "Allow: \r\n", 1);
+    SIP_Header_Input_Output hdr4(SIP_HEADER_ALLOW, "Allow:", "Allow: \r\n", 1, true, true);
     _header_input_output.push_back(hdr4);
 }
 
@@ -360,13 +380,13 @@ SIP_Header_Allow_Test::SIP_Header_Allow_Test()
 
 SIP_Header_Allow_Events_Test::SIP_Header_Allow_Events_Test()
 {
-    SIP_Header_Input_Output hdr1(SIP_HEADER_ALLOW_EVENTS, "Allow-Events: presence", "Allow-Events: presence\r\n", 1);
+    SIP_Header_Input_Output hdr1(SIP_HEADER_ALLOW_EVENTS, "Allow-Events: presence", "Allow-Events: presence\r\n", 1, true, true);
     _header_input_output.push_back(hdr1);
 
-    SIP_Header_Input_Output hdr2(SIP_HEADER_ALLOW_EVENTS, "Allow-Events:presence, test1.test2", "Allow-Events: presence, test1.test2\r\n", 2);
+    SIP_Header_Input_Output hdr2(SIP_HEADER_ALLOW_EVENTS, "Allow-Events:presence, test1.test2", "Allow-Events: presence, test1.test2\r\n", 2, true, true);
     _header_input_output.push_back(hdr2);
 
-    SIP_Header_Input_Output hdr3(SIP_HEADER_ALLOW_EVENTS, "u: presence.template1.template2 , test.template,package-xyz", "Allow-Events: presence.template1.template2, test.template, package-xyz\r\n", 3);
+    SIP_Header_Input_Output hdr3(SIP_HEADER_ALLOW_EVENTS, "u: presence.template1.template2 , test.template,package-xyz", "Allow-Events: presence.template1.template2, test.template, package-xyz\r\n", 3, true, true);
     _header_input_output.push_back(hdr3);
 }
 
@@ -375,19 +395,19 @@ SIP_Header_Allow_Events_Test::SIP_Header_Allow_Events_Test()
 
 SIP_Header_Call_ID_Test::SIP_Header_Call_ID_Test()
 {
-    SIP_Header_Input_Output hdr1(SIP_HEADER_CALL_ID, "Call-ID: 123456789@my-domain.org", "Call-ID: 123456789@my-domain.org\r\n", 1);
+    SIP_Header_Input_Output hdr1(SIP_HEADER_CALL_ID, "Call-ID: 123456789@my-domain.org", "Call-ID: 123456789@my-domain.org\r\n", 1, true, true);
     _header_input_output.push_back(hdr1);
 
-    SIP_Header_Input_Output hdr2(SIP_HEADER_CALL_ID, "Call-ID: 123456789", "Call-ID: 123456789\r\n", 1);
+    SIP_Header_Input_Output hdr2(SIP_HEADER_CALL_ID, "Call-ID: 123456789", "Call-ID: 123456789\r\n", 1, true, true);
     _header_input_output.push_back(hdr2);
 
-    SIP_Header_Input_Output hdr3(SIP_HEADER_CALL_ID, "i:my-domain.org ", "Call-ID: my-domain.org\r\n", 1);
+    SIP_Header_Input_Output hdr3(SIP_HEADER_CALL_ID, "i:my-domain.org ", "Call-ID: my-domain.org\r\n", 1, true, true);
     _header_input_output.push_back(hdr3);
 
-    SIP_Header_Input_Output hdr4(SIP_HEADER_CALL_ID, "Call-ID: f81d4fae-7dec-11d0-a765-00a0c91e6bf6@biloxi.com", "Call-ID: f81d4fae-7dec-11d0-a765-00a0c91e6bf6@biloxi.com\r\n", 1);
+    SIP_Header_Input_Output hdr4(SIP_HEADER_CALL_ID, "Call-ID: f81d4fae-7dec-11d0-a765-00a0c91e6bf6@biloxi.com", "Call-ID: f81d4fae-7dec-11d0-a765-00a0c91e6bf6@biloxi.com\r\n", 1, true, true);
     _header_input_output.push_back(hdr4);
 
-    SIP_Header_Input_Output hdr5(SIP_HEADER_CALL_ID, "i:f81d4fae-7dec-11d0-a765-00a0c91e6bf6@192.0.2.4", "Call-ID: f81d4fae-7dec-11d0-a765-00a0c91e6bf6@192.0.2.4\r\n", 1);
+    SIP_Header_Input_Output hdr5(SIP_HEADER_CALL_ID, "i:f81d4fae-7dec-11d0-a765-00a0c91e6bf6@192.0.2.4", "Call-ID: f81d4fae-7dec-11d0-a765-00a0c91e6bf6@192.0.2.4\r\n", 1, true, true);
     _header_input_output.push_back(hdr5);
 }
 
@@ -396,13 +416,13 @@ SIP_Header_Call_ID_Test::SIP_Header_Call_ID_Test()
 
 SIP_Header_Call_Info_Test::SIP_Header_Call_Info_Test()
 {
-    SIP_Header_Input_Output hdr1(SIP_HEADER_CALL_INFO, "Call-Info: <http://wwww.example.com/alice/photo.jpg> ;purpose=icon, <http://www.example.com/alice/> ;purpose=info", "Call-Info: <http://wwww.example.com/alice/photo.jpg>;purpose=icon, <http://www.example.com/alice/>;purpose=info\r\n", 2);
+    SIP_Header_Input_Output hdr1(SIP_HEADER_CALL_INFO, "Call-Info: <http://wwww.example.com/alice/photo.jpg> ;purpose=icon, <http://www.example.com/alice/> ;purpose=info", "Call-Info: <http://wwww.example.com/alice/photo.jpg>;purpose=icon, <http://www.example.com/alice/>;purpose=info\r\n", 2, true, true);
     _header_input_output.push_back(hdr1);
 
-    SIP_Header_Input_Output hdr2(SIP_HEADER_CALL_INFO, "Call-Info: <mailto:user@host.com;par1; par2 ;par3>;param1 ; param2 ;param3 ", "Call-Info: <mailto:user@host.com;par1; par2 ;par3>;param1;param2;param3\r\n", 1);
+    SIP_Header_Input_Output hdr2(SIP_HEADER_CALL_INFO, "Call-Info: <mailto:user@host.com;par1; par2 ;par3>;param1 ; param2 ;param3 ", "Call-Info: <mailto:user@host.com;par1; par2 ;par3>;param1;param2;param3\r\n", 1, true, true);
     _header_input_output.push_back(hdr2);
 
-    SIP_Header_Input_Output hdr3(SIP_HEADER_CALL_INFO, "Call-Info: <sips:user@host.com;par1> ; param1 ; purpose= card; param2 ;param3,<abc:user;par1> ; param2", "Call-Info: <sips:user@host.com;par1>;purpose=card;param1;param2;param3, <abc:user;par1>;param2\r\n", 2);
+    SIP_Header_Input_Output hdr3(SIP_HEADER_CALL_INFO, "Call-Info: <sips:user@host.com;par1> ; param1 ; purpose= card; param2 ;param3,<abc:user;par1> ; param2", "Call-Info: <sips:user@host.com;par1>;purpose=card;param1;param2;param3, <abc:user;par1>;param2\r\n", 2, true, true);
     _header_input_output.push_back(hdr3);
 }
 
@@ -411,25 +431,25 @@ SIP_Header_Call_Info_Test::SIP_Header_Call_Info_Test()
 
 SIP_Header_Contact_Test::SIP_Header_Contact_Test()
 {
-    SIP_Header_Input_Output hdr1(SIP_HEADER_CONTACT, "Contact: sip:123456789@my-domain.org", "Contact: <sip:123456789@my-domain.org>\r\n", 1);
+    SIP_Header_Input_Output hdr1(SIP_HEADER_CONTACT, "Contact: sip:123456789@my-domain.org", "Contact: <sip:123456789@my-domain.org>\r\n", 1, true, true);
     _header_input_output.push_back(hdr1);
 
-    SIP_Header_Input_Output hdr2(SIP_HEADER_CONTACT, "Contact: sips:my-domain.org:5060;parameter1;parameter2;expires=60;parameter3;q=1.0", "Contact: <sips:my-domain.org:5060>;expires=60;q=1.0;parameter1;parameter2;parameter3\r\n", 1);
+    SIP_Header_Input_Output hdr2(SIP_HEADER_CONTACT, "Contact: sips:my-domain.org:5060;parameter1;parameter2;expires=60;parameter3;q=1.0", "Contact: <sips:my-domain.org:5060>;expires=60;q=1.0;parameter1;parameter2;parameter3\r\n", 1, true, true);
     _header_input_output.push_back(hdr2);
 
-    SIP_Header_Input_Output hdr3(SIP_HEADER_CONTACT, "Contact:   Display name here <sip:my-domain.org;par;lr;ttl=160>;parameter1  ;q=0.5;  parameter2,tel:+123456789;par", "Contact: Display name here <sip:my-domain.org;ttl=160;lr;par>;q=0.5;parameter1;parameter2\r\nContact: <tel:+123456789>;par\r\n", 2);
+    SIP_Header_Input_Output hdr3(SIP_HEADER_CONTACT, "Contact:   Display name here <sip:my-domain.org;par;lr;ttl=160>;parameter1  ;q=0.5;  parameter2,tel:+123456789;par", "Contact: Display name here <sip:my-domain.org;ttl=160;lr;par>;q=0.5;parameter1;parameter2\r\nContact: <tel:+123456789>;par\r\n", 2, true, true);
     _header_input_output.push_back(hdr3);
 
-    SIP_Header_Input_Output hdr4(SIP_HEADER_CONTACT, "Contact: \"Mr. Watson\" <sip:watson@worcester.bell-telephone.com;lr;par1? header=hdr1 > ;q=0.7 ;expires=3600, \"Mr. Watson\" <mailto:watson@bell-telephone.com> ;q=0.1", "Contact: \"Mr. Watson\" <sip:watson@worcester.bell-telephone.com;lr;par1?header=hdr1>;expires=3600;q=0.7\r\nContact: \"Mr. Watson\" <mailto:watson@bell-telephone.com>;q=0.1\r\n", 2);
+    SIP_Header_Input_Output hdr4(SIP_HEADER_CONTACT, "Contact: \"Mr. Watson\" <sip:watson@worcester.bell-telephone.com;lr;par1? header=hdr1 > ;q=0.7 ;expires=3600, \"Mr. Watson\" <mailto:watson@bell-telephone.com> ;q=0.1", "Contact: \"Mr. Watson\" <sip:watson@worcester.bell-telephone.com;lr;par1?header=hdr1>;expires=3600;q=0.7\r\nContact: \"Mr. Watson\" <mailto:watson@bell-telephone.com>;q=0.1\r\n", 2, true, true);
     _header_input_output.push_back(hdr4);
 
-    SIP_Header_Input_Output hdr5(SIP_HEADER_CONTACT, "m: *", "Contact: *\r\n", 1);
+    SIP_Header_Input_Output hdr5(SIP_HEADER_CONTACT, "m: *", "Contact: *\r\n", 1, true, true);
     _header_input_output.push_back(hdr5);
 
-    SIP_Header_Input_Output hdr6(SIP_HEADER_CONTACT, "Contact: sip:123456789:password@my-domain.org", "Contact: <sip:123456789:password@my-domain.org>\r\n", 1);
+    SIP_Header_Input_Output hdr6(SIP_HEADER_CONTACT, "Contact: sip:123456789:password@my-domain.org", "Contact: <sip:123456789:password@my-domain.org>\r\n", 1, true, true);
     _header_input_output.push_back(hdr6);
 
-    SIP_Header_Input_Output hdr7(SIP_HEADER_CONTACT, "m: <sips:bob@192.0.2.4>;expires=60", "Contact: <sips:bob@192.0.2.4>;expires=60\r\n", 1);
+    SIP_Header_Input_Output hdr7(SIP_HEADER_CONTACT, "m: <sips:bob@192.0.2.4>;expires=60", "Contact: <sips:bob@192.0.2.4>;expires=60\r\n", 1, true, true);
     _header_input_output.push_back(hdr7);
 }
 
@@ -438,16 +458,16 @@ SIP_Header_Contact_Test::SIP_Header_Contact_Test()
 
 SIP_Header_Content_Disposition_Test::SIP_Header_Content_Disposition_Test()
 {
-    SIP_Header_Input_Output hdr1(SIP_HEADER_CONTENT_DISPOSITION, "Content-Disposition: session;handling=required;par1", "Content-Disposition: session;handling=required;par1\r\n", 1);
+    SIP_Header_Input_Output hdr1(SIP_HEADER_CONTENT_DISPOSITION, "Content-Disposition: session;handling=required;par1", "Content-Disposition: session;handling=required;par1\r\n", 1, true, true);
     _header_input_output.push_back(hdr1);
 
-    SIP_Header_Input_Output hdr2(SIP_HEADER_CONTENT_DISPOSITION, "Content-Disposition:   alert  ;  handling=  optional ; par1 ; par2;par3", "Content-Disposition: alert;handling=optional;par1;par2;par3\r\n", 1);
+    SIP_Header_Input_Output hdr2(SIP_HEADER_CONTENT_DISPOSITION, "Content-Disposition:   alert  ;  handling=  optional ; par1 ; par2;par3", "Content-Disposition: alert;handling=optional;par1;par2;par3\r\n", 1, true, true);
     _header_input_output.push_back(hdr2);
 
-    SIP_Header_Input_Output hdr3(SIP_HEADER_CONTENT_DISPOSITION, "Content-Disposition: attachment; filename=smime.p7s;handling=required", "Content-Disposition: attachment;handling=required;filename=smime.p7s\r\n", 1);
+    SIP_Header_Input_Output hdr3(SIP_HEADER_CONTENT_DISPOSITION, "Content-Disposition: attachment; filename=smime.p7s;handling=required", "Content-Disposition: attachment;handling=required;filename=smime.p7s\r\n", 1, true, true);
     _header_input_output.push_back(hdr3);
 
-    SIP_Header_Input_Output hdr4(SIP_HEADER_CONTENT_DISPOSITION, "Content-Disposition: render", "Content-Disposition: render\r\n", 1);
+    SIP_Header_Input_Output hdr4(SIP_HEADER_CONTENT_DISPOSITION, "Content-Disposition: render", "Content-Disposition: render\r\n", 1, true, true);
     _header_input_output.push_back(hdr4);
 }
 
@@ -456,19 +476,19 @@ SIP_Header_Content_Disposition_Test::SIP_Header_Content_Disposition_Test()
 
 SIP_Header_Content_Encoding_Test::SIP_Header_Content_Encoding_Test()
 {
-    SIP_Header_Input_Output hdr1(SIP_HEADER_CONTENT_ENCODING, "Content-Encoding: text/plain, gzip", "Content-Encoding: text/plain, gzip\r\n", 2);
+    SIP_Header_Input_Output hdr1(SIP_HEADER_CONTENT_ENCODING, "Content-Encoding: text/plain, gzip", "Content-Encoding: text/plain, gzip\r\n", 2, true, true);
     _header_input_output.push_back(hdr1);
 
-    SIP_Header_Input_Output hdr2(SIP_HEADER_CONTENT_ENCODING, "Content-Encoding:   code1 ", "Content-Encoding: code1\r\n", 1);
+    SIP_Header_Input_Output hdr2(SIP_HEADER_CONTENT_ENCODING, "Content-Encoding:   code1 ", "Content-Encoding: code1\r\n", 1, true, true);
     _header_input_output.push_back(hdr2);
 
-    SIP_Header_Input_Output hdr3(SIP_HEADER_CONTENT_ENCODING, "Content-Encoding: code1,code2 , code3", "Content-Encoding: code1, code2, code3\r\n", 3);
+    SIP_Header_Input_Output hdr3(SIP_HEADER_CONTENT_ENCODING, "Content-Encoding: code1,code2 , code3", "Content-Encoding: code1, code2, code3\r\n", 3, true, true);
     _header_input_output.push_back(hdr3);
 
-    SIP_Header_Input_Output hdr4(SIP_HEADER_CONTENT_ENCODING, "e: tar", "Content-Encoding: tar\r\n", 1);
+    SIP_Header_Input_Output hdr4(SIP_HEADER_CONTENT_ENCODING, "e: tar", "Content-Encoding: tar\r\n", 1, true, true);
     _header_input_output.push_back(hdr4);
 
-    SIP_Header_Input_Output hdr5(SIP_HEADER_CONTENT_ENCODING, "Content-Encoding:gzip", "Content-Encoding: gzip\r\n", 1);
+    SIP_Header_Input_Output hdr5(SIP_HEADER_CONTENT_ENCODING, "Content-Encoding:gzip", "Content-Encoding: gzip\r\n", 1, true, true);
     _header_input_output.push_back(hdr5);
 }
 
@@ -477,13 +497,13 @@ SIP_Header_Content_Encoding_Test::SIP_Header_Content_Encoding_Test()
 
 SIP_Header_Content_Language_Test::SIP_Header_Content_Language_Test()
 {
-    SIP_Header_Input_Output hdr1(SIP_HEADER_CONTENT_LANGUAGE, "Content-Language: pt", "Content-Language: pt\r\n", 1);
+    SIP_Header_Input_Output hdr1(SIP_HEADER_CONTENT_LANGUAGE, "Content-Language: pt", "Content-Language: pt\r\n", 1, true, true);
     _header_input_output.push_back(hdr1);
 
-    SIP_Header_Input_Output hdr2(SIP_HEADER_CONTENT_LANGUAGE, "Content-Language:  en,fr ", "Content-Language: en, fr\r\n", 2);
+    SIP_Header_Input_Output hdr2(SIP_HEADER_CONTENT_LANGUAGE, "Content-Language:  en,fr ", "Content-Language: en, fr\r\n", 2, true, true);
     _header_input_output.push_back(hdr2);
 
-    SIP_Header_Input_Output hdr3(SIP_HEADER_CONTENT_LANGUAGE, "Content-Language:pt,en, fr", "Content-Language: pt, en, fr\r\n", 3);
+    SIP_Header_Input_Output hdr3(SIP_HEADER_CONTENT_LANGUAGE, "Content-Language:pt,en, fr", "Content-Language: pt, en, fr\r\n", 3, true, true);
     _header_input_output.push_back(hdr3);
 }
 
@@ -492,20 +512,32 @@ SIP_Header_Content_Language_Test::SIP_Header_Content_Language_Test()
 
 SIP_Header_Content_Length_Test::SIP_Header_Content_Length_Test()
 {
-    SIP_Header_Input_Output hdr1(SIP_HEADER_CONTENT_LENGTH, "Content-Length: 0", "Content-Length: 0\r\n", 1);
+    SIP_Header_Input_Output hdr1(SIP_HEADER_CONTENT_LENGTH, "Content-Length: 0", "Content-Length: 0\r\n", 1, true, true);
     _header_input_output.push_back(hdr1);
 
-    SIP_Header_Input_Output hdr2(SIP_HEADER_CONTENT_LENGTH, "Content-Length: 5678", "Content-Length: 5678\r\n", 1);
+    SIP_Header_Input_Output hdr2(SIP_HEADER_CONTENT_LENGTH, "Content-Length: 5678", "Content-Length: 5678\r\n", 1, true, true);
     _header_input_output.push_back(hdr2);
 
-    SIP_Header_Input_Output hdr3(SIP_HEADER_CONTENT_LENGTH, "l:50 ", "Content-Length: 50\r\n", 1);
+    SIP_Header_Input_Output hdr3(SIP_HEADER_CONTENT_LENGTH, "l:50 ", "Content-Length: 50\r\n", 1, true, true);
     _header_input_output.push_back(hdr3);
 
-    SIP_Header_Input_Output hdr4(SIP_HEADER_CONTENT_LENGTH, "Content-Length:2147483647", "Content-Length: 2147483647\r\n", 1);
+    SIP_Header_Input_Output hdr4(SIP_HEADER_CONTENT_LENGTH, "Content-Length:2147483647", "Content-Length: 2147483647\r\n", 1, true, true);
     _header_input_output.push_back(hdr4);
 
-    SIP_Header_Input_Output hdr5(SIP_HEADER_CONTENT_LENGTH, "l: 4294967294", "Content-Length: 4294967294\r\n", 1);
+    SIP_Header_Input_Output hdr5(SIP_HEADER_CONTENT_LENGTH, "l: 4294967294", "Content-Length: 4294967294\r\n", 1, true, true);
     _header_input_output.push_back(hdr5);
+
+    SIP_Header_Input_Output hdr6(SIP_HEADER_CONTENT_LENGTH, "Content-Length: 4294967295", "", 0, false, false);
+    _header_input_output.push_back(hdr6);
+
+    SIP_Header_Input_Output hdr7(SIP_HEADER_CONTENT_LENGTH, "l: 4294967296", "", 0, false, false);
+    _header_input_output.push_back(hdr7);
+
+    SIP_Header_Input_Output hdr8(SIP_HEADER_CONTENT_LENGTH, "Content-Length: 4294967297", "", 0, false, false);
+    _header_input_output.push_back(hdr8);
+
+    SIP_Header_Input_Output hdr9(SIP_HEADER_CONTENT_LENGTH, "Content-Length: 6294967295", "", 0, false, false);
+    _header_input_output.push_back(hdr9);
 }
 
 //-------------------------------------------
@@ -513,13 +545,13 @@ SIP_Header_Content_Length_Test::SIP_Header_Content_Length_Test()
 
 SIP_Header_Content_Type_Test::SIP_Header_Content_Type_Test()
 {
-    SIP_Header_Input_Output hdr1(SIP_HEADER_CONTENT_TYPE, "Content-Type: application/sdp", "Content-Type: application/sdp\r\n", 1);
+    SIP_Header_Input_Output hdr1(SIP_HEADER_CONTENT_TYPE, "Content-Type: application/sdp", "Content-Type: application/sdp\r\n", 1, true, true);
     _header_input_output.push_back(hdr1);
 
-    SIP_Header_Input_Output hdr2(SIP_HEADER_CONTENT_TYPE, "c: text/html; charset=ISO-8859-4", "Content-Type: text/html;charset=ISO-8859-4\r\n", 1);
+    SIP_Header_Input_Output hdr2(SIP_HEADER_CONTENT_TYPE, "c: text/html; charset=ISO-8859-4", "Content-Type: text/html;charset=ISO-8859-4\r\n", 1, true, true);
     _header_input_output.push_back(hdr2);
 
-    SIP_Header_Input_Output hdr3(SIP_HEADER_CONTENT_TYPE, "Content-Type:type1/sub1  ;par1;par2  ;  par3 ", "Content-Type: type1/sub1;par1;par2;par3\r\n", 1);
+    SIP_Header_Input_Output hdr3(SIP_HEADER_CONTENT_TYPE, "Content-Type:type1/sub1  ;par1;par2  ;  par3 ", "Content-Type: type1/sub1;par1;par2;par3\r\n", 1, true, true);
     _header_input_output.push_back(hdr3);
 }
 
@@ -528,13 +560,13 @@ SIP_Header_Content_Type_Test::SIP_Header_Content_Type_Test()
 
 SIP_Header_CSeq_Test::SIP_Header_CSeq_Test()
 {
-    SIP_Header_Input_Output hdr1(SIP_HEADER_CSEQ, "CSeq: 1 INVITE", "CSeq: 1 INVITE\r\n", 1);
+    SIP_Header_Input_Output hdr1(SIP_HEADER_CSEQ, "CSeq: 1 INVITE", "CSeq: 1 INVITE\r\n", 1, true, true);
     _header_input_output.push_back(hdr1);
 
-    SIP_Header_Input_Output hdr2(SIP_HEADER_CSEQ, "CSeq: 9876 TEST", "CSeq: 9876 TEST\r\n", 1);
+    SIP_Header_Input_Output hdr2(SIP_HEADER_CSEQ, "CSeq: 9876 TEST", "CSeq: 9876 TEST\r\n", 1, true, true);
     _header_input_output.push_back(hdr2);
 
-    SIP_Header_Input_Output hdr3(SIP_HEADER_CSEQ, "CSeq:0    ACK   ", "CSeq: 0 ACK\r\n", 1);
+    SIP_Header_Input_Output hdr3(SIP_HEADER_CSEQ, "CSeq:0    ACK   ", "CSeq: 0 ACK\r\n", 1, true, true);
     _header_input_output.push_back(hdr3);
 }
 
@@ -543,13 +575,13 @@ SIP_Header_CSeq_Test::SIP_Header_CSeq_Test()
 
 SIP_Header_Date_Test::SIP_Header_Date_Test()
 {
-    SIP_Header_Input_Output hdr1(SIP_HEADER_DATE, "Date: Fri, 1 Oct 1990 00:10:59 GMT", "Date: Fri, 01 Oct 1990 00:10:59 GMT\r\n", 1);
+    SIP_Header_Input_Output hdr1(SIP_HEADER_DATE, "Date: Fri, 1 Oct 1990 00:10:59 GMT", "Date: Fri, 01 Oct 1990 00:10:59 GMT\r\n", 1, true, true);
     _header_input_output.push_back(hdr1);
 
-    SIP_Header_Input_Output hdr2(SIP_HEADER_DATE, "Date: Wed, 10 Feb 2001 23:00:20 GMT", "Date: Wed, 10 Feb 2001 23:00:20 GMT\r\n", 1);
+    SIP_Header_Input_Output hdr2(SIP_HEADER_DATE, "Date: Wed, 10 Feb 2001 23:00:20 GMT", "Date: Wed, 10 Feb 2001 23:00:20 GMT\r\n", 1, true, true);
     _header_input_output.push_back(hdr2);
 
-    SIP_Header_Input_Output hdr3(SIP_HEADER_DATE, "Date: Mon, 31 Dec 2010 12:59:05 GM", "Date: Mon, 31 Dec 2010 12:59:05 GM\r\n", 1);
+    SIP_Header_Input_Output hdr3(SIP_HEADER_DATE, "Date: Mon, 31 Dec 2010 12:59:05 GM", "Date: Mon, 31 Dec 2010 12:59:05 GM\r\n", 1, true, true);
     _header_input_output.push_back(hdr3);
 }
 
@@ -558,13 +590,13 @@ SIP_Header_Date_Test::SIP_Header_Date_Test()
 
 SIP_Header_Error_Info_Test::SIP_Header_Error_Info_Test()
 {
-    SIP_Header_Input_Output hdr1(SIP_HEADER_ERROR_INFO, "Error-Info: <sip:not-in-service-recording@atlanta.com>", "Error-Info: <sip:not-in-service-recording@atlanta.com>\r\n", 1);
+    SIP_Header_Input_Output hdr1(SIP_HEADER_ERROR_INFO, "Error-Info: <sip:not-in-service-recording@atlanta.com>", "Error-Info: <sip:not-in-service-recording@atlanta.com>\r\n", 1, true, true);
     _header_input_output.push_back(hdr1);
 
-    SIP_Header_Input_Output hdr2(SIP_HEADER_ERROR_INFO, "Error-Info: <mailto:user@host.com;par1; par2 ;par3>;param1 ; param2 ;param3 , <http://wwww.example.com/alice/photo.jpg>", "Error-Info: <mailto:user@host.com;par1; par2 ;par3>;param1;param2;param3, <http://wwww.example.com/alice/photo.jpg>\r\n", 2);
+    SIP_Header_Input_Output hdr2(SIP_HEADER_ERROR_INFO, "Error-Info: <mailto:user@host.com;par1; par2 ;par3>;param1 ; param2 ;param3 , <http://wwww.example.com/alice/photo.jpg>", "Error-Info: <mailto:user@host.com;par1; par2 ;par3>;param1;param2;param3, <http://wwww.example.com/alice/photo.jpg>\r\n", 2, true, true);
     _header_input_output.push_back(hdr2);
 
-    SIP_Header_Input_Output hdr3(SIP_HEADER_ERROR_INFO, "Error-Info: <sips:user@host.com;par1> ; param1 ; param2 ;param3,<abc:user;par1> ; param2", "Error-Info: <sips:user@host.com;par1>;param1;param2;param3, <abc:user;par1>;param2\r\n", 2);
+    SIP_Header_Input_Output hdr3(SIP_HEADER_ERROR_INFO, "Error-Info: <sips:user@host.com;par1> ; param1 ; param2 ;param3,<abc:user;par1> ; param2", "Error-Info: <sips:user@host.com;par1>;param1;param2;param3, <abc:user;par1>;param2\r\n", 2, true, true);
     _header_input_output.push_back(hdr3);
 }
 
@@ -573,13 +605,13 @@ SIP_Header_Error_Info_Test::SIP_Header_Error_Info_Test()
 
 SIP_Header_Event_Test::SIP_Header_Event_Test()
 {
-    SIP_Header_Input_Output hdr1(SIP_HEADER_EVENT, "Event: presence", "Event: presence\r\n", 1);
+    SIP_Header_Input_Output hdr1(SIP_HEADER_EVENT, "Event: presence", "Event: presence\r\n", 1, true, true);
     _header_input_output.push_back(hdr1);
 
-    SIP_Header_Input_Output hdr2(SIP_HEADER_EVENT, "Event: test; id=1234", "Event: test;id=1234\r\n", 1);
+    SIP_Header_Input_Output hdr2(SIP_HEADER_EVENT, "Event: test; id=1234", "Event: test;id=1234\r\n", 1, true, true);
     _header_input_output.push_back(hdr2);
 
-    SIP_Header_Input_Output hdr3(SIP_HEADER_EVENT, "Event:  package.template1.template2  ; par1 ; id= 567 ;par2 ", "Event: package.template1.template2;id=567;par1;par2\r\n", 1);
+    SIP_Header_Input_Output hdr3(SIP_HEADER_EVENT, "Event:  package.template1.template2  ; par1 ; id= 567 ;par2 ", "Event: package.template1.template2;id=567;par1;par2\r\n", 1, true, true);
     _header_input_output.push_back(hdr3);
 }
 
@@ -588,13 +620,13 @@ SIP_Header_Event_Test::SIP_Header_Event_Test()
 
 SIP_Header_Expires_Test::SIP_Header_Expires_Test()
 {
-    SIP_Header_Input_Output hdr1(SIP_HEADER_EXPIRES, "Expires: 3600", "Expires: 3600\r\n", 1);
+    SIP_Header_Input_Output hdr1(SIP_HEADER_EXPIRES, "Expires: 3600", "Expires: 3600\r\n", 1, true, true);
     _header_input_output.push_back(hdr1);
 
-    SIP_Header_Input_Output hdr2(SIP_HEADER_EXPIRES, "Expires: 0", "Expires: 0\r\n", 1);
+    SIP_Header_Input_Output hdr2(SIP_HEADER_EXPIRES, "Expires: 0", "Expires: 0\r\n", 1, true, true);
     _header_input_output.push_back(hdr2);
 
-    SIP_Header_Input_Output hdr3(SIP_HEADER_EXPIRES, "Expires:    567890 ", "Expires: 567890\r\n", 1);
+    SIP_Header_Input_Output hdr3(SIP_HEADER_EXPIRES, "Expires:    567890 ", "Expires: 567890\r\n", 1, true, true);
     _header_input_output.push_back(hdr3);
 }
 
@@ -603,16 +635,16 @@ SIP_Header_Expires_Test::SIP_Header_Expires_Test()
 
 SIP_Header_From_Test::SIP_Header_From_Test()
 {
-    SIP_Header_Input_Output hdr1(SIP_HEADER_FROM, "From: Nikola Tesla <sip:n.tesla@high-voltage.org>;tag=76341", "From: Nikola Tesla <sip:n.tesla@high-voltage.org>;tag=76341\r\n", 1);
+    SIP_Header_Input_Output hdr1(SIP_HEADER_FROM, "From: Nikola Tesla <sip:n.tesla@high-voltage.org>;tag=76341", "From: Nikola Tesla <sip:n.tesla@high-voltage.org>;tag=76341\r\n", 1, true, true);
     _header_input_output.push_back(hdr1);
 
-    SIP_Header_Input_Output hdr2(SIP_HEADER_FROM, "f: Anonymous <sip:c8oqz84zk7z@privacy.org>", "From: Anonymous <sip:c8oqz84zk7z@privacy.org>\r\n", 1);
+    SIP_Header_Input_Output hdr2(SIP_HEADER_FROM, "f: Anonymous <sip:c8oqz84zk7z@privacy.org>", "From: Anonymous <sip:c8oqz84zk7z@privacy.org>\r\n", 1, true, true);
     _header_input_output.push_back(hdr2);
 
-    SIP_Header_Input_Output hdr3(SIP_HEADER_FROM, "From:  \"Nikola Tesla\"   <sip:n.tesla@high-voltage.org;par1 ;transport=tcp ; par2  ;par3>;parameter1;tag=76341 ", "From: \"Nikola Tesla\" <sip:n.tesla@high-voltage.org;transport=tcp;par1;par2;par3>;tag=76341;parameter1\r\n", 1);
+    SIP_Header_Input_Output hdr3(SIP_HEADER_FROM, "From:  \"Nikola Tesla\"   <sip:n.tesla@high-voltage.org;par1 ;transport=tcp ; par2  ;par3>;parameter1;tag=76341 ", "From: \"Nikola Tesla\" <sip:n.tesla@high-voltage.org;transport=tcp;par1;par2;par3>;tag=76341;parameter1\r\n", 1, true, true);
     _header_input_output.push_back(hdr3);
 
-    SIP_Header_Input_Output hdr4(SIP_HEADER_FROM, "f: Anonymous <sip: c8oqz84zk7z:pass123@privacy.org;method=INVITE ? header=hdr1 & name=value&name2=value2>", "From: Anonymous <sip:c8oqz84zk7z:pass123@privacy.org;method=INVITE?header=hdr1&name=value&name2=value2>\r\n", 1);
+    SIP_Header_Input_Output hdr4(SIP_HEADER_FROM, "f: Anonymous <sip: c8oqz84zk7z:pass123@privacy.org;method=INVITE ? header=hdr1 & name=value&name2=value2>", "From: Anonymous <sip:c8oqz84zk7z:pass123@privacy.org;method=INVITE?header=hdr1&name=value&name2=value2>\r\n", 1, true, true);
     _header_input_output.push_back(hdr4);
 }
 
@@ -621,13 +653,13 @@ SIP_Header_From_Test::SIP_Header_From_Test()
 
 SIP_Header_In_Reply_To_Test::SIP_Header_In_Reply_To_Test()
 {
-    SIP_Header_Input_Output hdr1(SIP_HEADER_IN_REPLY_TO, "In-Reply-To: 70710@saturn.bell-tel.com, 17320@saturn.bell-tel.com", "In-Reply-To: 70710@saturn.bell-tel.com, 17320@saturn.bell-tel.com\r\n", 2);
+    SIP_Header_Input_Output hdr1(SIP_HEADER_IN_REPLY_TO, "In-Reply-To: 70710@saturn.bell-tel.com, 17320@saturn.bell-tel.com", "In-Reply-To: 70710@saturn.bell-tel.com, 17320@saturn.bell-tel.com\r\n", 2, true, true);
     _header_input_output.push_back(hdr1);
 
-    SIP_Header_Input_Output hdr2(SIP_HEADER_IN_REPLY_TO, "In-Reply-To: 123456789", "In-Reply-To: 123456789\r\n", 1);
+    SIP_Header_Input_Output hdr2(SIP_HEADER_IN_REPLY_TO, "In-Reply-To: 123456789", "In-Reply-To: 123456789\r\n", 1, true, true);
     _header_input_output.push_back(hdr2);
 
-    SIP_Header_Input_Output hdr3(SIP_HEADER_IN_REPLY_TO, "In-Reply-To:my-domain.org , test@domain.com:1234", "In-Reply-To: my-domain.org, test@domain.com:1234\r\n", 2);
+    SIP_Header_Input_Output hdr3(SIP_HEADER_IN_REPLY_TO, "In-Reply-To:my-domain.org , test@domain.com:1234", "In-Reply-To: my-domain.org, test@domain.com:1234\r\n", 2, true, true);
     _header_input_output.push_back(hdr3);
 }
 
@@ -636,13 +668,13 @@ SIP_Header_In_Reply_To_Test::SIP_Header_In_Reply_To_Test()
 
 SIP_Header_Max_Forwards_Test::SIP_Header_Max_Forwards_Test()
 {
-    SIP_Header_Input_Output hdr1(SIP_HEADER_MAX_FORWARDS, "Max-Forwards: 70", "Max-Forwards: 70\r\n", 1);
+    SIP_Header_Input_Output hdr1(SIP_HEADER_MAX_FORWARDS, "Max-Forwards: 70", "Max-Forwards: 70\r\n", 1, true, true);
     _header_input_output.push_back(hdr1);
 
-    SIP_Header_Input_Output hdr2(SIP_HEADER_MAX_FORWARDS, "Max-Forwards:   56789  ", "Max-Forwards: 56789\r\n", 1);
+    SIP_Header_Input_Output hdr2(SIP_HEADER_MAX_FORWARDS, "Max-Forwards:   56789  ", "Max-Forwards: 56789\r\n", 1, true, true);
     _header_input_output.push_back(hdr2);
 
-    SIP_Header_Input_Output hdr3(SIP_HEADER_MAX_FORWARDS, "Max-Forwards:1", "Max-Forwards: 1\r\n", 1);
+    SIP_Header_Input_Output hdr3(SIP_HEADER_MAX_FORWARDS, "Max-Forwards:1", "Max-Forwards: 1\r\n", 1, true, true);
     _header_input_output.push_back(hdr3);
 }
 
@@ -651,13 +683,13 @@ SIP_Header_Max_Forwards_Test::SIP_Header_Max_Forwards_Test()
 
 SIP_Header_Mime_Version_Test::SIP_Header_Mime_Version_Test()
 {
-    SIP_Header_Input_Output hdr1(SIP_HEADER_MIME_VERSION, "MIME-Version: 1.0", "MIME-Version: 1.0\r\n", 1);
+    SIP_Header_Input_Output hdr1(SIP_HEADER_MIME_VERSION, "MIME-Version: 1.0", "MIME-Version: 1.0\r\n", 1, true, true);
     _header_input_output.push_back(hdr1);
 
-    SIP_Header_Input_Output hdr2(SIP_HEADER_MIME_VERSION, "MIME-Version:   2.5  ", "MIME-Version: 2.5\r\n", 1);
+    SIP_Header_Input_Output hdr2(SIP_HEADER_MIME_VERSION, "MIME-Version:   2.5  ", "MIME-Version: 2.5\r\n", 1, true, true);
     _header_input_output.push_back(hdr2);
 
-    SIP_Header_Input_Output hdr3(SIP_HEADER_MIME_VERSION, "MIME-Version:0.0", "MIME-Version: 0.0\r\n", 1);
+    SIP_Header_Input_Output hdr3(SIP_HEADER_MIME_VERSION, "MIME-Version:0.0", "MIME-Version: 0.0\r\n", 1, true, true);
     _header_input_output.push_back(hdr3);
 }
 
@@ -666,13 +698,13 @@ SIP_Header_Mime_Version_Test::SIP_Header_Mime_Version_Test()
 
 SIP_Header_Min_Expires_Test::SIP_Header_Min_Expires_Test()
 {
-    SIP_Header_Input_Output hdr1(SIP_HEADER_MIN_EXPIRES, "Min-Expires: 3600", "Min-Expires: 3600\r\n", 1);
+    SIP_Header_Input_Output hdr1(SIP_HEADER_MIN_EXPIRES, "Min-Expires: 3600", "Min-Expires: 3600\r\n", 1, true, true);
     _header_input_output.push_back(hdr1);
 
-    SIP_Header_Input_Output hdr2(SIP_HEADER_MIN_EXPIRES, "Min-Expires:0", "Min-Expires: 0\r\n", 1);
+    SIP_Header_Input_Output hdr2(SIP_HEADER_MIN_EXPIRES, "Min-Expires:0", "Min-Expires: 0\r\n", 1, true, true);
     _header_input_output.push_back(hdr2);
 
-    SIP_Header_Input_Output hdr3(SIP_HEADER_MIN_EXPIRES, "Min-Expires:    567890 ", "Min-Expires: 567890\r\n", 1);
+    SIP_Header_Input_Output hdr3(SIP_HEADER_MIN_EXPIRES, "Min-Expires:    567890 ", "Min-Expires: 567890\r\n", 1, true, true);
     _header_input_output.push_back(hdr3);
 }
 
@@ -681,16 +713,16 @@ SIP_Header_Min_Expires_Test::SIP_Header_Min_Expires_Test()
 
 SIP_Header_Organization_Test::SIP_Header_Organization_Test()
 {
-    SIP_Header_Input_Output hdr1(SIP_HEADER_ORGANIZATION, "Organization: Boxes by Bob", "Organization: Boxes by Bob\r\n", 1);
+    SIP_Header_Input_Output hdr1(SIP_HEADER_ORGANIZATION, "Organization: Boxes by Bob", "Organization: Boxes by Bob\r\n", 1, true, true);
     _header_input_output.push_back(hdr1);
 
-    SIP_Header_Input_Output hdr2(SIP_HEADER_ORGANIZATION, "Organization:", "Organization: \r\n", 1);
+    SIP_Header_Input_Output hdr2(SIP_HEADER_ORGANIZATION, "Organization:", "Organization: \r\n", 1, true, true);
     _header_input_output.push_back(hdr2);
 
-    SIP_Header_Input_Output hdr3(SIP_HEADER_ORGANIZATION, "Organization:   ABC ", "Organization: ABC\r\n", 1);
+    SIP_Header_Input_Output hdr3(SIP_HEADER_ORGANIZATION, "Organization:   ABC ", "Organization: ABC\r\n", 1, true, true);
     _header_input_output.push_back(hdr3);
 
-    SIP_Header_Input_Output hdr4(SIP_HEADER_ORGANIZATION, "Organization:   ", "Organization: \r\n", 1);
+    SIP_Header_Input_Output hdr4(SIP_HEADER_ORGANIZATION, "Organization:   ", "Organization: \r\n", 1, true, true);
     _header_input_output.push_back(hdr4);
 }
 
@@ -699,13 +731,13 @@ SIP_Header_Organization_Test::SIP_Header_Organization_Test()
 
 SIP_Header_Priority_Test::SIP_Header_Priority_Test()
 {
-    SIP_Header_Input_Output hdr1(SIP_HEADER_PRIORITY, "Priority: normal", "Priority: normal\r\n", 1);
+    SIP_Header_Input_Output hdr1(SIP_HEADER_PRIORITY, "Priority: normal", "Priority: normal\r\n", 1, true, true);
     _header_input_output.push_back(hdr1);
 
-    SIP_Header_Input_Output hdr2(SIP_HEADER_PRIORITY, "Priority:urgent  ", "Priority: urgent\r\n", 1);
+    SIP_Header_Input_Output hdr2(SIP_HEADER_PRIORITY, "Priority:urgent  ", "Priority: urgent\r\n", 1, true, true);
     _header_input_output.push_back(hdr2);
 
-    SIP_Header_Input_Output hdr3(SIP_HEADER_PRIORITY, "Priority:my-priority", "Priority: my-priority\r\n", 1);
+    SIP_Header_Input_Output hdr3(SIP_HEADER_PRIORITY, "Priority:my-priority", "Priority: my-priority\r\n", 1, true, true);
     _header_input_output.push_back(hdr3);
 }
 
@@ -714,13 +746,13 @@ SIP_Header_Priority_Test::SIP_Header_Priority_Test()
 
 SIP_Header_Proxy_Require_Test::SIP_Header_Proxy_Require_Test()
 {
-    SIP_Header_Input_Output hdr1(SIP_HEADER_PROXY_REQUIRE, "Proxy-Require: foo", "Proxy-Require: foo\r\n", 1);
+    SIP_Header_Input_Output hdr1(SIP_HEADER_PROXY_REQUIRE, "Proxy-Require: foo", "Proxy-Require: foo\r\n", 1, true, true);
     _header_input_output.push_back(hdr1);
 
-    SIP_Header_Input_Output hdr2(SIP_HEADER_PROXY_REQUIRE, "Proxy-Require: req1, req2,req3", "Proxy-Require: req1, req2, req3\r\n", 3);
+    SIP_Header_Input_Output hdr2(SIP_HEADER_PROXY_REQUIRE, "Proxy-Require: req1, req2,req3", "Proxy-Require: req1, req2, req3\r\n", 3, true, true);
     _header_input_output.push_back(hdr2);
 
-    SIP_Header_Input_Output hdr3(SIP_HEADER_PROXY_REQUIRE, "Proxy-Require:req1,req2", "Proxy-Require: req1, req2\r\n", 2);
+    SIP_Header_Input_Output hdr3(SIP_HEADER_PROXY_REQUIRE, "Proxy-Require:req1,req2", "Proxy-Require: req1, req2\r\n", 2, true, true);
     _header_input_output.push_back(hdr3);
 }
 
@@ -729,13 +761,13 @@ SIP_Header_Proxy_Require_Test::SIP_Header_Proxy_Require_Test()
 
 SIP_Header_Record_Route_Test::SIP_Header_Record_Route_Test()
 {
-    SIP_Header_Input_Output hdr1(SIP_HEADER_RECORD_ROUTE, "Record-Route: <sip:server10.biloxi.com;lr>, <sip:bigbox3.site3.atlanta.com;lr>", "Record-Route: <sip:server10.biloxi.com;lr>\r\nRecord-Route: <sip:bigbox3.site3.atlanta.com;lr>\r\n", 2);
+    SIP_Header_Input_Output hdr1(SIP_HEADER_RECORD_ROUTE, "Record-Route: <sip:server10.biloxi.com;lr>, <sip:bigbox3.site3.atlanta.com;lr>", "Record-Route: <sip:server10.biloxi.com;lr>\r\nRecord-Route: <sip:bigbox3.site3.atlanta.com;lr>\r\n", 2, true, true);
     _header_input_output.push_back(hdr1);
 
-    SIP_Header_Input_Output hdr2(SIP_HEADER_RECORD_ROUTE, "Record-Route:   <sip:user@server10.biloxi.com;par1;user= phone >;parameter1, <sip:bigbox3.site3.atlanta.com;par1;lr;par2>", "Record-Route: <sip:user@server10.biloxi.com;user=phone;par1>;parameter1\r\nRecord-Route: <sip:bigbox3.site3.atlanta.com;lr;par1;par2>\r\n", 2);
+    SIP_Header_Input_Output hdr2(SIP_HEADER_RECORD_ROUTE, "Record-Route:   <sip:user@server10.biloxi.com;par1;user= phone >;parameter1, <sip:bigbox3.site3.atlanta.com;par1;lr;par2>", "Record-Route: <sip:user@server10.biloxi.com;user=phone;par1>;parameter1\r\nRecord-Route: <sip:bigbox3.site3.atlanta.com;lr;par1;par2>\r\n", 2, true, true);
     _header_input_output.push_back(hdr2);
 
-    SIP_Header_Input_Output hdr3(SIP_HEADER_RECORD_ROUTE, "Record-Route: <sip:n.tesla@high-voltage.org;par1 ; maddr= 10.0.0.10 ; par2  ;par3> ;  parameter1;parameter2 , <sip:c8oqz84zk7z@privacy.org> ; parameter1", "Record-Route: <sip:n.tesla@high-voltage.org;maddr=10.0.0.10;par1;par2;par3>;parameter1;parameter2\r\nRecord-Route: <sip:c8oqz84zk7z@privacy.org>;parameter1\r\n", 2);
+    SIP_Header_Input_Output hdr3(SIP_HEADER_RECORD_ROUTE, "Record-Route: <sip:n.tesla@high-voltage.org;par1 ; maddr= 10.0.0.10 ; par2  ;par3> ;  parameter1;parameter2 , <sip:c8oqz84zk7z@privacy.org> ; parameter1", "Record-Route: <sip:n.tesla@high-voltage.org;maddr=10.0.0.10;par1;par2;par3>;parameter1;parameter2\r\nRecord-Route: <sip:c8oqz84zk7z@privacy.org>;parameter1\r\n", 2, true, true);
     _header_input_output.push_back(hdr3);
 }
 
@@ -744,13 +776,13 @@ SIP_Header_Record_Route_Test::SIP_Header_Record_Route_Test()
 
 SIP_Header_Reply_To_Test::SIP_Header_Reply_To_Test()
 {
-    SIP_Header_Input_Output hdr1(SIP_HEADER_REPLY_TO, "Reply-To: Bob <sip:bob@biloxi.com>", "Reply-To: Bob <sip:bob@biloxi.com>\r\n", 1);
+    SIP_Header_Input_Output hdr1(SIP_HEADER_REPLY_TO, "Reply-To: Bob <sip:bob@biloxi.com>", "Reply-To: Bob <sip:bob@biloxi.com>\r\n", 1, true, true);
     _header_input_output.push_back(hdr1);
 
-    SIP_Header_Input_Output hdr2(SIP_HEADER_REPLY_TO, "Reply-To:   <sip:user@server10.biloxi.com;par1;user= phone >;parameter1", "Reply-To: <sip:user@server10.biloxi.com;user=phone;par1>;parameter1\r\n", 1);
+    SIP_Header_Input_Output hdr2(SIP_HEADER_REPLY_TO, "Reply-To:   <sip:user@server10.biloxi.com;par1;user= phone >;parameter1", "Reply-To: <sip:user@server10.biloxi.com;user=phone;par1>;parameter1\r\n", 1, true, true);
     _header_input_output.push_back(hdr2);
 
-    SIP_Header_Input_Output hdr3(SIP_HEADER_REPLY_TO, "Reply-To: <sip:n.tesla@high-voltage.org;par1 ; maddr= 10.0.0.10 ; par2  ;ttl=70;par3> ;  parameter1;parameter2 ", "Reply-To: <sip:n.tesla@high-voltage.org;ttl=70;maddr=10.0.0.10;par1;par2;par3>;parameter1;parameter2\r\n", 1);
+    SIP_Header_Input_Output hdr3(SIP_HEADER_REPLY_TO, "Reply-To: <sip:n.tesla@high-voltage.org;par1 ; maddr= 10.0.0.10 ; par2  ;ttl=70;par3> ;  parameter1;parameter2 ", "Reply-To: <sip:n.tesla@high-voltage.org;ttl=70;maddr=10.0.0.10;par1;par2;par3>;parameter1;parameter2\r\n", 1, true, true);
     _header_input_output.push_back(hdr3);
 }
 
@@ -759,13 +791,13 @@ SIP_Header_Reply_To_Test::SIP_Header_Reply_To_Test()
 
 SIP_Header_Require_Test::SIP_Header_Require_Test()
 {
-    SIP_Header_Input_Output hdr1(SIP_HEADER_REQUIRE, "Require: foo", "Require: foo\r\n", 1);
+    SIP_Header_Input_Output hdr1(SIP_HEADER_REQUIRE, "Require: foo", "Require: foo\r\n", 1, true, true);
     _header_input_output.push_back(hdr1);
 
-    SIP_Header_Input_Output hdr2(SIP_HEADER_REQUIRE, "Require: req1, req2,req3", "Require: req1, req2, req3\r\n", 3);
+    SIP_Header_Input_Output hdr2(SIP_HEADER_REQUIRE, "Require: req1, req2,req3", "Require: req1, req2, req3\r\n", 3, true, true);
     _header_input_output.push_back(hdr2);
 
-    SIP_Header_Input_Output hdr3(SIP_HEADER_REQUIRE, "Require:req1,req2", "Require: req1, req2\r\n", 2);
+    SIP_Header_Input_Output hdr3(SIP_HEADER_REQUIRE, "Require:req1,req2", "Require: req1, req2\r\n", 2, true, true);
     _header_input_output.push_back(hdr3);
 }
 
@@ -774,16 +806,16 @@ SIP_Header_Require_Test::SIP_Header_Require_Test()
 
 SIP_Header_Retry_After_Test::SIP_Header_Retry_After_Test()
 {
-    SIP_Header_Input_Output hdr1(SIP_HEADER_RETRY_AFTER, "Retry-After: 18000;duration=3600", "Retry-After: 18000;duration=3600\r\n", 1);
+    SIP_Header_Input_Output hdr1(SIP_HEADER_RETRY_AFTER, "Retry-After: 18000;duration=3600", "Retry-After: 18000;duration=3600\r\n", 1, true, true);
     _header_input_output.push_back(hdr1);
 
-    SIP_Header_Input_Output hdr2(SIP_HEADER_RETRY_AFTER, "Retry-After: 120 (I'm in a meeting)", "Retry-After: 120 (I'm in a meeting)\r\n", 1);
+    SIP_Header_Input_Output hdr2(SIP_HEADER_RETRY_AFTER, "Retry-After: 120 (I'm in a meeting)", "Retry-After: 120 (I'm in a meeting)\r\n", 1, true, true);
     _header_input_output.push_back(hdr2);
 
-    SIP_Header_Input_Output hdr3(SIP_HEADER_RETRY_AFTER, "Retry-After:10( I'm in a meeting );par1=test;duration= 100 ; par2", "Retry-After: 10 ( I'm in a meeting );duration=100;par1=test;par2\r\n", 1);
+    SIP_Header_Input_Output hdr3(SIP_HEADER_RETRY_AFTER, "Retry-After:10( I'm in a meeting );par1=test;duration= 100 ; par2", "Retry-After: 10 ( I'm in a meeting );duration=100;par1=test;par2\r\n", 1, true, true);
     _header_input_output.push_back(hdr3);
 
-    SIP_Header_Input_Output hdr4(SIP_HEADER_RETRY_AFTER, "Retry-After: 99999999 (This (\"is a\") comment); par1", "Retry-After: 99999999 (This (\"is a\") comment);par1\r\n", 1);
+    SIP_Header_Input_Output hdr4(SIP_HEADER_RETRY_AFTER, "Retry-After: 99999999 (This (\"is a\") comment); par1", "Retry-After: 99999999 (This (\"is a\") comment);par1\r\n", 1, true, true);
     _header_input_output.push_back(hdr4);
 }
 
@@ -792,19 +824,19 @@ SIP_Header_Retry_After_Test::SIP_Header_Retry_After_Test()
 
 SIP_Header_Route_Test::SIP_Header_Route_Test()
 {
-    SIP_Header_Input_Output hdr1(SIP_HEADER_ROUTE, "Route: <sip:bigbox3.site3.atlanta.com;lr>, <sip:server10.biloxi.com;lr>", "Route: <sip:bigbox3.site3.atlanta.com;lr>\r\nRoute: <sip:server10.biloxi.com;lr>\r\n", 2);
+    SIP_Header_Input_Output hdr1(SIP_HEADER_ROUTE, "Route: <sip:bigbox3.site3.atlanta.com;lr>, <sip:server10.biloxi.com;lr>", "Route: <sip:bigbox3.site3.atlanta.com;lr>\r\nRoute: <sip:server10.biloxi.com;lr>\r\n", 2, true, true);
     _header_input_output.push_back(hdr1);
 
-    SIP_Header_Input_Output hdr2(SIP_HEADER_ROUTE, "Route: <sip:server13.atlanta.com;lr>", "Route: <sip:server13.atlanta.com;lr>\r\n", 1);
+    SIP_Header_Input_Output hdr2(SIP_HEADER_ROUTE, "Route: <sip:server13.atlanta.com;lr>", "Route: <sip:server13.atlanta.com;lr>\r\n", 1, true, true);
     _header_input_output.push_back(hdr2);
 
-    SIP_Header_Input_Output hdr3(SIP_HEADER_ROUTE, "Route:   <sip:server1.atlanta.com ; transport=udp ; user=phone  ;  lr > ", "Route: <sip:server1.atlanta.com;transport=udp;user=phone;lr>\r\n", 1);
+    SIP_Header_Input_Output hdr3(SIP_HEADER_ROUTE, "Route:   <sip:server1.atlanta.com ; transport=udp ; user=phone  ;  lr > ", "Route: <sip:server1.atlanta.com;transport=udp;user=phone;lr>\r\n", 1, true, true);
     _header_input_output.push_back(hdr3);
 
-    SIP_Header_Input_Output hdr4(SIP_HEADER_ROUTE, "Route: <sip:server2.atlanta.com;transport=udp;user=phone>;lr", "Route: <sip:server2.atlanta.com;transport=udp;user=phone>;lr\r\n", 1);
+    SIP_Header_Input_Output hdr4(SIP_HEADER_ROUTE, "Route: <sip:server2.atlanta.com;transport=udp;user=phone>;lr", "Route: <sip:server2.atlanta.com;transport=udp;user=phone>;lr\r\n", 1, true, true);
     _header_input_output.push_back(hdr4);
 
-    SIP_Header_Input_Output hdr5(SIP_HEADER_ROUTE, "Route: <sip:server3.atlanta.com ; transport=udp;lr?header=hdr1& name=value > ; teste ; lr ", "Route: <sip:server3.atlanta.com;transport=udp;lr?header=hdr1&name=value>;teste;lr\r\n", 1);
+    SIP_Header_Input_Output hdr5(SIP_HEADER_ROUTE, "Route: <sip:server3.atlanta.com ; transport=udp;lr?header=hdr1& name=value > ; teste ; lr ", "Route: <sip:server3.atlanta.com;transport=udp;lr?header=hdr1&name=value>;teste;lr\r\n", 1, true, true);
     _header_input_output.push_back(hdr5);
 }
 
@@ -813,13 +845,13 @@ SIP_Header_Route_Test::SIP_Header_Route_Test()
 
 SIP_Header_Server_Test::SIP_Header_Server_Test()
 {
-    SIP_Header_Input_Output hdr1(SIP_HEADER_SERVER, "Server: HomeServer v2", "Server: HomeServer v2\r\n", 1);
+    SIP_Header_Input_Output hdr1(SIP_HEADER_SERVER, "Server: HomeServer v2", "Server: HomeServer v2\r\n", 1, true, true);
     _header_input_output.push_back(hdr1);
 
-    SIP_Header_Input_Output hdr2(SIP_HEADER_SERVER, "Server:My Server/1.5.0 Pro", "Server: My Server/1.5.0 Pro\r\n", 1);
+    SIP_Header_Input_Output hdr2(SIP_HEADER_SERVER, "Server:My Server/1.5.0 Pro", "Server: My Server/1.5.0 Pro\r\n", 1, true, true);
     _header_input_output.push_back(hdr2);
 
-    SIP_Header_Input_Output hdr3(SIP_HEADER_SERVER, "Server:  server1 ", "Server: server1\r\n", 1);
+    SIP_Header_Input_Output hdr3(SIP_HEADER_SERVER, "Server:  server1 ", "Server: server1\r\n", 1, true, true);
     _header_input_output.push_back(hdr3);
 }
 
@@ -828,16 +860,16 @@ SIP_Header_Server_Test::SIP_Header_Server_Test()
 
 SIP_Header_Subject_Test::SIP_Header_Subject_Test()
 {
-    SIP_Header_Input_Output hdr1(SIP_HEADER_SUBJECT, "Subject : lunch", "Subject: lunch\r\n", 1);
+    SIP_Header_Input_Output hdr1(SIP_HEADER_SUBJECT, "Subject : lunch", "Subject: lunch\r\n", 1, true, true);
     _header_input_output.push_back(hdr1);
 
-    SIP_Header_Input_Output hdr2(SIP_HEADER_SUBJECT, "Subject:Need more boxes ", "Subject: Need more boxes\r\n", 1);
+    SIP_Header_Input_Output hdr2(SIP_HEADER_SUBJECT, "Subject:Need more boxes ", "Subject: Need more boxes\r\n", 1, true, true);
     _header_input_output.push_back(hdr2);
 
-    SIP_Header_Input_Output hdr3(SIP_HEADER_SUBJECT, "s: Tech Support ", "Subject: Tech Support\r\n", 1);
+    SIP_Header_Input_Output hdr3(SIP_HEADER_SUBJECT, "s: Tech Support ", "Subject: Tech Support\r\n", 1, true, true);
     _header_input_output.push_back(hdr3);
 
-    SIP_Header_Input_Output hdr4(SIP_HEADER_SUBJECT, "s:", "Subject: \r\n", 1);
+    SIP_Header_Input_Output hdr4(SIP_HEADER_SUBJECT, "s:", "Subject: \r\n", 1, true, true);
     _header_input_output.push_back(hdr4);
 }
 
@@ -846,13 +878,13 @@ SIP_Header_Subject_Test::SIP_Header_Subject_Test()
 
 SIP_Header_Subscription_State_Test::SIP_Header_Subscription_State_Test()
 {
-    SIP_Header_Input_Output hdr1(SIP_HEADER_SUBSCRIPTION_STATE, "Subscription-State: active;expires=600", "Subscription-State: active;expires=600\r\n", 1);
+    SIP_Header_Input_Output hdr1(SIP_HEADER_SUBSCRIPTION_STATE, "Subscription-State: active;expires=600", "Subscription-State: active;expires=600\r\n", 1, true, true);
     _header_input_output.push_back(hdr1);
 
-    SIP_Header_Input_Output hdr2(SIP_HEADER_SUBSCRIPTION_STATE, "Subscription-State: state1 ; expires= 500", "Subscription-State: state1;expires=500\r\n", 1);
+    SIP_Header_Input_Output hdr2(SIP_HEADER_SUBSCRIPTION_STATE, "Subscription-State: state1 ; expires= 500", "Subscription-State: state1;expires=500\r\n", 1, true, true);
     _header_input_output.push_back(hdr2);
 
-    SIP_Header_Input_Output hdr3(SIP_HEADER_SUBSCRIPTION_STATE, "Subscription-State: terminated; reason=timeout ; retry-after=400 ", "Subscription-State: terminated;reason=timeout;retry-after=400\r\n", 1);
+    SIP_Header_Input_Output hdr3(SIP_HEADER_SUBSCRIPTION_STATE, "Subscription-State: terminated; reason=timeout ; retry-after=400 ", "Subscription-State: terminated;reason=timeout;retry-after=400\r\n", 1, true, true);
     _header_input_output.push_back(hdr3);
 }
 
@@ -861,16 +893,16 @@ SIP_Header_Subscription_State_Test::SIP_Header_Subscription_State_Test()
 
 SIP_Header_Supported_Test::SIP_Header_Supported_Test()
 {
-    SIP_Header_Input_Output hdr1(SIP_HEADER_SUPPORTED, "Supported: 100rel, foo", "Supported: 100rel, foo\r\n", 2);
+    SIP_Header_Input_Output hdr1(SIP_HEADER_SUPPORTED, "Supported: 100rel, foo", "Supported: 100rel, foo\r\n", 2, true, true);
     _header_input_output.push_back(hdr1);
 
-    SIP_Header_Input_Output hdr2(SIP_HEADER_SUPPORTED, "Supported:foo1", "Supported: foo1\r\n", 1);
+    SIP_Header_Input_Output hdr2(SIP_HEADER_SUPPORTED, "Supported:foo1", "Supported: foo1\r\n", 1, true, true);
     _header_input_output.push_back(hdr2);
 
-    SIP_Header_Input_Output hdr3(SIP_HEADER_SUPPORTED, "Supported: 100rel, foo, bar  ", "Supported: 100rel, foo, bar\r\n", 3);
+    SIP_Header_Input_Output hdr3(SIP_HEADER_SUPPORTED, "Supported: 100rel, foo, bar  ", "Supported: 100rel, foo, bar\r\n", 3, true, true);
     _header_input_output.push_back(hdr3);
 
-    SIP_Header_Input_Output hdr4(SIP_HEADER_SUPPORTED, "k:", "Supported: \r\n", 1);
+    SIP_Header_Input_Output hdr4(SIP_HEADER_SUPPORTED, "k:", "Supported: \r\n", 1, true, true);
     _header_input_output.push_back(hdr4);
 }
 
@@ -879,16 +911,16 @@ SIP_Header_Supported_Test::SIP_Header_Supported_Test()
 
 SIP_Header_Timestamp_Test::SIP_Header_Timestamp_Test()
 {
-    SIP_Header_Input_Output hdr1(SIP_HEADER_TIMESTAMP, "Timestamp: 54", "Timestamp: 54\r\n", 1);
+    SIP_Header_Input_Output hdr1(SIP_HEADER_TIMESTAMP, "Timestamp: 54", "Timestamp: 54\r\n", 1, true, true);
     _header_input_output.push_back(hdr1);
 
-    SIP_Header_Input_Output hdr2(SIP_HEADER_TIMESTAMP, "Timestamp:10.20", "Timestamp: 10.20\r\n", 1);
+    SIP_Header_Input_Output hdr2(SIP_HEADER_TIMESTAMP, "Timestamp:10.20", "Timestamp: 10.20\r\n", 1, true, true);
     _header_input_output.push_back(hdr2);
 
-    SIP_Header_Input_Output hdr3(SIP_HEADER_TIMESTAMP, "Timestamp: 10.20   7.90  ", "Timestamp: 10.20 7.90\r\n", 1);
+    SIP_Header_Input_Output hdr3(SIP_HEADER_TIMESTAMP, "Timestamp: 10.20   7.90  ", "Timestamp: 10.20 7.90\r\n", 1, true, true);
     _header_input_output.push_back(hdr3);
 
-    SIP_Header_Input_Output hdr4(SIP_HEADER_TIMESTAMP, "Timestamp: 99.88\t77.666  ", "Timestamp: 99.88 77.666\r\n", 1);
+    SIP_Header_Input_Output hdr4(SIP_HEADER_TIMESTAMP, "Timestamp: 99.88\t77.666  ", "Timestamp: 99.88 77.666\r\n", 1, true, true);
     _header_input_output.push_back(hdr4);
 }
 
@@ -897,16 +929,16 @@ SIP_Header_Timestamp_Test::SIP_Header_Timestamp_Test()
 
 SIP_Header_To_Test::SIP_Header_To_Test()
 {
-    SIP_Header_Input_Output hdr1(SIP_HEADER_TO, "To: G. Marconi <sip:Marconi@radio.org>", "To: G. Marconi <sip:Marconi@radio.org>\r\n", 1);
+    SIP_Header_Input_Output hdr1(SIP_HEADER_TO, "To: G. Marconi <sip:Marconi@radio.org>", "To: G. Marconi <sip:Marconi@radio.org>\r\n", 1, true, true);
     _header_input_output.push_back(hdr1);
 
-    SIP_Header_Input_Output hdr2(SIP_HEADER_TO, "t: sip:+12125551212@server.phone2net.com;tag=287447", "To: <sip:+12125551212@server.phone2net.com>;tag=287447\r\n", 1);
+    SIP_Header_Input_Output hdr2(SIP_HEADER_TO, "t: sip:+12125551212@server.phone2net.com;tag=287447", "To: <sip:+12125551212@server.phone2net.com>;tag=287447\r\n", 1, true, true);
     _header_input_output.push_back(hdr2);
 
-    SIP_Header_Input_Output hdr3(SIP_HEADER_TO, "To: \"Name\" <sip:+12125551212@server.phone2net.com ;par1 ;par2> ; tag=287447;parameter1 ", "To: \"Name\" <sip:+12125551212@server.phone2net.com;par1;par2>;tag=287447;parameter1\r\n", 1);
+    SIP_Header_Input_Output hdr3(SIP_HEADER_TO, "To: \"Name\" <sip:+12125551212@server.phone2net.com ;par1 ;par2> ; tag=287447;parameter1 ", "To: \"Name\" <sip:+12125551212@server.phone2net.com;par1;par2>;tag=287447;parameter1\r\n", 1, true, true);
     _header_input_output.push_back(hdr3);
 
-    SIP_Header_Input_Output hdr4(SIP_HEADER_TO, "To: <sip:server.phone2net.com ;par1 ; lr ; maddr= 10.10.10.10 ;ttl=20; method= BYE; user=ip;transport= udp ;par2> ; tag=287447;parameter1 ", "To: <sip:server.phone2net.com;transport=udp;user=ip;method=BYE;ttl=20;maddr=10.10.10.10;lr;par1;par2>;tag=287447;parameter1\r\n", 1);
+    SIP_Header_Input_Output hdr4(SIP_HEADER_TO, "To: <sip:server.phone2net.com ;par1 ; lr ; maddr= 10.10.10.10 ;ttl=20; method= BYE; user=ip;transport= udp ;par2> ; tag=287447;parameter1 ", "To: <sip:server.phone2net.com;transport=udp;user=ip;method=BYE;ttl=20;maddr=10.10.10.10;lr;par1;par2>;tag=287447;parameter1\r\n", 1, true, true);
     _header_input_output.push_back(hdr4);
 }
 
@@ -915,13 +947,13 @@ SIP_Header_To_Test::SIP_Header_To_Test()
 
 SIP_Header_Unsupported_Test::SIP_Header_Unsupported_Test()
 {
-    SIP_Header_Input_Output hdr1(SIP_HEADER_UNSUPPORTED, "Unsupported: 100rel, foo", "Unsupported: 100rel, foo\r\n", 2);
+    SIP_Header_Input_Output hdr1(SIP_HEADER_UNSUPPORTED, "Unsupported: 100rel, foo", "Unsupported: 100rel, foo\r\n", 2, true, true);
     _header_input_output.push_back(hdr1);
 
-    SIP_Header_Input_Output hdr2(SIP_HEADER_UNSUPPORTED, "Unsupported:foo1", "Unsupported: foo1\r\n", 1);
+    SIP_Header_Input_Output hdr2(SIP_HEADER_UNSUPPORTED, "Unsupported:foo1", "Unsupported: foo1\r\n", 1, true, true);
     _header_input_output.push_back(hdr2);
 
-    SIP_Header_Input_Output hdr3(SIP_HEADER_UNSUPPORTED, "Unsupported: 100rel, foo, bar  ", "Unsupported: 100rel, foo, bar\r\n", 3);
+    SIP_Header_Input_Output hdr3(SIP_HEADER_UNSUPPORTED, "Unsupported: 100rel, foo, bar  ", "Unsupported: 100rel, foo, bar\r\n", 3, true, true);
     _header_input_output.push_back(hdr3);
 }
 
@@ -930,13 +962,13 @@ SIP_Header_Unsupported_Test::SIP_Header_Unsupported_Test()
 
 SIP_Header_User_Agent_Test::SIP_Header_User_Agent_Test()
 {
-    SIP_Header_Input_Output hdr1(SIP_HEADER_USER_AGENT, "User-Agent: Softphone Beta1.5", "User-Agent: Softphone Beta1.5\r\n", 1);
+    SIP_Header_Input_Output hdr1(SIP_HEADER_USER_AGENT, "User-Agent: Softphone Beta1.5", "User-Agent: Softphone Beta1.5\r\n", 1, true, true);
     _header_input_output.push_back(hdr1);
 
-    SIP_Header_Input_Output hdr2(SIP_HEADER_USER_AGENT, "User-Agent:UA/1.5.0 Pro", "User-Agent: UA/1.5.0 Pro\r\n", 1);
+    SIP_Header_Input_Output hdr2(SIP_HEADER_USER_AGENT, "User-Agent:UA/1.5.0 Pro", "User-Agent: UA/1.5.0 Pro\r\n", 1, true, true);
     _header_input_output.push_back(hdr2);
 
-    SIP_Header_Input_Output hdr3(SIP_HEADER_USER_AGENT, "User-Agent:  user agent 1 ", "User-Agent: user agent 1\r\n", 1);
+    SIP_Header_Input_Output hdr3(SIP_HEADER_USER_AGENT, "User-Agent:  user agent 1 ", "User-Agent: user agent 1\r\n", 1, true, true);
     _header_input_output.push_back(hdr3);
 }
 
@@ -945,13 +977,13 @@ SIP_Header_User_Agent_Test::SIP_Header_User_Agent_Test()
 
 SIP_Header_Via_Test::SIP_Header_Via_Test()
 {
-    SIP_Header_Input_Output hdr1(SIP_HEADER_VIA, "Via: SIP/2.0/UDP lab.high-voltage.org:5060;branch=z9hG4bKfw19b", "Via: SIP/2.0/UDP lab.high-voltage.org:5060;branch=z9hG4bKfw19b\r\n", 1);
+    SIP_Header_Input_Output hdr1(SIP_HEADER_VIA, "Via: SIP/2.0/UDP lab.high-voltage.org:5060;branch=z9hG4bKfw19b", "Via: SIP/2.0/UDP lab.high-voltage.org:5060;branch=z9hG4bKfw19b\r\n", 1, true, true);
     _header_input_output.push_back(hdr1);
 
-    SIP_Header_Input_Output hdr2(SIP_HEADER_VIA, "Via: SIP / 2.0 / UDP first.example.com: 4000;ttl=16;maddr=224.2.0.1;branch=z9hG4bKa7c6a8dlze.1, SIP/2.0/UDP first.example.com", "Via: SIP/2.0/UDP first.example.com:4000;branch=z9hG4bKa7c6a8dlze.1;ttl=16;maddr=224.2.0.1\r\nVia: SIP/2.0/UDP first.example.com\r\n", 2);
+    SIP_Header_Input_Output hdr2(SIP_HEADER_VIA, "Via: SIP / 2.0 / UDP first.example.com: 4000;ttl=16;maddr=224.2.0.1;branch=z9hG4bKa7c6a8dlze.1, SIP/2.0/UDP first.example.com", "Via: SIP/2.0/UDP first.example.com:4000;branch=z9hG4bKa7c6a8dlze.1;ttl=16;maddr=224.2.0.1\r\nVia: SIP/2.0/UDP first.example.com\r\n", 2, true, true);
     _header_input_output.push_back(hdr2);
 
-    SIP_Header_Input_Output hdr3(SIP_HEADER_VIA, "v: SIP/2.0/UDP lab.high-voltage.org;received=10.10.10.10;branch=z9hG4bKfw19b,SIP/2.0/UDP 11.11.11.11:5070;branch=z9hG4bKfw19b;parameter1 ", "Via: SIP/2.0/UDP lab.high-voltage.org;branch=z9hG4bKfw19b;received=10.10.10.10\r\nVia: SIP/2.0/UDP 11.11.11.11:5070;branch=z9hG4bKfw19b;parameter1\r\n", 2);
+    SIP_Header_Input_Output hdr3(SIP_HEADER_VIA, "v: SIP/2.0/UDP lab.high-voltage.org;received=10.10.10.10;branch=z9hG4bKfw19b,SIP/2.0/UDP 11.11.11.11:5070;branch=z9hG4bKfw19b;parameter1 ", "Via: SIP/2.0/UDP lab.high-voltage.org;branch=z9hG4bKfw19b;received=10.10.10.10\r\nVia: SIP/2.0/UDP 11.11.11.11:5070;branch=z9hG4bKfw19b;parameter1\r\n", 2, true, true);
     _header_input_output.push_back(hdr3);
 }
 
@@ -960,13 +992,13 @@ SIP_Header_Via_Test::SIP_Header_Via_Test()
 
 SIP_Header_Warning_Test::SIP_Header_Warning_Test()
 {
-    SIP_Header_Input_Output hdr1(SIP_HEADER_WARNING, "Warning: 370 devnull \"Choose a bigger pipe\"", "Warning: 370 devnull \"Choose a bigger pipe\"\r\n", 1);
+    SIP_Header_Input_Output hdr1(SIP_HEADER_WARNING, "Warning: 370 devnull \"Choose a bigger pipe\"", "Warning: 370 devnull \"Choose a bigger pipe\"\r\n", 1, true, true);
     _header_input_output.push_back(hdr1);
 
-    SIP_Header_Input_Output hdr2(SIP_HEADER_WARNING, "Warning: 307 isi.edu \"Session parameter ’foo’ not understood\", 301 isi.edu \"Incompatible network address type ’E.164’\"", "Warning: 307 isi.edu \"Session parameter ’foo’ not understood\"\r\nWarning: 301 isi.edu \"Incompatible network address type ’E.164’\"\r\n", 2);
+    SIP_Header_Input_Output hdr2(SIP_HEADER_WARNING, "Warning: 307 isi.edu \"Session parameter ’foo’ not understood\", 301 isi.edu \"Incompatible network address type ’E.164’\"", "Warning: 307 isi.edu \"Session parameter ’foo’ not understood\"\r\nWarning: 301 isi.edu \"Incompatible network address type ’E.164’\"\r\n", 2, true, true);
     _header_input_output.push_back(hdr2);
 
-    SIP_Header_Input_Output hdr3(SIP_HEADER_WARNING, "Warning:  600 10.10.10.10 \"text\" ", "Warning: 600 10.10.10.10 \"text\"\r\n", 1);
+    SIP_Header_Input_Output hdr3(SIP_HEADER_WARNING, "Warning:  600 10.10.10.10 \"text\" ", "Warning: 600 10.10.10.10 \"text\"\r\n", 1, true, true);
     _header_input_output.push_back(hdr3);
 }
 

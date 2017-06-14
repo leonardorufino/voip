@@ -31,13 +31,17 @@ protected:
     class SIP_Header_Input_Output
     {
     public:
-        SIP_Header_Input_Output(SIP_Header_Type header_type, std::string input, std::string output, short header_nb)
-            : _header_type(header_type), _input(input), _output(output), _header_nb(header_nb) {}
+        SIP_Header_Input_Output(SIP_Header_Type header_type, std::string input, std::string output,
+                                short header_nb, bool decode_success, bool _encode_success)
+            : _header_type(header_type), _input(input), _output(output), _header_nb(header_nb),
+              _decode_success(decode_success), _encode_success(_encode_success) {}
 
         SIP_Header_Type _header_type;
         std::string _input;
         std::string _output;
         unsigned short _header_nb;
+        bool _decode_success;
+        bool _encode_success;
     };
 
     std::list<SIP_Header_Input_Output> _header_input_output;
