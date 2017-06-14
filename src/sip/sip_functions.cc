@@ -430,3 +430,55 @@ void SIP_Functions::random(std::string &buffer)
 }
 
 //-------------------------------------------
+
+unsigned short SIP_Functions::str_to_us(const std::string &str)
+{
+    unsigned short value = 0;
+
+    for (unsigned short i = 0; i < (unsigned short) str.size(); i++)
+    {
+        char digit = str.at(i);
+
+        if ((digit < '0') || (digit > '9'))
+            return INVALID_UNSIGNED_SHORT;
+
+        unsigned short check_overflow = (INVALID_UNSIGNED_SHORT - (digit - '0')) / 10;
+        if (value > check_overflow)
+        {
+            // Overflow
+            return INVALID_UNSIGNED_SHORT;
+        }
+
+        value = value * 10 + (digit - '0');
+    }
+
+    return value;
+}
+
+//-------------------------------------------
+
+unsigned long SIP_Functions::str_to_ul(const std::string &str)
+{
+    unsigned long value = 0;
+
+    for (unsigned short i = 0; i < (unsigned short) str.size(); i++)
+    {
+        char digit = str.at(i);
+
+        if ((digit < '0') || (digit > '9'))
+            return INVALID_UNSIGNED_LONG;
+
+        unsigned long check_overflow = (INVALID_UNSIGNED_LONG - (digit - '0')) / 10;
+        if (value > check_overflow)
+        {
+            // Overflow
+            return INVALID_UNSIGNED_LONG;
+        }
+
+        value = value * 10 + (digit - '0');
+    }
+
+    return value;
+}
+
+//-------------------------------------------

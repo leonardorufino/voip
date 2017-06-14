@@ -767,7 +767,9 @@ bool SIP_Header_Contact::parse(std::string &sip_msg)
             if (exp.empty())
                 return false;
 
-            _expires = (unsigned int) atol(exp.c_str());
+            _expires = SIP_Functions::str_to_ul(exp);
+            if (_expires == INVALID_EXPIRES)
+                return false;
 
         }else if (SIP_Functions::start_with(result, "q="))
         {
@@ -985,7 +987,10 @@ bool SIP_Header_Content_Length::parse(std::string &sip_msg)
     if (sip_msg.empty())
         return false;
 
-    _length = (unsigned int) atol(sip_msg.c_str());
+    _length = SIP_Functions::str_to_ul(sip_msg);
+    if (_length == INVALID_LENGTH)
+        return false;
+
     return true;
 }
 
@@ -1029,7 +1034,9 @@ bool SIP_Header_CSeq::parse(std::string &sip_msg)
     if (!SIP_Functions::match(sip_msg, " \t", result))
         return false;
 
-    _sequence = (unsigned int) atol(result.c_str());
+    _sequence = SIP_Functions::str_to_ul(result);
+    if (_sequence == INVALID_SEQUENCE)
+        return false;
 
     SIP_Functions::trim(sip_msg);
     if (sip_msg.empty())
@@ -1102,7 +1109,9 @@ bool SIP_Header_Date::parse(std::string &sip_msg)
     if (result.empty())
         return false;
 
-    _day = (unsigned short) atol(result.c_str());
+    _day = SIP_Functions::str_to_us(result);
+    if (_day == INVALID_DAY)
+        return false;
 
     SIP_Functions::trim(sip_msg);
     if (!SIP_Functions::match(sip_msg, " ", result))
@@ -1122,7 +1131,9 @@ bool SIP_Header_Date::parse(std::string &sip_msg)
     if (result.empty())
         return false;
 
-    _year = (unsigned short) atol(result.c_str());
+    _year = SIP_Functions::str_to_us(result);
+    if (_year == INVALID_YEAR)
+        return false;
 
     SIP_Functions::trim(sip_msg);
     if (!SIP_Functions::match(sip_msg, ":", result))
@@ -1132,7 +1143,9 @@ bool SIP_Header_Date::parse(std::string &sip_msg)
     if (result.empty())
         return false;
 
-    _hour = (unsigned short) atol(result.c_str());
+    _hour = SIP_Functions::str_to_us(result);
+    if (_hour == INVALID_HOUR)
+        return false;
 
     SIP_Functions::trim(sip_msg);
     if (!SIP_Functions::match(sip_msg, ":", result))
@@ -1142,7 +1155,9 @@ bool SIP_Header_Date::parse(std::string &sip_msg)
     if (result.empty())
         return false;
 
-    _minute = (unsigned short) atol(result.c_str());
+    _minute = SIP_Functions::str_to_us(result);
+    if (_minute == INVALID_MINUTE)
+        return false;
 
     SIP_Functions::trim(sip_msg);
     if (!SIP_Functions::match(sip_msg, " ", result))
@@ -1152,7 +1167,9 @@ bool SIP_Header_Date::parse(std::string &sip_msg)
     if (result.empty())
         return false;
 
-    _second = (unsigned short) atol(result.c_str());
+    _second = SIP_Functions::str_to_us(result);
+    if (_second == INVALID_SECOND)
+        return false;
 
     SIP_Functions::trim(sip_msg);
     if (sip_msg.empty())
@@ -1398,7 +1415,11 @@ bool SIP_Header_Event::encode(std::string &sip_msg)
 bool SIP_Header_Expires::parse(std::string &sip_msg)
 {
     SIP_Functions::trim(sip_msg);
-    _expires = (unsigned int) atol(sip_msg.c_str());
+
+    _expires = SIP_Functions::str_to_ul(sip_msg);
+    if (_expires == INVALID_EXPIRES)
+        return false;
+
     return true;
 }
 
@@ -1495,7 +1516,11 @@ bool SIP_Header_In_Reply_To::encode(std::string &sip_msg)
 bool SIP_Header_Max_Forwards::parse(std::string &sip_msg)
 {
     SIP_Functions::trim(sip_msg);
-    _max_forwards = (unsigned int) atol(sip_msg.c_str());
+
+    _max_forwards = SIP_Functions::str_to_ul(sip_msg);
+    if (_max_forwards == INVALID_MAX_FORWARDS)
+        return false;
+
     return true;
 }
 
@@ -1525,13 +1550,18 @@ bool SIP_Header_Mime_Version::parse(std::string &sip_msg)
     if (result.empty())
         return false;
 
-    _major_version = (unsigned int) atol(result.c_str());
+    _major_version = SIP_Functions::str_to_ul(result);
+    if (_major_version == INVALID_MIME_VERSION)
+        return false;
 
     SIP_Functions::trim(sip_msg);
     if (sip_msg.empty())
         return false;
 
-    _minor_version = (unsigned int) atol(sip_msg.c_str());
+    _minor_version = SIP_Functions::str_to_ul(sip_msg);
+    if (_minor_version == INVALID_MIME_VERSION)
+        return false;
+
     return true;
 }
 
@@ -1554,7 +1584,11 @@ bool SIP_Header_Mime_Version::encode(std::string &sip_msg)
 bool SIP_Header_Min_Expires::parse(std::string &sip_msg)
 {
     SIP_Functions::trim(sip_msg);
-    _min_expires = (unsigned int) atol(sip_msg.c_str());
+
+    _min_expires = SIP_Functions::str_to_ul(sip_msg);
+    if (_min_expires == INVALID_MIN_EXPIRES)
+        return false;
+
     return true;
 }
 
@@ -1773,14 +1807,16 @@ bool SIP_Header_Retry_After::parse(std::string &sip_msg)
     std::string result;
     std::string retry;
 
-    bool has_param = has_param = SIP_Functions::match(sip_msg, ";", result);
+    bool has_param = SIP_Functions::match(sip_msg, ";", result);
 
     bool has_comment = SIP_Functions::match(result, "(", retry);
     SIP_Functions::trim(retry);
     if (retry.empty())
         return false;
 
-    _retry_after = (unsigned int) atol(retry.c_str());
+    _retry_after = SIP_Functions::str_to_ul(retry);
+    if (_retry_after == INVALID_RETRY_AFTER)
+        return false;
 
     if (has_comment)
     {
@@ -1809,7 +1845,9 @@ bool SIP_Header_Retry_After::parse(std::string &sip_msg)
             if (duration.empty())
                 return false;
 
-            _duration = (unsigned int) atol(duration.c_str());
+            _duration = SIP_Functions::str_to_ul(duration);
+            if (_duration == INVALID_DURATION)
+                return false;
         }else
             _parameters.push_back(result);
     }
@@ -1956,7 +1994,9 @@ bool SIP_Header_Subscription_State::parse(std::string &sip_msg)
             if (exp.empty())
                 return false;
 
-            _expires = (unsigned int) atol(exp.c_str());
+            _expires = SIP_Functions::str_to_ul(exp);
+            if (_expires == INVALID_EXPIRES)
+                return false;
         }else
             _parameters.push_back(result);
     }
@@ -2221,7 +2261,10 @@ bool SIP_Header_Via::parse(std::string &sip_msg)
 
         matched = SIP_Functions::match(sip_msg, ";", result);
         SIP_Functions::trim(result);
-        _port = (unsigned short) atol(result.c_str());
+
+        _port = SIP_Functions::str_to_us(result);
+        if (_port == INVALID_PORT)
+            return false;
     }else
     {
         matched = SIP_Functions::match(sip_msg, ";", result);
@@ -2330,7 +2373,9 @@ bool SIP_Header_Warning::parse(std::string &sip_msg)
     if (result.empty())
         return false;
 
-    _code = (unsigned short) atol(result.c_str());
+    _code = SIP_Functions::str_to_us(result);
+    if (_code == INVALID_CODE)
+        return false;
 
     SIP_Functions::trim(sip_msg);
     if (!SIP_Functions::match(sip_msg, " ", result))

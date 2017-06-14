@@ -300,7 +300,7 @@ private:
 
 class SIP_Header_Contact : public SIP_Header
 {
-    static const unsigned int INVALID_EXPIRES = 0xFFFFFFFF;
+    static const unsigned long INVALID_EXPIRES = INVALID_UNSIGNED_LONG;
 
 public:
     SIP_Header_Contact() : _star(false), _expires(INVALID_EXPIRES) {}
@@ -318,8 +318,8 @@ public:
 
     SIP_Address &get_address() { return _address; }
 
-    void set_expires(unsigned int expires) { _expires = expires; }
-    unsigned int get_expires() { return _expires; }
+    void set_expires(unsigned long expires) { _expires = expires; }
+    unsigned long get_expires() { return _expires; }
 
     void set_q(std::string q) { _q = q; }
     std::string get_q() { return _q; }
@@ -329,7 +329,7 @@ public:
 private:
     bool _star;
     SIP_Address _address;
-    unsigned int _expires;
+    unsigned long _expires;
     std::string _q;
     std::list<std::string> _parameters;
 };
@@ -416,7 +416,7 @@ private:
 class SIP_Header_Content_Length : public SIP_Header
 {
 public:
-    static const unsigned int INVALID_LENGTH = 0xFFFFFFFF;
+    static const unsigned long INVALID_LENGTH = INVALID_UNSIGNED_LONG;
 
 public:
     SIP_Header_Content_Length() : _length(INVALID_LENGTH) {}
@@ -429,11 +429,11 @@ public:
     bool parse(std::string &sip_msg);
     bool encode(std::string &sip_msg);
 
-    void set_length(unsigned int length) { _length = length; }
-    unsigned int get_length() { return _length; }
+    void set_length(unsigned long length) { _length = length; }
+    unsigned long get_length() { return _length; }
 
 private:
-    unsigned int _length;
+    unsigned long _length;
 };
 
 //-------------------------------------------
@@ -462,7 +462,7 @@ private:
 class SIP_Header_CSeq : public SIP_Header
 {
 public:
-    static const unsigned int INVALID_SEQUENCE = 0xFFFFFFFF;
+    static const unsigned long INVALID_SEQUENCE = INVALID_UNSIGNED_LONG;
 
 public:
     SIP_Header_CSeq() : _sequence(INVALID_SEQUENCE) {}
@@ -475,8 +475,8 @@ public:
     bool parse(std::string &sip_msg);
     bool encode(std::string &sip_msg);
 
-    void set_sequence(unsigned int sequence) { _sequence = sequence; }
-    unsigned int get_sequence() { return _sequence; }
+    void set_sequence(unsigned long sequence) { _sequence = sequence; }
+    unsigned long get_sequence() { return _sequence; }
 
     void set_method(SIP_Method_Type method);
     void set_method(std::string method) { _method = method; }
@@ -484,7 +484,7 @@ public:
     std::string get_method_str() { return _method; }
 
 private:
-    unsigned int _sequence;
+    unsigned long _sequence;
     std::string _method;
 };
 
@@ -493,11 +493,11 @@ private:
 class SIP_Header_Date : public SIP_Header
 {
 public:
-    static const unsigned short INVALID_DAY = 0xFFFF;
-    static const unsigned short INVALID_YEAR = 0xFFFF;
-    static const unsigned short INVALID_HOUR = 0xFFFF;
-    static const unsigned short INVALID_MINUTE = 0xFFFF;
-    static const unsigned short INVALID_SECOND = 0xFFFF;
+    static const unsigned short INVALID_DAY = INVALID_UNSIGNED_SHORT;
+    static const unsigned short INVALID_YEAR = INVALID_UNSIGNED_SHORT;
+    static const unsigned short INVALID_HOUR = INVALID_UNSIGNED_SHORT;
+    static const unsigned short INVALID_MINUTE = INVALID_UNSIGNED_SHORT;
+    static const unsigned short INVALID_SECOND = INVALID_UNSIGNED_SHORT;
 
 public:
     SIP_Header_Date();
@@ -606,7 +606,7 @@ private:
 class SIP_Header_Expires : public SIP_Header
 {
 public:
-    static const unsigned int INVALID_EXPIRES = 0xFFFFFFFF;
+    static const unsigned long INVALID_EXPIRES = INVALID_UNSIGNED_LONG;
 
 public:
     SIP_Header_Expires() : _expires(INVALID_EXPIRES) {}
@@ -619,11 +619,11 @@ public:
     bool parse(std::string &sip_msg);
     bool encode(std::string &sip_msg);
 
-    void set_expires(unsigned int expires) { _expires = expires; }
-    unsigned int get_expires() { return _expires; }
+    void set_expires(unsigned long expires) { _expires = expires; }
+    unsigned long get_expires() { return _expires; }
 
 private:
-    unsigned int _expires;
+    unsigned long _expires;
 };
 
 //-------------------------------------------
@@ -681,7 +681,7 @@ private:
 class SIP_Header_Max_Forwards : public SIP_Header
 {
 public:
-    static const unsigned int INVALID_MAX_FORWARDS = 0xFFFFFFFF;
+    static const unsigned long INVALID_MAX_FORWARDS = INVALID_UNSIGNED_LONG;
 
 public:
     SIP_Header_Max_Forwards() : _max_forwards(INVALID_MAX_FORWARDS) {}
@@ -694,11 +694,11 @@ public:
     bool parse(std::string &sip_msg);
     bool encode(std::string &sip_msg);
 
-    void set_max_forwards(unsigned int max_forwards) { _max_forwards = max_forwards; }
-    unsigned int get_max_forwards() { return _max_forwards; }
+    void set_max_forwards(unsigned long max_forwards) { _max_forwards = max_forwards; }
+    unsigned long get_max_forwards() { return _max_forwards; }
 
 private:
-    unsigned int _max_forwards;
+    unsigned long _max_forwards;
 };
 
 //-------------------------------------------
@@ -706,7 +706,7 @@ private:
 class SIP_Header_Mime_Version : public SIP_Header
 {
 public:
-    static const unsigned int INVALID_MIME_VERSION = 0xFFFFFFFF;
+    static const unsigned long INVALID_MIME_VERSION = INVALID_UNSIGNED_LONG;
 
 public:
     SIP_Header_Mime_Version() : _major_version(INVALID_MIME_VERSION), _minor_version(INVALID_MIME_VERSION) {}
@@ -719,15 +719,15 @@ public:
     bool parse(std::string &sip_msg);
     bool encode(std::string &sip_msg);
 
-    void set_major_version(unsigned int major_version) { _major_version = major_version; }
-    unsigned int get_major_version() { return _major_version; }
+    void set_major_version(unsigned long major_version) { _major_version = major_version; }
+    unsigned long get_major_version() { return _major_version; }
 
-    void set_minor_version(unsigned int minor_version) { _minor_version = minor_version; }
-    unsigned int get_minor_version() { return _minor_version; }
+    void set_minor_version(unsigned long minor_version) { _minor_version = minor_version; }
+    unsigned long get_minor_version() { return _minor_version; }
 
 private:
-    unsigned int _major_version;
-    unsigned int _minor_version;
+    unsigned long _major_version;
+    unsigned long _minor_version;
 };
 
 //-------------------------------------------
@@ -735,7 +735,7 @@ private:
 class SIP_Header_Min_Expires : public SIP_Header
 {
 public:
-    static const unsigned int INVALID_MIN_EXPIRES = 0xFFFFFFFF;
+    static const unsigned long INVALID_MIN_EXPIRES = INVALID_UNSIGNED_LONG;
 
 public:
     SIP_Header_Min_Expires() : _min_expires(INVALID_MIN_EXPIRES) {}
@@ -748,11 +748,11 @@ public:
     bool parse(std::string &sip_msg);
     bool encode(std::string &sip_msg);
 
-    void set_min_expires(unsigned int min_expires) { _min_expires = min_expires; }
-    unsigned int get_min_expires() { return _min_expires; }
+    void set_min_expires(unsigned long min_expires) { _min_expires = min_expires; }
+    unsigned long get_min_expires() { return _min_expires; }
 
 private:
-    unsigned int _min_expires;
+    unsigned long _min_expires;
 };
 
 //-------------------------------------------
@@ -898,8 +898,8 @@ private:
 class SIP_Header_Retry_After : public SIP_Header
 {
 public:
-    static const unsigned int INVALID_RETRY_AFTER = 0xFFFFFFFF;
-    static const unsigned int INVALID_DURATION = 0xFFFFFFFF;
+    static const unsigned long INVALID_RETRY_AFTER = INVALID_UNSIGNED_LONG;
+    static const unsigned long INVALID_DURATION = INVALID_UNSIGNED_LONG;
 
 public:
     SIP_Header_Retry_After() : _retry_after(INVALID_RETRY_AFTER), _duration(INVALID_DURATION) {}
@@ -912,21 +912,21 @@ public:
     bool parse(std::string &sip_msg);
     bool encode(std::string &sip_msg);
 
-    void set_retry_after(unsigned int retry_after) { _retry_after = retry_after; }
-    unsigned int get_retry_after() { return _retry_after; }
+    void set_retry_after(unsigned long retry_after) { _retry_after = retry_after; }
+    unsigned long get_retry_after() { return _retry_after; }
 
     void set_comment(std::string comment) { _comment = comment; }
     std::string get_comment() { return _comment; }
 
-    void set_duration(unsigned int duration) { _duration = duration; }
-    unsigned int get_duration() { return _duration; }
+    void set_duration(unsigned long duration) { _duration = duration; }
+    unsigned long get_duration() { return _duration; }
 
     std::list<std::string> &get_parameters() { return _parameters; }
 
 private:
-    unsigned int _retry_after;
+    unsigned long _retry_after;
     std::string _comment;
-    unsigned int _duration;
+    unsigned long _duration;
     std::list<std::string> _parameters;
 };
 
@@ -1003,7 +1003,7 @@ private:
 class SIP_Header_Subscription_State : public SIP_Header
 {
 public:
-    static const unsigned int INVALID_EXPIRES = 0xFFFFFFFF;
+    static const unsigned long INVALID_EXPIRES = INVALID_UNSIGNED_LONG;
 
 public:
     SIP_Header_Subscription_State() : _expires(INVALID_EXPIRES) {}
@@ -1021,14 +1021,14 @@ public:
     SIP_Subscription_State get_state();
     std::string get_state_str() { return _state; }
 
-    void set_expires(unsigned int expires) { _expires = expires; }
-    unsigned int get_expires() { return _expires; }
+    void set_expires(unsigned long expires) { _expires = expires; }
+    unsigned long get_expires() { return _expires; }
 
     std::list<std::string> &get_parameters() { return _parameters; }
 
 private:
     std::string _state;
-    unsigned int _expires;
+    unsigned long _expires;
     std::list<std::string> _parameters;
 };
 
@@ -1157,7 +1157,7 @@ private:
 class SIP_Header_Via : public SIP_Header
 {
 public:
-    static const unsigned short INVALID_PORT = 0xFFFF;
+    static const unsigned short INVALID_PORT = INVALID_UNSIGNED_SHORT;
 
 public:
     SIP_Header_Via() : _port(INVALID_PORT) {}
@@ -1211,7 +1211,7 @@ private:
 class SIP_Header_Warning : public SIP_Header
 {
 public:
-    static const unsigned short INVALID_CODE = 0xFFFF;
+    static const unsigned short INVALID_CODE = INVALID_UNSIGNED_SHORT;
 
 public:
     SIP_Header_Warning() : _code(INVALID_CODE) {}

@@ -17,8 +17,8 @@
 class SIP_URI
 {
 public:
-    static const unsigned short INVALID_PORT = 0xFFFF;
-    static const unsigned short INVALID_TTL = 0xFFFF;
+    static const unsigned short INVALID_PORT = INVALID_UNSIGNED_SHORT;
+    static const unsigned short INVALID_TTL = INVALID_UNSIGNED_SHORT;
 
 public:
     SIP_URI() : _port(INVALID_PORT), _ttl(INVALID_TTL), _lr(false) {}

@@ -500,6 +500,12 @@ SIP_Header_Content_Length_Test::SIP_Header_Content_Length_Test()
 
     SIP_Header_Input_Output hdr3(SIP_HEADER_CONTENT_LENGTH, "l:50 ", "Content-Length: 50\r\n", 1);
     _header_input_output.push_back(hdr3);
+
+    SIP_Header_Input_Output hdr4(SIP_HEADER_CONTENT_LENGTH, "Content-Length:2147483647", "Content-Length: 2147483647\r\n", 1);
+    _header_input_output.push_back(hdr4);
+
+    SIP_Header_Input_Output hdr5(SIP_HEADER_CONTENT_LENGTH, "l: 4294967294", "Content-Length: 4294967294\r\n", 1);
+    _header_input_output.push_back(hdr5);
 }
 
 //-------------------------------------------

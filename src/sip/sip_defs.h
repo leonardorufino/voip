@@ -14,10 +14,8 @@
 #include <iostream>
 
 #define SIP_VERSION             "SIP/2.0"
-#define MAX_MSG_SIZE            5000
-#define MAX_REASON_PHRASE_LEN   128
-#define SIP_PORT                5060
-#define USHORT_NIL              0xffff
+#define INVALID_UNSIGNED_SHORT  (unsigned short) ~0
+#define INVALID_UNSIGNED_LONG   (unsigned long) ~0
 
 enum SIP_Method_Type
 {

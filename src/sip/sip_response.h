@@ -17,7 +17,7 @@
 class SIP_Response : public SIP_Message
 {
 public:
-    static const unsigned short INVALID_STATUS_CODE = 0xFFFF;
+    static const unsigned short INVALID_STATUS_CODE = INVALID_UNSIGNED_SHORT;
 
 public:
     SIP_Response() : _status_code(INVALID_STATUS_CODE) {}

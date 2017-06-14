@@ -36,4 +36,6 @@ public:
     static void trim(std::string &str);
     static void skip(std::string &str, const std::string skip);
     static void random(std::string &buffer);
+    static unsigned short str_to_us(const std::string &str);
+    static unsigned long str_to_ul(const std::string &str);
 };
