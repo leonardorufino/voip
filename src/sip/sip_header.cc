@@ -1943,6 +1943,8 @@ bool SIP_Header_Server::encode(std::string &sip_msg)
 bool SIP_Header_Subject::parse(std::string &sip_msg)
 {
     SIP_Functions::trim(sip_msg);
+
+    // Subject header can be empty
     _subject = sip_msg;
     return true;
 }
@@ -1951,6 +1953,12 @@ bool SIP_Header_Subject::parse(std::string &sip_msg)
 
 bool SIP_Header_Subject::encode(std::string &sip_msg)
 {
+    if (_subject.empty())
+    {
+        // Subject header can be empty
+        return true;
+    }
+
     sip_msg += _subject;
     return true;
 }
