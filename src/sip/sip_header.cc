@@ -1589,6 +1589,8 @@ bool SIP_Header_Min_Expires::encode(std::string &sip_msg)
 bool SIP_Header_Organization::parse(std::string &sip_msg)
 {
     SIP_Functions::trim(sip_msg);
+
+    // Organization header can be empty
     _organization = sip_msg;
     return true;
 }
@@ -1597,6 +1599,12 @@ bool SIP_Header_Organization::parse(std::string &sip_msg)
 
 bool SIP_Header_Organization::encode(std::string &sip_msg)
 {
+    if (_organization.empty())
+    {
+        // Organization header can be empty
+        return true;
+    }
+
     sip_msg += _organization;
     return true;
 }
