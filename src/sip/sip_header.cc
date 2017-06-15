@@ -1188,39 +1188,19 @@ bool SIP_Header_Date::encode(std::string &sip_msg)
         (_time_zone.empty()))
         return false;
 
-    std::string day = std::to_string(_day);
-    if (day.size() < 2)
-        day.insert(0, 2 - day.size(), '0');
-
-    std::string year = std::to_string(_year);
-    if (year.size() < 4)
-        year.insert(0, 4 - year.size(), '0');
-
-    std::string hour = std::to_string(_hour);
-    if (hour.size() < 2)
-        hour.insert(0, 2 - hour.size(), '0');
-
-    std::string minute = std::to_string(_minute);
-    if (minute.size() < 2)
-        minute.insert(0, 2 - minute.size(), '0');
-
-    std::string second = std::to_string(_second);
-    if (second.size() < 2)
-        second.insert(0, 2 - second.size(), '0');
-
     sip_msg += _weekday;
     sip_msg += ", ";
-    sip_msg += day;
+    sip_msg += SIP_Functions::add_leading_zeros(_day, 2);
     sip_msg += " ";
     sip_msg += _month;
     sip_msg += " ";
-    sip_msg += year;
+    sip_msg += SIP_Functions::add_leading_zeros(_year, 4);
     sip_msg += " ";
-    sip_msg += hour;
+    sip_msg += SIP_Functions::add_leading_zeros(_hour, 2);
     sip_msg += ":";
-    sip_msg += minute;
+    sip_msg += SIP_Functions::add_leading_zeros(_minute, 2);
     sip_msg += ":";
-    sip_msg += second;
+    sip_msg += SIP_Functions::add_leading_zeros(_second, 2);
     sip_msg += " ";
     sip_msg += _time_zone;
     return true;
@@ -2402,11 +2382,7 @@ bool SIP_Header_Warning::encode(std::string &sip_msg)
     if ((_code == INVALID_CODE) || (_agent.empty()) || (_text.empty()))
         return false;
 
-    std::string code = std::to_string(_code);
-    if (code.size() < 3)
-        code.insert(0, 3 - code.size(), '0');
-
-    sip_msg += code;
+    sip_msg += SIP_Functions::add_leading_zeros(_code, 3);
     sip_msg += " ";
     sip_msg += _agent;
     sip_msg += " ";

@@ -568,6 +568,9 @@ SIP_Header_CSeq_Test::SIP_Header_CSeq_Test()
 
     SIP_Header_Input_Output hdr3(SIP_HEADER_CSEQ, "CSeq:0    ACK   ", "CSeq: 0 ACK\r\n", 1, true, true);
     _header_input_output.push_back(hdr3);
+
+    SIP_Header_Input_Output hdr4(SIP_HEADER_CSEQ, "CSeq: 4711 INVITE", "CSeq: 4711 INVITE\r\n", 1, true, true);
+    _header_input_output.push_back(hdr4);
 }
 
 //-------------------------------------------
@@ -583,6 +586,9 @@ SIP_Header_Date_Test::SIP_Header_Date_Test()
 
     SIP_Header_Input_Output hdr3(SIP_HEADER_DATE, "Date: Mon, 31 Dec 2010 12:59:05 GM", "Date: Mon, 31 Dec 2010 12:59:05 GM\r\n", 1, true, true);
     _header_input_output.push_back(hdr3);
+
+    SIP_Header_Input_Output hdr4(SIP_HEADER_DATE, "Date: Sat, 13 Nov 2010 23:29:00 GMT", "Date: Sat, 13 Nov 2010 23:29:00 GMT\r\n", 1, true, true);
+    _header_input_output.push_back(hdr4);
 }
 
 //-------------------------------------------

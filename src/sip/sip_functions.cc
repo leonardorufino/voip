@@ -482,3 +482,14 @@ unsigned long SIP_Functions::str_to_ul(const std::string &str)
 }
 
 //-------------------------------------------
+
+std::string SIP_Functions::add_leading_zeros(unsigned long value, unsigned short digits)
+{
+    std::string str = std::to_string(value);
+    if (str.size() < digits)
+        str.insert(0, digits - str.size(), '0');
+
+    return str;
+}
+
+//-------------------------------------------
