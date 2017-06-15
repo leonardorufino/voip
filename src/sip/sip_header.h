@@ -1004,9 +1004,10 @@ class SIP_Header_Subscription_State : public SIP_Header
 {
 public:
     static const unsigned long INVALID_EXPIRES = INVALID_UNSIGNED_LONG;
+    static const unsigned long INVALID_RETRY_AFTER = INVALID_UNSIGNED_LONG;
 
 public:
-    SIP_Header_Subscription_State() : _expires(INVALID_EXPIRES) {}
+    SIP_Header_Subscription_State() : _expires(INVALID_EXPIRES), _retry_after(INVALID_RETRY_AFTER) {}
     SIP_Header_Subscription_State(const SIP_Header_Subscription_State &header) { *this = header; }
     ~SIP_Header_Subscription_State() {}
 
@@ -1021,14 +1022,24 @@ public:
     SIP_Subscription_State get_state();
     std::string get_state_str() { return _state; }
 
+    void set_reason(SIP_Subscription_State_Reason reason);
+    void set_reason(std::string reason) { _reason = reason; }
+    SIP_Subscription_State_Reason get_reason();
+    std::string get_reason_str() { return _reason; }
+
     void set_expires(unsigned long expires) { _expires = expires; }
     unsigned long get_expires() { return _expires; }
+
+    void set_retry_after(unsigned long retry_after) { _retry_after = retry_after; }
+    unsigned long get_retry_after() { return _retry_after; }
 
     std::list<std::string> &get_parameters() { return _parameters; }
 
 private:
     std::string _state;
+    std::string _reason;
     unsigned long _expires;
+    unsigned long _retry_after;
     std::list<std::string> _parameters;
 };
 

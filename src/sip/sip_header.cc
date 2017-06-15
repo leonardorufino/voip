@@ -1969,9 +1969,8 @@ bool SIP_Header_Subject::encode(std::string &sip_msg)
 bool SIP_Header_Subscription_State::parse(std::string &sip_msg)
 {
     std::string result;
-    bool matched;
 
-    matched = SIP_Functions::match(sip_msg, ";", result);
+    bool matched = SIP_Functions::match(sip_msg, ";", result);
     SIP_Functions::trim(result);
     if (result.empty())
         return false;
@@ -1983,7 +1982,14 @@ bool SIP_Header_Subscription_State::parse(std::string &sip_msg)
         matched = SIP_Functions::match(sip_msg, ";", result);
         SIP_Functions::trim(result);
 
-        if (SIP_Functions::start_with(result, "expires="))
+        if (SIP_Functions::start_with(result, "reason="))
+        {
+            _reason = result.substr(7);
+            SIP_Functions::trim(_reason);
+            if (_reason.empty())
+                return false;
+
+        }else if (SIP_Functions::start_with(result, "expires="))
         {
             std::string exp = result.substr(8);
             SIP_Functions::trim(exp);
@@ -1992,6 +1998,17 @@ bool SIP_Header_Subscription_State::parse(std::string &sip_msg)
 
             _expires = SIP_Functions::str_to_ul(exp);
             if (_expires == INVALID_EXPIRES)
+                return false;
+
+        }else if (SIP_Functions::start_with(result, "retry-after="))
+        {
+            std::string retry = result.substr(12);
+            SIP_Functions::trim(retry);
+            if (retry.empty())
+                return false;
+
+            _retry_after = SIP_Functions::str_to_ul(retry);
+            if (_retry_after == INVALID_RETRY_AFTER)
                 return false;
         }else
             _parameters.push_back(result);
@@ -2009,10 +2026,22 @@ bool SIP_Header_Subscription_State::encode(std::string &sip_msg)
 
     sip_msg += _state;
 
+    if (!_reason.empty())
+    {
+        sip_msg += ";reason=";
+        sip_msg += _reason;
+    }
+
     if (_expires != INVALID_EXPIRES)
     {
         sip_msg += ";expires=";
         sip_msg += std::to_string(_expires);
+    }
+
+    if (_retry_after != INVALID_RETRY_AFTER)
+    {
+        sip_msg += ";retry-after=";
+        sip_msg += std::to_string(_retry_after);
     }
 
     std::list<std::string>::iterator it = _parameters.begin();
@@ -2050,6 +2079,45 @@ SIP_Subscription_State SIP_Header_Subscription_State::get_state()
         return SIP_SUBSCRIPTION_STATE_TERMINATED;
 
     return SIP_SUBSCRIPTION_STATE_INVALID;
+}
+
+//-------------------------------------------
+
+void SIP_Header_Subscription_State::set_reason(SIP_Subscription_State_Reason reason)
+{
+    switch (reason)
+    {
+        case SIP_SUBSCRIPTION_STATE_REASON_DEACTIVATED: _state = "deactivated"; break;
+        case SIP_SUBSCRIPTION_STATE_REASON_PROBATION:   _state = "probation";   break;
+        case SIP_SUBSCRIPTION_STATE_REASON_REJECTED:    _state = "rejected";    break;
+        case SIP_SUBSCRIPTION_STATE_REASON_TIMEOUT:     _state = "timeout";     break;
+        case SIP_SUBSCRIPTION_STATE_REASON_GIVEUP:      _state = "giveup";      break;
+        case SIP_SUBSCRIPTION_STATE_REASON_NORESOURCE:  _state = "noresource";  break;
+        case SIP_SUBSCRIPTION_STATE_REASON_INVARIANT:   _state = "invariant";   break;
+        default:                                                                break;
+    }
+}
+
+//-------------------------------------------
+
+SIP_Subscription_State_Reason SIP_Header_Subscription_State::get_reason()
+{
+    if (_reason == "deactivated")
+        return SIP_SUBSCRIPTION_STATE_REASON_DEACTIVATED;
+    else if (_reason == "probation")
+        return SIP_SUBSCRIPTION_STATE_REASON_PROBATION;
+    else if (_reason == "rejected")
+        return SIP_SUBSCRIPTION_STATE_REASON_REJECTED;
+    else if (_reason == "timeout")
+        return SIP_SUBSCRIPTION_STATE_REASON_TIMEOUT;
+    else if (_reason == "giveup")
+        return SIP_SUBSCRIPTION_STATE_REASON_GIVEUP;
+    else if (_reason == "noresource")
+        return SIP_SUBSCRIPTION_STATE_REASON_NORESOURCE;
+    else if (_reason == "invariant")
+        return SIP_SUBSCRIPTION_STATE_REASON_INVARIANT;
+
+    return SIP_SUBSCRIPTION_STATE_REASON_INVALID;
 }
 
 //-------------------------------------------

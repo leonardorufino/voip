@@ -925,6 +925,15 @@ SIP_Header_Subscription_State_Test::SIP_Header_Subscription_State_Test()
 
     SIP_Header_Input_Output hdr3(SIP_HEADER_SUBSCRIPTION_STATE, "Subscription-State: terminated; reason=timeout ; retry-after=400 ", "Subscription-State: terminated;reason=timeout;retry-after=400\r\n", 1, true, true);
     _header_input_output.push_back(hdr3);
+
+    SIP_Header_Input_Output hdr4(SIP_HEADER_SUBSCRIPTION_STATE, "Subscription-State: pending; expires= 500 ; retry-after=9999 ;reason=deactivated ", "Subscription-State: pending;reason=deactivated;expires=500;retry-after=9999\r\n", 1, true, true);
+    _header_input_output.push_back(hdr4);
+
+    SIP_Header_Input_Output hdr5(SIP_HEADER_SUBSCRIPTION_STATE, "Subscription-State: state; reason=giveup  ", "Subscription-State: state;reason=giveup\r\n", 1, true, true);
+    _header_input_output.push_back(hdr5);
+
+    SIP_Header_Input_Output hdr6(SIP_HEADER_SUBSCRIPTION_STATE, "Subscription-State:active", "Subscription-State: active\r\n", 1, true, true);
+    _header_input_output.push_back(hdr6);
 }
 
 //-------------------------------------------
