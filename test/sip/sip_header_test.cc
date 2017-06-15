@@ -952,6 +952,9 @@ SIP_Header_Supported_Test::SIP_Header_Supported_Test()
 
     SIP_Header_Input_Output hdr4(SIP_HEADER_SUPPORTED, "k:", "Supported: \r\n", 1, true, true);
     _header_input_output.push_back(hdr4);
+
+    SIP_Header_Input_Output hdr5(SIP_HEADER_SUPPORTED, "Supported: 100rel", "Supported: 100rel\r\n", 1, true, true);
+    _header_input_output.push_back(hdr5);
 }
 
 //-------------------------------------------

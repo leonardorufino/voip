@@ -2126,6 +2126,8 @@ SIP_Subscription_State_Reason SIP_Header_Subscription_State::get_reason()
 bool SIP_Header_Supported::parse(std::string &sip_msg)
 {
     SIP_Functions::trim(sip_msg);
+
+    // Supported header can be empty
     _option_tag = sip_msg;
     return true;
 }
@@ -2134,6 +2136,12 @@ bool SIP_Header_Supported::parse(std::string &sip_msg)
 
 bool SIP_Header_Supported::encode(std::string &sip_msg)
 {
+    if (_option_tag.empty())
+    {
+        // Supported header can be empty
+        return true;
+    }
+
     sip_msg += _option_tag;
     return true;
 }
