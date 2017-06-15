@@ -634,6 +634,9 @@ SIP_Header_Expires_Test::SIP_Header_Expires_Test()
 
     SIP_Header_Input_Output hdr3(SIP_HEADER_EXPIRES, "Expires:    567890 ", "Expires: 567890\r\n", 1, true, true);
     _header_input_output.push_back(hdr3);
+
+    SIP_Header_Input_Output hdr4(SIP_HEADER_EXPIRES, "Expires: 4294967296", "", 0, false, false);
+    _header_input_output.push_back(hdr4);
 }
 
 //-------------------------------------------
@@ -652,6 +655,12 @@ SIP_Header_From_Test::SIP_Header_From_Test()
 
     SIP_Header_Input_Output hdr4(SIP_HEADER_FROM, "f: Anonymous <sip: c8oqz84zk7z:pass123@privacy.org;method=INVITE ? header=hdr1 & name=value&name2=value2>", "From: Anonymous <sip:c8oqz84zk7z:pass123@privacy.org;method=INVITE?header=hdr1&name=value&name2=value2>\r\n", 1, true, true);
     _header_input_output.push_back(hdr4);
+
+    SIP_Header_Input_Output hdr5(SIP_HEADER_FROM, "From: \"A. G. Bell\" <sip:agb@bell-telephone.com> ;tag=a48s", "From: \"A. G. Bell\" <sip:agb@bell-telephone.com>;tag=a48s\r\n", 1, true, true);
+    _header_input_output.push_back(hdr5);
+
+    SIP_Header_Input_Output hdr6(SIP_HEADER_FROM, "From: sip:+12125551212@server.phone2net.com;tag=887s", "From: <sip:+12125551212@server.phone2net.com>;tag=887s\r\n", 1, true, true);
+    _header_input_output.push_back(hdr6);
 }
 
 //-------------------------------------------
@@ -682,6 +691,18 @@ SIP_Header_Max_Forwards_Test::SIP_Header_Max_Forwards_Test()
 
     SIP_Header_Input_Output hdr3(SIP_HEADER_MAX_FORWARDS, "Max-Forwards:1", "Max-Forwards: 1\r\n", 1, true, true);
     _header_input_output.push_back(hdr3);
+
+    SIP_Header_Input_Output hdr4(SIP_HEADER_MAX_FORWARDS, "Max-Forwards: 65534", "Max-Forwards: 65534\r\n", 1, true, true);
+    _header_input_output.push_back(hdr4);
+
+    SIP_Header_Input_Output hdr5(SIP_HEADER_MAX_FORWARDS, "Max-Forwards: 65535", "", 0, false, false);
+    _header_input_output.push_back(hdr5);
+
+    SIP_Header_Input_Output hdr6(SIP_HEADER_MAX_FORWARDS, "Max-Forwards: 65536", "", 0, false, false);
+    _header_input_output.push_back(hdr6);
+
+    SIP_Header_Input_Output hdr7(SIP_HEADER_MAX_FORWARDS, "Max-Forwards: 268435455", "", 0, false, false);
+    _header_input_output.push_back(hdr7);
 }
 
 //-------------------------------------------
@@ -712,6 +733,12 @@ SIP_Header_Min_Expires_Test::SIP_Header_Min_Expires_Test()
 
     SIP_Header_Input_Output hdr3(SIP_HEADER_MIN_EXPIRES, "Min-Expires:    567890 ", "Min-Expires: 567890\r\n", 1, true, true);
     _header_input_output.push_back(hdr3);
+
+    SIP_Header_Input_Output hdr4(SIP_HEADER_MIN_EXPIRES, "Min-Expires: 60", "Min-Expires: 60\r\n", 1, true, true);
+    _header_input_output.push_back(hdr4);
+
+    SIP_Header_Input_Output hdr5(SIP_HEADER_MIN_EXPIRES, "Min-Expires: 7834990190", "", 0, false, false);
+    _header_input_output.push_back(hdr5);
 }
 
 //-------------------------------------------
