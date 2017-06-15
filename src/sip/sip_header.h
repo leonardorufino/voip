@@ -681,7 +681,7 @@ private:
 class SIP_Header_Max_Forwards : public SIP_Header
 {
 public:
-    static const unsigned long INVALID_MAX_FORWARDS = INVALID_UNSIGNED_LONG;
+    static const unsigned short INVALID_MAX_FORWARDS = INVALID_UNSIGNED_SHORT;
 
 public:
     SIP_Header_Max_Forwards() : _max_forwards(INVALID_MAX_FORWARDS) {}
@@ -694,11 +694,11 @@ public:
     bool parse(std::string &sip_msg);
     bool encode(std::string &sip_msg);
 
-    void set_max_forwards(unsigned long max_forwards) { _max_forwards = max_forwards; }
-    unsigned long get_max_forwards() { return _max_forwards; }
+    void set_max_forwards(unsigned short max_forwards) { _max_forwards = max_forwards; }
+    unsigned short get_max_forwards() { return _max_forwards; }
 
 private:
-    unsigned long _max_forwards;
+    unsigned short _max_forwards;
 };
 
 //-------------------------------------------

@@ -1497,7 +1497,7 @@ bool SIP_Header_Max_Forwards::parse(std::string &sip_msg)
 {
     SIP_Functions::trim(sip_msg);
 
-    _max_forwards = SIP_Functions::str_to_ul(sip_msg);
+    _max_forwards = SIP_Functions::str_to_us(sip_msg);
     if (_max_forwards == INVALID_MAX_FORWARDS)
         return false;
 
