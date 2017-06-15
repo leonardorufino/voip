@@ -772,6 +772,9 @@ SIP_Header_Priority_Test::SIP_Header_Priority_Test()
 
     SIP_Header_Input_Output hdr3(SIP_HEADER_PRIORITY, "Priority:my-priority", "Priority: my-priority\r\n", 1, true, true);
     _header_input_output.push_back(hdr3);
+
+    SIP_Header_Input_Output hdr4(SIP_HEADER_PRIORITY, "Priority: emergency", "Priority: emergency\r\n", 1, true, true);
+    _header_input_output.push_back(hdr4);
 }
 
 //-------------------------------------------
@@ -832,6 +835,9 @@ SIP_Header_Require_Test::SIP_Header_Require_Test()
 
     SIP_Header_Input_Output hdr3(SIP_HEADER_REQUIRE, "Require:req1,req2", "Require: req1, req2\r\n", 2, true, true);
     _header_input_output.push_back(hdr3);
+
+    SIP_Header_Input_Output hdr4(SIP_HEADER_REQUIRE, "Require: 100rel", "Require: 100rel\r\n", 1, true, true);
+    _header_input_output.push_back(hdr4);
 }
 
 //-------------------------------------------
