@@ -326,7 +326,6 @@ bool SIP_Event_Type::parse(std::string &sip_msg)
 
     bool matched = SIP_Functions::match(sip_msg, ".", result);
     SIP_Functions::trim(result);
-
     if (result.empty())
         return false;
 
@@ -336,7 +335,6 @@ bool SIP_Event_Type::parse(std::string &sip_msg)
     {
         matched = SIP_Functions::match(sip_msg, ".", result);
         SIP_Functions::trim(result);
-
         if (result.empty())
             return false;
 
@@ -2152,11 +2150,10 @@ bool SIP_Header_Supported::encode(std::string &sip_msg)
 bool SIP_Header_Timestamp::parse(std::string &sip_msg)
 {
     std::string result;
-    bool matched;
 
     SIP_Functions::trim(sip_msg);
 
-    matched = SIP_Functions::match(sip_msg, " \t", result);
+    bool matched = SIP_Functions::match(sip_msg, " \t", result);
     SIP_Functions::trim(result);
     if (result.empty())
         return false;

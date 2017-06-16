@@ -973,6 +973,9 @@ SIP_Header_Timestamp_Test::SIP_Header_Timestamp_Test()
 
     SIP_Header_Input_Output hdr4(SIP_HEADER_TIMESTAMP, "Timestamp: 99.88\t77.666  ", "Timestamp: 99.88 77.666\r\n", 1, true, true);
     _header_input_output.push_back(hdr4);
+
+    SIP_Header_Input_Output hdr5(SIP_HEADER_TIMESTAMP, "Timestamp: 12345678901234.1001  \t \t 55666778899.123  ", "Timestamp: 12345678901234.1001 55666778899.123\r\n", 1, true, true);
+    _header_input_output.push_back(hdr5);
 }
 
 //-------------------------------------------
