@@ -1169,9 +1169,10 @@ class SIP_Header_Via : public SIP_Header
 {
 public:
     static const unsigned short INVALID_PORT = INVALID_UNSIGNED_SHORT;
+    static const unsigned short INVALID_TTL = INVALID_UNSIGNED_SHORT;
 
 public:
-    SIP_Header_Via() : _port(INVALID_PORT) {}
+    SIP_Header_Via() : _port(INVALID_PORT), _ttl(INVALID_TTL) {}
     SIP_Header_Via(const SIP_Header_Via &header) { *this = header; }
     ~SIP_Header_Via() {}
 
@@ -1204,6 +1205,12 @@ public:
     void set_received(std::string received) { _received = received; }
     std::string get_received() { return _received; }
 
+    void set_ttl(unsigned short ttl) { _ttl = ttl; }
+    unsigned short get_ttl() { return _ttl; }
+
+    void set_maddr(std::string maddr) { _maddr = maddr; }
+    std::string get_maddr() { return _maddr; }
+
     std::list<std::string> &get_parameters() { return _parameters; }
 
 private:
@@ -1214,6 +1221,8 @@ private:
     unsigned short _port;
     std::string _branch;
     std::string _received;
+    unsigned short _ttl;
+    std::string _maddr;
     std::list<std::string> _parameters;
 };
 

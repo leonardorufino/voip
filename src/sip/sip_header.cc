@@ -2352,16 +2352,32 @@ bool SIP_Header_Via::parse(std::string &sip_msg)
 
         if (SIP_Functions::start_with(result, "branch="))
         {
-            _branch = &result[7];
+            _branch = result.substr(7);
             SIP_Functions::trim(_branch);
             if (_branch.empty())
                 return false;
 
         }else if (SIP_Functions::start_with(result, "received="))
         {
-            _received = &result[9];
+            _received = result.substr(9);
             SIP_Functions::trim(_received);
             if (_received.empty())
+                return false;
+
+        }else if (SIP_Functions::start_with(result, "ttl="))
+        {
+            std::string ttl = result.substr(4);
+            SIP_Functions::trim(ttl);
+            if (ttl.empty())
+                return false;
+
+            _ttl = (unsigned short) atol(ttl.c_str());
+
+        }else if (SIP_Functions::start_with(result, "maddr="))
+        {
+            _maddr = result.substr(6);
+            SIP_Functions::trim(_maddr);
+            if (_maddr.empty())
                 return false;
         }else
             _parameters.push_back(result);
@@ -2401,6 +2417,18 @@ bool SIP_Header_Via::encode(std::string &sip_msg)
     {
         sip_msg += ";received=";
         sip_msg += _received;
+    }
+
+    if (_ttl != INVALID_TTL)
+    {
+        sip_msg += ";ttl=";
+        sip_msg += std::to_string(_ttl);
+    }
+
+    if (!_maddr.empty())
+    {
+        sip_msg += ";maddr=";
+        sip_msg += _maddr;
     }
 
     std::list<std::string>::iterator it = _parameters.begin();

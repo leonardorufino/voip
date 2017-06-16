@@ -994,6 +994,9 @@ SIP_Header_To_Test::SIP_Header_To_Test()
 
     SIP_Header_Input_Output hdr4(SIP_HEADER_TO, "To: <sip:server.phone2net.com ;par1 ; lr ; maddr= 10.10.10.10 ;ttl=20; method= BYE; user=ip;transport= udp ;par2> ; tag=287447;parameter1 ", "To: <sip:server.phone2net.com;transport=udp;user=ip;method=BYE;ttl=20;maddr=10.10.10.10;lr;par1;par2>;tag=287447;parameter1\r\n", 1, true, true);
     _header_input_output.push_back(hdr4);
+
+    SIP_Header_Input_Output hdr5(SIP_HEADER_TO, "To: The Operator <sip:operator@cs.columbia.edu>;tag=287447", "To: The Operator <sip:operator@cs.columbia.edu>;tag=287447\r\n", 1, true, true);
+    _header_input_output.push_back(hdr5);
 }
 
 //-------------------------------------------
@@ -1034,11 +1037,20 @@ SIP_Header_Via_Test::SIP_Header_Via_Test()
     SIP_Header_Input_Output hdr1(SIP_HEADER_VIA, "Via: SIP/2.0/UDP lab.high-voltage.org:5060;branch=z9hG4bKfw19b", "Via: SIP/2.0/UDP lab.high-voltage.org:5060;branch=z9hG4bKfw19b\r\n", 1, true, true);
     _header_input_output.push_back(hdr1);
 
-    SIP_Header_Input_Output hdr2(SIP_HEADER_VIA, "Via: SIP / 2.0 / UDP first.example.com: 4000;ttl=16;maddr=224.2.0.1;branch=z9hG4bKa7c6a8dlze.1, SIP/2.0/UDP first.example.com", "Via: SIP/2.0/UDP first.example.com:4000;branch=z9hG4bKa7c6a8dlze.1;ttl=16;maddr=224.2.0.1\r\nVia: SIP/2.0/UDP first.example.com\r\n", 2, true, true);
+    SIP_Header_Input_Output hdr2(SIP_HEADER_VIA, "Via: SIP / 2.0 / UDP first.example.com: 4000  ;par1;maddr=224.2.0.1 ;ttl=16;branch=z9hG4bKa7c6a8dlze.1, SIP/2.0/UDP first.example.com", "Via: SIP/2.0/UDP first.example.com:4000;branch=z9hG4bKa7c6a8dlze.1;ttl=16;maddr=224.2.0.1;par1\r\nVia: SIP/2.0/UDP first.example.com\r\n", 2, true, true);
     _header_input_output.push_back(hdr2);
 
     SIP_Header_Input_Output hdr3(SIP_HEADER_VIA, "v: SIP/2.0/UDP lab.high-voltage.org;received=10.10.10.10;branch=z9hG4bKfw19b,SIP/2.0/UDP 11.11.11.11:5070;branch=z9hG4bKfw19b;parameter1 ", "Via: SIP/2.0/UDP lab.high-voltage.org;branch=z9hG4bKfw19b;received=10.10.10.10\r\nVia: SIP/2.0/UDP 11.11.11.11:5070;branch=z9hG4bKfw19b;parameter1\r\n", 2, true, true);
     _header_input_output.push_back(hdr3);
+
+    SIP_Header_Input_Output hdr4(SIP_HEADER_VIA, "Via: SIP/2.0/UDP erlang.bell-telephone.com:5060;branch=z9hG4bK87asdks7", "Via: SIP/2.0/UDP erlang.bell-telephone.com:5060;branch=z9hG4bK87asdks7\r\n", 1, true, true);
+    _header_input_output.push_back(hdr4);
+
+    SIP_Header_Input_Output hdr5(SIP_HEADER_VIA, "Via: SIP/2.0/UDP 192.0.2.1:5060 ;received=192.0.2.207;branch=z9hG4bK77asjd", "Via: SIP/2.0/UDP 192.0.2.1:5060;branch=z9hG4bK77asjd;received=192.0.2.207\r\n", 1, true, true);
+    _header_input_output.push_back(hdr5);
+
+    SIP_Header_Input_Output hdr6(SIP_HEADER_VIA, "Via: SIP / 2.0 / UDP first.example.com: 4000;ttl=16 ;maddr=224.2.0.1 ;branch=z9hG4bKa7c6a8dlze.1", "Via: SIP/2.0/UDP first.example.com:4000;branch=z9hG4bKa7c6a8dlze.1;ttl=16;maddr=224.2.0.1\r\n", 1, true, true);
+    _header_input_output.push_back(hdr6);
 }
 
 //-------------------------------------------
