@@ -41,6 +41,10 @@ bool SIP_Header_Test::init()
     if (!header_allow_events.run())
         return false;
 
+    SIP_Header_Authorization_Test header_authorization;
+    if (!header_authorization.run())
+        return false;
+
     SIP_Header_Call_ID_Test header_call_id;
     if (!header_call_id.run())
         return false;
@@ -388,6 +392,30 @@ SIP_Header_Allow_Events_Test::SIP_Header_Allow_Events_Test()
 
     SIP_Header_Input_Output hdr3(SIP_HEADER_ALLOW_EVENTS, "u: presence.template1.template2 , test.template,package-xyz", "Allow-Events: presence.template1.template2, test.template, package-xyz\r\n", 3, true, true);
     _header_input_output.push_back(hdr3);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+SIP_Header_Authorization_Test::SIP_Header_Authorization_Test()
+{
+    SIP_Header_Input_Output hdr1(SIP_HEADER_AUTHORIZATION, "Authorization: Digest username=\"Alice\", realm=\"atlanta.com\", nonce=\"84a4cc6f3082121f32b42a2187831a9e\", response=\"7587245234b3434cc3412213e5f113a5432\"", "Authorization: Digest username=\"Alice\", realm=\"atlanta.com\", nonce=\"84a4cc6f3082121f32b42a2187831a9e\", response=\"7587245234b3434cc3412213e5f113a5432\"\r\n", 1, true, true);
+    _header_input_output.push_back(hdr1);
+
+    SIP_Header_Input_Output hdr2(SIP_HEADER_AUTHORIZATION, "Authorization: Digest username=\"bob\", realm=\"biloxi.com\", nonce=\"dcd98b7102dd2f0e8b11d0f600bfb0c093\", uri=\"sip:bob@biloxi.com\", qop=auth, nc=00000001, cnonce=\"0a4f113b\", response=\"6629fae49393a05397450978507c4ef1\", opaque=\"5ccc069c403ebaf9f0171e9517f40e41\"", "Authorization: Digest username=\"bob\", realm=\"biloxi.com\", nonce=\"dcd98b7102dd2f0e8b11d0f600bfb0c093\", uri=\"sip:bob@biloxi.com\", response=\"6629fae49393a05397450978507c4ef1\", cnonce=\"0a4f113b\", opaque=\"5ccc069c403ebaf9f0171e9517f40e41\", qop=auth, nc=00000001\r\n", 1, true, true);
+    _header_input_output.push_back(hdr2);
+
+    SIP_Header_Input_Output hdr3(SIP_HEADER_AUTHORIZATION, "Authorization: Digest username=\"bob\",realm=\"atlanta.example.com\",nonce=\"ea9c8e88df84f1cec4341ae6cbe5a359\" ,   opaque=\"\",   uri=\"sips:ss2.biloxi.example.com\",response=\"dfe56131d1958046689d83306477ecc\"", "Authorization: Digest username=\"bob\", realm=\"atlanta.example.com\", nonce=\"ea9c8e88df84f1cec4341ae6cbe5a359\", uri=\"sips:ss2.biloxi.example.com\", response=\"dfe56131d1958046689d83306477ecc\", opaque=\"\"\r\n", 1, true, true);
+    _header_input_output.push_back(hdr3);
+
+    SIP_Header_Input_Output hdr4(SIP_HEADER_AUTHORIZATION, "Authorization: Digest\tusername=\"name\",realm=\"myrealm.com\",nonce=\"123456789012345678901\", uri=\"sip:myrealm.com\",response=\"12345678901234567890123456789012\",algorithm=MD5", "Authorization: Digest username=\"name\", realm=\"myrealm.com\", nonce=\"123456789012345678901\", uri=\"sip:myrealm.com\", response=\"12345678901234567890123456789012\", algorithm=MD5\r\n", 1, true, true);
+    _header_input_output.push_back(hdr4);
+
+    SIP_Header_Input_Output hdr5(SIP_HEADER_AUTHORIZATION, "Authorization: Scheme1 param1, param2=test, nonce=\"123456789012345678901\",realm=\"server.com\",response=\"12345678901234567890123456789012\", username=\"1234\", uri=\"sip:server.com\",qop=auth, nc=00000001, cnonce=\"0a4f113b\", opaque=\"11223344556677889900aabbccddeeff\", par3=\"test\", algorithm=XYZ", "Authorization: Scheme1 username=\"1234\", realm=\"server.com\", nonce=\"123456789012345678901\", uri=\"sip:server.com\", response=\"12345678901234567890123456789012\", algorithm=XYZ, cnonce=\"0a4f113b\", opaque=\"11223344556677889900aabbccddeeff\", qop=auth, nc=00000001, param1, param2=test, par3=\"test\"\r\n", 1, true, true);
+    _header_input_output.push_back(hdr5);
+
+    SIP_Header_Input_Output hdr6(SIP_HEADER_AUTHORIZATION, "Authorization: scheme2 param1, param2=test,par3=\"test\"", "Authorization: scheme2 param1, param2=test, par3=\"test\"\r\n", 1, true, true);
+    _header_input_output.push_back(hdr6);
 }
 
 //-------------------------------------------

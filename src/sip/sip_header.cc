@@ -26,6 +26,7 @@ SIP_Header *SIP_Header::create_header(SIP_Header_Type header_type, const SIP_Hea
         case SIP_HEADER_ALERT_INFO:          header = (!copy) ? new SIP_Header_Alert_Info()          : new SIP_Header_Alert_Info(*((SIP_Header_Alert_Info *) copy));                    break;
         case SIP_HEADER_ALLOW:               header = (!copy) ? new SIP_Header_Allow()               : new SIP_Header_Allow(*((SIP_Header_Allow *) copy));                              break;
         case SIP_HEADER_ALLOW_EVENTS:        header = (!copy) ? new SIP_Header_Allow_Events()        : new SIP_Header_Allow_Events(*((SIP_Header_Allow_Events *) copy));                break;
+        case SIP_HEADER_AUTHORIZATION:       header = (!copy) ? new SIP_Header_Authorization()       : new SIP_Header_Authorization(*((SIP_Header_Authorization *) copy));              break;
         case SIP_HEADER_CALL_ID:             header = (!copy) ? new SIP_Header_Call_ID()             : new SIP_Header_Call_ID(*((SIP_Header_Call_ID *) copy));                          break;
         case SIP_HEADER_CALL_INFO:           header = (!copy) ? new SIP_Header_Call_Info()           : new SIP_Header_Call_Info(*((SIP_Header_Call_Info *) copy));                      break;
         case SIP_HEADER_CONTACT:             header = (!copy) ? new SIP_Header_Contact()             : new SIP_Header_Contact(*((SIP_Header_Contact *) copy));                          break;
@@ -96,7 +97,7 @@ bool SIP_Header::decode_headers(std::string &sip_msg, std::map<SIP_Header_Type, 
     {
         SIP_Header *header = create_header(header_type);
 
-        if (header->encode_separator() != SIP_HEADER_SEPARATOR_NONE)
+        if (header->decode_separator() == SIP_HEADER_SEPARATOR_COMMA)
         {
             // There may be more than one of these headers
             matched = SIP_Functions::match(sip_msg, ",", result);
@@ -171,6 +172,208 @@ bool SIP_Header::encode_headers(std::string &sip_msg, std::map<SIP_Header_Type, 
         }
 
         sip_msg += "\r\n";
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+bool SIP_Credential::parse(std::string &sip_msg)
+{
+    std::string result;
+
+    SIP_Functions::trim(sip_msg);
+    bool matched = SIP_Functions::match(sip_msg, " \t", result);
+    if (!matched)
+        return false;
+
+    SIP_Functions::trim(result);
+    if (result.empty())
+        return false;
+
+    _scheme = result;
+
+    while (matched)
+    {
+        matched = SIP_Functions::match(sip_msg, ",", result);
+        SIP_Functions::trim(result);
+
+        if (SIP_Functions::start_with(result, "username="))
+        {
+            _username = result.substr(9);
+            SIP_Functions::trim(_username);
+            if (_username.empty())
+                return false;
+
+        }else if (SIP_Functions::start_with(result, "realm="))
+        {
+            _realm = result.substr(6);
+            SIP_Functions::trim(_realm);
+            if (_realm.empty())
+                return false;
+
+        }else if (SIP_Functions::start_with(result, "nonce="))
+        {
+            _nonce = result.substr(6);
+            SIP_Functions::trim(_nonce);
+            if (_nonce.empty())
+                return false;
+
+        }else if (SIP_Functions::start_with(result, "uri="))
+        {
+            _uri = result.substr(4);
+            SIP_Functions::trim(_uri);
+            if (_uri.empty())
+                return false;
+
+        }else if (SIP_Functions::start_with(result, "response="))
+        {
+            _response = result.substr(9);
+            SIP_Functions::trim(_response);
+            if (_response.empty())
+                return false;
+
+        }else if (SIP_Functions::start_with(result, "algorithm="))
+        {
+            _algorithm = result.substr(10);
+            SIP_Functions::trim(_algorithm);
+            if (_algorithm.empty())
+                return false;
+
+        }else if (SIP_Functions::start_with(result, "cnonce="))
+        {
+            _cnonce = result.substr(7);
+            SIP_Functions::trim(_cnonce);
+            if (_cnonce.empty())
+                return false;
+
+        }else if (SIP_Functions::start_with(result, "opaque="))
+        {
+            _opaque = result.substr(7);
+            SIP_Functions::trim(_opaque);
+            if (_opaque.empty())
+                return false;
+
+        }else if (SIP_Functions::start_with(result, "qop="))
+        {
+            _qop = result.substr(4);
+            SIP_Functions::trim(_qop);
+            if (_qop.empty())
+                return false;
+
+        }else if (SIP_Functions::start_with(result, "nc="))
+        {
+            _nonce_count = result.substr(3);
+            SIP_Functions::trim(_nonce_count);
+            if (_nonce_count.empty())
+                return false;
+
+        }else
+            _parameters.push_back(result);
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Credential::encode(std::string &sip_msg)
+{
+    if (_scheme.empty())
+        return false;
+
+    sip_msg += _scheme;
+
+    bool first_param = true;
+
+    if (!_username.empty())
+    {
+        sip_msg += (first_param) ? " " : ", ";
+        sip_msg += "username=";
+        sip_msg += _username;
+        first_param = false;
+    }
+
+    if (!_realm.empty())
+    {
+        sip_msg += (first_param) ? " " : ", ";
+        sip_msg += "realm=";
+        sip_msg += _realm;
+        first_param = false;
+    }
+
+    if (!_nonce.empty())
+    {
+        sip_msg += (first_param) ? " " : ", ";
+        sip_msg += "nonce=";
+        sip_msg += _nonce;
+        first_param = false;
+    }
+
+    if (!_uri.empty())
+    {
+        sip_msg += (first_param) ? " " : ", ";
+        sip_msg += "uri=";
+        sip_msg += _uri;
+        first_param = false;
+    }
+
+    if (!_response.empty())
+    {
+        sip_msg += (first_param) ? " " : ", ";
+        sip_msg += "response=";
+        sip_msg += _response;
+        first_param = false;
+    }
+
+    if (!_algorithm.empty())
+    {
+        sip_msg += (first_param) ? " " : ", ";
+        sip_msg += "algorithm=";
+        sip_msg += _algorithm;
+        first_param = false;
+    }
+
+    if (!_cnonce.empty())
+    {
+        sip_msg += (first_param) ? " " : ", ";
+        sip_msg += "cnonce=";
+        sip_msg += _cnonce;
+        first_param = false;
+    }
+
+    if (!_opaque.empty())
+    {
+        sip_msg += (first_param) ? " " : ", ";
+        sip_msg += "opaque=";
+        sip_msg += _opaque;
+        first_param = false;
+    }
+
+    if (!_qop.empty())
+    {
+        sip_msg += (first_param) ? " " : ", ";
+        sip_msg += "qop=";
+        sip_msg += _qop;
+        first_param = false;
+    }
+
+    if (!_nonce_count.empty())
+    {
+        sip_msg += (first_param) ? " " : ", ";
+        sip_msg += "nc=";
+        sip_msg += _nonce_count;
+        first_param = false;
+    }
+
+    std::list<std::string>::iterator it = _parameters.begin();
+    while (it != _parameters.end())
+    {
+        sip_msg += (first_param) ? " " : ", ";
+        sip_msg += *it++;
+        first_param = false;
     }
 
     return true;
@@ -623,10 +826,22 @@ bool SIP_Header_Allow_Events::parse(std::string &sip_msg)
 
 bool SIP_Header_Allow_Events::encode(std::string &sip_msg)
 {
-    if (!_event_type.encode(sip_msg))
-        return false;
+    return _event_type.encode(sip_msg);
+}
 
-    return true;
+//-------------------------------------------
+//-------------------------------------------
+
+bool SIP_Header_Authorization::parse(std::string &sip_msg)
+{
+    return _credential.parse(sip_msg);
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Authorization::encode(std::string &sip_msg)
+{
+    return _credential.encode(sip_msg);
 }
 
 //-------------------------------------------
@@ -1015,10 +1230,7 @@ bool SIP_Header_Content_Type::parse(std::string &sip_msg)
 
 bool SIP_Header_Content_Type::encode(std::string &sip_msg)
 {
-    if (!_media_type.encode(sip_msg))
-        return false;
-
-    return true;
+    return _media_type.encode(sip_msg);
 }
 
 //-------------------------------------------

@@ -111,6 +111,8 @@ SIP_Header_Type SIP_Functions::get_header_type(std::string header)
         return SIP_HEADER_ALLOW;
     else if ((header == "Allow-Events") || (header == "u"))
         return SIP_HEADER_ALLOW_EVENTS;
+    else if (header == "Authorization")
+        return SIP_HEADER_AUTHORIZATION;
     else if ((header == "Call-ID") || (header == "i"))
         return SIP_HEADER_CALL_ID;
     else if (header == "Call-Info")
@@ -199,6 +201,7 @@ std::string SIP_Functions::get_header_type(SIP_Header_Type header)
         case SIP_HEADER_ALERT_INFO:             return "Alert-Info";
         case SIP_HEADER_ALLOW:                  return "Allow";
         case SIP_HEADER_ALLOW_EVENTS:           return "Allow-Events";
+        case SIP_HEADER_AUTHORIZATION:          return "Authorization";
         case SIP_HEADER_CALL_ID:                return "Call-ID";
         case SIP_HEADER_CALL_INFO:              return "Call-Info";
         case SIP_HEADER_CONTACT:                return "Contact";
