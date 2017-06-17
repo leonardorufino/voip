@@ -26,10 +26,10 @@ public:
 
     virtual SIP_Method_Type get_message_type() = 0;
 
-    bool parse(std::string &sip_msg);
-    virtual bool parse_start_line(std::string &sip_msg) = 0;
-    bool parse_header(std::string &sip_msg);
-    bool parse_body(std::string &sip_msg);
+    bool decode(std::string &sip_msg);
+    virtual bool decode_start_line(std::string &sip_msg) = 0;
+    bool decode_header(std::string &sip_msg);
+    bool decode_body(std::string &sip_msg);
 
     bool encode(std::string &sip_msg);
     virtual bool encode_start_line(std::string &sip_msg) = 0;

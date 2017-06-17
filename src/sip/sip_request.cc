@@ -23,18 +23,18 @@ SIP_Request::SIP_Request(const SIP_Request &request) : SIP_Message(request)
 
 //-------------------------------------------
 
-bool SIP_Request::parse_start_line(std::string &sip_msg)
+bool SIP_Request::decode_start_line(std::string &sip_msg)
 {
     std::string line;
     SIP_Functions::get_line(sip_msg, line);
 
-    _method = get_message_type(); // The method was already parsed by SIP_Message::decode_msg
+    _method = get_message_type(); // The method was already decoded by SIP_Message::decode_msg
 
     std::string result;
     SIP_Functions::skip(line, " \t");
     if (!SIP_Functions::match(line, " ", result))
     {
-        std::cout << "SIP_Request::parse_start_line -> Failed to parse request URI (request_uri=" << line.c_str() << ")\n";
+        std::cout << "SIP_Request::decode_start_line -> Failed to decode request URI (request_uri=" << line.c_str() << ")\n";
         return false;
     }
 
@@ -44,7 +44,7 @@ bool SIP_Request::parse_start_line(std::string &sip_msg)
     _sip_version = line;
     if ((_sip_version.empty()) || (_sip_version != SIP_VERSION))
     {
-        std::cout << "SIP_Request::parse_start_line -> Failed to parse SIP version (version=" << _sip_version.c_str() << ")\n";
+        std::cout << "SIP_Request::decode_start_line -> Failed to decode SIP version (version=" << _sip_version.c_str() << ")\n";
         return false;
     }
 

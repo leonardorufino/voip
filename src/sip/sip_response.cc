@@ -39,25 +39,25 @@ SIP_Response::SIP_Response(const SIP_Response &response) : SIP_Message(response)
 
 //-------------------------------------------
 
-bool SIP_Response::parse_start_line(std::string &sip_msg)
+bool SIP_Response::decode_start_line(std::string &sip_msg)
 {
     std::string line;
     SIP_Functions::get_line(sip_msg, line);
 
-    _sip_version = SIP_VERSION; // The version was already parsed by SIP_Message::decode_msg
+    _sip_version = SIP_VERSION; // The version was already decoded by SIP_Message::decode_msg
 
     std::string result;
     SIP_Functions::skip(line, " \t");
     if (!SIP_Functions::match(line, " ", result))
     {
-        std::cout << "SIP_Response::parse_start_line -> Failed to parse status code (status_code=" << line.c_str() << ")\n";
+        std::cout << "SIP_Response::decode_start_line -> Failed to decode status code (status_code=" << line.c_str() << ")\n";
         return false;
     }
 
     _status_code = (unsigned short) atol(result.c_str());
     if ((_status_code < 100) || (_status_code > 699))
     {
-        std::cout << "SIP_Response::parse_start_line -> Invalid status code (status_code=" << _status_code << ")\n";
+        std::cout << "SIP_Response::decode_start_line -> Invalid status code (status_code=" << _status_code << ")\n";
         return false;
     }
 

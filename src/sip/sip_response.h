@@ -26,7 +26,7 @@ public:
     ~SIP_Response() {}
 
     // Virtual pure functions
-    bool parse_start_line(std::string &sip_msg);
+    bool decode_start_line(std::string &sip_msg);
     bool encode_start_line(std::string &sip_msg);
     SIP_Method_Type get_message_type() { return SIP_RESPONSE; }
 

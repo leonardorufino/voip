@@ -14,7 +14,7 @@
 
 //-------------------------------------------
 
-bool SIP_URI::parse(std::string &sip_msg)
+bool SIP_URI::decode(std::string &sip_msg)
 {
     SIP_Functions::trim(sip_msg);
 
@@ -265,7 +265,7 @@ SIP_Method_Type SIP_URI::get_method()
 //-------------------------------------------
 //-------------------------------------------
 
-bool SIP_Absolute_URI::parse(std::string &sip_msg)
+bool SIP_Absolute_URI::decode(std::string &sip_msg)
 {
     SIP_Functions::trim(sip_msg);
     if (sip_msg.empty())
@@ -289,7 +289,7 @@ bool SIP_Absolute_URI::encode(std::string &sip_msg)
 //-------------------------------------------
 //-------------------------------------------
 
-bool SIP_Address::parse(std::string &sip_msg)
+bool SIP_Address::decode(std::string &sip_msg)
 {
     std::string display_name;
     std::string uri;
@@ -321,14 +321,14 @@ bool SIP_Address::parse(std::string &sip_msg)
         case SIP_ADDRESS_SCHEME_SIP:
         case SIP_ADDRESS_SCHEME_SIPS:
         {
-            if (!_sip_uri.parse(uri))
+            if (!_sip_uri.decode(uri))
                 return false;
             break;
         }
 
         default:
         {
-            if (!_absolute_uri.parse(uri))
+            if (!_absolute_uri.decode(uri))
                 return false;
             break;
         }

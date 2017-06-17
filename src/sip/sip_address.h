@@ -25,7 +25,7 @@ public:
     SIP_URI(const SIP_URI &value) { *this = value; }
     ~SIP_URI() {}
 
-    bool parse(std::string &sip_msg);
+    bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
 
     void set_user(std::string user) { _user = user; }
@@ -94,7 +94,7 @@ public:
     SIP_Absolute_URI(const SIP_Absolute_URI &value) { *this = value; }
     ~SIP_Absolute_URI() {}
 
-    bool parse(std::string &sip_msg);
+    bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
 
     void set_address(std::string address) { _address = address; }
@@ -113,7 +113,7 @@ public:
     SIP_Address(const SIP_Address &value) { *this = value; }
     ~SIP_Address() {}
 
-    bool parse(std::string &sip_msg);
+    bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
 
     void set_display_name(std::string display_name) { _display_name = display_name; }

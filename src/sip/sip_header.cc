@@ -108,9 +108,9 @@ bool SIP_Header::decode_headers(std::string &sip_msg, std::map<SIP_Header_Type, 
 
         header->_header_line = result;
 
-        if (!header->parse(result))
+        if (!header->decode(result))
         {
-            std::cout << "SIP_Header::decode_header -> Failed to parse header type (header=" << header_type << ")\n";
+            std::cout << "SIP_Header::decode_header -> Failed to decode header type (header=" << header_type << ")\n";
             delete header;
             return false;
         }
@@ -180,7 +180,7 @@ bool SIP_Header::encode_headers(std::string &sip_msg, std::map<SIP_Header_Type, 
 //-------------------------------------------
 //-------------------------------------------
 
-bool SIP_Credential::parse(std::string &sip_msg)
+bool SIP_Credential::decode(std::string &sip_msg)
 {
     std::string result;
 
@@ -382,7 +382,7 @@ bool SIP_Credential::encode(std::string &sip_msg)
 //-------------------------------------------
 //-------------------------------------------
 
-bool SIP_Media_Range::parse(std::string &sip_msg)
+bool SIP_Media_Range::decode(std::string &sip_msg)
 {
     std::string result;
     if (!SIP_Functions::match(sip_msg, "/", result))
@@ -523,7 +523,7 @@ SIP_Media_Subtype SIP_Media_Range::get_subtype()
 //-------------------------------------------
 //-------------------------------------------
 
-bool SIP_Event_Type::parse(std::string &sip_msg)
+bool SIP_Event_Type::decode(std::string &sip_msg)
 {
     std::string result;
 
@@ -590,7 +590,7 @@ SIP_Event_Package SIP_Event_Type::get_package()
 //-------------------------------------------
 //-------------------------------------------
 
-bool SIP_Header_Accept::parse(std::string &sip_msg)
+bool SIP_Header_Accept::decode(std::string &sip_msg)
 {
     SIP_Functions::trim(sip_msg);
     if (sip_msg.empty())
@@ -599,7 +599,7 @@ bool SIP_Header_Accept::parse(std::string &sip_msg)
         return true;
     }
 
-    return _media_range.parse(sip_msg);
+    return _media_range.decode(sip_msg);
 }
 
 //-------------------------------------------
@@ -621,7 +621,7 @@ bool SIP_Header_Accept::encode(std::string &sip_msg)
 //-------------------------------------------
 //-------------------------------------------
 
-bool SIP_Header_Accept_Encoding::parse(std::string &sip_msg)
+bool SIP_Header_Accept_Encoding::decode(std::string &sip_msg)
 {
     std::string result;
 
@@ -680,7 +680,7 @@ bool SIP_Header_Accept_Encoding::encode(std::string &sip_msg)
 //-------------------------------------------
 //-------------------------------------------
 
-bool SIP_Header_Accept_Language::parse(std::string &sip_msg)
+bool SIP_Header_Accept_Language::decode(std::string &sip_msg)
 {
     std::string result;
 
@@ -739,12 +739,12 @@ bool SIP_Header_Accept_Language::encode(std::string &sip_msg)
 //-------------------------------------------
 //-------------------------------------------
 
-bool SIP_Header_Alert_Info::parse(std::string &sip_msg)
+bool SIP_Header_Alert_Info::decode(std::string &sip_msg)
 {
     std::string result;
     bool matched = SIP_Functions::match(sip_msg, ";", result);
 
-    if (!_address.parse(result))
+    if (!_address.decode(result))
         return false;
 
     while (matched)
@@ -777,7 +777,7 @@ bool SIP_Header_Alert_Info::encode(std::string &sip_msg)
 //-------------------------------------------
 //-------------------------------------------
 
-bool SIP_Header_Allow::parse(std::string &sip_msg)
+bool SIP_Header_Allow::decode(std::string &sip_msg)
 {
     SIP_Functions::trim(sip_msg);
 
@@ -817,9 +817,9 @@ SIP_Method_Type SIP_Header_Allow::get_method()
 //-------------------------------------------
 //-------------------------------------------
 
-bool SIP_Header_Allow_Events::parse(std::string &sip_msg)
+bool SIP_Header_Allow_Events::decode(std::string &sip_msg)
 {
-    return _event_type.parse(sip_msg);
+    return _event_type.decode(sip_msg);
 }
 
 //-------------------------------------------
@@ -832,9 +832,9 @@ bool SIP_Header_Allow_Events::encode(std::string &sip_msg)
 //-------------------------------------------
 //-------------------------------------------
 
-bool SIP_Header_Authorization::parse(std::string &sip_msg)
+bool SIP_Header_Authorization::decode(std::string &sip_msg)
 {
-    return _credential.parse(sip_msg);
+    return _credential.decode(sip_msg);
 }
 
 //-------------------------------------------
@@ -847,7 +847,7 @@ bool SIP_Header_Authorization::encode(std::string &sip_msg)
 //-------------------------------------------
 //-------------------------------------------
 
-bool SIP_Header_Call_ID::parse(std::string &sip_msg)
+bool SIP_Header_Call_ID::decode(std::string &sip_msg)
 {
     SIP_Functions::trim(sip_msg);
     if (sip_msg.empty())
@@ -871,12 +871,12 @@ bool SIP_Header_Call_ID::encode(std::string &sip_msg)
 //-------------------------------------------
 //-------------------------------------------
 
-bool SIP_Header_Call_Info::parse(std::string &sip_msg)
+bool SIP_Header_Call_Info::decode(std::string &sip_msg)
 {
     std::string result;
     bool matched = SIP_Functions::match(sip_msg, ";", result);
 
-    if (!_address.parse(result))
+    if (!_address.decode(result))
         return false;
 
     while (matched)
@@ -950,7 +950,7 @@ SIP_Call_Info_Purpose SIP_Header_Call_Info::get_purpose()
 //-------------------------------------------
 //-------------------------------------------
 
-bool SIP_Header_Contact::parse(std::string &sip_msg)
+bool SIP_Header_Contact::decode(std::string &sip_msg)
 {
     SIP_Functions::trim(sip_msg);
 
@@ -965,7 +965,7 @@ bool SIP_Header_Contact::parse(std::string &sip_msg)
     std::string result;
     bool matched = SIP_Functions::match(sip_msg, ";", result);
 
-    if (!_address.parse(result))
+    if (!_address.decode(result))
         return false;
 
     while (matched)
@@ -1035,7 +1035,7 @@ bool SIP_Header_Contact::encode(std::string &sip_msg)
 //-------------------------------------------
 //-------------------------------------------
 
-bool SIP_Header_Content_Disposition::parse(std::string &sip_msg)
+bool SIP_Header_Content_Disposition::decode(std::string &sip_msg)
 {
     std::string result;
 
@@ -1146,7 +1146,7 @@ SIP_Disposition_Handling SIP_Header_Content_Disposition::get_handling()
 //-------------------------------------------
 //-------------------------------------------
 
-bool SIP_Header_Content_Encoding::parse(std::string &sip_msg)
+bool SIP_Header_Content_Encoding::decode(std::string &sip_msg)
 {
     SIP_Functions::trim(sip_msg);
     if (sip_msg.empty())
@@ -1170,7 +1170,7 @@ bool SIP_Header_Content_Encoding::encode(std::string &sip_msg)
 //-------------------------------------------
 //-------------------------------------------
 
-bool SIP_Header_Content_Language::parse(std::string &sip_msg)
+bool SIP_Header_Content_Language::decode(std::string &sip_msg)
 {
     SIP_Functions::trim(sip_msg);
     if (sip_msg.empty())
@@ -1194,7 +1194,7 @@ bool SIP_Header_Content_Language::encode(std::string &sip_msg)
 //-------------------------------------------
 //-------------------------------------------
 
-bool SIP_Header_Content_Length::parse(std::string &sip_msg)
+bool SIP_Header_Content_Length::decode(std::string &sip_msg)
 {
     SIP_Functions::trim(sip_msg);
     if (sip_msg.empty())
@@ -1221,9 +1221,9 @@ bool SIP_Header_Content_Length::encode(std::string &sip_msg)
 //-------------------------------------------
 //-------------------------------------------
 
-bool SIP_Header_Content_Type::parse(std::string &sip_msg)
+bool SIP_Header_Content_Type::decode(std::string &sip_msg)
 {
-    return _media_type.parse(sip_msg);
+    return _media_type.decode(sip_msg);
 }
 
 //-------------------------------------------
@@ -1236,7 +1236,7 @@ bool SIP_Header_Content_Type::encode(std::string &sip_msg)
 //-------------------------------------------
 //-------------------------------------------
 
-bool SIP_Header_CSeq::parse(std::string &sip_msg)
+bool SIP_Header_CSeq::decode(std::string &sip_msg)
 {
     std::string result;
 
@@ -1297,7 +1297,7 @@ SIP_Header_Date::SIP_Header_Date()
 
 //-------------------------------------------
 
-bool SIP_Header_Date::parse(std::string &sip_msg)
+bool SIP_Header_Date::decode(std::string &sip_msg)
 {
     std::string result;
 
@@ -1512,12 +1512,12 @@ SIP_Date_Month SIP_Header_Date::get_month()
 //-------------------------------------------
 //-------------------------------------------
 
-bool SIP_Header_Error_Info::parse(std::string &sip_msg)
+bool SIP_Header_Error_Info::decode(std::string &sip_msg)
 {
     std::string result;
     bool matched = SIP_Functions::match(sip_msg, ";", result);
 
-    if (!_address.parse(result))
+    if (!_address.decode(result))
         return false;
 
     while (matched)
@@ -1550,12 +1550,12 @@ bool SIP_Header_Error_Info::encode(std::string &sip_msg)
 //-------------------------------------------
 //-------------------------------------------
 
-bool SIP_Header_Event::parse(std::string &sip_msg)
+bool SIP_Header_Event::decode(std::string &sip_msg)
 {
     std::string result;
     bool matched = SIP_Functions::match(sip_msg, ";", result);
 
-    if (!_event_type.parse(result))
+    if (!_event_type.decode(result))
         return false;
 
     while (matched)
@@ -1602,7 +1602,7 @@ bool SIP_Header_Event::encode(std::string &sip_msg)
 //-------------------------------------------
 //-------------------------------------------
 
-bool SIP_Header_Expires::parse(std::string &sip_msg)
+bool SIP_Header_Expires::decode(std::string &sip_msg)
 {
     SIP_Functions::trim(sip_msg);
 
@@ -1627,12 +1627,12 @@ bool SIP_Header_Expires::encode(std::string &sip_msg)
 //-------------------------------------------
 //-------------------------------------------
 
-bool SIP_Header_From::parse(std::string &sip_msg)
+bool SIP_Header_From::decode(std::string &sip_msg)
 {
     std::string result;
     bool matched = SIP_Functions::match(sip_msg, ";", result);
 
-    if (!_address.parse(result))
+    if (!_address.decode(result))
         return false;
 
     while (matched)
@@ -1679,7 +1679,7 @@ bool SIP_Header_From::encode(std::string &sip_msg)
 //-------------------------------------------
 //-------------------------------------------
 
-bool SIP_Header_In_Reply_To::parse(std::string &sip_msg)
+bool SIP_Header_In_Reply_To::decode(std::string &sip_msg)
 {
     SIP_Functions::trim(sip_msg);
     if (sip_msg.empty())
@@ -1703,7 +1703,7 @@ bool SIP_Header_In_Reply_To::encode(std::string &sip_msg)
 //-------------------------------------------
 //-------------------------------------------
 
-bool SIP_Header_Max_Forwards::parse(std::string &sip_msg)
+bool SIP_Header_Max_Forwards::decode(std::string &sip_msg)
 {
     SIP_Functions::trim(sip_msg);
 
@@ -1728,7 +1728,7 @@ bool SIP_Header_Max_Forwards::encode(std::string &sip_msg)
 //-------------------------------------------
 //-------------------------------------------
 
-bool SIP_Header_Mime_Version::parse(std::string &sip_msg)
+bool SIP_Header_Mime_Version::decode(std::string &sip_msg)
 {
     std::string result;
 
@@ -1771,7 +1771,7 @@ bool SIP_Header_Mime_Version::encode(std::string &sip_msg)
 //-------------------------------------------
 //-------------------------------------------
 
-bool SIP_Header_Min_Expires::parse(std::string &sip_msg)
+bool SIP_Header_Min_Expires::decode(std::string &sip_msg)
 {
     SIP_Functions::trim(sip_msg);
 
@@ -1796,7 +1796,7 @@ bool SIP_Header_Min_Expires::encode(std::string &sip_msg)
 //-------------------------------------------
 //-------------------------------------------
 
-bool SIP_Header_Organization::parse(std::string &sip_msg)
+bool SIP_Header_Organization::decode(std::string &sip_msg)
 {
     SIP_Functions::trim(sip_msg);
 
@@ -1822,7 +1822,7 @@ bool SIP_Header_Organization::encode(std::string &sip_msg)
 //-------------------------------------------
 //-------------------------------------------
 
-bool SIP_Header_Priority::parse(std::string &sip_msg)
+bool SIP_Header_Priority::decode(std::string &sip_msg)
 {
     SIP_Functions::trim(sip_msg);
     if (sip_msg.empty())
@@ -1876,7 +1876,7 @@ SIP_Priority_Value SIP_Header_Priority::get_priority()
 //-------------------------------------------
 //-------------------------------------------
 
-bool SIP_Header_Proxy_Require::parse(std::string &sip_msg)
+bool SIP_Header_Proxy_Require::decode(std::string &sip_msg)
 {
     SIP_Functions::trim(sip_msg);
     if (sip_msg.empty())
@@ -1900,12 +1900,12 @@ bool SIP_Header_Proxy_Require::encode(std::string &sip_msg)
 //-------------------------------------------
 //-------------------------------------------
 
-bool SIP_Header_Record_Route::parse(std::string &sip_msg)
+bool SIP_Header_Record_Route::decode(std::string &sip_msg)
 {
     std::string result;
     bool matched = SIP_Functions::match(sip_msg, ";", result);
 
-    if (!_address.parse(result))
+    if (!_address.decode(result))
         return false;
 
     while (matched)
@@ -1938,12 +1938,12 @@ bool SIP_Header_Record_Route::encode(std::string &sip_msg)
 //-------------------------------------------
 //-------------------------------------------
 
-bool SIP_Header_Reply_To::parse(std::string &sip_msg)
+bool SIP_Header_Reply_To::decode(std::string &sip_msg)
 {
     std::string result;
     bool matched = SIP_Functions::match(sip_msg, ";", result);
 
-    if (!_address.parse(result))
+    if (!_address.decode(result))
         return false;
 
     while (matched)
@@ -1976,7 +1976,7 @@ bool SIP_Header_Reply_To::encode(std::string &sip_msg)
 //-------------------------------------------
 //-------------------------------------------
 
-bool SIP_Header_Require::parse(std::string &sip_msg)
+bool SIP_Header_Require::decode(std::string &sip_msg)
 {
     SIP_Functions::trim(sip_msg);
     if (sip_msg.empty())
@@ -2000,7 +2000,7 @@ bool SIP_Header_Require::encode(std::string &sip_msg)
 //-------------------------------------------
 //-------------------------------------------
 
-bool SIP_Header_Retry_After::parse(std::string &sip_msg)
+bool SIP_Header_Retry_After::decode(std::string &sip_msg)
 {
     std::string result;
     std::string retry;
@@ -2088,12 +2088,12 @@ bool SIP_Header_Retry_After::encode(std::string &sip_msg)
 //-------------------------------------------
 //-------------------------------------------
 
-bool SIP_Header_Route::parse(std::string &sip_msg)
+bool SIP_Header_Route::decode(std::string &sip_msg)
 {
     std::string result;
     bool matched = SIP_Functions::match(sip_msg, ";", result);
 
-    if (!_address.parse(result))
+    if (!_address.decode(result))
         return false;
 
     while (matched)
@@ -2126,7 +2126,7 @@ bool SIP_Header_Route::encode(std::string &sip_msg)
 //-------------------------------------------
 //-------------------------------------------
 
-bool SIP_Header_Server::parse(std::string &sip_msg)
+bool SIP_Header_Server::decode(std::string &sip_msg)
 {
     SIP_Functions::trim(sip_msg);
     if (sip_msg.empty())
@@ -2150,7 +2150,7 @@ bool SIP_Header_Server::encode(std::string &sip_msg)
 //-------------------------------------------
 //-------------------------------------------
 
-bool SIP_Header_Subject::parse(std::string &sip_msg)
+bool SIP_Header_Subject::decode(std::string &sip_msg)
 {
     SIP_Functions::trim(sip_msg);
 
@@ -2176,7 +2176,7 @@ bool SIP_Header_Subject::encode(std::string &sip_msg)
 //-------------------------------------------
 //-------------------------------------------
 
-bool SIP_Header_Subscription_State::parse(std::string &sip_msg)
+bool SIP_Header_Subscription_State::decode(std::string &sip_msg)
 {
     std::string result;
 
@@ -2333,7 +2333,7 @@ SIP_Subscription_State_Reason SIP_Header_Subscription_State::get_reason()
 //-------------------------------------------
 //-------------------------------------------
 
-bool SIP_Header_Supported::parse(std::string &sip_msg)
+bool SIP_Header_Supported::decode(std::string &sip_msg)
 {
     SIP_Functions::trim(sip_msg);
 
@@ -2359,7 +2359,7 @@ bool SIP_Header_Supported::encode(std::string &sip_msg)
 //-------------------------------------------
 //-------------------------------------------
 
-bool SIP_Header_Timestamp::parse(std::string &sip_msg)
+bool SIP_Header_Timestamp::decode(std::string &sip_msg)
 {
     std::string result;
 
@@ -2402,12 +2402,12 @@ bool SIP_Header_Timestamp::encode(std::string &sip_msg)
 //-------------------------------------------
 //-------------------------------------------
 
-bool SIP_Header_To::parse(std::string &sip_msg)
+bool SIP_Header_To::decode(std::string &sip_msg)
 {
     std::string result;
     bool matched = SIP_Functions::match(sip_msg, ";", result);
 
-    if (!_address.parse(result))
+    if (!_address.decode(result))
         return false;
 
     while (matched)
@@ -2454,7 +2454,7 @@ bool SIP_Header_To::encode(std::string &sip_msg)
 //-------------------------------------------
 //-------------------------------------------
 
-bool SIP_Header_Unsupported::parse(std::string &sip_msg)
+bool SIP_Header_Unsupported::decode(std::string &sip_msg)
 {
     SIP_Functions::trim(sip_msg);
     if (sip_msg.empty())
@@ -2478,7 +2478,7 @@ bool SIP_Header_Unsupported::encode(std::string &sip_msg)
 //-------------------------------------------
 //-------------------------------------------
 
-bool SIP_Header_User_Agent::parse(std::string &sip_msg)
+bool SIP_Header_User_Agent::decode(std::string &sip_msg)
 {
     SIP_Functions::trim(sip_msg);
     if (sip_msg.empty())
@@ -2502,7 +2502,7 @@ bool SIP_Header_User_Agent::encode(std::string &sip_msg)
 //-------------------------------------------
 //-------------------------------------------
 
-bool SIP_Header_Via::parse(std::string &sip_msg)
+bool SIP_Header_Via::decode(std::string &sip_msg)
 {
     std::string result;
     bool matched;
@@ -2670,7 +2670,7 @@ SIP_Transport_Type SIP_Header_Via::get_transport()
 //-------------------------------------------
 //-------------------------------------------
 
-bool SIP_Header_Warning::parse(std::string &sip_msg)
+bool SIP_Header_Warning::decode(std::string &sip_msg)
 {
     std::string result;
 

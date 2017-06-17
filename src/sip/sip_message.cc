@@ -75,9 +75,9 @@ SIP_Message *SIP_Message::decode_msg(std::string sip_msg)
     else
         message = new SIP_Response();
 
-    if (!message->parse(sip_msg))
+    if (!message->decode(sip_msg))
     {
-        std::cout << "SIP_Message::decode_msg -> Failed to parse message (method=" << msg.c_str() << ")\n";
+        std::cout << "SIP_Message::decode_msg -> Failed to decode message (method=" << msg.c_str() << ")\n";
         delete message;
         return NULL;
     }
@@ -87,15 +87,15 @@ SIP_Message *SIP_Message::decode_msg(std::string sip_msg)
 
 //-------------------------------------------
 
-bool SIP_Message::parse(std::string &sip_msg)
+bool SIP_Message::decode(std::string &sip_msg)
 {
-    if (!parse_start_line(sip_msg))
+    if (!decode_start_line(sip_msg))
         return false;
 
-    if (!parse_header(sip_msg))
+    if (!decode_header(sip_msg))
         return false;
 
-    if (!parse_body(sip_msg))
+    if (!decode_body(sip_msg))
         return false;
 
     return true;
@@ -103,7 +103,7 @@ bool SIP_Message::parse(std::string &sip_msg)
 
 //-------------------------------------------
 
-bool SIP_Message::parse_header(std::string &sip_msg)
+bool SIP_Message::decode_header(std::string &sip_msg)
 {
     std::string line;
     while (true)
@@ -121,7 +121,7 @@ bool SIP_Message::parse_header(std::string &sip_msg)
 
 //-------------------------------------------
 
-bool SIP_Message::parse_body(std::string &sip_msg)
+bool SIP_Message::decode_body(std::string &sip_msg)
 {
     SIP_Header_Content_Type *content_type = (SIP_Header_Content_Type *) get_header(SIP_HEADER_CONTENT_TYPE);
     if (content_type)
