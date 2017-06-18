@@ -48,6 +48,7 @@ SIP_Header *SIP_Header::create_header(SIP_Header_Type header_type, const SIP_Hea
         case SIP_HEADER_ORGANIZATION:        header = (!copy) ? new SIP_Header_Organization()        : new SIP_Header_Organization(*((SIP_Header_Organization *) copy));                break;
         case SIP_HEADER_PRIORITY:            header = (!copy) ? new SIP_Header_Priority()            : new SIP_Header_Priority(*((SIP_Header_Priority *) copy));                        break;
         case SIP_HEADER_PROXY_REQUIRE:       header = (!copy) ? new SIP_Header_Proxy_Require()       : new SIP_Header_Proxy_Require(*((SIP_Header_Proxy_Require *) copy));              break;
+        case SIP_HEADER_PROXY_AUTHORIZATION: header = (!copy) ? new SIP_Header_Proxy_Authorization() : new SIP_Header_Proxy_Authorization(*((SIP_Header_Proxy_Authorization *) copy));  break;
         case SIP_HEADER_RECORD_ROUTE:        header = (!copy) ? new SIP_Header_Record_Route()        : new SIP_Header_Record_Route(*((SIP_Header_Record_Route *) copy));                break;
         case SIP_HEADER_REPLY_TO:            header = (!copy) ? new SIP_Header_Reply_To()            : new SIP_Header_Reply_To(*((SIP_Header_Reply_To *) copy));                        break;
         case SIP_HEADER_REQUIRE:             header = (!copy) ? new SIP_Header_Require()             : new SIP_Header_Require(*((SIP_Header_Require *) copy));                          break;
@@ -1871,6 +1872,21 @@ SIP_Priority_Value SIP_Header_Priority::get_priority()
         return SIP_PRIORITY_NON_URGENT;
 
     return SIP_PRIORITY_VALUE_INVALID;
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+bool SIP_Header_Proxy_Authorization::decode(std::string &sip_msg)
+{
+    return _credential.decode(sip_msg);
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Proxy_Authorization::encode(std::string &sip_msg)
+{
+    return _credential.encode(sip_msg);
 }
 
 //-------------------------------------------

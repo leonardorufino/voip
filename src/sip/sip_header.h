@@ -915,6 +915,28 @@ private:
 
 //-------------------------------------------
 
+class SIP_Header_Proxy_Authorization : public SIP_Header
+{
+public:
+    SIP_Header_Proxy_Authorization() {}
+    SIP_Header_Proxy_Authorization(const SIP_Header_Proxy_Authorization &header) { *this = header; }
+    ~SIP_Header_Proxy_Authorization() {}
+
+    // Virtual pure functions
+    SIP_Header_Type get_header_type() { return SIP_HEADER_PROXY_AUTHORIZATION; }
+    SIP_Header_Separator decode_separator() { return SIP_HEADER_SEPARATOR_CRLF; }
+    SIP_Header_Separator encode_separator() { return SIP_HEADER_SEPARATOR_CRLF; }
+    bool decode(std::string &sip_msg);
+    bool encode(std::string &sip_msg);
+
+    SIP_Credential &get_credential() { return _credential; }
+
+private:
+    SIP_Credential _credential;
+};
+
+//-------------------------------------------
+
 class SIP_Header_Proxy_Require : public SIP_Header
 {
 public:

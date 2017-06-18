@@ -266,6 +266,14 @@ public:
 
 //-------------------------------------------
 
+class SIP_Header_Proxy_Authorization_Test : public SIP_Header_Test
+{
+public:
+    SIP_Header_Proxy_Authorization_Test();
+};
+
+//-------------------------------------------
+
 class SIP_Header_Proxy_Require_Test : public SIP_Header_Test
 {
 public:
