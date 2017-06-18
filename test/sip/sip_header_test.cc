@@ -125,6 +125,10 @@ bool SIP_Header_Test::init()
     if (!header_priority.run())
         return false;
 
+    SIP_Header_Proxy_Authenticate_Test header_proxy_authenticate;
+    if (!header_proxy_authenticate.run())
+        return false;
+
     SIP_Header_Proxy_Authorization_Test header_proxy_authorization;
     if (!header_proxy_authorization.run())
         return false;
@@ -807,6 +811,30 @@ SIP_Header_Priority_Test::SIP_Header_Priority_Test()
 
     SIP_Header_Input_Output hdr4(SIP_HEADER_PRIORITY, "Priority: emergency", "Priority: emergency\r\n", 1, true, true);
     _header_input_output.push_back(hdr4);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+SIP_Header_Proxy_Authenticate_Test::SIP_Header_Proxy_Authenticate_Test()
+{
+    SIP_Header_Input_Output hdr1(SIP_HEADER_PROXY_AUTHENTICATE, "Proxy-Authenticate: Digest realm=\"atlanta.com\", domain=\"sip:ss1.carrier.com\", qop=\"auth\", nonce=\"f84f1cec41e6cbe5aea9c8e88d359\", opaque=\"\", stale=FALSE, algorithm=MD5", "Proxy-Authenticate: Digest realm=\"atlanta.com\", domain=\"sip:ss1.carrier.com\", nonce=\"f84f1cec41e6cbe5aea9c8e88d359\", opaque=\"\", stale=FALSE, algorithm=MD5, qop=\"auth\"\r\n", 1, true, true);
+    _header_input_output.push_back(hdr1);
+
+    SIP_Header_Input_Output hdr2(SIP_HEADER_PROXY_AUTHENTICATE, "Proxy-Authenticate: Digest realm=\"atlanta.example.com\",qop=\"auth\",   nonce=\"wf84f1cczx41ae6cbeaea9ce88d359\",opaque=\"\",stale=FALSE,algorithm=MD5", "Proxy-Authenticate: Digest realm=\"atlanta.example.com\", nonce=\"wf84f1cczx41ae6cbeaea9ce88d359\", opaque=\"\", stale=FALSE, algorithm=MD5, qop=\"auth\"\r\n", 1, true, true);
+    _header_input_output.push_back(hdr2);
+
+    SIP_Header_Input_Output hdr3(SIP_HEADER_PROXY_AUTHENTICATE, "Proxy-Authenticate: Digest nonce=\"ea9c8e88df84f1cec4341ae6cbe5a359\" ,   realm=\"atlanta.example.com\"", "Proxy-Authenticate: Digest realm=\"atlanta.example.com\", nonce=\"ea9c8e88df84f1cec4341ae6cbe5a359\"\r\n", 1, true, true);
+    _header_input_output.push_back(hdr3);
+
+    SIP_Header_Input_Output hdr4(SIP_HEADER_PROXY_AUTHENTICATE, "Proxy-Authenticate: Digest\trealm=\"myrealm.com\",nonce=\"123456789012345678901\", domain=\"sip:myrealm.com\",algorithm=MD5", "Proxy-Authenticate: Digest realm=\"myrealm.com\", domain=\"sip:myrealm.com\", nonce=\"123456789012345678901\", algorithm=MD5\r\n", 1, true, true);
+    _header_input_output.push_back(hdr4);
+
+    SIP_Header_Input_Output hdr5(SIP_HEADER_PROXY_AUTHENTICATE, "Proxy-Authenticate: Scheme1 param1, param2=test, nonce=\"123456789012345678901\",realm=\"server.com\",domain=\"sip:server.com\",qop=\"auth, auth-int, value\", opaque=\"11223344556677889900aabbccddeeff\", stale=true, par3=\"test\", algorithm=XYZ", "Proxy-Authenticate: Scheme1 realm=\"server.com\", domain=\"sip:server.com\", nonce=\"123456789012345678901\", opaque=\"11223344556677889900aabbccddeeff\", stale=true, algorithm=XYZ, qop=\"auth, auth-int, value\", param1, param2=test, par3=\"test\"\r\n", 1, true, true);
+    _header_input_output.push_back(hdr5);
+
+    SIP_Header_Input_Output hdr6(SIP_HEADER_PROXY_AUTHENTICATE, "Proxy-Authenticate: scheme2 param1, param2=test,par3=\"test\"", "Proxy-Authenticate: scheme2 param1, param2=test, par3=\"test\"\r\n", 1, true, true);
+    _header_input_output.push_back(hdr6);
 }
 
 //-------------------------------------------

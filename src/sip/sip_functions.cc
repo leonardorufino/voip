@@ -153,6 +153,8 @@ SIP_Header_Type SIP_Functions::get_header_type(std::string header)
         return SIP_HEADER_ORGANIZATION;
     else if (header == "Priority")
         return SIP_HEADER_PRIORITY;
+    else if (header == "Proxy-Authenticate")
+        return SIP_HEADER_PROXY_AUTHENTICATE;
     else if (header == "Proxy-Authorization")
         return SIP_HEADER_PROXY_AUTHORIZATION;
     else if (header == "Proxy-Require")
@@ -225,6 +227,7 @@ std::string SIP_Functions::get_header_type(SIP_Header_Type header)
         case SIP_HEADER_ORGANIZATION:           return "Organization";
         case SIP_HEADER_PRIORITY:               return "Priority";
         case SIP_HEADER_PROXY_REQUIRE:          return "Proxy-Require";
+        case SIP_HEADER_PROXY_AUTHENTICATE:     return "Proxy-Authenticate";
         case SIP_HEADER_PROXY_AUTHORIZATION:    return "Proxy-Authorization";
         case SIP_HEADER_RECORD_ROUTE:           return "Record-Route";
         case SIP_HEADER_REPLY_TO:               return "Reply-To";

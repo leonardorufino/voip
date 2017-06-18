@@ -48,6 +48,7 @@ SIP_Header *SIP_Header::create_header(SIP_Header_Type header_type, const SIP_Hea
         case SIP_HEADER_ORGANIZATION:        header = (!copy) ? new SIP_Header_Organization()        : new SIP_Header_Organization(*((SIP_Header_Organization *) copy));                break;
         case SIP_HEADER_PRIORITY:            header = (!copy) ? new SIP_Header_Priority()            : new SIP_Header_Priority(*((SIP_Header_Priority *) copy));                        break;
         case SIP_HEADER_PROXY_REQUIRE:       header = (!copy) ? new SIP_Header_Proxy_Require()       : new SIP_Header_Proxy_Require(*((SIP_Header_Proxy_Require *) copy));              break;
+        case SIP_HEADER_PROXY_AUTHENTICATE:  header = (!copy) ? new SIP_Header_Proxy_Authenticate()  : new SIP_Header_Proxy_Authenticate(*((SIP_Header_Proxy_Authenticate *) copy));    break;
         case SIP_HEADER_PROXY_AUTHORIZATION: header = (!copy) ? new SIP_Header_Proxy_Authorization() : new SIP_Header_Proxy_Authorization(*((SIP_Header_Proxy_Authorization *) copy));  break;
         case SIP_HEADER_RECORD_ROUTE:        header = (!copy) ? new SIP_Header_Record_Route()        : new SIP_Header_Record_Route(*((SIP_Header_Record_Route *) copy));                break;
         case SIP_HEADER_REPLY_TO:            header = (!copy) ? new SIP_Header_Reply_To()            : new SIP_Header_Reply_To(*((SIP_Header_Reply_To *) copy));                        break;
@@ -181,6 +182,162 @@ bool SIP_Header::encode_headers(std::string &sip_msg, std::map<SIP_Header_Type, 
 //-------------------------------------------
 //-------------------------------------------
 
+bool SIP_Challenge::decode(std::string &sip_msg)
+{
+    std::string result;
+
+    SIP_Functions::trim(sip_msg);
+    bool matched = SIP_Functions::match(sip_msg, " \t", result);
+    if (!matched)
+        return false;
+
+    SIP_Functions::trim(result);
+    if (result.empty())
+        return false;
+
+    _scheme = result;
+
+    while (matched)
+    {
+        matched = SIP_Functions::match(sip_msg, ",", result);
+        SIP_Functions::trim(result);
+
+        if (SIP_Functions::start_with(result, "realm="))
+        {
+            _realm = result.substr(6);
+            SIP_Functions::trim(_realm);
+            if (_realm.empty())
+                return false;
+
+        }else if (SIP_Functions::start_with(result, "domain="))
+        {
+            _domain = result.substr(7);
+            SIP_Functions::trim(_domain);
+            if (_domain.empty())
+                return false;
+
+        }else if (SIP_Functions::start_with(result, "nonce="))
+        {
+            _nonce = result.substr(6);
+            SIP_Functions::trim(_nonce);
+            if (_nonce.empty())
+                return false;
+
+        }else if (SIP_Functions::start_with(result, "opaque="))
+        {
+            _opaque = result.substr(7);
+            SIP_Functions::trim(_opaque);
+            if (_opaque.empty())
+                return false;
+
+        }else if (SIP_Functions::start_with(result, "stale="))
+        {
+            _stale = result.substr(6);
+            SIP_Functions::trim(_stale);
+            if (_stale.empty())
+                return false;
+
+        }else if (SIP_Functions::start_with(result, "algorithm="))
+        {
+            _algorithm = result.substr(10);
+            SIP_Functions::trim(_algorithm);
+            if (_algorithm.empty())
+                return false;
+
+        }else if (SIP_Functions::start_with(result, "qop="))
+        {
+            _qop = result.substr(4);
+            SIP_Functions::trim(_qop);
+            if (_qop.empty())
+                return false;
+        }else
+            _parameters.push_back(result);
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Challenge::encode(std::string &sip_msg)
+{
+    if (_scheme.empty())
+        return false;
+
+    sip_msg += _scheme;
+
+    bool first_param = true;
+
+    if (!_realm.empty())
+    {
+        sip_msg += (first_param) ? " " : ", ";
+        sip_msg += "realm=";
+        sip_msg += _realm;
+        first_param = false;
+    }
+
+    if (!_domain.empty())
+    {
+        sip_msg += (first_param) ? " " : ", ";
+        sip_msg += "domain=";
+        sip_msg += _domain;
+        first_param = false;
+    }
+
+    if (!_nonce.empty())
+    {
+        sip_msg += (first_param) ? " " : ", ";
+        sip_msg += "nonce=";
+        sip_msg += _nonce;
+        first_param = false;
+    }
+
+    if (!_opaque.empty())
+    {
+        sip_msg += (first_param) ? " " : ", ";
+        sip_msg += "opaque=";
+        sip_msg += _opaque;
+        first_param = false;
+    }
+
+    if (!_stale.empty())
+    {
+        sip_msg += (first_param) ? " " : ", ";
+        sip_msg += "stale=";
+        sip_msg += _stale;
+        first_param = false;
+    }
+
+    if (!_algorithm.empty())
+    {
+        sip_msg += (first_param) ? " " : ", ";
+        sip_msg += "algorithm=";
+        sip_msg += _algorithm;
+        first_param = false;
+    }
+
+    if (!_qop.empty())
+    {
+        sip_msg += (first_param) ? " " : ", ";
+        sip_msg += "qop=";
+        sip_msg += _qop;
+        first_param = false;
+    }
+
+    std::list<std::string>::iterator it = _parameters.begin();
+    while (it != _parameters.end())
+    {
+        sip_msg += (first_param) ? " " : ", ";
+        sip_msg += *it++;
+        first_param = false;
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
 bool SIP_Credential::decode(std::string &sip_msg)
 {
     std::string result;
@@ -270,7 +427,6 @@ bool SIP_Credential::decode(std::string &sip_msg)
             SIP_Functions::trim(_nonce_count);
             if (_nonce_count.empty())
                 return false;
-
         }else
             _parameters.push_back(result);
     }
@@ -1872,6 +2028,21 @@ SIP_Priority_Value SIP_Header_Priority::get_priority()
         return SIP_PRIORITY_NON_URGENT;
 
     return SIP_PRIORITY_VALUE_INVALID;
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+bool SIP_Header_Proxy_Authenticate::decode(std::string &sip_msg)
+{
+    return _challenge.decode(sip_msg);
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Proxy_Authenticate::encode(std::string &sip_msg)
+{
+    return _challenge.encode(sip_msg);
 }
 
 //-------------------------------------------
