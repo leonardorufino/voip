@@ -1483,3 +1483,25 @@ private:
 };
 
 //-------------------------------------------
+
+class SIP_Header_WWW_Authenticate : public SIP_Header
+{
+public:
+    SIP_Header_WWW_Authenticate() {}
+    SIP_Header_WWW_Authenticate(const SIP_Header_WWW_Authenticate &header) { *this = header; }
+    ~SIP_Header_WWW_Authenticate() {}
+
+    // Virtual pure functions
+    SIP_Header_Type get_header_type() { return SIP_HEADER_WWW_AUTHENTICATE; }
+    SIP_Header_Separator decode_separator() { return SIP_HEADER_SEPARATOR_CRLF; }
+    SIP_Header_Separator encode_separator() { return SIP_HEADER_SEPARATOR_CRLF; }
+    bool decode(std::string &sip_msg);
+    bool encode(std::string &sip_msg);
+
+    SIP_Challenge &get_challenge() { return _challenge; }
+
+private:
+    SIP_Challenge _challenge;
+};
+
+//-------------------------------------------

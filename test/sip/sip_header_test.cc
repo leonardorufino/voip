@@ -197,6 +197,10 @@ bool SIP_Header_Test::init()
     if (!header_warning.run())
         return false;
 
+    SIP_Header_WWW_Authenticate_Test header_www_authenticate;
+    if (!header_www_authenticate.run())
+        return false;
+
     std::cout << "SIP header test completed successfully\n";
     return true;
 }
@@ -1150,6 +1154,30 @@ SIP_Header_Warning_Test::SIP_Header_Warning_Test()
 
     SIP_Header_Input_Output hdr3(SIP_HEADER_WARNING, "Warning:  600 10.10.10.10 \"text\" ", "Warning: 600 10.10.10.10 \"text\"\r\n", 1, true, true);
     _header_input_output.push_back(hdr3);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+SIP_Header_WWW_Authenticate_Test::SIP_Header_WWW_Authenticate_Test()
+{
+    SIP_Header_Input_Output hdr1(SIP_HEADER_WWW_AUTHENTICATE, "WWW-Authenticate: Digest realm=\"atlanta.com\", domain=\"sip:boxesbybob.com\", qop=\"auth\", nonce=\"f84f1cec41e6cbe5aea9c8e88d359\", opaque=\"\", stale=FALSE, algorithm=MD5", "WWW-Authenticate: Digest realm=\"atlanta.com\", domain=\"sip:boxesbybob.com\", nonce=\"f84f1cec41e6cbe5aea9c8e88d359\", opaque=\"\", stale=FALSE, algorithm=MD5, qop=\"auth\"\r\n", 1, true, true);
+    _header_input_output.push_back(hdr1);
+
+    SIP_Header_Input_Output hdr2(SIP_HEADER_WWW_AUTHENTICATE, "WWW-Authenticate: Digest realm=\"biloxi.com\",qop=\"auth,auth-int\",  nonce=\"dcd98b7102dd2f0e8b11d0f600bfb0c093\",opaque=\"5ccc069c403ebaf9f0171e9517f40e41\"", "WWW-Authenticate: Digest realm=\"biloxi.com\", nonce=\"dcd98b7102dd2f0e8b11d0f600bfb0c093\", opaque=\"5ccc069c403ebaf9f0171e9517f40e41\", qop=\"auth,auth-int\"\r\n", 1, true, true);
+    _header_input_output.push_back(hdr2);
+
+    SIP_Header_Input_Output hdr3(SIP_HEADER_WWW_AUTHENTICATE, "WWW-Authenticate: Digest nonce=\"ea9c8e88df84f1cec4341ae6cbe5a359\" ,   realm=\"atlanta.example.com\"", "WWW-Authenticate: Digest realm=\"atlanta.example.com\", nonce=\"ea9c8e88df84f1cec4341ae6cbe5a359\"\r\n", 1, true, true);
+    _header_input_output.push_back(hdr3);
+
+    SIP_Header_Input_Output hdr4(SIP_HEADER_WWW_AUTHENTICATE, "WWW-Authenticate: Digest\trealm=\"myrealm.com\",nonce=\"123456789012345678901\", domain=\"sip:myrealm.com\",algorithm=MD5", "WWW-Authenticate: Digest realm=\"myrealm.com\", domain=\"sip:myrealm.com\", nonce=\"123456789012345678901\", algorithm=MD5\r\n", 1, true, true);
+    _header_input_output.push_back(hdr4);
+
+    SIP_Header_Input_Output hdr5(SIP_HEADER_WWW_AUTHENTICATE, "WWW-Authenticate: Scheme1 param1, param2=test, nonce=\"123456789012345678901\",realm=\"server.com\",domain=\"sip:server.com\",qop=\"auth, auth-int, value\", opaque=\"11223344556677889900aabbccddeeff\", stale=true, par3=\"test\", algorithm=XYZ", "WWW-Authenticate: Scheme1 realm=\"server.com\", domain=\"sip:server.com\", nonce=\"123456789012345678901\", opaque=\"11223344556677889900aabbccddeeff\", stale=true, algorithm=XYZ, qop=\"auth, auth-int, value\", param1, param2=test, par3=\"test\"\r\n", 1, true, true);
+    _header_input_output.push_back(hdr5);
+
+    SIP_Header_Input_Output hdr6(SIP_HEADER_WWW_AUTHENTICATE, "WWW-Authenticate: scheme2 param1, param2=test,par3=\"test\"", "WWW-Authenticate: scheme2 param1, param2=test, par3=\"test\"\r\n", 1, true, true);
+    _header_input_output.push_back(hdr6);
 }
 
 //-------------------------------------------

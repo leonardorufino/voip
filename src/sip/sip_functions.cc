@@ -189,6 +189,8 @@ SIP_Header_Type SIP_Functions::get_header_type(std::string header)
         return SIP_HEADER_VIA;
     else if (header == "Warning")
         return SIP_HEADER_WARNING;
+    else if (header == "WWW-Authenticate")
+        return SIP_HEADER_WWW_AUTHENTICATE;
 
     return SIP_HEADER_TYPE_INVALID;
 }
@@ -244,6 +246,7 @@ std::string SIP_Functions::get_header_type(SIP_Header_Type header)
         case SIP_HEADER_USER_AGENT:             return "User-Agent";
         case SIP_HEADER_VIA:                    return "Via";
         case SIP_HEADER_WARNING:                return "Warning";
+        case SIP_HEADER_WWW_AUTHENTICATE:       return "WWW-Authenticate";
         default:                                return "";
     }
 }

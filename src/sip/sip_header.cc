@@ -65,6 +65,7 @@ SIP_Header *SIP_Header::create_header(SIP_Header_Type header_type, const SIP_Hea
         case SIP_HEADER_USER_AGENT:          header = (!copy) ? new SIP_Header_User_Agent()          : new SIP_Header_User_Agent(*((SIP_Header_User_Agent *) copy));                    break;
         case SIP_HEADER_VIA:                 header = (!copy) ? new SIP_Header_Via()                 : new SIP_Header_Via(*((SIP_Header_Via *) copy));                                  break;
         case SIP_HEADER_WARNING:             header = (!copy) ? new SIP_Header_Warning()             : new SIP_Header_Warning(*((SIP_Header_Warning *) copy));                          break;
+        case SIP_HEADER_WWW_AUTHENTICATE:    header = (!copy) ? new SIP_Header_WWW_Authenticate()    : new SIP_Header_WWW_Authenticate(*((SIP_Header_WWW_Authenticate *) copy));        break;
         default:                                                                                                                                                                        break;
     }
 
@@ -2904,6 +2905,21 @@ bool SIP_Header_Warning::encode(std::string &sip_msg)
     sip_msg += " ";
     sip_msg += _text;
     return true;
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+bool SIP_Header_WWW_Authenticate::decode(std::string &sip_msg)
+{
+    return _challenge.decode(sip_msg);
+}
+
+//-------------------------------------------
+
+bool SIP_Header_WWW_Authenticate::encode(std::string &sip_msg)
+{
+    return _challenge.encode(sip_msg);
 }
 
 //-------------------------------------------

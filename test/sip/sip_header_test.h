@@ -409,3 +409,11 @@ public:
 };
 
 //-------------------------------------------
+
+class SIP_Header_WWW_Authenticate_Test : public SIP_Header_Test
+{
+public:
+    SIP_Header_WWW_Authenticate_Test();
+};
+
+//-------------------------------------------
