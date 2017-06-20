@@ -367,6 +367,48 @@ private:
 
 //-------------------------------------------
 
+class SIP_Header_Authentication_Info : public SIP_Header
+{
+public:
+    SIP_Header_Authentication_Info() {}
+    SIP_Header_Authentication_Info(const SIP_Header_Authentication_Info &header) { *this = header; }
+    ~SIP_Header_Authentication_Info() {}
+
+    // Virtual pure functions
+    SIP_Header_Type get_header_type() { return SIP_HEADER_AUTHENTICATION_INFO; }
+    SIP_Header_Separator decode_separator() { return SIP_HEADER_SEPARATOR_CRLF; }
+    SIP_Header_Separator encode_separator() { return SIP_HEADER_SEPARATOR_CRLF; }
+    bool decode(std::string &sip_msg);
+    bool encode(std::string &sip_msg);
+
+    void set_next_nonce(std::string next_nonce) { _next_nonce = next_nonce; }
+    std::string get_next_nonce() { return _next_nonce; }
+
+    void set_qop(std::string qop) { _qop = qop; }
+    std::string get_qop() { return _qop; }
+
+    void set_response(std::string response) { _response = response; }
+    std::string get_response() { return _response; }
+
+    void set_cnonce(std::string cnonce) { _cnonce = cnonce; }
+    std::string get_cnonce() { return _cnonce; }
+
+    void set_nonce_count(std::string nonce_count) { _nonce_count = nonce_count; }
+    std::string get_nonce_count() { return _nonce_count; }
+
+    std::list<std::string> &get_parameters() { return _parameters; }
+
+private:
+    std::string _next_nonce;
+    std::string _qop;
+    std::string _response;
+    std::string _cnonce;
+    std::string _nonce_count;
+    std::list<std::string> _parameters;
+};
+
+//-------------------------------------------
+
 class SIP_Header_Authorization : public SIP_Header
 {
 public:

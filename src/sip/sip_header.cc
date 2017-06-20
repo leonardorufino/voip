@@ -26,6 +26,7 @@ SIP_Header *SIP_Header::create_header(SIP_Header_Type header_type, const SIP_Hea
         case SIP_HEADER_ALERT_INFO:          header = (!copy) ? new SIP_Header_Alert_Info()          : new SIP_Header_Alert_Info(*((SIP_Header_Alert_Info *) copy));                    break;
         case SIP_HEADER_ALLOW:               header = (!copy) ? new SIP_Header_Allow()               : new SIP_Header_Allow(*((SIP_Header_Allow *) copy));                              break;
         case SIP_HEADER_ALLOW_EVENTS:        header = (!copy) ? new SIP_Header_Allow_Events()        : new SIP_Header_Allow_Events(*((SIP_Header_Allow_Events *) copy));                break;
+        case SIP_HEADER_AUTHENTICATION_INFO: header = (!copy) ? new SIP_Header_Authentication_Info() : new SIP_Header_Authentication_Info(*((SIP_Header_Authentication_Info *) copy));  break;
         case SIP_HEADER_AUTHORIZATION:       header = (!copy) ? new SIP_Header_Authorization()       : new SIP_Header_Authorization(*((SIP_Header_Authorization *) copy));              break;
         case SIP_HEADER_CALL_ID:             header = (!copy) ? new SIP_Header_Call_ID()             : new SIP_Header_Call_ID(*((SIP_Header_Call_ID *) copy));                          break;
         case SIP_HEADER_CALL_INFO:           header = (!copy) ? new SIP_Header_Call_Info()           : new SIP_Header_Call_Info(*((SIP_Header_Call_Info *) copy));                      break;
@@ -985,6 +986,120 @@ bool SIP_Header_Allow_Events::decode(std::string &sip_msg)
 bool SIP_Header_Allow_Events::encode(std::string &sip_msg)
 {
     return _event_type.encode(sip_msg);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+bool SIP_Header_Authentication_Info::decode(std::string &sip_msg)
+{
+    std::string result;
+    bool matched;
+
+    do
+    {
+        matched = SIP_Functions::match(sip_msg, ",", result);
+        SIP_Functions::trim(result);
+        if (result.empty())
+            return false;
+
+        if (SIP_Functions::start_with(result, "nextnonce="))
+        {
+            _next_nonce = result.substr(10);
+            SIP_Functions::trim(_next_nonce);
+            if (_next_nonce.empty())
+                return false;
+
+        }else if (SIP_Functions::start_with(result, "qop="))
+        {
+            _qop = result.substr(4);
+            SIP_Functions::trim(_qop);
+            if (_qop.empty())
+                return false;
+
+        }else if (SIP_Functions::start_with(result, "rspauth="))
+        {
+            _response = result.substr(8);
+            SIP_Functions::trim(_response);
+            if (_response.empty())
+                return false;
+
+        }else if (SIP_Functions::start_with(result, "cnonce="))
+        {
+            _cnonce = result.substr(7);
+            SIP_Functions::trim(_cnonce);
+            if (_cnonce.empty())
+                return false;
+
+        }else if (SIP_Functions::start_with(result, "nc="))
+        {
+            _nonce_count = result.substr(3);
+            SIP_Functions::trim(_nonce_count);
+            if (_nonce_count.empty())
+                return false;
+        }else
+            _parameters.push_back(result);
+
+    }while (matched);
+
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Authentication_Info::encode(std::string &sip_msg)
+{
+    bool first_param = true;
+
+    if (!_next_nonce.empty())
+    {
+        sip_msg += (first_param) ? "" : ", ";
+        sip_msg += "nextnonce=";
+        sip_msg += _next_nonce;
+        first_param = false;
+    }
+
+    if (!_qop.empty())
+    {
+        sip_msg += (first_param) ? "" : ", ";
+        sip_msg += "qop=";
+        sip_msg += _qop;
+        first_param = false;
+    }
+
+    if (!_response.empty())
+    {
+        sip_msg += (first_param) ? "" : ", ";
+        sip_msg += "rspauth=";
+        sip_msg += _response;
+        first_param = false;
+    }
+
+    if (!_cnonce.empty())
+    {
+        sip_msg += (first_param) ? "" : ", ";
+        sip_msg += "cnonce=";
+        sip_msg += _cnonce;
+        first_param = false;
+    }
+
+    if (!_nonce_count.empty())
+    {
+        sip_msg += (first_param) ? "" : ", ";
+        sip_msg += "nc=";
+        sip_msg += _nonce_count;
+        first_param = false;
+    }
+
+    std::list<std::string>::iterator it = _parameters.begin();
+    while (it != _parameters.end())
+    {
+        sip_msg += (first_param) ? "" : ", ";
+        sip_msg += *it++;
+        first_param = false;
+    }
+
+    return true;
 }
 
 //-------------------------------------------

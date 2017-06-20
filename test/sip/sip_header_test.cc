@@ -41,6 +41,10 @@ bool SIP_Header_Test::init()
     if (!header_allow_events.run())
         return false;
 
+    SIP_Header_Authentication_Info_Test header_authentication_info;
+    if (!header_authentication_info.run())
+        return false;
+
     SIP_Header_Authorization_Test header_authorization;
     if (!header_authorization.run())
         return false;
@@ -403,6 +407,21 @@ SIP_Header_Allow_Events_Test::SIP_Header_Allow_Events_Test()
     _header_input_output.push_back(hdr2);
 
     SIP_Header_Input_Output hdr3(SIP_HEADER_ALLOW_EVENTS, "u: presence.template1.template2 , test.template,package-xyz", "Allow-Events: presence.template1.template2, test.template, package-xyz\r\n", 3, true, true);
+    _header_input_output.push_back(hdr3);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+SIP_Header_Authentication_Info_Test::SIP_Header_Authentication_Info_Test()
+{
+    SIP_Header_Input_Output hdr1(SIP_HEADER_AUTHENTICATION_INFO, "Authentication-Info: nextnonce=\"47364c23432d2e131a5fb210812c\"", "Authentication-Info: nextnonce=\"47364c23432d2e131a5fb210812c\"\r\n", 1, true, true);
+    _header_input_output.push_back(hdr1);
+
+    SIP_Header_Input_Output hdr2(SIP_HEADER_AUTHENTICATION_INFO, "Authentication-Info: qop=auth, rspauth=\"1234567890abcdef1234567890\", cnonce=\"11223344\", nc=00000001", "Authentication-Info: qop=auth, rspauth=\"1234567890abcdef1234567890\", cnonce=\"11223344\", nc=00000001\r\n", 1, true, true);
+    _header_input_output.push_back(hdr2);
+
+    SIP_Header_Input_Output hdr3(SIP_HEADER_AUTHENTICATION_INFO, "Authentication-Info:   rspauth=\"1234567890abcdef1234567890\",cnonce=\"11223344\", \t nextnonce=\"47364c23432d2e131a5fb210812c\",nc=00000001,qop=auth", "Authentication-Info: nextnonce=\"47364c23432d2e131a5fb210812c\", qop=auth, rspauth=\"1234567890abcdef1234567890\", cnonce=\"11223344\", nc=00000001\r\n", 1, true, true);
     _header_input_output.push_back(hdr3);
 }
 

@@ -98,6 +98,14 @@ public:
 
 //-------------------------------------------
 
+class SIP_Header_Authentication_Info_Test : public SIP_Header_Test
+{
+public:
+    SIP_Header_Authentication_Info_Test();
+};
+
+//-------------------------------------------
+
 class SIP_Header_Authorization_Test : public SIP_Header_Test
 {
 public:
