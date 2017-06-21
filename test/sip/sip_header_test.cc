@@ -310,16 +310,40 @@ void SIP_Header_Test::clear(std::map<SIP_Header_Type, std::list<SIP_Header *>> &
 
 SIP_Header_Accept_Test::SIP_Header_Accept_Test()
 {
-    SIP_Header_Input_Output hdr1(SIP_HEADER_ACCEPT, "Accept: application/sdp", "Accept: application/sdp\r\n", 1, true, true);
+    SIP_Header_Input_Output hdr1;
+    hdr1._header_type    = SIP_HEADER_ACCEPT;
+    hdr1._input          = "Accept: application/sdp";
+    hdr1._output         = "Accept: application/sdp\r\n";
+    hdr1._header_nb      = 1;
+    hdr1._decode_success = true;
+    hdr1._encode_success = true;
     _header_input_output.push_back(hdr1);
 
-    SIP_Header_Input_Output hdr2(SIP_HEADER_ACCEPT, "Accept:application/sdp;level=1, application/x-private, text/html", "Accept: application/sdp;level=1, application/x-private, text/html\r\n", 3, true, true);
+    SIP_Header_Input_Output hdr2;
+    hdr2._header_type    = SIP_HEADER_ACCEPT;
+    hdr2._input          = "Accept:application/sdp;level=1, application/x-private, text/html";
+    hdr2._output         = "Accept: application/sdp;level=1, application/x-private, text/html\r\n";
+    hdr2._header_nb      = 3;
+    hdr2._decode_success = true;
+    hdr2._encode_success = true;
     _header_input_output.push_back(hdr2);
 
-    SIP_Header_Input_Output hdr3(SIP_HEADER_ACCEPT, "Accept: */*;q=0.75,application/*,   text/html,test1/test2", "Accept: */*;q=0.75, application/*, text/html, test1/test2\r\n", 4, true, true);
+    SIP_Header_Input_Output hdr3;
+    hdr3._header_type    = SIP_HEADER_ACCEPT;
+    hdr3._input          = "Accept: */*;q=0.75,application/*,   text/html,test1/test2";
+    hdr3._output         = "Accept: */*;q=0.75, application/*, text/html, test1/test2\r\n";
+    hdr3._header_nb      = 4;
+    hdr3._decode_success = true;
+    hdr3._encode_success = true;
     _header_input_output.push_back(hdr3);
 
-    SIP_Header_Input_Output hdr4(SIP_HEADER_ACCEPT, "Accept:", "Accept: \r\n", 1, true, true);
+    SIP_Header_Input_Output hdr4;
+    hdr4._header_type    = SIP_HEADER_ACCEPT;
+    hdr4._input          = "Accept:";
+    hdr4._output         = "Accept: \r\n";
+    hdr4._header_nb      = 1;
+    hdr4._decode_success = true;
+    hdr4._encode_success = true;
     _header_input_output.push_back(hdr4);
 }
 
@@ -328,19 +352,49 @@ SIP_Header_Accept_Test::SIP_Header_Accept_Test()
 
 SIP_Header_Accept_Encoding_Test::SIP_Header_Accept_Encoding_Test()
 {
-    SIP_Header_Input_Output hdr1(SIP_HEADER_ACCEPT_ENCODING, "Accept-Encoding: gzip, text/plain", "Accept-Encoding: gzip, text/plain\r\n", 2, true, true);
+    SIP_Header_Input_Output hdr1;
+    hdr1._header_type    = SIP_HEADER_ACCEPT_ENCODING;
+    hdr1._input          = "Accept-Encoding: gzip, text/plain";
+    hdr1._output         = "Accept-Encoding: gzip, text/plain\r\n";
+    hdr1._header_nb      = 2;
+    hdr1._decode_success = true;
+    hdr1._encode_success = true;
     _header_input_output.push_back(hdr1);
 
-    SIP_Header_Input_Output hdr2(SIP_HEADER_ACCEPT_ENCODING, "Accept-Encoding: ", "Accept-Encoding: \r\n", 1, true, true);
+    SIP_Header_Input_Output hdr2;
+    hdr2._header_type    = SIP_HEADER_ACCEPT_ENCODING;
+    hdr2._input          = "Accept-Encoding: ";
+    hdr2._output         = "Accept-Encoding: \r\n";
+    hdr2._header_nb      = 1;
+    hdr2._decode_success = true;
+    hdr2._encode_success = true;
     _header_input_output.push_back(hdr2);
 
-    SIP_Header_Input_Output hdr3(SIP_HEADER_ACCEPT_ENCODING, "Accept-Encoding: *;q=0.75,code1,   code2;par1,code3", "Accept-Encoding: *;q=0.75, code1, code2;par1, code3\r\n", 4, true, true);
+    SIP_Header_Input_Output hdr3;
+    hdr3._header_type    = SIP_HEADER_ACCEPT_ENCODING;
+    hdr3._input          = "Accept-Encoding: *;q=0.75,code1,   code2;par1,code3";
+    hdr3._output         = "Accept-Encoding: *;q=0.75, code1, code2;par1, code3\r\n";
+    hdr3._header_nb      = 4;
+    hdr3._decode_success = true;
+    hdr3._encode_success = true;
     _header_input_output.push_back(hdr3);
 
-    SIP_Header_Input_Output hdr4(SIP_HEADER_ACCEPT_ENCODING, "Accept-Encoding: *;par1=test; q=1.000  ; par2=test", "Accept-Encoding: *;q=1.000;par1=test;par2=test\r\n", 1, true, true);
+    SIP_Header_Input_Output hdr4;
+    hdr4._header_type    = SIP_HEADER_ACCEPT_ENCODING;
+    hdr4._input          = "Accept-Encoding: *;par1=test; q=1.000  ; par2=test";
+    hdr4._output         = "Accept-Encoding: *;q=1.000;par1=test;par2=test\r\n";
+    hdr4._header_nb      = 1;
+    hdr4._decode_success = true;
+    hdr4._encode_success = true;
     _header_input_output.push_back(hdr4);
 
-    SIP_Header_Input_Output hdr5(SIP_HEADER_ACCEPT_ENCODING, "Accept-Encoding: gzip", "Accept-Encoding: gzip\r\n", 1, true, true);
+    SIP_Header_Input_Output hdr5;
+    hdr5._header_type    = SIP_HEADER_ACCEPT_ENCODING;
+    hdr5._input          = "Accept-Encoding: gzip";
+    hdr5._output         = "Accept-Encoding: gzip\r\n";
+    hdr5._header_nb      = 1;
+    hdr5._decode_success = true;
+    hdr5._encode_success = true;
     _header_input_output.push_back(hdr5);
 }
 
@@ -349,16 +403,40 @@ SIP_Header_Accept_Encoding_Test::SIP_Header_Accept_Encoding_Test()
 
 SIP_Header_Accept_Language_Test::SIP_Header_Accept_Language_Test()
 {
-    SIP_Header_Input_Output hdr1(SIP_HEADER_ACCEPT_LANGUAGE, "Accept-Language: pt", "Accept-Language: pt\r\n", 1, true, true);
+    SIP_Header_Input_Output hdr1;
+    hdr1._header_type    = SIP_HEADER_ACCEPT_LANGUAGE;
+    hdr1._input          = "Accept-Language: pt";
+    hdr1._output         = "Accept-Language: pt\r\n";
+    hdr1._header_nb      = 1;
+    hdr1._decode_success = true;
+    hdr1._encode_success = true;
     _header_input_output.push_back(hdr1);
 
-    SIP_Header_Input_Output hdr2(SIP_HEADER_ACCEPT_LANGUAGE, "Accept-Language:", "Accept-Language: \r\n", 1, true, true);
+    SIP_Header_Input_Output hdr2;
+    hdr2._header_type    = SIP_HEADER_ACCEPT_LANGUAGE;
+    hdr2._input          = "Accept-Language:";
+    hdr2._output         = "Accept-Language: \r\n";
+    hdr2._header_nb      = 1;
+    hdr2._decode_success = true;
+    hdr2._encode_success = true;
     _header_input_output.push_back(hdr2);
 
-    SIP_Header_Input_Output hdr3(SIP_HEADER_ACCEPT_LANGUAGE, "Accept-Language: da, en-gb;q=0.8, en ;q=0.7, *", "Accept-Language: da, en-gb;q=0.8, en;q=0.7, *\r\n", 4, true, true);
+    SIP_Header_Input_Output hdr3;
+    hdr3._header_type    = SIP_HEADER_ACCEPT_LANGUAGE;
+    hdr3._input          = "Accept-Language: da, en-gb;q=0.8, en ;q=0.7, *";
+    hdr3._output         = "Accept-Language: da, en-gb;q=0.8, en;q=0.7, *\r\n";
+    hdr3._header_nb      = 4;
+    hdr3._decode_success = true;
+    hdr3._encode_success = true;
     _header_input_output.push_back(hdr3);
 
-    SIP_Header_Input_Output hdr4(SIP_HEADER_ACCEPT_LANGUAGE, "Accept-Language: en-us, en-gb; par1 = test ; q=0.8;par2", "Accept-Language: en-us, en-gb;q=0.8;par1 = test;par2\r\n", 2, true, true);
+    SIP_Header_Input_Output hdr4;
+    hdr4._header_type    = SIP_HEADER_ACCEPT_LANGUAGE;
+    hdr4._input          = "Accept-Language: en-us, en-gb; par1 = test ; q=0.8;par2";
+    hdr4._output         = "Accept-Language: en-us, en-gb;q=0.8;par1 = test;par2\r\n";
+    hdr4._header_nb      = 2;
+    hdr4._decode_success = true;
+    hdr4._encode_success = true;
     _header_input_output.push_back(hdr4);
 }
 
@@ -367,13 +445,31 @@ SIP_Header_Accept_Language_Test::SIP_Header_Accept_Language_Test()
 
 SIP_Header_Alert_Info_Test::SIP_Header_Alert_Info_Test()
 {
-    SIP_Header_Input_Output hdr1(SIP_HEADER_ALERT_INFO, "Alert-Info: <http://www.example.com/sounds/moo.wav>", "Alert-Info: <http://www.example.com/sounds/moo.wav>\r\n", 1, true, true);
+    SIP_Header_Input_Output hdr1;
+    hdr1._header_type    = SIP_HEADER_ALERT_INFO;
+    hdr1._input          = "Alert-Info: <http://www.example.com/sounds/moo.wav>";
+    hdr1._output         = "Alert-Info: <http://www.example.com/sounds/moo.wav>\r\n";
+    hdr1._header_nb      = 1;
+    hdr1._decode_success = true;
+    hdr1._encode_success = true;
     _header_input_output.push_back(hdr1);
 
-    SIP_Header_Input_Output hdr2(SIP_HEADER_ALERT_INFO, "Alert-Info: <mailto:user@host.com;par1; par2 ;par3>;param1 ; param2 ;param3 ", "Alert-Info: <mailto:user@host.com;par1; par2 ;par3>;param1;param2;param3\r\n", 1, true, true);
+    SIP_Header_Input_Output hdr2;
+    hdr2._header_type    = SIP_HEADER_ALERT_INFO;
+    hdr2._input          = "Alert-Info: <mailto:user@host.com;par1; par2 ;par3>;param1 ; param2 ;param3 ";
+    hdr2._output         = "Alert-Info: <mailto:user@host.com;par1; par2 ;par3>;param1;param2;param3\r\n";
+    hdr2._header_nb      = 1;
+    hdr2._decode_success = true;
+    hdr2._encode_success = true;
     _header_input_output.push_back(hdr2);
 
-    SIP_Header_Input_Output hdr3(SIP_HEADER_ALERT_INFO, "Alert-Info: <sips:user@host.com;par1> ; param1 ; param2 ;param3, <abc:user;par1> ; param2", "Alert-Info: <sips:user@host.com;par1>;param1;param2;param3, <abc:user;par1>;param2\r\n", 2, true, true);
+    SIP_Header_Input_Output hdr3;
+    hdr3._header_type    = SIP_HEADER_ALERT_INFO;
+    hdr3._input          = "Alert-Info: <sips:user@host.com;par1> ; param1 ; param2 ;param3, <abc:user;par1> ; param2";
+    hdr3._output         = "Alert-Info: <sips:user@host.com;par1>;param1;param2;param3, <abc:user;par1>;param2\r\n";
+    hdr3._header_nb      = 2;
+    hdr3._decode_success = true;
+    hdr3._encode_success = true;
     _header_input_output.push_back(hdr3);
 }
 
@@ -382,16 +478,40 @@ SIP_Header_Alert_Info_Test::SIP_Header_Alert_Info_Test()
 
 SIP_Header_Allow_Test::SIP_Header_Allow_Test()
 {
-    SIP_Header_Input_Output hdr1(SIP_HEADER_ALLOW, "Allow: INVITE", "Allow: INVITE\r\n", 1, true, true);
+    SIP_Header_Input_Output hdr1;
+    hdr1._header_type    = SIP_HEADER_ALLOW;
+    hdr1._input          = "Allow: INVITE";
+    hdr1._output         = "Allow: INVITE\r\n";
+    hdr1._header_nb      = 1;
+    hdr1._decode_success = true;
+    hdr1._encode_success = true;
     _header_input_output.push_back(hdr1);
 
-    SIP_Header_Input_Output hdr2(SIP_HEADER_ALLOW, "Allow: INVITE, ACK,  OPTIONS, CANCEL,BYE", "Allow: INVITE, ACK, OPTIONS, CANCEL, BYE\r\n", 5, true, true);
+    SIP_Header_Input_Output hdr2;
+    hdr2._header_type    = SIP_HEADER_ALLOW;
+    hdr2._input          = "Allow: INVITE, ACK,  OPTIONS, CANCEL,BYE";
+    hdr2._output         = "Allow: INVITE, ACK, OPTIONS, CANCEL, BYE\r\n";
+    hdr2._header_nb      = 5;
+    hdr2._decode_success = true;
+    hdr2._encode_success = true;
     _header_input_output.push_back(hdr2);
 
-    SIP_Header_Input_Output hdr3(SIP_HEADER_ALLOW, "Allow:NOTIFY,REFER,   TEST  ", "Allow: NOTIFY, REFER, TEST\r\n", 3, true, true);
+    SIP_Header_Input_Output hdr3;
+    hdr3._header_type    = SIP_HEADER_ALLOW;
+    hdr3._input          = "Allow:NOTIFY,REFER,   TEST  ";
+    hdr3._output         = "Allow: NOTIFY, REFER, TEST\r\n";
+    hdr3._header_nb      = 3;
+    hdr3._decode_success = true;
+    hdr3._encode_success = true;
     _header_input_output.push_back(hdr3);
 
-    SIP_Header_Input_Output hdr4(SIP_HEADER_ALLOW, "Allow:", "Allow: \r\n", 1, true, true);
+    SIP_Header_Input_Output hdr4;
+    hdr4._header_type    = SIP_HEADER_ALLOW;
+    hdr4._input          = "Allow:";
+    hdr4._output         = "Allow: \r\n";
+    hdr4._header_nb      = 1;
+    hdr4._decode_success = true;
+    hdr4._encode_success = true;
     _header_input_output.push_back(hdr4);
 }
 
