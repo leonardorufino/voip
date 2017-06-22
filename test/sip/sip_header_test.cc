@@ -664,19 +664,49 @@ SIP_Header_Authorization_Test::SIP_Header_Authorization_Test()
 
 SIP_Header_Call_ID_Test::SIP_Header_Call_ID_Test()
 {
-    SIP_Header_Input_Output hdr1(SIP_HEADER_CALL_ID, "Call-ID: 123456789@my-domain.org", "Call-ID: 123456789@my-domain.org\r\n", 1, true, true);
+    SIP_Header_Input_Output hdr1;
+    hdr1._header_type    = SIP_HEADER_CALL_ID;
+    hdr1._input          = "Call-ID: 123456789@my-domain.org";
+    hdr1._output         = "Call-ID: 123456789@my-domain.org\r\n";
+    hdr1._header_nb      = 1;
+    hdr1._decode_success = true;
+    hdr1._encode_success = true;
     _header_input_output.push_back(hdr1);
 
-    SIP_Header_Input_Output hdr2(SIP_HEADER_CALL_ID, "Call-ID: 123456789", "Call-ID: 123456789\r\n", 1, true, true);
+    SIP_Header_Input_Output hdr2;
+    hdr2._header_type    = SIP_HEADER_CALL_ID;
+    hdr2._input          = "Call-ID: 123456789";
+    hdr2._output         = "Call-ID: 123456789\r\n";
+    hdr2._header_nb      = 1;
+    hdr2._decode_success = true;
+    hdr2._encode_success = true;
     _header_input_output.push_back(hdr2);
 
-    SIP_Header_Input_Output hdr3(SIP_HEADER_CALL_ID, "i:my-domain.org ", "Call-ID: my-domain.org\r\n", 1, true, true);
+    SIP_Header_Input_Output hdr3;
+    hdr3._header_type    = SIP_HEADER_CALL_ID;
+    hdr3._input          = "i:my-domain.org ";
+    hdr3._output         = "Call-ID: my-domain.org\r\n";
+    hdr3._header_nb      = 1;
+    hdr3._decode_success = true;
+    hdr3._encode_success = true;
     _header_input_output.push_back(hdr3);
 
-    SIP_Header_Input_Output hdr4(SIP_HEADER_CALL_ID, "Call-ID: f81d4fae-7dec-11d0-a765-00a0c91e6bf6@biloxi.com", "Call-ID: f81d4fae-7dec-11d0-a765-00a0c91e6bf6@biloxi.com\r\n", 1, true, true);
+    SIP_Header_Input_Output hdr4;
+    hdr4._header_type    = SIP_HEADER_CALL_ID;
+    hdr4._input          = "Call-ID: f81d4fae-7dec-11d0-a765-00a0c91e6bf6@biloxi.com";
+    hdr4._output         = "Call-ID: f81d4fae-7dec-11d0-a765-00a0c91e6bf6@biloxi.com\r\n";
+    hdr4._header_nb      = 1;
+    hdr4._decode_success = true;
+    hdr4._encode_success = true;
     _header_input_output.push_back(hdr4);
 
-    SIP_Header_Input_Output hdr5(SIP_HEADER_CALL_ID, "i:f81d4fae-7dec-11d0-a765-00a0c91e6bf6@192.0.2.4", "Call-ID: f81d4fae-7dec-11d0-a765-00a0c91e6bf6@192.0.2.4\r\n", 1, true, true);
+    SIP_Header_Input_Output hdr5;
+    hdr5._header_type    = SIP_HEADER_CALL_ID;
+    hdr5._input          = "i:f81d4fae-7dec-11d0-a765-00a0c91e6bf6@192.0.2.4";
+    hdr5._output         = "Call-ID: f81d4fae-7dec-11d0-a765-00a0c91e6bf6@192.0.2.4\r\n";
+    hdr5._header_nb      = 1;
+    hdr5._decode_success = true;
+    hdr5._encode_success = true;
     _header_input_output.push_back(hdr5);
 }
 
@@ -685,13 +715,33 @@ SIP_Header_Call_ID_Test::SIP_Header_Call_ID_Test()
 
 SIP_Header_Call_Info_Test::SIP_Header_Call_Info_Test()
 {
-    SIP_Header_Input_Output hdr1(SIP_HEADER_CALL_INFO, "Call-Info: <http://wwww.example.com/alice/photo.jpg> ;purpose=icon, <http://www.example.com/alice/> ;purpose=info", "Call-Info: <http://wwww.example.com/alice/photo.jpg>;purpose=icon, <http://www.example.com/alice/>;purpose=info\r\n", 2, true, true);
+    SIP_Header_Input_Output hdr1;
+    hdr1._header_type    = SIP_HEADER_CALL_INFO;
+    hdr1._input          = "Call-Info: <http://wwww.example.com/alice/photo.jpg> ;purpose=icon, <http://www.example.com/alice/> ";
+    hdr1._input         += ";purpose=info";
+    hdr1._output         = "Call-Info: <http://wwww.example.com/alice/photo.jpg>;purpose=icon, <http://www.example.com/alice/>";
+    hdr1._output        += ";purpose=info\r\n";
+    hdr1._header_nb      = 2;
+    hdr1._decode_success = true;
+    hdr1._encode_success = true;
     _header_input_output.push_back(hdr1);
 
-    SIP_Header_Input_Output hdr2(SIP_HEADER_CALL_INFO, "Call-Info: <mailto:user@host.com;par1; par2 ;par3>;param1 ; param2 ;param3 ", "Call-Info: <mailto:user@host.com;par1; par2 ;par3>;param1;param2;param3\r\n", 1, true, true);
+    SIP_Header_Input_Output hdr2(SIP_HEADER_CALL_INFO, "", "", 1, true, true);
+    hdr2._header_type    = SIP_HEADER_CALL_INFO;
+    hdr2._input          = "Call-Info: <mailto:user@host.com;par1; par2 ;par3>;param1 ; param2 ;param3 ";
+    hdr2._output         = "Call-Info: <mailto:user@host.com;par1; par2 ;par3>;param1;param2;param3\r\n";
+    hdr2._header_nb      = 1;
+    hdr2._decode_success = true;
+    hdr2._encode_success = true;
     _header_input_output.push_back(hdr2);
 
-    SIP_Header_Input_Output hdr3(SIP_HEADER_CALL_INFO, "Call-Info: <sips:user@host.com;par1> ; param1 ; purpose= card; param2 ;param3,<abc:user;par1> ; param2", "Call-Info: <sips:user@host.com;par1>;purpose=card;param1;param2;param3, <abc:user;par1>;param2\r\n", 2, true, true);
+    SIP_Header_Input_Output hdr3;
+    hdr3._header_type    = SIP_HEADER_CALL_INFO;
+    hdr3._input          = "Call-Info: <sips:user@host.com;par1> ; param1 ; purpose= card; param2 ;param3,<abc:user;par1> ; param2";
+    hdr3._output         = "Call-Info: <sips:user@host.com;par1>;purpose=card;param1;param2;param3, <abc:user;par1>;param2\r\n";
+    hdr3._header_nb      = 2;
+    hdr3._decode_success = true;
+    hdr3._encode_success = true;
     _header_input_output.push_back(hdr3);
 }
 
@@ -700,25 +750,71 @@ SIP_Header_Call_Info_Test::SIP_Header_Call_Info_Test()
 
 SIP_Header_Contact_Test::SIP_Header_Contact_Test()
 {
-    SIP_Header_Input_Output hdr1(SIP_HEADER_CONTACT, "Contact: sip:123456789@my-domain.org", "Contact: <sip:123456789@my-domain.org>\r\n", 1, true, true);
+    SIP_Header_Input_Output hdr1;
+    hdr1._header_type    = SIP_HEADER_CONTACT;
+    hdr1._input          = "Contact: sip:123456789@my-domain.org";
+    hdr1._output         = "Contact: <sip:123456789@my-domain.org>\r\n";
+    hdr1._header_nb      = 1;
+    hdr1._decode_success = true;
+    hdr1._encode_success = true;
     _header_input_output.push_back(hdr1);
 
-    SIP_Header_Input_Output hdr2(SIP_HEADER_CONTACT, "Contact: sips:my-domain.org:5060;parameter1;parameter2;expires=60;parameter3;q=1.0", "Contact: <sips:my-domain.org:5060>;expires=60;q=1.0;parameter1;parameter2;parameter3\r\n", 1, true, true);
+    SIP_Header_Input_Output hdr2;
+    hdr2._header_type    = SIP_HEADER_CONTACT;
+    hdr2._input          = "Contact: sips:my-domain.org:5060;parameter1;parameter2;expires=60;parameter3;q=1.0";
+    hdr2._output         = "Contact: <sips:my-domain.org:5060>;expires=60;q=1.0;parameter1;parameter2;parameter3\r\n";
+    hdr2._header_nb      = 1;
+    hdr2._decode_success = true;
+    hdr2._encode_success = true;
     _header_input_output.push_back(hdr2);
 
-    SIP_Header_Input_Output hdr3(SIP_HEADER_CONTACT, "Contact:   Display name here <sip:my-domain.org;par;lr;ttl=160>;parameter1  ;q=0.5;  parameter2,tel:+123456789;par", "Contact: Display name here <sip:my-domain.org;ttl=160;lr;par>;q=0.5;parameter1;parameter2\r\nContact: <tel:+123456789>;par\r\n", 2, true, true);
+    SIP_Header_Input_Output hdr3;
+    hdr3._header_type    = SIP_HEADER_CONTACT;
+    hdr3._input          = "Contact:   Display name here <sip:my-domain.org;par;lr;ttl=160>;parameter1  ;q=0.5;  parameter2,";
+    hdr3._input         += "tel:+123456789;par";
+    hdr3._output         = "Contact: Display name here <sip:my-domain.org;ttl=160;lr;par>;q=0.5;parameter1;parameter2\r\n";
+    hdr3._output        += "Contact: <tel:+123456789>;par\r\n";
+    hdr3._header_nb      = 2;
+    hdr3._decode_success = true;
+    hdr3._encode_success = true;
     _header_input_output.push_back(hdr3);
 
-    SIP_Header_Input_Output hdr4(SIP_HEADER_CONTACT, "Contact: \"Mr. Watson\" <sip:watson@worcester.bell-telephone.com;lr;par1? header=hdr1 > ;q=0.7 ;expires=3600, \"Mr. Watson\" <mailto:watson@bell-telephone.com> ;q=0.1", "Contact: \"Mr. Watson\" <sip:watson@worcester.bell-telephone.com;lr;par1?header=hdr1>;expires=3600;q=0.7\r\nContact: \"Mr. Watson\" <mailto:watson@bell-telephone.com>;q=0.1\r\n", 2, true, true);
+    SIP_Header_Input_Output hdr4;
+    hdr4._header_type    = SIP_HEADER_CONTACT;
+    hdr4._input          = "Contact: \"Mr. Watson\" <sip:watson@worcester.bell-telephone.com;lr;par1? header=hdr1 > ;q=0.7 ;expires=3600, ";
+    hdr4._input         += "\"Mr. Watson\" <mailto:watson@bell-telephone.com> ;q=0.1";
+    hdr4._output         = "Contact: \"Mr. Watson\" <sip:watson@worcester.bell-telephone.com;lr;par1?header=hdr1>;expires=3600;q=0.7\r\n";
+    hdr4._output        += "Contact: \"Mr. Watson\" <mailto:watson@bell-telephone.com>;q=0.1\r\n";
+    hdr4._header_nb      = 2;
+    hdr4._decode_success = true;
+    hdr4._encode_success = true;
     _header_input_output.push_back(hdr4);
 
-    SIP_Header_Input_Output hdr5(SIP_HEADER_CONTACT, "m: *", "Contact: *\r\n", 1, true, true);
+    SIP_Header_Input_Output hdr5;
+    hdr5._header_type    = SIP_HEADER_CONTACT;
+    hdr5._input          = "m: *";
+    hdr5._output         = "Contact: *\r\n";
+    hdr5._header_nb      = 1;
+    hdr5._decode_success = true;
+    hdr5._encode_success = true;
     _header_input_output.push_back(hdr5);
 
-    SIP_Header_Input_Output hdr6(SIP_HEADER_CONTACT, "Contact: sip:123456789:password@my-domain.org", "Contact: <sip:123456789:password@my-domain.org>\r\n", 1, true, true);
+    SIP_Header_Input_Output hdr6;
+    hdr6._header_type    = SIP_HEADER_CONTACT;
+    hdr6._input          = "Contact: sip:123456789:password@my-domain.org";
+    hdr6._output         = "Contact: <sip:123456789:password@my-domain.org>\r\n";
+    hdr6._header_nb      = 1;
+    hdr6._decode_success = true;
+    hdr6._encode_success = true;
     _header_input_output.push_back(hdr6);
 
-    SIP_Header_Input_Output hdr7(SIP_HEADER_CONTACT, "m: <sips:bob@192.0.2.4>;expires=60", "Contact: <sips:bob@192.0.2.4>;expires=60\r\n", 1, true, true);
+    SIP_Header_Input_Output hdr7;
+    hdr7._header_type    = SIP_HEADER_CONTACT;
+    hdr7._input          = "m: <sips:bob@192.0.2.4>;expires=60";
+    hdr7._output         = "Contact: <sips:bob@192.0.2.4>;expires=60\r\n";
+    hdr7._header_nb      = 1;
+    hdr7._decode_success = true;
+    hdr7._encode_success = true;
     _header_input_output.push_back(hdr7);
 }
 
