@@ -76,27 +76,28 @@ bool SIP_Message_Test::run()
 
 SIP_Request_Test::SIP_Request_Test()
 {
-    SIP_Message_Input_Output msg1(
-"INVITE sip:bob@biloxi.com SIP/2.0\r\n\
-Via: SIP/2.0/UDP pc33.atlanta.com;branch=z9hG4bK776asdhds\r\n\
-Max-Forwards: 70\r\n\
-To: Bob <sip:bob@biloxi.com>\r\n\
-From: Alice <sip:alice@atlanta.com>;tag=1928301774\r\n\
-Call-ID: a84b4c76e66710@pc33.atlanta.com\r\n\
-CSeq: 314159 INVITE\r\n\
-Contact: <sip:alice@pc33.atlanta.com>\r\n\
-Content-Type: application/sdp\r\n\
-Content-Length: 0\r\n\r\n",
-"INVITE sip:bob@biloxi.com SIP/2.0\r\n\
-Call-ID: a84b4c76e66710@pc33.atlanta.com\r\n\
-Contact: <sip:alice@pc33.atlanta.com>\r\n\
-Content-Length: 0\r\n\
-Content-Type: application/sdp\r\n\
-CSeq: 314159 INVITE\r\n\
-From: Alice <sip:alice@atlanta.com>;tag=1928301774\r\n\
-Max-Forwards: 70\r\n\
-To: Bob <sip:bob@biloxi.com>\r\n\
-Via: SIP/2.0/UDP pc33.atlanta.com;branch=z9hG4bK776asdhds\r\n\r\n");
+    SIP_Message_Input_Output msg1;
+    msg1._input   = "INVITE sip:bob@biloxi.com SIP/2.0\r\n";
+    msg1._input  += "Via: SIP/2.0/UDP pc33.atlanta.com;branch=z9hG4bK776asdhds\r\n";
+    msg1._input  += "Max-Forwards: 70\r\n";
+    msg1._input  += "To: Bob <sip:bob@biloxi.com>\r\n";
+    msg1._input  += "From: Alice <sip:alice@atlanta.com>;tag=1928301774\r\n";
+    msg1._input  += "Call-ID: a84b4c76e66710@pc33.atlanta.com\r\n";
+    msg1._input  += "CSeq: 314159 INVITE\r\n";
+    msg1._input  += "Contact: <sip:alice@pc33.atlanta.com>\r\n";
+    msg1._input  += "Content-Type: application/sdp\r\n";
+    msg1._input  += "Content-Length: 0\r\n\r\n";
+
+    msg1._output  = "INVITE sip:bob@biloxi.com SIP/2.0\r\n";
+    msg1._output += "Call-ID: a84b4c76e66710@pc33.atlanta.com\r\n";
+    msg1._output += "Contact: <sip:alice@pc33.atlanta.com>\r\n";
+    msg1._output += "Content-Length: 0\r\n";
+    msg1._output += "Content-Type: application/sdp\r\n";
+    msg1._output += "CSeq: 314159 INVITE\r\n";
+    msg1._output += "From: Alice <sip:alice@atlanta.com>;tag=1928301774\r\n";
+    msg1._output += "Max-Forwards: 70\r\n";
+    msg1._output += "To: Bob <sip:bob@biloxi.com>\r\n";
+    msg1._output += "Via: SIP/2.0/UDP pc33.atlanta.com;branch=z9hG4bK776asdhds\r\n\r\n";
     _message_input_output.push_back(msg1);
 }
 
@@ -105,30 +106,31 @@ Via: SIP/2.0/UDP pc33.atlanta.com;branch=z9hG4bK776asdhds\r\n\r\n");
 
 SIP_Response_Test::SIP_Response_Test()
 {
-    SIP_Message_Input_Output msg1(
-"SIP/2.0 200 OK\r\n\
-Via: SIP/2.0/UDP server10.biloxi.com;branch=z9hG4bKnashds8;received=192.0.2.3,\
- SIP/2.0/UDP bigbox3.site3.atlanta.com;branch=z9hG4bK77ef4c2312983.1;received=192.0.2.2\r\n\
-Via: SIP/2.0/UDP pc33.atlanta.com\r\n\
-\t;branch=z9hG4bK776asdhds ;received=192.0.2.1\r\n\
-To: Bob <sip:bob@biloxi.com>;tag=a6c85cf\r\n\
-From: Alice <sip:alice@atlanta.com>;tag=1928301774\r\n\
-Call-ID: a84b4c76e66710@pc33.atlanta.com\r\n\
-CSeq: 314159 INVITE\r\n\
-Contact: <sip:bob@192.0.2.4>\r\n\
-Content-Type: application/sdp\r\n\
-Content-Length: 0\r\n\r\n",
-"SIP/2.0 200 OK\r\n\
-Call-ID: a84b4c76e66710@pc33.atlanta.com\r\n\
-Contact: <sip:bob@192.0.2.4>\r\n\
-Content-Length: 0\r\n\
-Content-Type: application/sdp\r\n\
-CSeq: 314159 INVITE\r\n\
-From: Alice <sip:alice@atlanta.com>;tag=1928301774\r\n\
-To: Bob <sip:bob@biloxi.com>;tag=a6c85cf\r\n\
-Via: SIP/2.0/UDP server10.biloxi.com;branch=z9hG4bKnashds8;received=192.0.2.3\r\n\
-Via: SIP/2.0/UDP bigbox3.site3.atlanta.com;branch=z9hG4bK77ef4c2312983.1;received=192.0.2.2\r\n\
-Via: SIP/2.0/UDP pc33.atlanta.com;branch=z9hG4bK776asdhds;received=192.0.2.1\r\n\r\n");
+    SIP_Message_Input_Output msg1;
+    msg1._input   = "SIP/2.0 200 OK\r\n";
+    msg1._input  += "Via: SIP/2.0/UDP server10.biloxi.com;branch=z9hG4bKnashds8;received=192.0.2.3,";
+    msg1._input  += " SIP/2.0/UDP bigbox3.site3.atlanta.com;branch=z9hG4bK77ef4c2312983.1;received=192.0.2.2\r\n";
+    msg1._input  += "Via: SIP/2.0/UDP pc33.atlanta.com\r\n";
+    msg1._input  += "\t;branch=z9hG4bK776asdhds ;received=192.0.2.1\r\n";
+    msg1._input  += "To: Bob <sip:bob@biloxi.com>;tag=a6c85cf\r\n";
+    msg1._input  += "From: Alice <sip:alice@atlanta.com>;tag=1928301774\r\n";
+    msg1._input  += "Call-ID: a84b4c76e66710@pc33.atlanta.com\r\n";
+    msg1._input  += "CSeq: 314159 INVITE\r\n";
+    msg1._input  += "Contact: <sip:bob@192.0.2.4>\r\n";
+    msg1._input  += "Content-Type: application/sdp\r\n";
+    msg1._input  += "Content-Length: 0\r\n\r\n";
+
+    msg1._output  = "SIP/2.0 200 OK\r\n";
+    msg1._output += "Call-ID: a84b4c76e66710@pc33.atlanta.com\r\n";
+    msg1._output += "Contact: <sip:bob@192.0.2.4>\r\n";
+    msg1._output += "Content-Length: 0\r\n";
+    msg1._output += "Content-Type: application/sdp\r\n";
+    msg1._output += "CSeq: 314159 INVITE\r\n";
+    msg1._output += "From: Alice <sip:alice@atlanta.com>;tag=1928301774\r\n";
+    msg1._output += "To: Bob <sip:bob@biloxi.com>;tag=a6c85cf\r\n";
+    msg1._output += "Via: SIP/2.0/UDP server10.biloxi.com;branch=z9hG4bKnashds8;received=192.0.2.3\r\n";
+    msg1._output += "Via: SIP/2.0/UDP bigbox3.site3.atlanta.com;branch=z9hG4bK77ef4c2312983.1;received=192.0.2.2\r\n";
+    msg1._output += "Via: SIP/2.0/UDP pc33.atlanta.com;branch=z9hG4bK776asdhds;received=192.0.2.1\r\n\r\n";
     _message_input_output.push_back(msg1);
 }
 

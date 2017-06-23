@@ -33,8 +33,6 @@ protected:
     class SIP_Message_Input_Output
     {
     public:
-        SIP_Message_Input_Output(std::string input, std::string output) : _input(input), _output(output) {}
-
         std::string _input;
         std::string _output;
     };
