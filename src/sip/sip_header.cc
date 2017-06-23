@@ -20,54 +20,196 @@ SIP_Header *SIP_Header::create_header(SIP_Header_Type header_type, const SIP_Hea
 
     switch (header_type)
     {
-        case SIP_HEADER_ACCEPT:              header = (!copy) ? new SIP_Header_Accept()              : new SIP_Header_Accept(*((SIP_Header_Accept *) copy));                            break;
-        case SIP_HEADER_ACCEPT_ENCODING:     header = (!copy) ? new SIP_Header_Accept_Encoding()     : new SIP_Header_Accept_Encoding(*((SIP_Header_Accept_Encoding *) copy));          break;
-        case SIP_HEADER_ACCEPT_LANGUAGE:     header = (!copy) ? new SIP_Header_Accept_Language()     : new SIP_Header_Accept_Language(*((SIP_Header_Accept_Language *) copy));          break;
-        case SIP_HEADER_ALERT_INFO:          header = (!copy) ? new SIP_Header_Alert_Info()          : new SIP_Header_Alert_Info(*((SIP_Header_Alert_Info *) copy));                    break;
-        case SIP_HEADER_ALLOW:               header = (!copy) ? new SIP_Header_Allow()               : new SIP_Header_Allow(*((SIP_Header_Allow *) copy));                              break;
-        case SIP_HEADER_ALLOW_EVENTS:        header = (!copy) ? new SIP_Header_Allow_Events()        : new SIP_Header_Allow_Events(*((SIP_Header_Allow_Events *) copy));                break;
-        case SIP_HEADER_AUTHENTICATION_INFO: header = (!copy) ? new SIP_Header_Authentication_Info() : new SIP_Header_Authentication_Info(*((SIP_Header_Authentication_Info *) copy));  break;
-        case SIP_HEADER_AUTHORIZATION:       header = (!copy) ? new SIP_Header_Authorization()       : new SIP_Header_Authorization(*((SIP_Header_Authorization *) copy));              break;
-        case SIP_HEADER_CALL_ID:             header = (!copy) ? new SIP_Header_Call_ID()             : new SIP_Header_Call_ID(*((SIP_Header_Call_ID *) copy));                          break;
-        case SIP_HEADER_CALL_INFO:           header = (!copy) ? new SIP_Header_Call_Info()           : new SIP_Header_Call_Info(*((SIP_Header_Call_Info *) copy));                      break;
-        case SIP_HEADER_CONTACT:             header = (!copy) ? new SIP_Header_Contact()             : new SIP_Header_Contact(*((SIP_Header_Contact *) copy));                          break;
-        case SIP_HEADER_CONTENT_DISPOSITION: header = (!copy) ? new SIP_Header_Content_Disposition() : new SIP_Header_Content_Disposition(*((SIP_Header_Content_Disposition *) copy));  break;
-        case SIP_HEADER_CONTENT_ENCODING:    header = (!copy) ? new SIP_Header_Content_Encoding()    : new SIP_Header_Content_Encoding(*((SIP_Header_Content_Encoding *) copy));        break;
-        case SIP_HEADER_CONTENT_LANGUAGE:    header = (!copy) ? new SIP_Header_Content_Language()    : new SIP_Header_Content_Language(*((SIP_Header_Content_Language *) copy));        break;
-        case SIP_HEADER_CONTENT_LENGTH:      header = (!copy) ? new SIP_Header_Content_Length()      : new SIP_Header_Content_Length(*((SIP_Header_Content_Length *) copy));            break;
-        case SIP_HEADER_CONTENT_TYPE:        header = (!copy) ? new SIP_Header_Content_Type()        : new SIP_Header_Content_Type(*((SIP_Header_Content_Type *) copy));                break;
-        case SIP_HEADER_CSEQ:                header = (!copy) ? new SIP_Header_CSeq()                : new SIP_Header_CSeq(*((SIP_Header_CSeq *) copy));                                break;
-        case SIP_HEADER_DATE:                header = (!copy) ? new SIP_Header_Date()                : new SIP_Header_Date(*((SIP_Header_Date *) copy));                                break;
-        case SIP_HEADER_ERROR_INFO:          header = (!copy) ? new SIP_Header_Error_Info()          : new SIP_Header_Error_Info(*((SIP_Header_Error_Info *) copy));                    break;
-        case SIP_HEADER_EVENT:               header = (!copy) ? new SIP_Header_Event()               : new SIP_Header_Event(*((SIP_Header_Event *) copy));                              break;
-        case SIP_HEADER_EXPIRES:             header = (!copy) ? new SIP_Header_Expires()             : new SIP_Header_Expires(*((SIP_Header_Expires *) copy));                          break;
-        case SIP_HEADER_FROM:                header = (!copy) ? new SIP_Header_From()                : new SIP_Header_From(*((SIP_Header_From *) copy));                                break;
-        case SIP_HEADER_IN_REPLY_TO:         header = (!copy) ? new SIP_Header_In_Reply_To()         : new SIP_Header_In_Reply_To(*((SIP_Header_In_Reply_To *) copy));                  break;
-        case SIP_HEADER_MAX_FORWARDS:        header = (!copy) ? new SIP_Header_Max_Forwards()        : new SIP_Header_Max_Forwards(*((SIP_Header_Max_Forwards *) copy));                break;
-        case SIP_HEADER_MIME_VERSION:        header = (!copy) ? new SIP_Header_Mime_Version()        : new SIP_Header_Mime_Version(*((SIP_Header_Mime_Version *) copy));                break;
-        case SIP_HEADER_MIN_EXPIRES:         header = (!copy) ? new SIP_Header_Min_Expires()         : new SIP_Header_Min_Expires(*((SIP_Header_Min_Expires *) copy));                  break;
-        case SIP_HEADER_ORGANIZATION:        header = (!copy) ? new SIP_Header_Organization()        : new SIP_Header_Organization(*((SIP_Header_Organization *) copy));                break;
-        case SIP_HEADER_PRIORITY:            header = (!copy) ? new SIP_Header_Priority()            : new SIP_Header_Priority(*((SIP_Header_Priority *) copy));                        break;
-        case SIP_HEADER_PROXY_REQUIRE:       header = (!copy) ? new SIP_Header_Proxy_Require()       : new SIP_Header_Proxy_Require(*((SIP_Header_Proxy_Require *) copy));              break;
-        case SIP_HEADER_PROXY_AUTHENTICATE:  header = (!copy) ? new SIP_Header_Proxy_Authenticate()  : new SIP_Header_Proxy_Authenticate(*((SIP_Header_Proxy_Authenticate *) copy));    break;
-        case SIP_HEADER_PROXY_AUTHORIZATION: header = (!copy) ? new SIP_Header_Proxy_Authorization() : new SIP_Header_Proxy_Authorization(*((SIP_Header_Proxy_Authorization *) copy));  break;
-        case SIP_HEADER_RECORD_ROUTE:        header = (!copy) ? new SIP_Header_Record_Route()        : new SIP_Header_Record_Route(*((SIP_Header_Record_Route *) copy));                break;
-        case SIP_HEADER_REPLY_TO:            header = (!copy) ? new SIP_Header_Reply_To()            : new SIP_Header_Reply_To(*((SIP_Header_Reply_To *) copy));                        break;
-        case SIP_HEADER_REQUIRE:             header = (!copy) ? new SIP_Header_Require()             : new SIP_Header_Require(*((SIP_Header_Require *) copy));                          break;
-        case SIP_HEADER_RETRY_AFTER:         header = (!copy) ? new SIP_Header_Retry_After()         : new SIP_Header_Retry_After(*((SIP_Header_Retry_After *) copy));                  break;
-        case SIP_HEADER_ROUTE:               header = (!copy) ? new SIP_Header_Route()               : new SIP_Header_Route(*((SIP_Header_Route *) copy));                              break;
-        case SIP_HEADER_SERVER:              header = (!copy) ? new SIP_Header_Server()              : new SIP_Header_Server(*((SIP_Header_Server *) copy));                            break;
-        case SIP_HEADER_SUBJECT:             header = (!copy) ? new SIP_Header_Subject()             : new SIP_Header_Subject(*((SIP_Header_Subject *) copy));                          break;
-        case SIP_HEADER_SUBSCRIPTION_STATE:  header = (!copy) ? new SIP_Header_Subscription_State()  : new SIP_Header_Subscription_State(*((SIP_Header_Subscription_State *) copy));    break;
-        case SIP_HEADER_SUPPORTED:           header = (!copy) ? new SIP_Header_Supported()           : new SIP_Header_Supported(*((SIP_Header_Supported *) copy));                      break;
-        case SIP_HEADER_TIMESTAMP:           header = (!copy) ? new SIP_Header_Timestamp()           : new SIP_Header_Timestamp(*((SIP_Header_Timestamp *) copy));                      break;
-        case SIP_HEADER_TO:                  header = (!copy) ? new SIP_Header_To()                  : new SIP_Header_To(*((SIP_Header_To *) copy));                                    break;
-        case SIP_HEADER_UNSUPPORTED:         header = (!copy) ? new SIP_Header_Unsupported()         : new SIP_Header_Unsupported(*((SIP_Header_Unsupported *) copy));                  break;
-        case SIP_HEADER_USER_AGENT:          header = (!copy) ? new SIP_Header_User_Agent()          : new SIP_Header_User_Agent(*((SIP_Header_User_Agent *) copy));                    break;
-        case SIP_HEADER_VIA:                 header = (!copy) ? new SIP_Header_Via()                 : new SIP_Header_Via(*((SIP_Header_Via *) copy));                                  break;
-        case SIP_HEADER_WARNING:             header = (!copy) ? new SIP_Header_Warning()             : new SIP_Header_Warning(*((SIP_Header_Warning *) copy));                          break;
-        case SIP_HEADER_WWW_AUTHENTICATE:    header = (!copy) ? new SIP_Header_WWW_Authenticate()    : new SIP_Header_WWW_Authenticate(*((SIP_Header_WWW_Authenticate *) copy));        break;
-        default:                                                                                                                                                                        break;
+        case SIP_HEADER_ACCEPT:
+            header = (!copy) ? new SIP_Header_Accept()
+                             : new SIP_Header_Accept(dynamic_cast<const SIP_Header_Accept &>(*copy));
+            break;
+        case SIP_HEADER_ACCEPT_ENCODING:
+            header = (!copy) ? new SIP_Header_Accept_Encoding()
+                             : new SIP_Header_Accept_Encoding(dynamic_cast<const SIP_Header_Accept_Encoding &>(*copy));
+            break;
+        case SIP_HEADER_ACCEPT_LANGUAGE:
+            header = (!copy) ? new SIP_Header_Accept_Language()
+                             : new SIP_Header_Accept_Language(dynamic_cast<const SIP_Header_Accept_Language &>(*copy));
+            break;
+        case SIP_HEADER_ALERT_INFO:
+            header = (!copy) ? new SIP_Header_Alert_Info()
+                             : new SIP_Header_Alert_Info(dynamic_cast<const SIP_Header_Alert_Info &>(*copy));
+            break;
+        case SIP_HEADER_ALLOW:
+            header = (!copy) ? new SIP_Header_Allow()
+                             : new SIP_Header_Allow(dynamic_cast<const SIP_Header_Allow &>(*copy));
+            break;
+        case SIP_HEADER_ALLOW_EVENTS:
+            header = (!copy) ? new SIP_Header_Allow_Events()
+                             : new SIP_Header_Allow_Events(dynamic_cast<const SIP_Header_Allow_Events &>(*copy));
+            break;
+        case SIP_HEADER_AUTHENTICATION_INFO:
+            header = (!copy) ? new SIP_Header_Authentication_Info()
+                             : new SIP_Header_Authentication_Info(dynamic_cast<const SIP_Header_Authentication_Info &>(*copy));
+            break;
+        case SIP_HEADER_AUTHORIZATION:
+            header = (!copy) ? new SIP_Header_Authorization()
+                             : new SIP_Header_Authorization(dynamic_cast<const SIP_Header_Authorization &>(*copy));
+            break;
+        case SIP_HEADER_CALL_ID:
+            header = (!copy) ? new SIP_Header_Call_ID()
+                             : new SIP_Header_Call_ID(dynamic_cast<const SIP_Header_Call_ID &>(*copy));
+            break;
+        case SIP_HEADER_CALL_INFO:
+            header = (!copy) ? new SIP_Header_Call_Info()
+                             : new SIP_Header_Call_Info(dynamic_cast<const SIP_Header_Call_Info &>(*copy));
+            break;
+        case SIP_HEADER_CONTACT:
+            header = (!copy) ? new SIP_Header_Contact()
+                             : new SIP_Header_Contact(dynamic_cast<const SIP_Header_Contact &>(*copy));
+            break;
+        case SIP_HEADER_CONTENT_DISPOSITION:
+            header = (!copy) ? new SIP_Header_Content_Disposition()
+                             : new SIP_Header_Content_Disposition(dynamic_cast<const SIP_Header_Content_Disposition &>(*copy));
+            break;
+        case SIP_HEADER_CONTENT_ENCODING:
+            header = (!copy) ? new SIP_Header_Content_Encoding()
+                             : new SIP_Header_Content_Encoding(dynamic_cast<const SIP_Header_Content_Encoding &>(*copy));
+            break;
+        case SIP_HEADER_CONTENT_LANGUAGE:
+            header = (!copy) ? new SIP_Header_Content_Language()
+                             : new SIP_Header_Content_Language(dynamic_cast<const SIP_Header_Content_Language &>(*copy));
+            break;
+        case SIP_HEADER_CONTENT_LENGTH:
+            header = (!copy) ? new SIP_Header_Content_Length()
+                             : new SIP_Header_Content_Length(dynamic_cast<const SIP_Header_Content_Length &>(*copy));
+            break;
+        case SIP_HEADER_CONTENT_TYPE:
+            header = (!copy) ? new SIP_Header_Content_Type()
+                             : new SIP_Header_Content_Type(dynamic_cast<const SIP_Header_Content_Type &>(*copy));
+            break;
+        case SIP_HEADER_CSEQ:
+            header = (!copy) ? new SIP_Header_CSeq()
+                             : new SIP_Header_CSeq(dynamic_cast<const SIP_Header_CSeq &>(*copy));
+            break;
+        case SIP_HEADER_DATE:
+            header = (!copy) ? new SIP_Header_Date()
+                             : new SIP_Header_Date(dynamic_cast<const SIP_Header_Date &>(*copy));
+            break;
+        case SIP_HEADER_ERROR_INFO:
+            header = (!copy) ? new SIP_Header_Error_Info()
+                             : new SIP_Header_Error_Info(dynamic_cast<const SIP_Header_Error_Info &>(*copy));
+            break;
+        case SIP_HEADER_EVENT:
+            header = (!copy) ? new SIP_Header_Event()
+                             : new SIP_Header_Event(dynamic_cast<const SIP_Header_Event &>(*copy));
+            break;
+        case SIP_HEADER_EXPIRES:
+            header = (!copy) ? new SIP_Header_Expires()
+                             : new SIP_Header_Expires(dynamic_cast<const SIP_Header_Expires &>(*copy));
+            break;
+        case SIP_HEADER_FROM:
+            header = (!copy) ? new SIP_Header_From()
+                             : new SIP_Header_From(dynamic_cast<const SIP_Header_From &>(*copy));
+            break;
+        case SIP_HEADER_IN_REPLY_TO:
+            header = (!copy) ? new SIP_Header_In_Reply_To()
+                             : new SIP_Header_In_Reply_To(dynamic_cast<const SIP_Header_In_Reply_To &>(*copy));
+            break;
+        case SIP_HEADER_MAX_FORWARDS:
+            header = (!copy) ? new SIP_Header_Max_Forwards()
+                             : new SIP_Header_Max_Forwards(dynamic_cast<const SIP_Header_Max_Forwards &>(*copy));
+            break;
+        case SIP_HEADER_MIME_VERSION:
+            header = (!copy) ? new SIP_Header_Mime_Version()
+                             : new SIP_Header_Mime_Version(dynamic_cast<const SIP_Header_Mime_Version &>(*copy));
+            break;
+        case SIP_HEADER_MIN_EXPIRES:
+            header = (!copy) ? new SIP_Header_Min_Expires()
+                             : new SIP_Header_Min_Expires(dynamic_cast<const SIP_Header_Min_Expires &>(*copy));
+            break;
+        case SIP_HEADER_ORGANIZATION:
+            header = (!copy) ? new SIP_Header_Organization()
+                             : new SIP_Header_Organization(dynamic_cast<const SIP_Header_Organization &>(*copy));
+            break;
+        case SIP_HEADER_PRIORITY:
+            header = (!copy) ? new SIP_Header_Priority()
+                             : new SIP_Header_Priority(dynamic_cast<const SIP_Header_Priority &>(*copy));
+            break;
+        case SIP_HEADER_PROXY_REQUIRE:
+            header = (!copy) ? new SIP_Header_Proxy_Require()
+                             : new SIP_Header_Proxy_Require(dynamic_cast<const SIP_Header_Proxy_Require &>(*copy));
+            break;
+        case SIP_HEADER_PROXY_AUTHENTICATE:
+            header = (!copy) ? new SIP_Header_Proxy_Authenticate()
+                             : new SIP_Header_Proxy_Authenticate(dynamic_cast<const SIP_Header_Proxy_Authenticate &>(*copy));
+            break;
+        case SIP_HEADER_PROXY_AUTHORIZATION:
+            header = (!copy) ? new SIP_Header_Proxy_Authorization()
+                             : new SIP_Header_Proxy_Authorization(dynamic_cast<const SIP_Header_Proxy_Authorization &>(*copy));
+            break;
+        case SIP_HEADER_RECORD_ROUTE:
+            header = (!copy) ? new SIP_Header_Record_Route()
+                             : new SIP_Header_Record_Route(dynamic_cast<const SIP_Header_Record_Route &>(*copy));
+            break;
+        case SIP_HEADER_REPLY_TO:
+            header = (!copy) ? new SIP_Header_Reply_To()
+                             : new SIP_Header_Reply_To(dynamic_cast<const SIP_Header_Reply_To &>(*copy));
+            break;
+        case SIP_HEADER_REQUIRE:
+            header = (!copy) ? new SIP_Header_Require()
+                             : new SIP_Header_Require(dynamic_cast<const SIP_Header_Require &>(*copy));
+            break;
+        case SIP_HEADER_RETRY_AFTER:
+            header = (!copy) ? new SIP_Header_Retry_After()
+                             : new SIP_Header_Retry_After(dynamic_cast<const SIP_Header_Retry_After &>(*copy));
+            break;
+        case SIP_HEADER_ROUTE:
+            header = (!copy) ? new SIP_Header_Route()
+                             : new SIP_Header_Route(dynamic_cast<const SIP_Header_Route &>(*copy));
+            break;
+        case SIP_HEADER_SERVER:
+            header = (!copy) ? new SIP_Header_Server()
+                             : new SIP_Header_Server(dynamic_cast<const SIP_Header_Server &>(*copy));
+            break;
+        case SIP_HEADER_SUBJECT:
+            header = (!copy) ? new SIP_Header_Subject()
+                             : new SIP_Header_Subject(dynamic_cast<const SIP_Header_Subject &>(*copy));
+            break;
+        case SIP_HEADER_SUBSCRIPTION_STATE:
+            header = (!copy) ? new SIP_Header_Subscription_State()
+                             : new SIP_Header_Subscription_State(dynamic_cast<const SIP_Header_Subscription_State &>(*copy));
+            break;
+        case SIP_HEADER_SUPPORTED:
+            header = (!copy) ? new SIP_Header_Supported()
+                             : new SIP_Header_Supported(dynamic_cast<const SIP_Header_Supported &>(*copy));
+            break;
+        case SIP_HEADER_TIMESTAMP:
+            header = (!copy) ? new SIP_Header_Timestamp()
+                             : new SIP_Header_Timestamp(dynamic_cast<const SIP_Header_Timestamp &>(*copy));
+            break;
+        case SIP_HEADER_TO:
+            header = (!copy) ? new SIP_Header_To()
+                             : new SIP_Header_To(dynamic_cast<const SIP_Header_To &>(*copy));
+            break;
+        case SIP_HEADER_UNSUPPORTED:
+            header = (!copy) ? new SIP_Header_Unsupported()
+                             : new SIP_Header_Unsupported(dynamic_cast<const SIP_Header_Unsupported &>(*copy));
+            break;
+        case SIP_HEADER_USER_AGENT:
+            header = (!copy) ? new SIP_Header_User_Agent()
+                             : new SIP_Header_User_Agent(dynamic_cast<const SIP_Header_User_Agent &>(*copy));
+            break;
+        case SIP_HEADER_VIA:
+            header = (!copy) ? new SIP_Header_Via()
+                             : new SIP_Header_Via(dynamic_cast<const SIP_Header_Via &>(*copy));
+            break;
+        case SIP_HEADER_WARNING:
+            header = (!copy) ? new SIP_Header_Warning()
+                             : new SIP_Header_Warning(dynamic_cast<const SIP_Header_Warning &>(*copy));
+            break;
+        case SIP_HEADER_WWW_AUTHENTICATE:
+            header = (!copy) ? new SIP_Header_WWW_Authenticate()
+                             : new SIP_Header_WWW_Authenticate(dynamic_cast<const SIP_Header_WWW_Authenticate &>(*copy));
+            break;
+        default:
+            break;
     }
 
     return header;
