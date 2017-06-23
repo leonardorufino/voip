@@ -1164,8 +1164,10 @@ SIP_Header_Error_Info_Test::SIP_Header_Error_Info_Test()
 
     SIP_Header_Input_Output hdr2;
     hdr2._header_type    = SIP_HEADER_ERROR_INFO;
-    hdr2._input          = "Error-Info: <mailto:user@host.com;par1; par2 ;par3>;param1 ; param2 ;param3 , <http://wwww.example.com/alice/photo.jpg>";
-    hdr2._output         = "Error-Info: <mailto:user@host.com;par1; par2 ;par3>;param1;param2;param3, <http://wwww.example.com/alice/photo.jpg>\r\n";
+    hdr2._input          = "Error-Info: <mailto:user@host.com;par1; par2 ;par3>;param1 ; param2 ;param3 , ";
+    hdr2._input         += "<http://wwww.example.com/alice/photo.jpg>";
+    hdr2._output         = "Error-Info: <mailto:user@host.com;par1; par2 ;par3>;param1;param2;param3, ";
+    hdr2._output        += "<http://wwww.example.com/alice/photo.jpg>\r\n";
     hdr2._header_nb      = 2;
     hdr2._decode_success = true;
     hdr2._encode_success = true;
@@ -1593,8 +1595,10 @@ SIP_Header_Proxy_Authenticate_Test::SIP_Header_Proxy_Authenticate_Test()
 {
     SIP_Header_Input_Output hdr1;
     hdr1._header_type    = SIP_HEADER_PROXY_AUTHENTICATE;
-    hdr1._input          = "Proxy-Authenticate: Digest realm=\"atlanta.com\", domain=\"sip:ss1.carrier.com\", qop=\"auth\", nonce=\"f84f1cec41e6cbe5aea9c8e88d359\", opaque=\"\", stale=FALSE, algorithm=MD5";
-    hdr1._output         = "Proxy-Authenticate: Digest realm=\"atlanta.com\", domain=\"sip:ss1.carrier.com\", nonce=\"f84f1cec41e6cbe5aea9c8e88d359\", opaque=\"\", stale=FALSE, algorithm=MD5, qop=\"auth\"\r\n";
+    hdr1._input          = "Proxy-Authenticate: Digest realm=\"atlanta.com\", domain=\"sip:ss1.carrier.com\", qop=\"auth\", ";
+    hdr1._input         += "nonce=\"f84f1cec41e6cbe5aea9c8e88d359\", opaque=\"\", stale=FALSE, algorithm=MD5";
+    hdr1._output         = "Proxy-Authenticate: Digest realm=\"atlanta.com\", domain=\"sip:ss1.carrier.com\", ";
+    hdr1._output        += "nonce=\"f84f1cec41e6cbe5aea9c8e88d359\", opaque=\"\", stale=FALSE, algorithm=MD5, qop=\"auth\"\r\n";
     hdr1._header_nb      = 1;
     hdr1._decode_success = true;
     hdr1._encode_success = true;
@@ -1602,8 +1606,10 @@ SIP_Header_Proxy_Authenticate_Test::SIP_Header_Proxy_Authenticate_Test()
 
     SIP_Header_Input_Output hdr2;
     hdr2._header_type    = SIP_HEADER_PROXY_AUTHENTICATE;
-    hdr2._input          = "Proxy-Authenticate: Digest realm=\"atlanta.example.com\",qop=\"auth\",   nonce=\"wf84f1cczx41ae6cbeaea9ce88d359\",opaque=\"\",stale=FALSE,algorithm=MD5";
-    hdr2._output         = "Proxy-Authenticate: Digest realm=\"atlanta.example.com\", nonce=\"wf84f1cczx41ae6cbeaea9ce88d359\", opaque=\"\", stale=FALSE, algorithm=MD5, qop=\"auth\"\r\n";
+    hdr2._input          = "Proxy-Authenticate: Digest realm=\"atlanta.example.com\",qop=\"auth\",   ";
+    hdr2._input         += "nonce=\"wf84f1cczx41ae6cbeaea9ce88d359\",opaque=\"\",stale=FALSE,algorithm=MD5";
+    hdr2._output         = "Proxy-Authenticate: Digest realm=\"atlanta.example.com\", ";
+    hdr2._output        += "nonce=\"wf84f1cczx41ae6cbeaea9ce88d359\", opaque=\"\", stale=FALSE, algorithm=MD5, qop=\"auth\"\r\n";
     hdr2._header_nb      = 1;
     hdr2._decode_success = true;
     hdr2._encode_success = true;
@@ -1620,8 +1626,10 @@ SIP_Header_Proxy_Authenticate_Test::SIP_Header_Proxy_Authenticate_Test()
 
     SIP_Header_Input_Output hdr4;
     hdr4._header_type    = SIP_HEADER_PROXY_AUTHENTICATE;
-    hdr4._input          = "Proxy-Authenticate: Digest\trealm=\"myrealm.com\",nonce=\"123456789012345678901\", domain=\"sip:myrealm.com\",algorithm=MD5";
-    hdr4._output         = "Proxy-Authenticate: Digest realm=\"myrealm.com\", domain=\"sip:myrealm.com\", nonce=\"123456789012345678901\", algorithm=MD5\r\n";
+    hdr4._input          = "Proxy-Authenticate: Digest\trealm=\"myrealm.com\",nonce=\"123456789012345678901\", ";
+    hdr4._input         += "domain=\"sip:myrealm.com\",algorithm=MD5";
+    hdr4._output         = "Proxy-Authenticate: Digest realm=\"myrealm.com\", domain=\"sip:myrealm.com\", ";
+    hdr4._output        += "nonce=\"123456789012345678901\", algorithm=MD5\r\n";
     hdr4._header_nb      = 1;
     hdr4._decode_success = true;
     hdr4._encode_success = true;
@@ -1629,8 +1637,12 @@ SIP_Header_Proxy_Authenticate_Test::SIP_Header_Proxy_Authenticate_Test()
 
     SIP_Header_Input_Output hdr5;
     hdr5._header_type    = SIP_HEADER_PROXY_AUTHENTICATE;
-    hdr5._input          = "Proxy-Authenticate: Scheme1 param1, param2=test, nonce=\"123456789012345678901\",realm=\"server.com\",domain=\"sip:server.com\",qop=\"auth, auth-int, value\", opaque=\"11223344556677889900aabbccddeeff\", stale=true, par3=\"test\", algorithm=XYZ";
-    hdr5._output         = "Proxy-Authenticate: Scheme1 realm=\"server.com\", domain=\"sip:server.com\", nonce=\"123456789012345678901\", opaque=\"11223344556677889900aabbccddeeff\", stale=true, algorithm=XYZ, qop=\"auth, auth-int, value\", param1, param2=test, par3=\"test\"\r\n";
+    hdr5._input          = "Proxy-Authenticate: Scheme1 param1, param2=test, nonce=\"123456789012345678901\",";
+    hdr5._input         += "realm=\"server.com\",domain=\"sip:server.com\",qop=\"auth, auth-int, value\", ";
+    hdr5._input         += "opaque=\"11223344556677889900aabbccddeeff\", stale=true, par3=\"test\", algorithm=XYZ";
+    hdr5._output         = "Proxy-Authenticate: Scheme1 realm=\"server.com\", domain=\"sip:server.com\", ";
+    hdr5._output        += "nonce=\"123456789012345678901\", opaque=\"11223344556677889900aabbccddeeff\", stale=true, ";
+    hdr5._output        += "algorithm=XYZ, qop=\"auth, auth-int, value\", param1, param2=test, par3=\"test\"\r\n";
     hdr5._header_nb      = 1;
     hdr5._decode_success = true;
     hdr5._encode_success = true;
@@ -1653,8 +1665,10 @@ SIP_Header_Proxy_Authorization_Test::SIP_Header_Proxy_Authorization_Test()
 {
     SIP_Header_Input_Output hdr1;
     hdr1._header_type    = SIP_HEADER_PROXY_AUTHORIZATION;
-    hdr1._input          = "Proxy-Authorization: Digest username=\"Alice\", realm=\"atlanta.com\", nonce=\"c60f3082ee1212b402a21831ae\", response=\"245f23415f11432b3434341c022\"";
-    hdr1._output         = "Proxy-Authorization: Digest username=\"Alice\", realm=\"atlanta.com\", nonce=\"c60f3082ee1212b402a21831ae\", response=\"245f23415f11432b3434341c022\"\r\n";
+    hdr1._input          = "Proxy-Authorization: Digest username=\"Alice\", realm=\"atlanta.com\", ";
+    hdr1._input         += "nonce=\"c60f3082ee1212b402a21831ae\", response=\"245f23415f11432b3434341c022\"";
+    hdr1._output         = "Proxy-Authorization: Digest username=\"Alice\", realm=\"atlanta.com\", ";
+    hdr1._output        += "nonce=\"c60f3082ee1212b402a21831ae\", response=\"245f23415f11432b3434341c022\"\r\n";
     hdr1._header_nb      = 1;
     hdr1._decode_success = true;
     hdr1._encode_success = true;
@@ -1662,8 +1676,12 @@ SIP_Header_Proxy_Authorization_Test::SIP_Header_Proxy_Authorization_Test()
 
     SIP_Header_Input_Output hdr2;
     hdr2._header_type    = SIP_HEADER_PROXY_AUTHORIZATION;
-    hdr2._input          = "Proxy-Authorization: Digest username=\"alice\",realm=\"atlanta.example.com\",   nonce=\"wf84f1ceczx41ae6cbe5aea9c8e88d359\",opaque=\"\", uri=\"sip:bob@biloxi.example.com\", response=\"42ce3cef44b22f50c6a6071bc8\"";
-    hdr2._output         = "Proxy-Authorization: Digest username=\"alice\", realm=\"atlanta.example.com\", nonce=\"wf84f1ceczx41ae6cbe5aea9c8e88d359\", uri=\"sip:bob@biloxi.example.com\", response=\"42ce3cef44b22f50c6a6071bc8\", opaque=\"\"\r\n";
+    hdr2._input          = "Proxy-Authorization: Digest username=\"alice\",realm=\"atlanta.example.com\",   ";
+    hdr2._input         += "nonce=\"wf84f1ceczx41ae6cbe5aea9c8e88d359\",opaque=\"\", uri=\"sip:bob@biloxi.example.com\", ";
+    hdr2._input         += "response=\"42ce3cef44b22f50c6a6071bc8\"";
+    hdr2._output         = "Proxy-Authorization: Digest username=\"alice\", realm=\"atlanta.example.com\", ";
+    hdr2._output        += "nonce=\"wf84f1ceczx41ae6cbe5aea9c8e88d359\", uri=\"sip:bob@biloxi.example.com\", ";
+    hdr2._output        += "response=\"42ce3cef44b22f50c6a6071bc8\", opaque=\"\"\r\n";
     hdr2._header_nb      = 1;
     hdr2._decode_success = true;
     hdr2._encode_success = true;
@@ -1671,8 +1689,12 @@ SIP_Header_Proxy_Authorization_Test::SIP_Header_Proxy_Authorization_Test()
 
     SIP_Header_Input_Output hdr3;
     hdr3._header_type    = SIP_HEADER_PROXY_AUTHORIZATION;
-    hdr3._input          = "Proxy-Authorization: Digest username=\"bob\",realm=\"atlanta.example.com\",nonce=\"ea9c8e88df84f1cec4341ae6cbe5a359\" ,   opaque=\"\",   uri=\"sips:ss2.biloxi.example.com\",response=\"dfe56131d1958046689d83306477ecc\"";
-    hdr3._output         = "Proxy-Authorization: Digest username=\"bob\", realm=\"atlanta.example.com\", nonce=\"ea9c8e88df84f1cec4341ae6cbe5a359\", uri=\"sips:ss2.biloxi.example.com\", response=\"dfe56131d1958046689d83306477ecc\", opaque=\"\"\r\n";
+    hdr3._input          = "Proxy-Authorization: Digest username=\"bob\",realm=\"atlanta.example.com\",";
+    hdr3._input         += "nonce=\"ea9c8e88df84f1cec4341ae6cbe5a359\" ,   opaque=\"\",   ";
+    hdr3._input         += "uri=\"sips:ss2.biloxi.example.com\",response=\"dfe56131d1958046689d83306477ecc\"";
+    hdr3._output         = "Proxy-Authorization: Digest username=\"bob\", realm=\"atlanta.example.com\", ";
+    hdr3._output        += "nonce=\"ea9c8e88df84f1cec4341ae6cbe5a359\", uri=\"sips:ss2.biloxi.example.com\", ";
+    hdr3._output        += "response=\"dfe56131d1958046689d83306477ecc\", opaque=\"\"\r\n";
     hdr3._header_nb      = 1;
     hdr3._decode_success = true;
     hdr3._encode_success = true;
@@ -1680,8 +1702,10 @@ SIP_Header_Proxy_Authorization_Test::SIP_Header_Proxy_Authorization_Test()
 
     SIP_Header_Input_Output hdr4;
     hdr4._header_type    = SIP_HEADER_PROXY_AUTHORIZATION;
-    hdr4._input          = "Proxy-Authorization: Digest\tusername=\"name\",realm=\"myrealm.com\",nonce=\"123456789012345678901\", uri=\"sip:myrealm.com\",response=\"12345678901234567890123456789012\",algorithm=MD5";
-    hdr4._output         = "Proxy-Authorization: Digest username=\"name\", realm=\"myrealm.com\", nonce=\"123456789012345678901\", uri=\"sip:myrealm.com\", response=\"12345678901234567890123456789012\", algorithm=MD5\r\n";
+    hdr4._input          = "Proxy-Authorization: Digest\tusername=\"name\",realm=\"myrealm.com\",nonce=\"123456789012345678901\",";
+    hdr4._input         += "uri=\"sip:myrealm.com\",response=\"12345678901234567890123456789012\",algorithm=MD5";
+    hdr4._output         = "Proxy-Authorization: Digest username=\"name\", realm=\"myrealm.com\", nonce=\"123456789012345678901\", ";
+    hdr4._output        += "uri=\"sip:myrealm.com\", response=\"12345678901234567890123456789012\", algorithm=MD5\r\n";
     hdr4._header_nb      = 1;
     hdr4._decode_success = true;
     hdr4._encode_success = true;
@@ -1689,8 +1713,12 @@ SIP_Header_Proxy_Authorization_Test::SIP_Header_Proxy_Authorization_Test()
 
     SIP_Header_Input_Output hdr5;
     hdr5._header_type    = SIP_HEADER_PROXY_AUTHORIZATION;
-    hdr5._input          = "Proxy-Authorization: Scheme1 param1, param2=test, nonce=\"123456789012345678901\",realm=\"server.com\",response=\"12345678901234567890123456789012\", username=\"1234\", uri=\"sip:server.com\",qop=auth, nc=00000001, cnonce=\"0a4f113b\", opaque=\"11223344556677889900aabbccddeeff\", par3=\"test\", algorithm=XYZ";
-    hdr5._output         = "Proxy-Authorization: Scheme1 username=\"1234\", realm=\"server.com\", nonce=\"123456789012345678901\", uri=\"sip:server.com\", response=\"12345678901234567890123456789012\", algorithm=XYZ, cnonce=\"0a4f113b\", opaque=\"11223344556677889900aabbccddeeff\", qop=auth, nc=00000001, param1, param2=test, par3=\"test\"\r\n";
+    hdr5._input          = "Proxy-Authorization: Scheme1 param1, param2=test, nonce=\"123456789012345678901\",realm=\"server.com\",";
+    hdr5._input         += "response=\"12345678901234567890123456789012\", username=\"1234\", uri=\"sip:server.com\",qop=auth, ";
+    hdr5._input         += "nc=00000001, cnonce=\"0a4f113b\", opaque=\"11223344556677889900aabbccddeeff\", par3=\"test\", algorithm=XYZ";
+    hdr5._output         = "Proxy-Authorization: Scheme1 username=\"1234\", realm=\"server.com\", nonce=\"123456789012345678901\", ";
+    hdr5._output        += "uri=\"sip:server.com\", response=\"12345678901234567890123456789012\", algorithm=XYZ, cnonce=\"0a4f113b\", ";
+    hdr5._output        += "opaque=\"11223344556677889900aabbccddeeff\", qop=auth, nc=00000001, param1, param2=test, par3=\"test\"\r\n";
     hdr5._header_nb      = 1;
     hdr5._decode_success = true;
     hdr5._encode_success = true;
@@ -1755,8 +1783,10 @@ SIP_Header_Record_Route_Test::SIP_Header_Record_Route_Test()
 
     SIP_Header_Input_Output hdr2;
     hdr2._header_type    = SIP_HEADER_RECORD_ROUTE;
-    hdr2._input          = "Record-Route:   <sip:user@server10.biloxi.com;par1;user= phone >;parameter1, <sip:bigbox3.site3.atlanta.com;par1;lr;par2>";
-    hdr2._output         = "Record-Route: <sip:user@server10.biloxi.com;user=phone;par1>;parameter1\r\nRecord-Route: <sip:bigbox3.site3.atlanta.com;lr;par1;par2>\r\n";
+    hdr2._input          = "Record-Route:   <sip:user@server10.biloxi.com;par1;user= phone >;parameter1, ";
+    hdr2._input         += "<sip:bigbox3.site3.atlanta.com;par1;lr;par2>";
+    hdr2._output         = "Record-Route: <sip:user@server10.biloxi.com;user=phone;par1>;parameter1\r\n";
+    hdr2._output        += "Record-Route: <sip:bigbox3.site3.atlanta.com;lr;par1;par2>\r\n";
     hdr2._header_nb      = 2;
     hdr2._decode_success = true;
     hdr2._encode_success = true;
@@ -1764,8 +1794,10 @@ SIP_Header_Record_Route_Test::SIP_Header_Record_Route_Test()
 
     SIP_Header_Input_Output hdr3;
     hdr3._header_type    = SIP_HEADER_RECORD_ROUTE;
-    hdr3._input          = "Record-Route: <sip:n.tesla@high-voltage.org;par1 ; maddr= 10.0.0.10 ; par2  ;par3> ;  parameter1;parameter2 , <sip:c8oqz84zk7z@privacy.org> ; parameter1";
-    hdr3._output         = "Record-Route: <sip:n.tesla@high-voltage.org;maddr=10.0.0.10;par1;par2;par3>;parameter1;parameter2\r\nRecord-Route: <sip:c8oqz84zk7z@privacy.org>;parameter1\r\n";
+    hdr3._input          = "Record-Route: <sip:n.tesla@high-voltage.org;par1 ; maddr= 10.0.0.10 ; par2  ;par3> ;  parameter1;parameter2 , ";
+    hdr3._input         += "<sip:c8oqz84zk7z@privacy.org> ; parameter1";
+    hdr3._output         = "Record-Route: <sip:n.tesla@high-voltage.org;maddr=10.0.0.10;par1;par2;par3>;parameter1;parameter2\r\n";
+    hdr3._output        += "Record-Route: <sip:c8oqz84zk7z@privacy.org>;parameter1\r\n";
     hdr3._header_nb      = 2;
     hdr3._decode_success = true;
     hdr3._encode_success = true;
@@ -2211,8 +2243,10 @@ SIP_Header_To_Test::SIP_Header_To_Test()
 
     SIP_Header_Input_Output hdr4;
     hdr4._header_type    = SIP_HEADER_TO;
-    hdr4._input          = "To: <sip:server.phone2net.com ;par1 ; lr ; maddr= 10.10.10.10 ;ttl=20; method= BYE; user=ip;transport= udp ;par2> ; tag=287447;parameter1 ";
-    hdr4._output         = "To: <sip:server.phone2net.com;transport=udp;user=ip;method=BYE;ttl=20;maddr=10.10.10.10;lr;par1;par2>;tag=287447;parameter1\r\n";
+    hdr4._input          = "To: <sip:server.phone2net.com ;par1 ; lr ; maddr= 10.10.10.10 ;ttl=20; method= BYE; ";
+    hdr4._input         += "user=ip;transport= udp ;par2> ; tag=287447;parameter1 ";
+    hdr4._output         = "To: <sip:server.phone2net.com;transport=udp;user=ip;method=BYE;ttl=20";
+    hdr4._output        += ";maddr=10.10.10.10;lr;par1;par2>;tag=287447;parameter1\r\n";
     hdr4._header_nb      = 1;
     hdr4._decode_success = true;
     hdr4._encode_success = true;
@@ -2310,8 +2344,10 @@ SIP_Header_Via_Test::SIP_Header_Via_Test()
 
     SIP_Header_Input_Output hdr2;
     hdr2._header_type    = SIP_HEADER_VIA;
-    hdr2._input          = "Via: SIP / 2.0 / UDP first.example.com: 4000  ;par1;maddr=224.2.0.1 ;ttl=16;branch=z9hG4bKa7c6a8dlze.1, SIP/2.0/UDP first.example.com";
-    hdr2._output         = "Via: SIP/2.0/UDP first.example.com:4000;branch=z9hG4bKa7c6a8dlze.1;ttl=16;maddr=224.2.0.1;par1\r\nVia: SIP/2.0/UDP first.example.com\r\n";
+    hdr2._input          = "Via: SIP / 2.0 / UDP first.example.com: 4000  ;par1;maddr=224.2.0.1 ;ttl=16;branch=z9hG4bKa7c6a8dlze.1, ";
+    hdr2._input         += "SIP/2.0/UDP first.example.com";
+    hdr2._output         = "Via: SIP/2.0/UDP first.example.com:4000;branch=z9hG4bKa7c6a8dlze.1;ttl=16;maddr=224.2.0.1;par1\r\n";
+    hdr2._output        += "Via: SIP/2.0/UDP first.example.com\r\n";
     hdr2._header_nb      = 2;
     hdr2._decode_success = true;
     hdr2._encode_success = true;
@@ -2319,8 +2355,10 @@ SIP_Header_Via_Test::SIP_Header_Via_Test()
 
     SIP_Header_Input_Output hdr3;
     hdr3._header_type    = SIP_HEADER_VIA;
-    hdr3._input          = "v: SIP/2.0/UDP lab.high-voltage.org;received=10.10.10.10;branch=z9hG4bKfw19b,SIP/2.0/UDP 11.11.11.11:5070;branch=z9hG4bKfw19b;parameter1 ";
-    hdr3._output         = "Via: SIP/2.0/UDP lab.high-voltage.org;branch=z9hG4bKfw19b;received=10.10.10.10\r\nVia: SIP/2.0/UDP 11.11.11.11:5070;branch=z9hG4bKfw19b;parameter1\r\n";
+    hdr3._input          = "v: SIP/2.0/UDP lab.high-voltage.org;received=10.10.10.10;branch=z9hG4bKfw19b,";
+    hdr3._input         += "SIP/2.0/UDP 11.11.11.11:5070;branch=z9hG4bKfw19b;parameter1 ";
+    hdr3._output         = "Via: SIP/2.0/UDP lab.high-voltage.org;branch=z9hG4bKfw19b;received=10.10.10.10\r\n";
+    hdr3._output        += "Via: SIP/2.0/UDP 11.11.11.11:5070;branch=z9hG4bKfw19b;parameter1\r\n";
     hdr3._header_nb      = 2;
     hdr3._decode_success = true;
     hdr3._encode_success = true;
@@ -2370,8 +2408,10 @@ SIP_Header_Warning_Test::SIP_Header_Warning_Test()
 
     SIP_Header_Input_Output hdr2;
     hdr2._header_type    = SIP_HEADER_WARNING;
-    hdr2._input          = "Warning: 307 isi.edu \"Session parameter ’foo’ not understood\", 301 isi.edu \"Incompatible network address type ’E.164’\"";
-    hdr2._output         = "Warning: 307 isi.edu \"Session parameter ’foo’ not understood\"\r\nWarning: 301 isi.edu \"Incompatible network address type ’E.164’\"\r\n";
+    hdr2._input          = "Warning: 307 isi.edu \"Session parameter ’foo’ not understood\", ";
+    hdr2._input         += "301 isi.edu \"Incompatible network address type ’E.164’\"";
+    hdr2._output         = "Warning: 307 isi.edu \"Session parameter ’foo’ not understood\"\r\n";
+    hdr2._output        += "Warning: 301 isi.edu \"Incompatible network address type ’E.164’\"\r\n";
     hdr2._header_nb      = 2;
     hdr2._decode_success = true;
     hdr2._encode_success = true;
@@ -2394,8 +2434,10 @@ SIP_Header_WWW_Authenticate_Test::SIP_Header_WWW_Authenticate_Test()
 {
     SIP_Header_Input_Output hdr1;
     hdr1._header_type    = SIP_HEADER_WWW_AUTHENTICATE;
-    hdr1._input          = "WWW-Authenticate: Digest realm=\"atlanta.com\", domain=\"sip:boxesbybob.com\", qop=\"auth\", nonce=\"f84f1cec41e6cbe5aea9c8e88d359\", opaque=\"\", stale=FALSE, algorithm=MD5";
-    hdr1._output         = "WWW-Authenticate: Digest realm=\"atlanta.com\", domain=\"sip:boxesbybob.com\", nonce=\"f84f1cec41e6cbe5aea9c8e88d359\", opaque=\"\", stale=FALSE, algorithm=MD5, qop=\"auth\"\r\n";
+    hdr1._input          = "WWW-Authenticate: Digest realm=\"atlanta.com\", domain=\"sip:boxesbybob.com\", qop=\"auth\", ";
+    hdr1._input         += "nonce=\"f84f1cec41e6cbe5aea9c8e88d359\", opaque=\"\", stale=FALSE, algorithm=MD5";
+    hdr1._output         = "WWW-Authenticate: Digest realm=\"atlanta.com\", domain=\"sip:boxesbybob.com\", ";
+    hdr1._output        += "nonce=\"f84f1cec41e6cbe5aea9c8e88d359\", opaque=\"\", stale=FALSE, algorithm=MD5, qop=\"auth\"\r\n";
     hdr1._header_nb      = 1;
     hdr1._decode_success = true;
     hdr1._encode_success = true;
@@ -2403,8 +2445,10 @@ SIP_Header_WWW_Authenticate_Test::SIP_Header_WWW_Authenticate_Test()
 
     SIP_Header_Input_Output hdr2;
     hdr2._header_type    = SIP_HEADER_WWW_AUTHENTICATE;
-    hdr2._input          = "WWW-Authenticate: Digest realm=\"biloxi.com\",qop=\"auth,auth-int\",  nonce=\"dcd98b7102dd2f0e8b11d0f600bfb0c093\",opaque=\"5ccc069c403ebaf9f0171e9517f40e41\"";
-    hdr2._output         = "WWW-Authenticate: Digest realm=\"biloxi.com\", nonce=\"dcd98b7102dd2f0e8b11d0f600bfb0c093\", opaque=\"5ccc069c403ebaf9f0171e9517f40e41\", qop=\"auth,auth-int\"\r\n";
+    hdr2._input          = "WWW-Authenticate: Digest realm=\"biloxi.com\",qop=\"auth,auth-int\",  ";
+    hdr2._input         += "nonce=\"dcd98b7102dd2f0e8b11d0f600bfb0c093\",opaque=\"5ccc069c403ebaf9f0171e9517f40e41\"";
+    hdr2._output         = "WWW-Authenticate: Digest realm=\"biloxi.com\", nonce=\"dcd98b7102dd2f0e8b11d0f600bfb0c093\", ";
+    hdr2._output        += "opaque=\"5ccc069c403ebaf9f0171e9517f40e41\", qop=\"auth,auth-int\"\r\n";
     hdr2._header_nb      = 1;
     hdr2._decode_success = true;
     hdr2._encode_success = true;
@@ -2421,8 +2465,10 @@ SIP_Header_WWW_Authenticate_Test::SIP_Header_WWW_Authenticate_Test()
 
     SIP_Header_Input_Output hdr4;
     hdr4._header_type    = SIP_HEADER_WWW_AUTHENTICATE;
-    hdr4._input          = "WWW-Authenticate: Digest\trealm=\"myrealm.com\",nonce=\"123456789012345678901\", domain=\"sip:myrealm.com\",algorithm=MD5";
-    hdr4._output         = "WWW-Authenticate: Digest realm=\"myrealm.com\", domain=\"sip:myrealm.com\", nonce=\"123456789012345678901\", algorithm=MD5\r\n";
+    hdr4._input          = "WWW-Authenticate: Digest\trealm=\"myrealm.com\",nonce=\"123456789012345678901\", ";
+    hdr4._input         += "domain=\"sip:myrealm.com\",algorithm=MD5";
+    hdr4._output         = "WWW-Authenticate: Digest realm=\"myrealm.com\", domain=\"sip:myrealm.com\", ";
+    hdr4._output        += "nonce=\"123456789012345678901\", algorithm=MD5\r\n";
     hdr4._header_nb      = 1;
     hdr4._decode_success = true;
     hdr4._encode_success = true;
@@ -2430,8 +2476,12 @@ SIP_Header_WWW_Authenticate_Test::SIP_Header_WWW_Authenticate_Test()
 
     SIP_Header_Input_Output hdr5;
     hdr5._header_type    = SIP_HEADER_WWW_AUTHENTICATE;
-    hdr5._input          = "WWW-Authenticate: Scheme1 param1, param2=test, nonce=\"123456789012345678901\",realm=\"server.com\",domain=\"sip:server.com\",qop=\"auth, auth-int, value\", opaque=\"11223344556677889900aabbccddeeff\", stale=true, par3=\"test\", algorithm=XYZ";
-    hdr5._output         = "WWW-Authenticate: Scheme1 realm=\"server.com\", domain=\"sip:server.com\", nonce=\"123456789012345678901\", opaque=\"11223344556677889900aabbccddeeff\", stale=true, algorithm=XYZ, qop=\"auth, auth-int, value\", param1, param2=test, par3=\"test\"\r\n";
+    hdr5._input          = "WWW-Authenticate: Scheme1 param1, param2=test, nonce=\"123456789012345678901\",";
+    hdr5._input         += "realm=\"server.com\",domain=\"sip:server.com\",qop=\"auth, auth-int, value\", ";
+    hdr5._input         += "opaque=\"11223344556677889900aabbccddeeff\", stale=true, par3=\"test\", algorithm=XYZ";
+    hdr5._output         = "WWW-Authenticate: Scheme1 realm=\"server.com\", domain=\"sip:server.com\", ";
+    hdr5._output        += "nonce=\"123456789012345678901\", opaque=\"11223344556677889900aabbccddeeff\", stale=true, ";
+    hdr5._output        += "algorithm=XYZ, qop=\"auth, auth-int, value\", param1, param2=test, par3=\"test\"\r\n";
     hdr5._header_nb      = 1;
     hdr5._decode_success = true;
     hdr5._encode_success = true;
