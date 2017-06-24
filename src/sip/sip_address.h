@@ -109,12 +109,15 @@ private:
 class SIP_Address
 {
 public:
-    SIP_Address() {}
+    SIP_Address() : _display_name_double_quote(true), _uri_angle_quote(true) {}
     SIP_Address(const SIP_Address &value) { *this = value; }
     ~SIP_Address() {}
 
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
+
+    void set_display_name_double_quote(bool quote) { _display_name_double_quote = quote; }
+    bool get_display_name_double_quote() { return _display_name_double_quote; }
 
     void set_display_name(std::string display_name) { _display_name = display_name; }
     std::string get_display_name() { return _display_name; }
@@ -124,13 +127,18 @@ public:
     SIP_Address_Scheme get_scheme();
     std::string get_scheme_str() { return _scheme; }
 
+    void set_uri_angle_quote(bool quote) { _uri_angle_quote = quote; }
+    bool get_uri_angle_quote() { return _uri_angle_quote; }
+
     SIP_URI &get_sip_uri() { return _sip_uri; }
     SIP_Absolute_URI &get_absolute_uri() { return _absolute_uri; }
 
 private:
+    bool _display_name_double_quote;
     std::string _display_name;
     std::string _scheme;
 
+    bool _uri_angle_quote;
     SIP_URI _sip_uri;
     SIP_Absolute_URI _absolute_uri;
 };

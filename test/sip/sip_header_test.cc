@@ -773,7 +773,7 @@ SIP_Header_Contact_Test::SIP_Header_Contact_Test()
     SIP_Header_Input_Output hdr1;
     hdr1._header_type    = SIP_HEADER_CONTACT;
     hdr1._input          = "Contact: sip:123456789@my-domain.org";
-    hdr1._output         = "Contact: <sip:123456789@my-domain.org>\r\n";
+    hdr1._output         = "Contact: sip:123456789@my-domain.org\r\n";
     hdr1._header_nb      = 1;
     hdr1._decode_success = true;
     hdr1._encode_success = true;
@@ -782,7 +782,7 @@ SIP_Header_Contact_Test::SIP_Header_Contact_Test()
     SIP_Header_Input_Output hdr2;
     hdr2._header_type    = SIP_HEADER_CONTACT;
     hdr2._input          = "Contact: sips:my-domain.org:5060;parameter1;parameter2;expires=60;parameter3;q=1.0";
-    hdr2._output         = "Contact: <sips:my-domain.org:5060>;expires=60;q=1.0;parameter1;parameter2;parameter3\r\n";
+    hdr2._output         = "Contact: sips:my-domain.org:5060;expires=60;q=1.0;parameter1;parameter2;parameter3\r\n";
     hdr2._header_nb      = 1;
     hdr2._decode_success = true;
     hdr2._encode_success = true;
@@ -793,7 +793,7 @@ SIP_Header_Contact_Test::SIP_Header_Contact_Test()
     hdr3._input          = "Contact:   Display name here <sip:my-domain.org;par;lr;ttl=160>;parameter1  ;q=0.5;  parameter2,";
     hdr3._input         += "tel:+123456789;par";
     hdr3._output         = "Contact: Display name here <sip:my-domain.org;ttl=160;lr;par>;q=0.5;parameter1;parameter2\r\n";
-    hdr3._output        += "Contact: <tel:+123456789>;par\r\n";
+    hdr3._output        += "Contact: tel:+123456789;par\r\n";
     hdr3._header_nb      = 2;
     hdr3._decode_success = true;
     hdr3._encode_success = true;
@@ -822,7 +822,7 @@ SIP_Header_Contact_Test::SIP_Header_Contact_Test()
     SIP_Header_Input_Output hdr6;
     hdr6._header_type    = SIP_HEADER_CONTACT;
     hdr6._input          = "Contact: sip:123456789:password@my-domain.org";
-    hdr6._output         = "Contact: <sip:123456789:password@my-domain.org>\r\n";
+    hdr6._output         = "Contact: sip:123456789:password@my-domain.org\r\n";
     hdr6._header_nb      = 1;
     hdr6._decode_success = true;
     hdr6._encode_success = true;
@@ -1331,7 +1331,7 @@ SIP_Header_From_Test::SIP_Header_From_Test()
     SIP_Header_Input_Output hdr6;
     hdr6._header_type    = SIP_HEADER_FROM;
     hdr6._input          = "From: sip:+12125551212@server.phone2net.com;tag=887s";
-    hdr6._output         = "From: <sip:+12125551212@server.phone2net.com>;tag=887s\r\n";
+    hdr6._output         = "From: sip:+12125551212@server.phone2net.com;tag=887s\r\n";
     hdr6._header_nb      = 1;
     hdr6._decode_success = true;
     hdr6._encode_success = true;
@@ -2246,7 +2246,7 @@ SIP_Header_To_Test::SIP_Header_To_Test()
     SIP_Header_Input_Output hdr2;
     hdr2._header_type    = SIP_HEADER_TO;
     hdr2._input          = "t: sip:+12125551212@server.phone2net.com;tag=287447";
-    hdr2._output         = "To: <sip:+12125551212@server.phone2net.com>;tag=287447\r\n";
+    hdr2._output         = "To: sip:+12125551212@server.phone2net.com;tag=287447\r\n";
     hdr2._header_nb      = 1;
     hdr2._decode_success = true;
     hdr2._encode_success = true;
@@ -2254,7 +2254,7 @@ SIP_Header_To_Test::SIP_Header_To_Test()
 
     SIP_Header_Input_Output hdr3;
     hdr3._header_type    = SIP_HEADER_TO;
-    hdr3._input          = "To: \"Name\" <sip:+12125551212@server.phone2net.com ;par1 ;par2> ; tag=287447;parameter1 ";
+    hdr3._input          = "To: \" Name  \" <sip:+12125551212@server.phone2net.com ;par1 ;par2> ; tag=287447;parameter1 ";
     hdr3._output         = "To: \"Name\" <sip:+12125551212@server.phone2net.com;par1;par2>;tag=287447;parameter1\r\n";
     hdr3._header_nb      = 1;
     hdr3._decode_success = true;
@@ -2280,6 +2280,15 @@ SIP_Header_To_Test::SIP_Header_To_Test()
     hdr5._decode_success = true;
     hdr5._encode_success = true;
     _header_input_output.push_back(hdr5);
+
+    SIP_Header_Input_Output hdr6;
+    hdr6._header_type    = SIP_HEADER_TO;
+    hdr6._input          = "To: \"  \" <sip:operator:123456@cs.columbia.edu ; par1> ; par2";
+    hdr6._output         = "To: <sip:operator:123456@cs.columbia.edu;par1>;par2\r\n";
+    hdr6._header_nb      = 1;
+    hdr6._decode_success = true;
+    hdr6._encode_success = true;
+    _header_input_output.push_back(hdr6);
 }
 
 //-------------------------------------------

@@ -291,18 +291,41 @@ bool SIP_Absolute_URI::encode(std::string &sip_msg)
 
 bool SIP_Address::decode(std::string &sip_msg)
 {
-    std::string display_name;
+    std::string display;
     std::string uri;
 
-    if (SIP_Functions::match(sip_msg, "<", display_name, true))
+    if (SIP_Functions::match(sip_msg, "<", display, true))
     {
-        SIP_Functions::trim(display_name);
-        _display_name = display_name;
+        SIP_Functions::trim(display);
+
+        if (!display.empty())
+        {
+            if ((display.size() >= 2) && (display.front() == '\"') && (display.back() == '\"'))
+            {
+                _display_name_double_quote = true;
+
+                display.erase(0, 1);
+                display.erase(display.size() - 1);
+
+                SIP_Functions::trim(display);
+            }else
+                _display_name_double_quote = false;
+
+            _display_name = display;
+        }else
+            _display_name_double_quote = false;
 
         if (!SIP_Functions::match(sip_msg, ">", uri, true))
             return false;
+
+        _uri_angle_quote = true;
     }else
+    {
+        _display_name_double_quote = false;
+        _uri_angle_quote = false;
+
         uri = sip_msg;
+    }
 
     SIP_Functions::trim(uri);
 
@@ -346,11 +369,20 @@ bool SIP_Address::encode(std::string &sip_msg)
 
     if (!_display_name.empty())
     {
+        if (_display_name_double_quote)
+            sip_msg += "\"";
+
         sip_msg += _display_name;
+
+        if (_display_name_double_quote)
+            sip_msg += "\"";
+
         sip_msg += " ";
     }
 
-    sip_msg += "<";
+    if (_uri_angle_quote)
+        sip_msg += "<";
+
     sip_msg += _scheme;
     sip_msg += ":";
 
@@ -372,7 +404,9 @@ bool SIP_Address::encode(std::string &sip_msg)
         }
     }
 
-    sip_msg += ">";
+    if (_uri_angle_quote)
+        sip_msg += ">";
+
     return true;
 }
 
