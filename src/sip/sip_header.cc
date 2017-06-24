@@ -217,7 +217,7 @@ SIP_Header *SIP_Header::create_header(SIP_Header_Type header_type, const SIP_Hea
 
 //-------------------------------------------
 
-bool SIP_Header::decode_headers(std::string &sip_msg, std::map<SIP_Header_Type, std::list<SIP_Header *>> &headers)
+bool SIP_Header::decode_headers(std::string &sip_msg, std::list<SIP_Header *> &headers)
 {
     std::string type;
     bool matched = SIP_Functions::match(sip_msg, ":", type);
@@ -261,16 +261,8 @@ bool SIP_Header::decode_headers(std::string &sip_msg, std::map<SIP_Header_Type, 
             return false;
         }
 
-        if (headers.count(header_type) > 0)
-        {
-            std::list<SIP_Header *> &header_list = headers.at(header_type);
-            header_list.push_back(header);
-        }else
-        {
-            std::list<SIP_Header *> header_list;
-            header_list.push_back(header);
-            headers[header_type] = header_list;
-        }
+        headers.push_back(header);
+
     }while (matched);
 
     return true;
@@ -278,48 +270,44 @@ bool SIP_Header::decode_headers(std::string &sip_msg, std::map<SIP_Header_Type, 
 
 //-------------------------------------------
 
-bool SIP_Header::encode_headers(std::string &sip_msg, std::map<SIP_Header_Type, std::list<SIP_Header *>> &headers)
+bool SIP_Header::encode_headers(std::string &sip_msg, std::list<SIP_Header *> &headers)
 {
-    std::map<SIP_Header_Type, std::list<SIP_Header *>>::iterator it1 = headers.begin();
-    while (it1 != headers.end())
+    std::string type;
+
+    std::list<SIP_Header *>::const_iterator it = headers.begin();
+    while (it != headers.end())
     {
-        SIP_Header_Type header_type = it1->first;
-        std::list<SIP_Header *> header_list = it1->second;
-        it1++;
+        SIP_Header *header = *it;
 
-        std::string type = SIP_Functions::get_header_type(header_type);
-        if (type.empty())
+        if (it++ == headers.begin())
         {
-            std::cout << "SIP_Header::encode_headers -> Failed to get header type (header=" << header_type << ")\n";
-            return false;
-        }
+            SIP_Header_Type header_type = header->get_header_type();
 
-        sip_msg += type;
-        sip_msg += ": ";
-
-        std::list<SIP_Header *>::iterator it2 = header_list.begin();
-        while (it2 != header_list.end())
-        {
-            SIP_Header *header = *it2;
-
-            if (it2++ != header_list.begin())
+            type = SIP_Functions::get_header_type(header_type);
+            if (type.empty())
             {
-                switch (header->encode_separator())
-                {
-                    case SIP_HEADER_SEPARATOR_NONE:     return false;
-                    case SIP_HEADER_SEPARATOR_COMMA:    sip_msg += ", ";                    break;
-                    case SIP_HEADER_SEPARATOR_CRLF:     sip_msg += "\r\n" + type + ": ";    break;
-                    default:                                                                break;
-                }
+                std::cout << "SIP_Header::encode_headers -> Failed to get header type (header=" << header_type << ")\n";
+                return false;
             }
 
-            if (!header->encode(sip_msg))
-                return false;
+            sip_msg += type;
+            sip_msg += ": ";
+        }else
+        {
+            switch (header->encode_separator())
+            {
+                case SIP_HEADER_SEPARATOR_NONE:     return false;
+                case SIP_HEADER_SEPARATOR_COMMA:    sip_msg += ", ";                    break;
+                case SIP_HEADER_SEPARATOR_CRLF:     sip_msg += "\r\n" + type + ": ";    break;
+                default:                                                                break;
+            }
         }
 
-        sip_msg += "\r\n";
+        if (!header->encode(sip_msg))
+            return false;
     }
 
+    sip_msg += "\r\n";
     return true;
 }
 

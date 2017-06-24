@@ -37,6 +37,8 @@ public:
     bool encode_body(std::string &sip_msg);
 
     void add_header(SIP_Header *header);
+    void add_headers(std::list<SIP_Header *> &headers);
+
     SIP_Header *get_header(SIP_Header_Type header_type, unsigned short pos = 0);
     unsigned int get_num_header(SIP_Header_Type header_type);
 

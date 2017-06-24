@@ -26,10 +26,8 @@ public:
 
     bool run();
 
-    bool copy_headers(std::map<SIP_Header_Type, std::list<SIP_Header *>> &headers,
-                      std::map<SIP_Header_Type, std::list<SIP_Header *>> &copy);
-    void add_header(std::map<SIP_Header_Type, std::list<SIP_Header *>> &headers, SIP_Header *header);
-    void clear(std::map<SIP_Header_Type, std::list<SIP_Header *>> &headers);
+    bool copy_headers(std::list<SIP_Header *> &headers, std::list<SIP_Header *> &copy);
+    void clear(std::list<SIP_Header *> &headers);
 
 protected:
     class SIP_Header_Input_Output

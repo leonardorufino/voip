@@ -23,8 +23,8 @@ public:
     virtual ~SIP_Header() {}
 
     static SIP_Header *create_header(SIP_Header_Type header_type, const SIP_Header *copy = NULL);
-    static bool decode_headers(std::string &sip_msg, std::map<SIP_Header_Type, std::list<SIP_Header *>> &headers);
-    static bool encode_headers(std::string &sip_msg, std::map<SIP_Header_Type, std::list<SIP_Header *>> &headers);
+    static bool decode_headers(std::string &sip_msg, std::list<SIP_Header *> &headers);
+    static bool encode_headers(std::string &sip_msg, std::list<SIP_Header *> &headers);
 
     // Virtual pure functions
     virtual SIP_Header_Type get_header_type() = 0;
