@@ -252,8 +252,19 @@ bool SIP_Header_Test::run()
             return false;
         }
 
+        std::map<SIP_Header_Type, std::list<SIP_Header *>> copy;
+        if (!copy_headers(headers, copy))
+        {
+            std::cout << "SIP_Header_Test::run -> Failed to copy headers:\n";
+            std::cout << std::setw(12) << "Type: " << header_input_output._header_type << "\n";
+            std::cout << std::setw(12) << "Input: " << header_input_output._input.c_str() << "\n";
+            return false;
+        }
+
+        clear(headers);
+
         std::string output;
-        bool encode = SIP_Header::encode_headers(output, headers);
+        bool encode = SIP_Header::encode_headers(output, copy);
 
         if (header_input_output._encode_success != encode)
         {
@@ -267,7 +278,7 @@ bool SIP_Header_Test::run()
 
         if (!encode)
         {
-            clear(headers);
+            clear(copy);
             continue;
         }
 
@@ -281,7 +292,7 @@ bool SIP_Header_Test::run()
             return false;
         }
 
-        clear(headers);
+        clear(copy);
     }
 
     return true;
@@ -289,15 +300,60 @@ bool SIP_Header_Test::run()
 
 //-------------------------------------------
 
-void SIP_Header_Test::clear(std::map<SIP_Header_Type, std::list<SIP_Header *>> &headers)
+bool SIP_Header_Test::copy_headers(std::map<SIP_Header_Type, std::list<SIP_Header *>> &headers,
+                                   std::map<SIP_Header_Type, std::list<SIP_Header *>> &copy)
 {
-    std::map<SIP_Header_Type, std::list<SIP_Header *>>::iterator it1 = headers.begin();
+    std::map<SIP_Header_Type, std::list<SIP_Header *>>::const_iterator it1 = headers.begin();
     while (it1 != headers.end())
     {
         std::list<SIP_Header *> header_list = it1->second;
         it1++;
 
-        std::list<SIP_Header *>::iterator it2 = header_list.begin();
+        std::list<SIP_Header *>::const_iterator it2 = header_list.begin();
+        while (it2 != header_list.end())
+        {
+            SIP_Header *header = *it2++;
+
+            SIP_Header *new_header = SIP_Header::create_header(header->get_header_type(), header);
+            if (!new_header)
+                return false;
+
+            add_header(copy, new_header);
+        }
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+
+void SIP_Header_Test::add_header(std::map<SIP_Header_Type, std::list<SIP_Header *>> &headers, SIP_Header *header)
+{
+    SIP_Header_Type header_type = header->get_header_type();
+
+    if (headers.count(header_type) > 0)
+    {
+        std::list<SIP_Header *> &header_list = headers.at(header_type);
+        header_list.push_back(header);
+    }else
+    {
+        std::list<SIP_Header *> header_list;
+        header_list.push_back(header);
+        headers[header_type] = header_list;
+    }
+}
+
+//-------------------------------------------
+
+void SIP_Header_Test::clear(std::map<SIP_Header_Type, std::list<SIP_Header *>> &headers)
+{
+    std::map<SIP_Header_Type, std::list<SIP_Header *>>::const_iterator it1 = headers.begin();
+    while (it1 != headers.end())
+    {
+        std::list<SIP_Header *> header_list = it1->second;
+        it1++;
+
+        std::list<SIP_Header *>::const_iterator it2 = header_list.begin();
         while (it2 != header_list.end())
             delete *it2++;
     }
