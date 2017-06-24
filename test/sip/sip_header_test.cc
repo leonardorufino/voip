@@ -218,7 +218,7 @@ bool SIP_Header_Test::run()
     {
         SIP_Header_Input_Output header_input_output = *it++;
 
-        std::list<SIP_Header *> headers;
+        sip_header_list headers;
 
         std::string input = header_input_output._input;
         bool decode = SIP_Header::decode_headers(input, headers);
@@ -249,7 +249,7 @@ bool SIP_Header_Test::run()
             return false;
         }
 
-        std::list<SIP_Header *> copy;
+        sip_header_list copy;
         if (!copy_headers(headers, copy))
         {
             std::cout << "SIP_Header_Test::run -> Failed to copy headers:\n";
@@ -297,9 +297,9 @@ bool SIP_Header_Test::run()
 
 //-------------------------------------------
 
-bool SIP_Header_Test::copy_headers(std::list<SIP_Header *> &headers, std::list<SIP_Header *> &copy)
+bool SIP_Header_Test::copy_headers(sip_header_list &headers, sip_header_list &copy)
 {
-    std::list<SIP_Header *>::const_iterator it = headers.begin();
+    sip_header_list::const_iterator it = headers.begin();
     while (it != headers.end())
     {
         SIP_Header *header = *it++;
@@ -316,9 +316,9 @@ bool SIP_Header_Test::copy_headers(std::list<SIP_Header *> &headers, std::list<S
 
 //-------------------------------------------
 
-void SIP_Header_Test::clear(std::list<SIP_Header *> &headers)
+void SIP_Header_Test::clear(sip_header_list &headers)
 {
-    std::list<SIP_Header *>::const_iterator it = headers.begin();
+    sip_header_list::const_iterator it = headers.begin();
     while (it != headers.end())
         delete *it++;
 

@@ -16,7 +16,7 @@
 #include <map>
 #include <list>
 
-typedef std::map<SIP_Header_Type, std::list<SIP_Header *>> sip_header_map;
+typedef std::map<SIP_Header_Type, sip_header_list> sip_header_map;
 
 class SIP_Message
 {
@@ -40,10 +40,10 @@ public:
     bool encode_body(std::string &sip_msg);
 
     void add_header(SIP_Header *header);
-    void add_headers(std::list<SIP_Header *> &headers);
+    void add_headers(sip_header_list &headers);
 
     SIP_Header *get_header(SIP_Header_Type header_type, unsigned short pos = 0);
-    unsigned int get_num_header(SIP_Header_Type header_type);
+    unsigned short get_num_header(SIP_Header_Type header_type);
 
 private:
     sip_header_map _headers;

@@ -217,7 +217,7 @@ SIP_Header *SIP_Header::create_header(SIP_Header_Type header_type, const SIP_Hea
 
 //-------------------------------------------
 
-bool SIP_Header::decode_headers(std::string &sip_msg, std::list<SIP_Header *> &headers)
+bool SIP_Header::decode_headers(std::string &sip_msg, sip_header_list &headers)
 {
     std::string type;
     bool matched = SIP_Functions::match(sip_msg, ":", type);
@@ -270,11 +270,11 @@ bool SIP_Header::decode_headers(std::string &sip_msg, std::list<SIP_Header *> &h
 
 //-------------------------------------------
 
-bool SIP_Header::encode_headers(std::string &sip_msg, std::list<SIP_Header *> &headers)
+bool SIP_Header::encode_headers(std::string &sip_msg, sip_header_list &headers)
 {
     std::string type;
 
-    std::list<SIP_Header *>::const_iterator it = headers.begin();
+    sip_header_list::const_iterator it = headers.begin();
     while (it != headers.end())
     {
         SIP_Header *header = *it;

@@ -21,11 +21,11 @@ SIP_Message::SIP_Message(const SIP_Message &message)
     sip_header_map::const_iterator it1 = message._headers.begin();
     while (it1 != message._headers.end())
     {
-        std::list<SIP_Header *> header_list = it1->second;
+        sip_header_list headers = it1->second;
         it1++;
 
-        std::list<SIP_Header *>::iterator it2 = header_list.begin();
-        while (it2 != header_list.end())
+        sip_header_list::iterator it2 = headers.begin();
+        while (it2 != headers.end())
         {
             SIP_Header *header = *it2++;
             SIP_Header *new_header = SIP_Header::create_header(header->get_header_type(), header);
@@ -41,11 +41,11 @@ SIP_Message::~SIP_Message()
     sip_header_map::iterator it1 = _headers.begin();
     while (it1 != _headers.end())
     {
-        std::list<SIP_Header *> header_list = it1->second;
+        sip_header_list headers = it1->second;
         it1++;
 
-        std::list<SIP_Header *>::iterator it2 = header_list.begin();
-        while (it2 != header_list.end())
+        sip_header_list::iterator it2 = headers.begin();
+        while (it2 != headers.end())
             delete *it2++;
     }
 
@@ -112,7 +112,7 @@ bool SIP_Message::decode_header(std::string &sip_msg)
         if ((!ret) || (line.empty()))
             return true;
 
-        std::list<SIP_Header *> headers;
+        sip_header_list headers;
 
         if (!SIP_Header::decode_headers(line, headers))
             return false;
@@ -161,7 +161,7 @@ bool SIP_Message::encode_header(std::string &sip_msg, std::string &body_msg)
     sip_header_map::const_iterator it = _headers.begin();
     while (it != _headers.end())
     {
-        std::list<SIP_Header *> headers = it->second;
+        sip_header_list headers = it->second;
         it++;
 
         if (!SIP_Header::encode_headers(sip_msg, headers))
@@ -192,24 +192,24 @@ void SIP_Message::add_header(SIP_Header *header)
 
     if (_headers.count(header_type) > 0)
     {
-        std::list<SIP_Header *> &header_list = _headers.at(header_type);
-        header_list.push_back(header);
+        sip_header_list &headers = _headers.at(header_type);
+        headers.push_back(header);
     }else
     {
-        std::list<SIP_Header *> header_list;
-        header_list.push_back(header);
-        _headers[header_type] = header_list;
+        sip_header_list headers;
+        headers.push_back(header);
+        _headers[header_type] = headers;
     }
 }
 
 //-------------------------------------------
 
-void SIP_Message::add_headers(std::list<SIP_Header *> &headers)
+void SIP_Message::add_headers(sip_header_list &headers)
 {
     if (headers.empty())
         return;
 
-    std::list<SIP_Header *>::const_iterator it = headers.begin();
+    sip_header_list::const_iterator it = headers.begin();
     while (it != headers.end())
     {
         SIP_Header *header = *it++;
@@ -226,9 +226,9 @@ SIP_Header *SIP_Message::get_header(SIP_Header_Type header_type, unsigned short 
 
     unsigned int count = 0;
 
-    std::list<SIP_Header *> &header_list = _headers.at(header_type);
-    std::list<SIP_Header *>::iterator it = header_list.begin();
-    while (it != header_list.end())
+    sip_header_list &headers = _headers.at(header_type);
+    sip_header_list::iterator it = headers.begin();
+    while (it != headers.end())
     {
         SIP_Header *header = *it++;
 
@@ -241,13 +241,13 @@ SIP_Header *SIP_Message::get_header(SIP_Header_Type header_type, unsigned short 
 
 //-------------------------------------------
 
-unsigned int SIP_Message::get_num_header(SIP_Header_Type header_type)
+unsigned short SIP_Message::get_num_header(SIP_Header_Type header_type)
 {
     if (_headers.count(header_type) == 0)
         return 0;
 
-    std::list<SIP_Header *> &header_list = _headers.at(header_type);
-    return (unsigned int) header_list.size();
+    sip_header_list &headers = _headers.at(header_type);
+    return (unsigned short) headers.size();
 }
 
 //-------------------------------------------

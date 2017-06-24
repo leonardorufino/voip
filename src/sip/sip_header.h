@@ -15,6 +15,9 @@
 #include "sip_address.h"
 #include <list>
 
+class SIP_Header;
+typedef std::list<SIP_Header *> sip_header_list;
+
 class SIP_Header
 {
 public:
@@ -22,8 +25,8 @@ public:
     virtual ~SIP_Header() {}
 
     static SIP_Header *create_header(SIP_Header_Type header_type, const SIP_Header *copy = NULL);
-    static bool decode_headers(std::string &sip_msg, std::list<SIP_Header *> &headers);
-    static bool encode_headers(std::string &sip_msg, std::list<SIP_Header *> &headers);
+    static bool decode_headers(std::string &sip_msg, sip_header_list &headers);
+    static bool encode_headers(std::string &sip_msg, sip_header_list &headers);
 
     // Virtual pure functions
     virtual SIP_Header_Type get_header_type() = 0;
