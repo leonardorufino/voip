@@ -48,8 +48,19 @@ bool SIP_Message_Test::run()
             return false;
         }
 
+        SIP_Message *copy = copy_message(*message);
+        if (!copy)
+        {
+            std::cout << "SIP_Message_Test::run -> Failed to copy message:\n";
+            std::cout << std::setw(12) << "Input: " << message_input_output._input.c_str() << "\n";
+            return false;
+        }
+
+        delete message;
+        message = NULL;
+
         std::string output;
-        if (!message->encode(output))
+        if (!copy->encode(output))
         {
             std::cout << "SIP_Message_Test::run -> Failed to encode message:\n";
             std::cout << std::setw(12) << "Input: " << message_input_output._input.c_str() << "\n";
@@ -65,10 +76,40 @@ bool SIP_Message_Test::run()
             return false;
         }
 
-        delete message;
+        delete copy;
+        copy = NULL;
     }
 
     return true;
+}
+
+//-------------------------------------------
+
+SIP_Message *SIP_Message_Test::copy_message(SIP_Message &message)
+{
+    SIP_Message *copy = NULL;
+
+    switch (message.get_message_type())
+    {
+        case SIP_RESPONSE:
+        {
+            SIP_Response &response = dynamic_cast<SIP_Response &>(message);
+            copy = new SIP_Response(response);
+            break;
+        }
+
+        case SIP_METHOD_TYPE_INVALID:
+            break;
+
+        default:
+        {
+            SIP_Request &request = dynamic_cast<SIP_Request &>(message);
+            copy = new SIP_Request(request);
+            break;
+        }
+    }
+
+    return copy;
 }
 
 //-------------------------------------------

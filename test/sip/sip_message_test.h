@@ -29,6 +29,8 @@ public:
 
     bool run();
 
+    SIP_Message *copy_message(SIP_Message &message);
+
 protected:
     class SIP_Message_Input_Output
     {
