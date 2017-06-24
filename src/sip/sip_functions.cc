@@ -57,6 +57,8 @@ SIP_Method_Type SIP_Functions::get_method_type(const std::string method)
         return SIP_REQUEST_BYE;
     else if (method == "CANCEL")
         return SIP_REQUEST_CANCEL;
+    else if (method == "INFO")
+        return SIP_REQUEST_INFO;
     else if (method == "INVITE")
         return SIP_REQUEST_INVITE;
     else if (method == "MESSAGE")
@@ -65,10 +67,18 @@ SIP_Method_Type SIP_Functions::get_method_type(const std::string method)
         return SIP_REQUEST_NOTIFY;
     else if (method == "OPTIONS")
         return SIP_REQUEST_OPTIONS;
+    else if (method == "PRACK")
+        return SIP_REQUEST_PRACK;
+    else if (method == "PUBLISH")
+        return SIP_REQUEST_PUBLISH;
+    else if (method == "REFER")
+        return SIP_REQUEST_REFER;
     else if (method == "REGISTER")
         return SIP_REQUEST_REGISTER;
     else if (method == "SUBSCRIBE")
         return SIP_REQUEST_SUBSCRIBE;
+    else if (method == "UPDATE")
+        return SIP_REQUEST_UPDATE;
     else if (method == SIP_VERSION)
         return SIP_RESPONSE;
 
@@ -84,12 +94,17 @@ std::string SIP_Functions::get_method_type(SIP_Method_Type method)
         case SIP_REQUEST_ACK:       return "ACK";
         case SIP_REQUEST_BYE:       return "BYE";
         case SIP_REQUEST_CANCEL:    return "CANCEL";
+        case SIP_REQUEST_INFO:      return "INFO";
         case SIP_REQUEST_INVITE:    return "INVITE";
         case SIP_REQUEST_MESSAGE:   return "MESSAGE";
         case SIP_REQUEST_NOTIFY:    return "NOTIFY";
         case SIP_REQUEST_OPTIONS:   return "OPTIONS";
+        case SIP_REQUEST_PRACK:     return "PRACK";
+        case SIP_REQUEST_PUBLISH:   return "PUBLISH";
+        case SIP_REQUEST_REFER:     return "REFER";
         case SIP_REQUEST_REGISTER:  return "REGISTER";
         case SIP_REQUEST_SUBSCRIBE: return "SUBSCRIBE";
+        case SIP_REQUEST_UPDATE:    return "UPDATE";
         case SIP_RESPONSE:          return SIP_VERSION;
         default:                    return "";
     }
