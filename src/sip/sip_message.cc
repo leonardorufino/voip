@@ -24,7 +24,7 @@ SIP_Message::SIP_Message(const SIP_Message &message)
         sip_header_list headers = it1->second;
         it1++;
 
-        sip_header_list::iterator it2 = headers.begin();
+        sip_header_list::const_iterator it2 = headers.begin();
         while (it2 != headers.end())
         {
             SIP_Header *header = *it2++;
@@ -38,15 +38,18 @@ SIP_Message::SIP_Message(const SIP_Message &message)
 
 SIP_Message::~SIP_Message()
 {
-    sip_header_map::iterator it1 = _headers.begin();
+    sip_header_map::const_iterator it1 = _headers.begin();
     while (it1 != _headers.end())
     {
         sip_header_list headers = it1->second;
         it1++;
 
-        sip_header_list::iterator it2 = headers.begin();
+        sip_header_list::const_iterator it2 = headers.begin();
         while (it2 != headers.end())
-            delete *it2++;
+        {
+            SIP_Header *header = *it2++;
+            delete header;
+        }
     }
 
     _headers.clear();
@@ -227,7 +230,7 @@ SIP_Header *SIP_Message::get_header(SIP_Header_Type header_type, unsigned short 
     unsigned int count = 0;
 
     sip_header_list &headers = _headers.at(header_type);
-    sip_header_list::iterator it = headers.begin();
+    sip_header_list::const_iterator it = headers.begin();
     while (it != headers.end())
     {
         SIP_Header *header = *it++;

@@ -456,7 +456,7 @@ bool SIP_Challenge::encode(std::string &sip_msg)
         first_param = false;
     }
 
-    std::list<std::string>::iterator it = _parameters.begin();
+    std::list<std::string>::const_iterator it = _parameters.begin();
     while (it != _parameters.end())
     {
         sip_msg += (first_param) ? " " : ", ";
@@ -657,7 +657,7 @@ bool SIP_Credential::encode(std::string &sip_msg)
         first_param = false;
     }
 
-    std::list<std::string>::iterator it = _parameters.begin();
+    std::list<std::string>::const_iterator it = _parameters.begin();
     while (it != _parameters.end())
     {
         sip_msg += (first_param) ? " " : ", ";
@@ -725,7 +725,7 @@ bool SIP_Media_Range::encode(std::string &sip_msg)
         sip_msg += _q;
     }
 
-    std::list<std::string>::iterator it = _parameters.begin();
+    std::list<std::string>::const_iterator it = _parameters.begin();
     while (it != _parameters.end())
     {
         sip_msg += ";";
@@ -845,7 +845,7 @@ bool SIP_Event_Type::encode(std::string &sip_msg)
 
     sip_msg += _package;
 
-    std::list<std::string>::iterator it = _templates.begin();
+    std::list<std::string>::const_iterator it = _templates.begin();
     while (it != _templates.end())
     {
         sip_msg += ".";
@@ -956,7 +956,7 @@ bool SIP_Header_Accept_Encoding::encode(std::string &sip_msg)
         sip_msg += _q;
     }
 
-    std::list<std::string>::iterator it = _parameters.begin();
+    std::list<std::string>::const_iterator it = _parameters.begin();
     while (it != _parameters.end())
     {
         sip_msg += ";";
@@ -1015,7 +1015,7 @@ bool SIP_Header_Accept_Language::encode(std::string &sip_msg)
         sip_msg += _q;
     }
 
-    std::list<std::string>::iterator it = _parameters.begin();
+    std::list<std::string>::const_iterator it = _parameters.begin();
     while (it != _parameters.end())
     {
         sip_msg += ";";
@@ -1053,7 +1053,7 @@ bool SIP_Header_Alert_Info::encode(std::string &sip_msg)
     if (!_address.encode(sip_msg))
         return false;
 
-    std::list<std::string>::iterator it = _parameters.begin();
+    std::list<std::string>::const_iterator it = _parameters.begin();
     while (it != _parameters.end())
     {
         sip_msg += ";";
@@ -1221,7 +1221,7 @@ bool SIP_Header_Authentication_Info::encode(std::string &sip_msg)
         first_param = false;
     }
 
-    std::list<std::string>::iterator it = _parameters.begin();
+    std::list<std::string>::const_iterator it = _parameters.begin();
     while (it != _parameters.end())
     {
         sip_msg += (first_param) ? "" : ", ";
@@ -1313,7 +1313,7 @@ bool SIP_Header_Call_Info::encode(std::string &sip_msg)
         sip_msg += _purpose;
     }
 
-    std::list<std::string>::iterator it = _parameters.begin();
+    std::list<std::string>::const_iterator it = _parameters.begin();
     while (it != _parameters.end())
     {
         sip_msg += ";";
@@ -1425,7 +1425,7 @@ bool SIP_Header_Contact::encode(std::string &sip_msg)
         sip_msg += _q;
     }
 
-    std::list<std::string>::iterator it = _parameters.begin();
+    std::list<std::string>::const_iterator it = _parameters.begin();
     while (it != _parameters.end())
     {
         sip_msg += ";";
@@ -1482,7 +1482,7 @@ bool SIP_Header_Content_Disposition::encode(std::string &sip_msg)
         sip_msg += _handling;
     }
 
-    std::list<std::string>::iterator it = _parameters.begin();
+    std::list<std::string>::const_iterator it = _parameters.begin();
     while (it != _parameters.end())
     {
         sip_msg += ";";
@@ -1940,7 +1940,7 @@ bool SIP_Header_Error_Info::encode(std::string &sip_msg)
     if (!_address.encode(sip_msg))
         return false;
 
-    std::list<std::string>::iterator it = _parameters.begin();
+    std::list<std::string>::const_iterator it = _parameters.begin();
     while (it != _parameters.end())
     {
         sip_msg += ";";
@@ -1992,7 +1992,7 @@ bool SIP_Header_Event::encode(std::string &sip_msg)
         sip_msg += _id;
     }
 
-    std::list<std::string>::iterator it = _parameters.begin();
+    std::list<std::string>::const_iterator it = _parameters.begin();
     while (it != _parameters.end())
     {
         sip_msg += ";";
@@ -2069,7 +2069,7 @@ bool SIP_Header_From::encode(std::string &sip_msg)
         sip_msg += _tag;
     }
 
-    std::list<std::string>::iterator it = _parameters.begin();
+    std::list<std::string>::const_iterator it = _parameters.begin();
     while (it != _parameters.end())
     {
         sip_msg += ";";
@@ -2358,7 +2358,7 @@ bool SIP_Header_Record_Route::encode(std::string &sip_msg)
     if (!_address.encode(sip_msg))
         return false;
 
-    std::list<std::string>::iterator it = _parameters.begin();
+    std::list<std::string>::const_iterator it = _parameters.begin();
     while (it != _parameters.end())
     {
         sip_msg += ";";
@@ -2396,7 +2396,7 @@ bool SIP_Header_Reply_To::encode(std::string &sip_msg)
     if (!_address.encode(sip_msg))
         return false;
 
-    std::list<std::string>::iterator it = _parameters.begin();
+    std::list<std::string>::const_iterator it = _parameters.begin();
     while (it != _parameters.end())
     {
         sip_msg += ";";
@@ -2508,7 +2508,7 @@ bool SIP_Header_Retry_After::encode(std::string &sip_msg)
         sip_msg += std::to_string(_duration);
     }
 
-    std::list<std::string>::iterator it = _parameters.begin();
+    std::list<std::string>::const_iterator it = _parameters.begin();
     while (it != _parameters.end())
     {
         sip_msg += ";";
@@ -2546,7 +2546,7 @@ bool SIP_Header_Route::encode(std::string &sip_msg)
     if (!_address.encode(sip_msg))
         return false;
 
-    std::list<std::string>::iterator it = _parameters.begin();
+    std::list<std::string>::const_iterator it = _parameters.begin();
     while (it != _parameters.end())
     {
         sip_msg += ";";
@@ -2687,7 +2687,7 @@ bool SIP_Header_Subscription_State::encode(std::string &sip_msg)
         sip_msg += std::to_string(_retry_after);
     }
 
-    std::list<std::string>::iterator it = _parameters.begin();
+    std::list<std::string>::const_iterator it = _parameters.begin();
     while (it != _parameters.end())
     {
         sip_msg += ";";
@@ -2874,7 +2874,7 @@ bool SIP_Header_To::encode(std::string &sip_msg)
         sip_msg += _tag;
     }
 
-    std::list<std::string>::iterator it = _parameters.begin();
+    std::list<std::string>::const_iterator it = _parameters.begin();
     while (it != _parameters.end())
     {
         sip_msg += ";";
@@ -3076,7 +3076,7 @@ bool SIP_Header_Via::encode(std::string &sip_msg)
         sip_msg += _maddr;
     }
 
-    std::list<std::string>::iterator it = _parameters.begin();
+    std::list<std::string>::const_iterator it = _parameters.begin();
     while (it != _parameters.end())
     {
         sip_msg += ";";

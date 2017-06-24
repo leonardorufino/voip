@@ -34,7 +34,7 @@ bool SIP_Message_Test::init()
 
 bool SIP_Message_Test::run()
 {
-    std::list<SIP_Message_Input_Output>::iterator it = _message_input_output.begin();
+    std::list<SIP_Message_Input_Output>::const_iterator it = _message_input_output.begin();
     while (it != _message_input_output.end())
     {
         SIP_Message_Input_Output message_input_output = *it++;

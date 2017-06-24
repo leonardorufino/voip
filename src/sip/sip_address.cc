@@ -189,14 +189,14 @@ bool SIP_URI::encode(std::string &sip_msg)
     if (_lr)
         sip_msg += ";lr";
 
-    std::list<std::string>::iterator it_params = _parameters.begin();
+    std::list<std::string>::const_iterator it_params = _parameters.begin();
     while (it_params != _parameters.end())
     {
         sip_msg += ";";
         sip_msg += *it_params++;
     }
 
-    std::list<std::string>::iterator it_headers = _headers.begin();
+    std::list<std::string>::const_iterator it_headers = _headers.begin();
     while (it_headers != _headers.end())
     {
         if (it_headers == _headers.begin())

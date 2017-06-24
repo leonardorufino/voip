@@ -213,7 +213,7 @@ bool SIP_Header_Test::init()
 
 bool SIP_Header_Test::run()
 {
-    std::list<SIP_Header_Input_Output>::iterator it = _header_input_output.begin();
+    std::list<SIP_Header_Input_Output>::const_iterator it = _header_input_output.begin();
     while (it != _header_input_output.end())
     {
         SIP_Header_Input_Output header_input_output = *it++;
