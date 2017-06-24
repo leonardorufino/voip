@@ -13,7 +13,10 @@
 
 #include "sip_defs.h"
 #include "sip_header.h"
+#include <map>
 #include <list>
+
+typedef std::map<SIP_Header_Type, std::list<SIP_Header *>> sip_header_map;
 
 class SIP_Message
 {
@@ -43,5 +46,5 @@ public:
     unsigned int get_num_header(SIP_Header_Type header_type);
 
 private:
-    std::map<SIP_Header_Type, std::list<SIP_Header *>> _headers;
+    sip_header_map _headers;
 };

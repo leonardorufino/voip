@@ -13,7 +13,6 @@
 
 #include "sip_defs.h"
 #include "sip_address.h"
-#include <map>
 #include <list>
 
 class SIP_Header

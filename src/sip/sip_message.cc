@@ -18,7 +18,7 @@
 
 SIP_Message::SIP_Message(const SIP_Message &message)
 {
-    std::map<SIP_Header_Type, std::list<SIP_Header *>>::const_iterator it1 = message._headers.begin();
+    sip_header_map::const_iterator it1 = message._headers.begin();
     while (it1 != message._headers.end())
     {
         std::list<SIP_Header *> header_list = it1->second;
@@ -38,7 +38,7 @@ SIP_Message::SIP_Message(const SIP_Message &message)
 
 SIP_Message::~SIP_Message()
 {
-    std::map<SIP_Header_Type, std::list<SIP_Header *>>::iterator it1 = _headers.begin();
+    sip_header_map::iterator it1 = _headers.begin();
     while (it1 != _headers.end())
     {
         std::list<SIP_Header *> header_list = it1->second;
@@ -158,7 +158,7 @@ bool SIP_Message::encode(std::string &sip_msg)
 
 bool SIP_Message::encode_header(std::string &sip_msg, std::string &body_msg)
 {
-    std::map<SIP_Header_Type, std::list<SIP_Header *>>::const_iterator it = _headers.begin();
+    sip_header_map::const_iterator it = _headers.begin();
     while (it != _headers.end())
     {
         std::list<SIP_Header *> headers = it->second;
