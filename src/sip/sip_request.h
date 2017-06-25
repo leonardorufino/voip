@@ -28,16 +28,15 @@ public:
 
     void set_method(SIP_Method_Type method) { _method = method; }
 
-    void set_request_uri(std::string request_uri) { _request_uri = request_uri; }
-    std::string get_request_uri() { return _request_uri; }
+    SIP_Address &get_request_uri() { return _request_uri; }
 
     void set_sip_version(std::string sip_version) { _sip_version = sip_version; }
     std::string get_sip_version() { return _sip_version; }
 
-    void set_request_line(SIP_Method_Type msg_type, std::string request_uri, std::string sip_version);
+    void set_request_line(SIP_Method_Type msg_type, const SIP_Address &request_uri, std::string sip_version);
 
 private:
     SIP_Method_Type _method;
-    std::string _request_uri;
+    SIP_Address _request_uri;
     std::string _sip_version;
 };

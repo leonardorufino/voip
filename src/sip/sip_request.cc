@@ -38,7 +38,8 @@ bool SIP_Request::decode_start_line(std::string &sip_msg)
         return false;
     }
 
-    _request_uri = result;
+    if (!_request_uri.decode(result))
+        return false;
 
     SIP_Functions::trim(line);
     _sip_version = line;
@@ -56,12 +57,15 @@ bool SIP_Request::decode_start_line(std::string &sip_msg)
 bool SIP_Request::encode_start_line(std::string &sip_msg)
 {
     std::string method = SIP_Functions::get_method_type(_method);
-    if ((method.empty()) || (_request_uri.empty()) || (_sip_version.empty()))
+    if ((method.empty()) || (_sip_version.empty()))
         return false;
 
     sip_msg += method;
     sip_msg += " ";
-    sip_msg += _request_uri;
+
+    if (!_request_uri.encode(sip_msg))
+        return false;
+
     sip_msg += " ";
     sip_msg += _sip_version;
     sip_msg += "\r\n";
@@ -70,7 +74,7 @@ bool SIP_Request::encode_start_line(std::string &sip_msg)
 
 //-------------------------------------------
 
-void SIP_Request::set_request_line(SIP_Method_Type msg_type, std::string request_uri, std::string sip_version)
+void SIP_Request::set_request_line(SIP_Method_Type msg_type, const SIP_Address &request_uri, std::string sip_version)
 {
     _method = msg_type;
     _request_uri = request_uri;
