@@ -14,6 +14,7 @@
 #ifdef WIN32
     #include <windows.h>
 #else
+    #include <pthread.h>
     #include <unistd.h>
 #endif
 
@@ -21,4 +22,5 @@ class Common_Functions
 {
 public:
     static void delay(unsigned int time);
+    static unsigned long get_tick();
 };

@@ -23,3 +23,19 @@ void Common_Functions::delay(unsigned int time)
 }
 
 //-------------------------------------------
+
+unsigned long Common_Functions::get_tick()
+{
+#ifdef WIN32
+    return GetTickCount();
+#else
+    struct timespec time;
+
+    if (clock_gettime(CLOCK_MONOTONIC, &time))
+        return 0;
+
+    return time.tv_sec * 1000 + time.tv_nsec / 1000000;
+#endif
+}
+
+//-------------------------------------------
