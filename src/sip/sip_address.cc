@@ -23,7 +23,7 @@ bool SIP_URI::decode(std::string &sip_msg)
     SIP_Functions::trim(user_host);
 
     std::string parameters;
-    bool has_headers = SIP_Functions::match(sip_msg, "?", parameters);
+    bool has_headers = SIP_Functions::match(sip_msg, "?", (has_parameter ? parameters : user_host));
 
     std::string user_password;
     if (SIP_Functions::match(user_host, "@", user_password))
