@@ -57,7 +57,9 @@ bool SIP_URI::decode(std::string &sip_msg)
         _host = host;
 
         SIP_Functions::trim(user_host);
-        _port = (unsigned short) atol(user_host.c_str());
+        _port = SIP_Functions::str_to_us(user_host);
+        if (_port == INVALID_PORT)
+            return false;
     }else
     {
         SIP_Functions::trim(user_host);
@@ -102,7 +104,9 @@ bool SIP_URI::decode(std::string &sip_msg)
             if (ttl.empty())
                 return false;
 
-            _ttl = (unsigned short) atol(ttl.c_str());
+            _ttl = SIP_Functions::str_to_us(ttl);
+            if (_ttl == INVALID_TTL)
+                return false;
 
         }else if (SIP_Functions::start_with(param, "maddr="))
         {

@@ -3016,7 +3016,9 @@ bool SIP_Header_Via::decode(std::string &sip_msg)
             if (ttl.empty())
                 return false;
 
-            _ttl = (unsigned short) atol(ttl.c_str());
+            _ttl = SIP_Functions::str_to_us(ttl);
+            if (_ttl == INVALID_TTL)
+                return false;
 
         }else if (SIP_Functions::start_with(result, "maddr="))
         {

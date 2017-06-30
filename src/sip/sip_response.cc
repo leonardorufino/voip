@@ -54,7 +54,7 @@ bool SIP_Response::decode_start_line(std::string &sip_msg)
         return false;
     }
 
-    _status_code = (unsigned short) atol(result.c_str());
+    _status_code = SIP_Functions::str_to_us(result);
     if ((_status_code < 100) || (_status_code > 699))
     {
         std::cout << "SIP_Response::decode_start_line -> Invalid status code (status_code=" << _status_code << ")\n";
