@@ -178,6 +178,8 @@ SIP_Header_Type SIP_Functions::get_header_type(std::string header)
         return SIP_HEADER_PROXY_REQUIRE;
     else if (header == "Record-Route")
         return SIP_HEADER_RECORD_ROUTE;
+    else if (header == "Refer-To")
+        return SIP_HEADER_REFER_TO;
     else if (header == "Reply-To")
         return SIP_HEADER_REPLY_TO;
     else if (header == "Require")
@@ -250,6 +252,7 @@ std::string SIP_Functions::get_header_type(SIP_Header_Type header)
         case SIP_HEADER_PROXY_AUTHENTICATE:     return "Proxy-Authenticate";
         case SIP_HEADER_PROXY_AUTHORIZATION:    return "Proxy-Authorization";
         case SIP_HEADER_RECORD_ROUTE:           return "Record-Route";
+        case SIP_HEADER_REFER_TO:               return "Refer-To";
         case SIP_HEADER_REPLY_TO:               return "Reply-To";
         case SIP_HEADER_REQUIRE:                return "Require";
         case SIP_HEADER_RETRY_AFTER:            return "Retry-After";

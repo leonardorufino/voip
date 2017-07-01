@@ -148,6 +148,10 @@ SIP_Header *SIP_Header::create_header(SIP_Header_Type header_type, const SIP_Hea
             header = (!copy) ? new SIP_Header_Record_Route()
                              : new SIP_Header_Record_Route(dynamic_cast<const SIP_Header_Record_Route &>(*copy));
             break;
+        case SIP_HEADER_REFER_TO:
+            header = (!copy) ? new SIP_Header_Refer_To()
+                             : new SIP_Header_Refer_To(dynamic_cast<const SIP_Header_Refer_To &>(*copy));
+            break;
         case SIP_HEADER_REPLY_TO:
             header = (!copy) ? new SIP_Header_Reply_To()
                              : new SIP_Header_Reply_To(dynamic_cast<const SIP_Header_Reply_To &>(*copy));
@@ -2354,6 +2358,44 @@ bool SIP_Header_Record_Route::decode(std::string &sip_msg)
 //-------------------------------------------
 
 bool SIP_Header_Record_Route::encode(std::string &sip_msg)
+{
+    if (!_address.encode(sip_msg))
+        return false;
+
+    std::list<std::string>::const_iterator it = _parameters.begin();
+    while (it != _parameters.end())
+    {
+        sip_msg += ";";
+        sip_msg += *it++;
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+bool SIP_Header_Refer_To::decode(std::string &sip_msg)
+{
+    std::string result;
+    bool matched = SIP_Functions::match(sip_msg, ";", result);
+
+    if (!_address.decode(result))
+        return false;
+
+    while (matched)
+    {
+        matched = SIP_Functions::match(sip_msg, ";", result);
+        SIP_Functions::trim(result);
+        _parameters.push_back(result);
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Refer_To::encode(std::string &sip_msg)
 {
     if (!_address.encode(sip_msg))
         return false;

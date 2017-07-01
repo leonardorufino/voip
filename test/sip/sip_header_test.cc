@@ -145,6 +145,10 @@ bool SIP_Header_Test::init()
     if (!header_record_route.run())
         return false;
 
+    SIP_Header_Refer_To_Test header_refer_to;
+    if (!header_refer_to.run())
+        return false;
+
     SIP_Header_Reply_To_Test header_reply_to;
     if (!header_reply_to.run())
         return false;
@@ -1822,6 +1826,79 @@ SIP_Header_Record_Route_Test::SIP_Header_Record_Route_Test()
     hdr3._decode_success = true;
     hdr3._encode_success = true;
     _header_input_output.push_back(hdr3);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+SIP_Header_Refer_To_Test::SIP_Header_Refer_To_Test()
+{
+    SIP_Header_Input_Output hdr1;
+    hdr1._header_type    = SIP_HEADER_REFER_TO;
+    hdr1._input          = "Refer-To: sip:alice@atlanta.example.com";
+    hdr1._output         = "Refer-To: sip:alice@atlanta.example.com\r\n";
+    hdr1._header_nb      = 1;
+    hdr1._decode_success = true;
+    hdr1._encode_success = true;
+    _header_input_output.push_back(hdr1);
+
+    SIP_Header_Input_Output hdr2;
+    hdr2._header_type    = SIP_HEADER_REFER_TO;
+    hdr2._input          = "Refer-To: <sip:bob@biloxi.example.net?Accept-Contact=sip:bobsdesk.biloxi.example.net";
+    hdr2._input         += "&Call-ID%3D55432%40alicepc.atlanta.example.com>";
+    hdr2._output         = "Refer-To: <sip:bob@biloxi.example.net?Accept-Contact=sip:bobsdesk.biloxi.example.net";
+    hdr2._output        += "&Call-ID%3D55432%40alicepc.atlanta.example.com>\r\n";
+    hdr2._header_nb      = 1;
+    hdr2._decode_success = true;
+    hdr2._encode_success = true;
+    _header_input_output.push_back(hdr2);
+
+    SIP_Header_Input_Output hdr3;
+    hdr3._header_type    = SIP_HEADER_REFER_TO;
+    hdr3._input          = "Refer-To: <sip:dave@denver.example.org?Replaces=12345%40192.168.118.3%3Bto-tag%3D12345";
+    hdr3._input         += "%3Bfrom-tag%3D5FFE-3994>";
+    hdr3._output         = "Refer-To: <sip:dave@denver.example.org?Replaces=12345%40192.168.118.3%3Bto-tag%3D12345";
+    hdr3._output        += "%3Bfrom-tag%3D5FFE-3994>\r\n";
+    hdr3._header_nb      = 1;
+    hdr3._decode_success = true;
+    hdr3._encode_success = true;
+    _header_input_output.push_back(hdr3);
+
+    SIP_Header_Input_Output hdr4;
+    hdr4._header_type    = SIP_HEADER_REFER_TO;
+    hdr4._input          = "Refer-To: <sip:carol@cleveland.example.org;method=SUBSCRIBE>";
+    hdr4._output         = "Refer-To: <sip:carol@cleveland.example.org;method=SUBSCRIBE>\r\n";
+    hdr4._header_nb      = 1;
+    hdr4._decode_success = true;
+    hdr4._encode_success = true;
+    _header_input_output.push_back(hdr4);
+
+    SIP_Header_Input_Output hdr5;
+    hdr5._header_type    = SIP_HEADER_REFER_TO;
+    hdr5._input          = "Refer-To: http://www.ietf.org";
+    hdr5._output         = "Refer-To: http://www.ietf.org\r\n";
+    hdr5._header_nb      = 1;
+    hdr5._decode_success = true;
+    hdr5._encode_success = true;
+    _header_input_output.push_back(hdr5);
+
+    SIP_Header_Input_Output hdr6;
+    hdr6._header_type    = SIP_HEADER_REFER_TO;
+    hdr6._input          = "Refer-To: sip:+12125551212@server.phone2net.com;par=123";
+    hdr6._output         = "Refer-To: sip:+12125551212@server.phone2net.com;par=123\r\n";
+    hdr6._header_nb      = 1;
+    hdr6._decode_success = true;
+    hdr6._encode_success = true;
+    _header_input_output.push_back(hdr6);
+
+    SIP_Header_Input_Output hdr7;
+    hdr7._header_type    = SIP_HEADER_REFER_TO;
+    hdr7._input          = "Refer-To: <sip:user:password@server.phone2net.com ; par=123> ; parameter1 ;parameter2=123";
+    hdr7._output         = "Refer-To: <sip:user:password@server.phone2net.com;par=123>;parameter1;parameter2=123\r\n";
+    hdr7._header_nb      = 1;
+    hdr7._decode_success = true;
+    hdr7._encode_success = true;
+    _header_input_output.push_back(hdr7);
 }
 
 //-------------------------------------------
