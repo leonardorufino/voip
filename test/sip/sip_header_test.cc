@@ -253,6 +253,20 @@ bool SIP_Header_Test::run()
             return false;
         }
 
+        sip_header_list::iterator it2 = headers.begin();
+        while (it2 != headers.end())
+        {
+            SIP_Header *header = *it2++;
+            if (header->get_header_type() != header_input_output._header_type)
+            {
+                std::cout << "SIP_Header_Test::run -> Invalid decoded header type:\n";
+                std::cout << std::setw(12) << "Type: " << header_input_output._header_type << "\n";
+                std::cout << std::setw(12) << "Input: " << header_input_output._input.c_str() << "\n";
+                std::cout << std::setw(12) << "Result: " << header->get_header_type() << "\n";
+                return false;
+            }
+        }
+
         sip_header_list copy;
         if (!copy_headers(headers, copy))
         {
