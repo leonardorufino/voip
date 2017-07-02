@@ -264,7 +264,7 @@ bool SIP_Header::decode_headers(std::string &sip_msg, sip_header_list &headers)
 
         if (!header->decode(result))
         {
-            std::cout << "SIP_Header::decode_header -> Failed to decode header type (header=" << header_type << ")\n";
+            std::cout << "SIP_Header::decode_header -> Failed to decode header (header=" << header_type << ")\n";
             delete header;
             return false;
         }
@@ -312,7 +312,10 @@ bool SIP_Header::encode_headers(std::string &sip_msg, sip_header_list &headers)
         }
 
         if (!header->encode(sip_msg))
+        {
+            std::cout << "SIP_Header::encode_header -> Failed to encode header (header=" << header->get_header_type() << ")\n";
             return false;
+        }
     }
 
     sip_msg += "\r\n";
