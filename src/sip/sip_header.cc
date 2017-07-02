@@ -152,6 +152,10 @@ SIP_Header *SIP_Header::create_header(SIP_Header_Type header_type, const SIP_Hea
             header = (!copy) ? new SIP_Header_Refer_To()
                              : new SIP_Header_Refer_To(dynamic_cast<const SIP_Header_Refer_To &>(*copy));
             break;
+        case SIP_HEADER_REFERRED_BY:
+            header = (!copy) ? new SIP_Header_Referred_By()
+                             : new SIP_Header_Referred_By(dynamic_cast<const SIP_Header_Referred_By &>(*copy));
+            break;
         case SIP_HEADER_REPLY_TO:
             header = (!copy) ? new SIP_Header_Reply_To()
                              : new SIP_Header_Reply_To(dynamic_cast<const SIP_Header_Reply_To &>(*copy));
@@ -2399,6 +2403,59 @@ bool SIP_Header_Refer_To::encode(std::string &sip_msg)
 {
     if (!_address.encode(sip_msg))
         return false;
+
+    std::list<std::string>::const_iterator it = _parameters.begin();
+    while (it != _parameters.end())
+    {
+        sip_msg += ";";
+        sip_msg += *it++;
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+bool SIP_Header_Referred_By::decode(std::string &sip_msg)
+{
+    std::string result;
+    bool matched = SIP_Functions::match(sip_msg, ";", result);
+
+    if (!_address.decode(result))
+        return false;
+
+    while (matched)
+    {
+        matched = SIP_Functions::match(sip_msg, ";", result);
+        SIP_Functions::trim(result);
+
+        if (SIP_Functions::start_with(result, "cid="))
+        {
+            _cid = result.substr(4);
+            SIP_Functions::trim(_cid);
+            if (_cid.empty())
+                return false;
+
+        }else
+            _parameters.push_back(result);
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Referred_By::encode(std::string &sip_msg)
+{
+    if (!_address.encode(sip_msg))
+        return false;
+
+    if (!_cid.empty())
+    {
+        sip_msg += ";cid=";
+        sip_msg += _cid;
+    }
 
     std::list<std::string>::const_iterator it = _parameters.begin();
     while (it != _parameters.end())

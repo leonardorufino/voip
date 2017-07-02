@@ -1127,6 +1127,35 @@ private:
 
 //-------------------------------------------
 
+class SIP_Header_Referred_By : public SIP_Header
+{
+public:
+    SIP_Header_Referred_By() {}
+    SIP_Header_Referred_By(const SIP_Header_Referred_By &header) { *this = header; }
+    ~SIP_Header_Referred_By() {}
+
+    // Virtual pure functions
+    SIP_Header_Type get_header_type() { return SIP_HEADER_REFERRED_BY; }
+    SIP_Header_Separator decode_separator() { return SIP_HEADER_SEPARATOR_NONE; }
+    SIP_Header_Separator encode_separator() { return SIP_HEADER_SEPARATOR_NONE; }
+    bool decode(std::string &sip_msg);
+    bool encode(std::string &sip_msg);
+
+    SIP_Address &get_address() { return _address; }
+
+    void set_cid(std::string cid) { _cid = cid; }
+    std::string get_cid() { return _cid; }
+
+    std::list<std::string> &get_parameters() { return _parameters; }
+
+private:
+    SIP_Address _address;
+    std::string _cid;
+    std::list<std::string> _parameters;
+};
+
+//-------------------------------------------
+
 class SIP_Header_Reply_To : public SIP_Header
 {
 public:
