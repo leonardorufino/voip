@@ -198,15 +198,6 @@ enum SIP_Priority_Value
     SIP_PRIORITY_VALUE_INVALID
 };
 
-enum SIP_Transaction_Type
-{
-    SIP_TRANSACTION_CLIENT_INVITE,
-    SIP_TRANSACTION_CLIENT_NON_INVITE,
-    SIP_TRANSACTION_SERVER_INVITE,
-    SIP_TRANSACTION_SERVER_NON_INVITE,
-    SIP_TRANSACTION_TYPE_INVALID
-};
-
 enum SIP_Transport_Type
 {
     SIP_TRANSPORT_UDP,
@@ -267,27 +258,6 @@ enum SIP_Call_Status
     SIP_CALL_STATUS_INACTIVE,
     SIP_CALL_STATUS_INCOMING,
     SIP_CALL_STATUS_OUTGOING
-};
-
-enum SIP_Timer
-{
-    SIP_TIMER_A,
-    SIP_TIMER_B,
-    SIP_TIMER_C,
-    SIP_TIMER_D,
-    SIP_TIMER_E,
-    SIP_TIMER_F,
-    SIP_TIMER_G,
-    SIP_TIMER_H,
-    SIP_TIMER_I,
-    SIP_TIMER_J,
-    SIP_TIMER_K,
-    SIP_TIMER_COUNT,
-
-    SIP_TIMER_1 = 500,     //500 millisec
-    SIP_TIMER_2 = 4000,    //4 sec
-    SIP_TIMER_4 = 5000,    //5 sec
-    SIP_TIMER_32s = 32000, //32 sec
 };
 
 enum SIP_Header_Separator
