@@ -12,6 +12,7 @@
 #pragma once
 
 #include "sip_defs.h"
+#include "sip_address.h"
 #include "sip_header.h"
 #include "sip_message.h"
 #include "sip_request.h"
@@ -74,3 +75,40 @@ protected:
     unsigned long _timer_values[SIP_TIMER_COUNT];
     Timer_Id _timer_ids[SIP_TIMER_COUNT];
 };
+
+//-------------------------------------------
+//-------------------------------------------
+
+class SIP_Transaction_Client_Invite : public SIP_Transaction
+{
+private:
+    enum State
+    {
+        sttIdle,
+        sttCalling,
+        sttProceeding,
+        sttCompleted,
+        sttTerminated
+    };
+
+public:
+    SIP_Transaction_Client_Invite() : _state(sttIdle) {}
+    ~SIP_Transaction_Client_Invite() {}
+
+    SIP_Transaction_Type get_transaction_type() { return SIP_TRANSACTION_CLIENT_INVITE; }
+
+    void send_invite(SIP_Request *msg);
+    void send_ack(SIP_Response *msg);
+    void receive_1xx(SIP_Response *msg);
+    void receive_2xx(SIP_Response *msg);
+    void receive_3xx_6xx(SIP_Response *msg);
+
+    static bool timer_A_Callback(void *p);
+    static bool timer_B_Callback(void *p);
+    static bool timer_D_Callback(void *p);
+
+private:
+    State _state;
+};
+
+//-------------------------------------------
