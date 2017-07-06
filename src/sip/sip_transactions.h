@@ -19,6 +19,12 @@
 #include "sip_response.h"
 #include "common/timer_manager.h"
 
+class SIP_Transaction;
+
+typedef bool (send_message_callback)(SIP_Message *msg);
+typedef bool (receive_request_callback)(SIP_Request *request, SIP_Transaction *transaction);
+typedef bool (receive_response_callback)(SIP_Request *request, SIP_Response *response, SIP_Transaction *transaction);
+
 class SIP_Transaction
 {
 public:
@@ -62,7 +68,9 @@ public:
     SIP_Transaction *match_transaction_client(SIP_Message *msg);
     SIP_Transaction *match_transaction_server(SIP_Message *msg);
 
-    SIP_Request *get_saved_request() { return _saved_request; }
+    void set_send_message_callback(send_message_callback *callback) { _send_message_callback = callback; }
+    void set_receive_request_callback(receive_request_callback *callback) { _receive_request_callback = callback; }
+    void set_receive_response_callback(receive_response_callback *callback) { _receive_response_callback = callback; }
 
     unsigned long get_timer_value(SIP_Timer timer);
     void set_timer_value(SIP_Timer timer, unsigned long timer_value);
@@ -71,6 +79,10 @@ public:
 
 protected:
     SIP_Request *_saved_request;
+
+    send_message_callback *_send_message_callback;
+    receive_request_callback *_receive_request_callback;
+    receive_response_callback *_receive_response_callback;
 
     unsigned long _timer_values[SIP_TIMER_COUNT];
     Timer_Id _timer_ids[SIP_TIMER_COUNT];
