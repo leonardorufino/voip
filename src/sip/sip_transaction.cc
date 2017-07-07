@@ -212,10 +212,10 @@ SIP_Transaction *SIP_Transaction::match_transaction_server(SIP_Message *msg)
     }
 
     if ((request_via_branch != saved_request_via_branch) || (request_via_host != saved_request_via_host) ||
-        ((request_method != saved_request_method) && ((saved_request_method != SIP_REQUEST_INVITE) ||
-         (request_method != SIP_REQUEST_ACK))))
+        (request_via_port != saved_request_via_port) || ((request_method != saved_request_method) &&
+        ((saved_request_method != SIP_REQUEST_INVITE) || (request_method != SIP_REQUEST_ACK))))
     {
-        std::cout << "SIP_Transaction::match_transaction_server -> Method, Via branch or Via host do not match\n";
+        std::cout << "SIP_Transaction::match_transaction_server -> Method, Via branch, host or port do not match\n";
         return NULL;
     }
 
