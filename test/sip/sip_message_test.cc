@@ -10,7 +10,6 @@
  */
 
 #include "sip_message_test.h"
-#include <assert.h>
 
 //-------------------------------------------
 
