@@ -156,3 +156,40 @@ private:
 };
 
 //-------------------------------------------
+
+class SIP_Transaction_Server_Invite : public SIP_Transaction
+{
+    friend class SIP_User_Agent;
+
+private:
+    enum State
+    {
+        sttIdle,
+        sttProceeding,
+        sttCompleted,
+        sttConfirmed,
+        sttTerminated
+    };
+
+public:
+    SIP_Transaction_Server_Invite() : _state(sttIdle), _last_response(NULL) {}
+    ~SIP_Transaction_Server_Invite();
+
+    SIP_Transaction_Type get_transaction_type() { return SIP_TRANSACTION_SERVER_INVITE; }
+
+    void receive_invite(SIP_Request *msg);
+    void receive_ack(SIP_Request *msg);
+    void send_1xx(SIP_Response *msg);
+    void send_2xx(SIP_Response *msg);
+    void send_3xx_6xx(SIP_Response *msg);
+
+    static bool timer_G_Callback(void *p);
+    static bool timer_H_Callback(void *p);
+    static bool timer_I_Callback(void *p);
+
+private:
+    State _state;
+    SIP_Response *_last_response;
+};
+
+//-------------------------------------------
