@@ -14,7 +14,6 @@
 #include "sip/sip_header.h"
 #include "sip/sip_message.h"
 #include <list>
-#include <utility>
 #include <iomanip>
 
 class SIP_Message_Test

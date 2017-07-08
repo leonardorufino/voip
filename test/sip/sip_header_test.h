@@ -13,7 +13,6 @@
 
 #include "sip/sip_header.h"
 #include <list>
-#include <utility>
 #include <iomanip>
 
 class SIP_Header_Test
