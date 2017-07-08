@@ -36,7 +36,7 @@ target_link_libraries(common_test common)
 message("Creating SIP test executable..")
 file(GLOB SIP_TEST_SOURCES "test/sip/*")
 add_executable(sip_test ${SIP_TEST_SOURCES})
-target_link_libraries(sip_test sip)
+target_link_libraries(sip_test sip common)
 
 enable_testing()
 add_test(Common_Test ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/common_test)
