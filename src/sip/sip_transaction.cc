@@ -316,6 +316,21 @@ void SIP_Transaction::stop_timer(SIP_Timer timer)
 //-------------------------------------------
 //-------------------------------------------
 
+std::string SIP_Transaction_Client_Invite::get_state_str()
+{
+    switch (_state)
+    {
+        case sttIdle:       return "Idle";
+        case sttCalling:    return "Calling";
+        case sttProceeding: return "Proceeding";
+        case sttCompleted:  return "Completed";
+        case sttTerminated: return "Terminated";
+        default:            return "Invalid";
+    }
+}
+
+//-------------------------------------------
+
 void SIP_Transaction_Client_Invite::send_invite(SIP_Request *msg)
 {
     switch (_state)
@@ -572,6 +587,21 @@ bool SIP_Transaction_Client_Invite::timer_D_Callback(void *p)
 //-------------------------------------------
 //-------------------------------------------
 
+std::string SIP_Transaction_Client_Non_Invite::get_state_str()
+{
+    switch (_state)
+    {
+        case sttIdle:       return "Idle";
+        case sttTrying:     return "Trying";
+        case sttProceeding: return "Proceeding";
+        case sttCompleted:  return "Completed";
+        case sttTerminated: return "Terminated";
+        default:            return "Invalid";
+    }
+}
+
+//-------------------------------------------
+
 void SIP_Transaction_Client_Non_Invite::send_request(SIP_Request *msg)
 {
     switch (_state)
@@ -746,6 +776,21 @@ SIP_Transaction_Server_Invite::~SIP_Transaction_Server_Invite()
 {
     if (_last_response)
         delete _last_response;
+}
+
+//-------------------------------------------
+
+std::string SIP_Transaction_Server_Invite::get_state_str()
+{
+    switch (_state)
+    {
+        case sttIdle:       return "Idle";
+        case sttProceeding: return "Proceeding";
+        case sttCompleted:  return "Completed";
+        case sttConfirmed:  return "Confirmed";
+        case sttTerminated: return "Terminated";
+        default:            return "Invalid";
+    }
 }
 
 //-------------------------------------------
@@ -956,6 +1001,21 @@ SIP_Transaction_Server_Non_Invite::~SIP_Transaction_Server_Non_Invite()
 {
     if (_last_response)
         delete _last_response;
+}
+
+//-------------------------------------------
+
+std::string SIP_Transaction_Server_Non_Invite::get_state_str()
+{
+    switch (_state)
+    {
+        case sttIdle:       return "Idle";
+        case sttTrying:     return "Trying";
+        case sttProceeding: return "Proceeding";
+        case sttCompleted:  return "Completed";
+        case sttTerminated: return "Terminated";
+        default:            return "Invalid";
+    }
 }
 
 //-------------------------------------------

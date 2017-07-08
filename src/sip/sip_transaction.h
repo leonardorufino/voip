@@ -91,7 +91,7 @@ protected:
 
 class SIP_Transaction_Client_Invite : public SIP_Transaction
 {
-private:
+public:
     enum State
     {
         sttIdle,
@@ -106,6 +106,9 @@ public:
     ~SIP_Transaction_Client_Invite() {}
 
     SIP_Transaction_Type get_transaction_type() { return SIP_TRANSACTION_CLIENT_INVITE; }
+
+    State get_state() { return _state; }
+    std::string get_state_str();
 
     void send_invite(SIP_Request *msg);
     void send_ack(SIP_Response *msg);
@@ -125,7 +128,7 @@ private:
 
 class SIP_Transaction_Client_Non_Invite : public SIP_Transaction
 {
-private:
+public:
     enum State
     {
         sttIdle,
@@ -140,6 +143,9 @@ public:
     ~SIP_Transaction_Client_Non_Invite() {}
 
     SIP_Transaction_Type get_transaction_type() { return SIP_TRANSACTION_CLIENT_NON_INVITE; }
+
+    State get_state() { return _state; }
+    std::string get_state_str();
 
     void send_request(SIP_Request *msg);
     void receive_1xx(SIP_Response *msg);
@@ -157,9 +163,7 @@ private:
 
 class SIP_Transaction_Server_Invite : public SIP_Transaction
 {
-    friend class SIP_User_Agent;
-
-private:
+public:
     enum State
     {
         sttIdle,
@@ -174,6 +178,9 @@ public:
     ~SIP_Transaction_Server_Invite();
 
     SIP_Transaction_Type get_transaction_type() { return SIP_TRANSACTION_SERVER_INVITE; }
+
+    State get_state() { return _state; }
+    std::string get_state_str();
 
     void receive_invite(SIP_Request *msg);
     void receive_ack(SIP_Request *msg);
@@ -194,7 +201,7 @@ private:
 
 class SIP_Transaction_Server_Non_Invite : public SIP_Transaction
 {
-private:
+public:
     enum State
     {
         sttIdle,
@@ -209,6 +216,9 @@ public:
     ~SIP_Transaction_Server_Non_Invite();
 
     SIP_Transaction_Type get_transaction_type() { return SIP_TRANSACTION_SERVER_NON_INVITE; }
+
+    State get_state() { return _state; }
+    std::string get_state_str();
 
     void receive_request(SIP_Request *msg);
     void send_1xx(SIP_Response *msg);
