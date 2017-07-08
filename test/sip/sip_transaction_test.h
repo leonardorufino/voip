@@ -24,9 +24,9 @@ public:
 
     static bool init();
 
+protected:
     virtual bool run() = 0;
 
-protected:
     static bool send_message_callback(SIP_Message *msg);
     static bool receive_request_callback(SIP_Request *request, SIP_Transaction *transaction);
     static bool receive_response_callback(SIP_Request *request, SIP_Response *response, SIP_Transaction *transaction);
@@ -38,23 +38,33 @@ protected:
 };
 
 //-------------------------------------------
+//-------------------------------------------
 
-class SIP_Transaction_Client_Invite_Accepted_Test : public SIP_Transaction_Test
+class SIP_Transaction_Client_Invite_Test : public SIP_Transaction_Test
+{
+public:
+    SIP_Transaction_Client_Invite_Test() {}
+    virtual ~SIP_Transaction_Client_Invite_Test() {}
+
+protected:
+    bool send_invite();
+    bool send_response_100();
+    bool send_response_180();
+    bool send_response_200();
+
+protected:
+    SIP_Transaction_Client_Invite transaction;
+};
+
+//-------------------------------------------
+
+class SIP_Transaction_Client_Invite_Accepted_Test : public SIP_Transaction_Client_Invite_Test
 {
 public:
     SIP_Transaction_Client_Invite_Accepted_Test() {}
     virtual ~SIP_Transaction_Client_Invite_Accepted_Test() {}
 
     bool run();
-
-private:
-    bool send_invite();
-    bool send_response_100();
-    bool send_response_180();
-    bool send_response_200();
-
-private:
-    SIP_Transaction_Client_Invite transaction;
 };
 
 //-------------------------------------------
