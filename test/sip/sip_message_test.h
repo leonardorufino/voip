@@ -11,10 +11,8 @@
 
 #pragma once
 
-#include "sip/sip_message.h"
-#include "sip/sip_request.h"
-#include "sip/sip_response.h"
 #include "sip/sip_header.h"
+#include "sip/sip_message.h"
 #include <list>
 #include <utility>
 #include <iomanip>

@@ -15,8 +15,6 @@
 #include "sip_address.h"
 #include "sip_header.h"
 #include "sip_message.h"
-#include "sip_request.h"
-#include "sip_response.h"
 #include "common/timer_manager.h"
 
 class SIP_Transaction;
