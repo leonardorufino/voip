@@ -17,16 +17,16 @@ bool Timer_Manager_Test::init()
 {
     std::cout << "Timer manager test initialized\n";
 
-    Timer_Manager_Test1 test1;
-    if (!test1.run())
+    Timer_Manager_Stop_Test stop_test;
+    if (!stop_test.run())
         return false;
 
-    Timer_Manager_Test2 test2;
-    if (!test2.run())
+    Timer_Manager_Callback_Test callback_test;
+    if (!callback_test.run())
         return false;
 
-    Timer_Manager_Test3 test3;
-    if (!test3.run())
+    Timer_Manager_Multiple_Timers_Test multiple_timers_test;
+    if (!multiple_timers_test.run())
         return false;
 
     std::cout << "Timer manager test completed successfully\n";
@@ -36,7 +36,7 @@ bool Timer_Manager_Test::init()
 //-------------------------------------------
 //-------------------------------------------
 
-bool Timer_Manager_Test1::run()
+bool Timer_Manager_Stop_Test::run()
 {
     Timer_Manager &manager = Timer_Manager::instance();
 
@@ -54,7 +54,7 @@ bool Timer_Manager_Test1::run()
 
     if (_stop != 0)
     {
-        std::cout << "Timer_Manager_Test1::run -> Callback shouldn't be called:\n";
+        std::cout << "Timer_Manager_Stop_Test::run -> Callback shouldn't be called:\n";
         std::cout << std::setw(12) << "Time: " << _time << "\n";
         std::cout << std::setw(12) << "Diff: " << (_stop - _start) << "\n";
         return false;
@@ -65,12 +65,12 @@ bool Timer_Manager_Test1::run()
 
 //-------------------------------------------
 
-bool Timer_Manager_Test1::callback(void *data)
+bool Timer_Manager_Stop_Test::callback(void *data)
 {
-    Timer_Manager_Test1 *test = reinterpret_cast<Timer_Manager_Test1 *>(data);
+    Timer_Manager_Stop_Test *test = reinterpret_cast<Timer_Manager_Stop_Test *>(data);
     if (!test)
     {
-        std::cout << "Timer_Manager_Test1::callback -> Invalid data parameter\n";
+        std::cout << "Timer_Manager_Stop_Test::callback -> Invalid data parameter\n";
         return false;
     }
 
@@ -81,7 +81,7 @@ bool Timer_Manager_Test1::callback(void *data)
 //-------------------------------------------
 //-------------------------------------------
 
-bool Timer_Manager_Test2::run()
+bool Timer_Manager_Callback_Test::run()
 {
     Timer_Manager &manager = Timer_Manager::instance();
 
@@ -96,7 +96,7 @@ bool Timer_Manager_Test2::run()
     if (waited >= _max_wait_time)
     {
         manager.stop_timer(id);
-        std::cout << "Timer_Manager_Test2::run -> Callback was not called:\n";
+        std::cout << "Timer_Manager_Callback_Test::run -> Callback was not called:\n";
         std::cout << std::setw(12) << "Time: " << _time << "\n";
         std::cout << std::setw(12) << "Waited: " << waited << "\n";
         std::cout << std::setw(12) << "Max: " << _max_wait_time << "\n";
@@ -108,12 +108,12 @@ bool Timer_Manager_Test2::run()
 
 //-------------------------------------------
 
-bool Timer_Manager_Test2::callback(void *data)
+bool Timer_Manager_Callback_Test::callback(void *data)
 {
-    Timer_Manager_Test2 *test = reinterpret_cast<Timer_Manager_Test2 *>(data);
+    Timer_Manager_Callback_Test *test = reinterpret_cast<Timer_Manager_Callback_Test *>(data);
     if (!test)
     {
-        std::cout << "Timer_Manager_Test2::callback -> Invalid data parameter\n";
+        std::cout << "Timer_Manager_Callback_Test::callback -> Invalid data parameter\n";
         return false;
     }
 
@@ -124,7 +124,7 @@ bool Timer_Manager_Test2::callback(void *data)
 //-------------------------------------------
 //-------------------------------------------
 
-Timer_Manager_Test3::Timer_Manager_Test3()
+Timer_Manager_Multiple_Timers_Test::Timer_Manager_Multiple_Timers_Test()
 {
     for (unsigned short i = 0; i < ARRAY_SIZE; i++)
     {
@@ -137,7 +137,7 @@ Timer_Manager_Test3::Timer_Manager_Test3()
 
 //-------------------------------------------
 
-bool Timer_Manager_Test3::run()
+bool Timer_Manager_Multiple_Timers_Test::run()
 {
     Timer_Manager &manager = Timer_Manager::instance();
 
@@ -162,7 +162,7 @@ bool Timer_Manager_Test3::run()
         if (waited >= _max_wait_time[i])
         {
             manager.stop_timer(id[i]);
-            std::cout << "Timer_Manager_Test3::run -> Callback " << i << " was not called:\n";
+            std::cout << "Timer_Manager_Multiple_Timers_Test::run -> Callback " << i << " was not called:\n";
             std::cout << std::setw(12) << "Time: " << _time[i] << "\n";
             std::cout << std::setw(12) << "Waited: " << waited << "\n";
             std::cout << std::setw(12) << "Max: " << _max_wait_time[i] << "\n";
@@ -175,12 +175,12 @@ bool Timer_Manager_Test3::run()
 
 //-------------------------------------------
 
-bool Timer_Manager_Test3::callback0(void *data)
+bool Timer_Manager_Multiple_Timers_Test::callback0(void *data)
 {
-    Timer_Manager_Test3 *test = reinterpret_cast<Timer_Manager_Test3 *>(data);
+    Timer_Manager_Multiple_Timers_Test *test = reinterpret_cast<Timer_Manager_Multiple_Timers_Test *>(data);
     if (!test)
     {
-        std::cout << "Timer_Manager_Test3::callback0 -> Invalid data parameter\n";
+        std::cout << "Timer_Manager_Multiple_Timers_Test::callback0 -> Invalid data parameter\n";
         return false;
     }
 
@@ -190,12 +190,12 @@ bool Timer_Manager_Test3::callback0(void *data)
 
 //-------------------------------------------
 
-bool Timer_Manager_Test3::callback1(void *data)
+bool Timer_Manager_Multiple_Timers_Test::callback1(void *data)
 {
-    Timer_Manager_Test3 *test = reinterpret_cast<Timer_Manager_Test3 *>(data);
+    Timer_Manager_Multiple_Timers_Test *test = reinterpret_cast<Timer_Manager_Multiple_Timers_Test *>(data);
     if (!test)
     {
-        std::cout << "Timer_Manager_Test3::callback1 -> Invalid data parameter\n";
+        std::cout << "Timer_Manager_Multiple_Timers_Test::callback1 -> Invalid data parameter\n";
         return false;
     }
 
@@ -205,12 +205,12 @@ bool Timer_Manager_Test3::callback1(void *data)
 
 //-------------------------------------------
 
-bool Timer_Manager_Test3::callback2(void *data)
+bool Timer_Manager_Multiple_Timers_Test::callback2(void *data)
 {
-    Timer_Manager_Test3 *test = reinterpret_cast<Timer_Manager_Test3 *>(data);
+    Timer_Manager_Multiple_Timers_Test *test = reinterpret_cast<Timer_Manager_Multiple_Timers_Test *>(data);
     if (!test)
     {
-        std::cout << "Timer_Manager_Test3::callback2 -> Invalid data parameter\n";
+        std::cout << "Timer_Manager_Multiple_Timers_Test::callback2 -> Invalid data parameter\n";
         return false;
     }
 

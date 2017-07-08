@@ -28,11 +28,11 @@ public:
 
 //-------------------------------------------
 
-class Timer_Manager_Test1 : public Timer_Manager_Test
+class Timer_Manager_Stop_Test : public Timer_Manager_Test
 {
 public:
-    Timer_Manager_Test1() : _start(0), _stop(0), _time(300), _max_wait_time(_time * 3) {}
-    virtual ~Timer_Manager_Test1() {}
+    Timer_Manager_Stop_Test() : _start(0), _stop(0), _time(300), _max_wait_time(_time * 3) {}
+    virtual ~Timer_Manager_Stop_Test() {}
 
     bool run();
 
@@ -47,11 +47,11 @@ private:
 
 //-------------------------------------------
 
-class Timer_Manager_Test2 : public Timer_Manager_Test
+class Timer_Manager_Callback_Test : public Timer_Manager_Test
 {
 public:
-    Timer_Manager_Test2() : _start(0), _stop(0), _time(300), _max_wait_time(_time * 3) {}
-    virtual ~Timer_Manager_Test2() {}
+    Timer_Manager_Callback_Test() : _start(0), _stop(0), _time(300), _max_wait_time(_time * 3) {}
+    virtual ~Timer_Manager_Callback_Test() {}
 
     bool run();
 
@@ -66,11 +66,11 @@ private:
 
 //-------------------------------------------
 
-class Timer_Manager_Test3 : public Timer_Manager_Test
+class Timer_Manager_Multiple_Timers_Test : public Timer_Manager_Test
 {
 public:
-    Timer_Manager_Test3();
-    virtual ~Timer_Manager_Test3() {}
+    Timer_Manager_Multiple_Timers_Test();
+    virtual ~Timer_Manager_Multiple_Timers_Test() {}
 
     bool run();
 
