@@ -950,3 +950,116 @@ bool SIP_Transaction_Server_Invite::timer_I_Callback(void *p)
 }
 
 //-------------------------------------------
+//-------------------------------------------
+
+SIP_Transaction_Server_Non_Invite::~SIP_Transaction_Server_Non_Invite()
+{
+    if (_last_response)
+        delete _last_response;
+}
+
+//-------------------------------------------
+
+void SIP_Transaction_Server_Non_Invite::receive_request(SIP_Request *msg)
+{
+    switch (_state)
+    {
+        case sttIdle:
+            _state = sttTrying;
+            _saved_request = new SIP_Request(*msg);
+
+            if (_receive_request_callback)
+                _receive_request_callback(_saved_request, this);
+            break;
+
+        case sttProceeding:
+            //_state = sttProceeding;
+            if ((_last_response) && (_send_message_callback))
+                _send_message_callback(_last_response);
+            break;
+
+        case sttCompleted:
+            //_state = sttCompleted;
+            if ((_last_response) && (_send_message_callback))
+                _send_message_callback(_last_response);
+            break;
+
+        default:
+            break;
+    }
+}
+
+//-------------------------------------------
+
+void SIP_Transaction_Server_Non_Invite::send_1xx(SIP_Response *msg)
+{
+    switch (_state)
+    {
+        case sttTrying:
+        case sttProceeding:
+            _state = sttProceeding;
+            if (_last_response)
+                delete _last_response;
+            _last_response = new SIP_Response(*msg);
+
+            if ((_last_response) && (_send_message_callback))
+                _send_message_callback(_last_response);
+            break;
+
+        default:
+            break;
+    }
+}
+
+//-------------------------------------------
+
+void SIP_Transaction_Server_Non_Invite::send_2xx_6xx(SIP_Response *msg)
+{
+    switch (_state)
+    {
+        case sttTrying:
+        case sttProceeding:
+            _state = sttCompleted;
+            if (_last_response)
+                delete _last_response;
+            _last_response = new SIP_Response(*msg);
+
+            if ((_last_response) && (_send_message_callback))
+                _send_message_callback(_last_response);
+
+            set_timer_value(SIP_TIMER_J, SIP_TIMER_1 * 64);
+            start_timer(SIP_TIMER_J, this);
+            break;
+
+        default:
+            break;
+    }
+}
+
+//-------------------------------------------
+
+bool SIP_Transaction_Server_Non_Invite::timer_J_Callback(void *p)
+{
+    SIP_Transaction_Server_Non_Invite *transaction = reinterpret_cast<SIP_Transaction_Server_Non_Invite *>(p);
+    if (!transaction)
+    {
+        std::cout << "SIP_Transaction_Server_Non_Invite::timer_J_Callback -> Invalid parameter\n";
+        return false;
+    }
+
+    transaction->_timer_ids[SIP_TIMER_J] = Timer::INVALID_TIMER_ID;
+
+    switch (transaction->_state)
+    {
+        case sttCompleted:
+            transaction->_state = sttTerminated;
+            break;
+
+        default:
+            break;
+    }
+
+    return true;
+}
+
+//-------------------------------------------

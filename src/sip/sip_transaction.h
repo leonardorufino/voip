@@ -193,3 +193,34 @@ private:
 };
 
 //-------------------------------------------
+
+class SIP_Transaction_Server_Non_Invite : public SIP_Transaction
+{
+private:
+    enum State
+    {
+        sttIdle,
+        sttTrying,
+        sttProceeding,
+        sttCompleted,
+        sttTerminated
+    };
+
+public:
+    SIP_Transaction_Server_Non_Invite() : _state(sttIdle), _last_response(NULL) {}
+    ~SIP_Transaction_Server_Non_Invite();
+
+    SIP_Transaction_Type get_transaction_type() { return SIP_TRANSACTION_SERVER_NON_INVITE; }
+
+    void receive_request(SIP_Request *msg);
+    void send_1xx(SIP_Response *msg);
+    void send_2xx_6xx(SIP_Response *msg);
+
+    static bool timer_J_Callback(void *p);
+
+private:
+    State _state;
+    SIP_Response *_last_response;
+};
+
+//-------------------------------------------
