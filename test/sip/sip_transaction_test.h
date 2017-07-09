@@ -94,3 +94,22 @@ public:
 };
 
 //-------------------------------------------
+//-------------------------------------------
+
+class SIP_Transaction_Client_Non_Invite_Test : public SIP_Transaction_Test
+{
+public:
+    SIP_Transaction_Client_Non_Invite_Test() {}
+    virtual ~SIP_Transaction_Client_Non_Invite_Test() {}
+
+protected:
+    bool send_bye();
+    bool send_response_100();
+    bool send_response_200();
+    bool wait_timer_K();
+
+protected:
+    SIP_Transaction_Client_Non_Invite transaction;
+};
+
+//-------------------------------------------
