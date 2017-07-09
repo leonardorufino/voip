@@ -106,6 +106,7 @@ protected:
     bool send_bye();
     bool send_response_100();
     bool send_response_200();
+    bool wait_timer_F();
     bool wait_timer_K();
 
 protected:
@@ -119,6 +120,17 @@ class SIP_Transaction_Client_Non_Invite_Accepted_Test : public SIP_Transaction_C
 public:
     SIP_Transaction_Client_Non_Invite_Accepted_Test() {}
     virtual ~SIP_Transaction_Client_Non_Invite_Accepted_Test() {}
+
+    bool run();
+};
+
+//-------------------------------------------
+
+class SIP_Transaction_Client_Non_Invite_Retransmission_Test : public SIP_Transaction_Client_Non_Invite_Test
+{
+public:
+    SIP_Transaction_Client_Non_Invite_Retransmission_Test() {}
+    virtual ~SIP_Transaction_Client_Non_Invite_Retransmission_Test() {}
 
     bool run();
 };

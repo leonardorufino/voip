@@ -39,6 +39,10 @@ bool SIP_Transaction_Test::init()
     if (!client_non_invite_accepted_test.run())
         return false;
 
+    SIP_Transaction_Client_Non_Invite_Retransmission_Test client_non_invite_retransmission_test;
+    if (!client_non_invite_retransmission_test.run())
+        return false;
+
     std::cout << "SIP transaction test completed successfully\n";
     return true;
 }
@@ -650,6 +654,58 @@ bool SIP_Transaction_Client_Non_Invite_Test::send_response_200()
 
 //-------------------------------------------
 
+bool SIP_Transaction_Client_Non_Invite_Test::wait_timer_F()
+{
+    unsigned long start = Common_Functions::get_tick();
+    unsigned long max_wait_time = (SIP_Transaction::SIP_TIMER_1 * 64) + 5000;
+
+    unsigned short request_retransmissions = 0;
+    const unsigned short expected_request_retransmissions = 10;
+
+    sent_message = false; // Request retransmission
+    received_response = false; // Final rejection response
+
+    while ((Common_Functions::get_tick() - start) < max_wait_time)
+    {
+        if (sent_message)
+        {
+            request_retransmissions++;
+            sent_message = false;
+        }
+
+        if ((transaction.get_state() == SIP_Transaction_Client_Non_Invite::sttTerminated) && (received_response))
+            break;
+
+        Common_Functions::delay(500);
+    }
+
+    if (!received_response)
+    {
+        std::cout << "SIP_Transaction_Client_Non_Invite_Test::wait_timer_F -> Response not received\n";
+        return false;
+    }
+
+    if (request_retransmissions != expected_request_retransmissions)
+    {
+        std::cout << "SIP_Transaction_Client_Non_Invite_Test::wait_timer_F -> Failed to retransmit request:\n";
+        std::cout << std::setw(12) << "Expected: " << expected_request_retransmissions << "\n";
+        std::cout << std::setw(12) << "Count: " << request_retransmissions << "\n";
+        return false;
+    }
+
+    if (transaction.get_state() != SIP_Transaction_Client_Non_Invite::sttTerminated)
+    {
+        std::cout << "SIP_Transaction_Client_Non_Invite_Test::wait_timer_F -> Invalid transaction state:\n";
+        std::cout << std::setw(12) << "Expected: " << "Terminated" << "\n";
+        std::cout << std::setw(12) << "State: " << transaction.get_state_str().c_str() << "\n";
+        return false;
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+
 bool SIP_Transaction_Client_Non_Invite_Test::wait_timer_K()
 {
     unsigned long start = Common_Functions::get_tick();
@@ -693,6 +749,24 @@ bool SIP_Transaction_Client_Non_Invite_Accepted_Test::run()
         return false;
 
     if (!wait_timer_K())
+        return false;
+
+    return true;
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+bool SIP_Transaction_Client_Non_Invite_Retransmission_Test::run()
+{
+    transaction.set_send_message_callback(send_message_callback);
+    transaction.set_receive_request_callback(receive_request_callback);
+    transaction.set_receive_response_callback(receive_response_callback);
+
+    if (!send_bye())
+        return false;
+
+    if (!wait_timer_F())
         return false;
 
     return true;
