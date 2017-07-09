@@ -262,9 +262,6 @@ void SIP_Transaction::start_timer(SIP_Timer timer, SIP_Transaction *p)
         case SIP_TIMER_B:
             _timer_ids[SIP_TIMER_B] = tm.start_timer(_timer_values[timer], p, SIP_Transaction_Client_Invite::timer_B_Callback);
             break;
-        //case SIP_TIMER_C:
-        //    _timer_ids[SIP_TIMER_C] = tm.start_timer(_timer_values[timer], p, timer_C_Callback);
-        //    break;
         case SIP_TIMER_D:
             _timer_ids[SIP_TIMER_D] = tm.start_timer(_timer_values[timer], p, SIP_Transaction_Client_Invite::timer_D_Callback);
             break;
@@ -683,7 +680,8 @@ bool SIP_Transaction_Client_Non_Invite::timer_E_Callback(void *p)
         case sttTrying:
         {
             //_state = sttTrying;
-            unsigned long value = ((transaction->get_timer_value(SIP_TIMER_E) * 2) < SIP_TIMER_2) ? transaction->get_timer_value(SIP_TIMER_E) * 2 : SIP_TIMER_2;
+            unsigned long value = ((transaction->get_timer_value(SIP_TIMER_E) * 2) < SIP_TIMER_2)
+                                ? transaction->get_timer_value(SIP_TIMER_E) * 2 : SIP_TIMER_2;
             transaction->set_timer_value(SIP_TIMER_E, value);
             transaction->start_timer(SIP_TIMER_E, transaction);
 
@@ -925,7 +923,8 @@ bool SIP_Transaction_Server_Invite::timer_G_Callback(void *p)
         case sttCompleted:
         {
             //transaction->_state = sttCompleted;
-            unsigned long value = ((transaction->get_timer_value(SIP_TIMER_G) * 2) < SIP_TIMER_2) ? transaction->get_timer_value(SIP_TIMER_G) * 2 : SIP_TIMER_2;
+            unsigned long value = ((transaction->get_timer_value(SIP_TIMER_G) * 2) < SIP_TIMER_2)
+                                ? transaction->get_timer_value(SIP_TIMER_G) * 2 : SIP_TIMER_2;
             transaction->set_timer_value(SIP_TIMER_G, value);
             transaction->start_timer(SIP_TIMER_G, transaction);
 

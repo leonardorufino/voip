@@ -113,3 +113,14 @@ protected:
 };
 
 //-------------------------------------------
+
+class SIP_Transaction_Client_Non_Invite_Accepted_Test : public SIP_Transaction_Client_Non_Invite_Test
+{
+public:
+    SIP_Transaction_Client_Non_Invite_Accepted_Test() {}
+    virtual ~SIP_Transaction_Client_Non_Invite_Accepted_Test() {}
+
+    bool run();
+};
+
+//-------------------------------------------
