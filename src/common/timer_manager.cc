@@ -141,6 +141,11 @@ bool Timer::expired()
 
         //std::cout << "Timer::expired -> Timer " << _timer_id << " expired\n";
         return _callback(_data);
+
+    }catch (std::exception &e)
+    {
+        std::cout << "Timer::expired -> Exception in timer callback (" << e.what() << ")\n";
+        return false;
     }catch (...)
     {
         std::cout << "Timer::expired -> Unknown exception in timer callback\n";
@@ -185,7 +190,7 @@ Timer_Manager &Timer_Manager::instance()
 
 Timer_Id Timer_Manager::start_timer(unsigned long time, void *data, timer_callback *callback)
 {
-    std::lock_guard<std::mutex> lock(_timer_list_mutex);
+    std::lock_guard<std::recursive_mutex> lock(_timer_list_mutex);
 
     Timer_Id id = Timer::next_timer_id();
 
@@ -205,7 +210,7 @@ Timer_Id Timer_Manager::start_timer(unsigned long time, void *data, timer_callba
 
 void Timer_Manager::stop_timer(Timer_Id timer_id)
 {
-    std::lock_guard<std::mutex> lock(_timer_list_mutex);
+    std::lock_guard<std::recursive_mutex> lock(_timer_list_mutex);
 
     Timer *timer = get_timer(timer_id);
     if (timer)
@@ -226,7 +231,7 @@ void Timer_Manager::stop_timer(Timer_Id timer_id)
 {
     Timer_Manager &manager = instance();
 
-    std::lock_guard<std::mutex> lock(manager._timer_list_mutex);
+    std::lock_guard<std::recursive_mutex> lock(manager._timer_list_mutex);
 
 #ifdef WIN32
     Timer_Id timer_id = (Timer_Id) id;

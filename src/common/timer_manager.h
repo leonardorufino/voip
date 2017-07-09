@@ -99,7 +99,7 @@ private:
 
 private:
     std::list<Timer *> _timer_list;
-    std::mutex _timer_list_mutex;
+    std::recursive_mutex _timer_list_mutex;
 };
 
 //-------------------------------------------
