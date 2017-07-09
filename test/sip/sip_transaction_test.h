@@ -14,6 +14,7 @@
 #include "sip/sip_header.h"
 #include "sip/sip_message.h"
 #include "sip/sip_transaction.h"
+#include "common/common_functions.h"
 #include <iomanip>
 
 class SIP_Transaction_Test
@@ -51,6 +52,8 @@ protected:
     bool send_response_100();
     bool send_response_180();
     bool send_response_200();
+    bool send_response_480();
+    bool wait_timeout();
 
 protected:
     SIP_Transaction_Client_Invite transaction;
@@ -63,6 +66,17 @@ class SIP_Transaction_Client_Invite_Accepted_Test : public SIP_Transaction_Clien
 public:
     SIP_Transaction_Client_Invite_Accepted_Test() {}
     virtual ~SIP_Transaction_Client_Invite_Accepted_Test() {}
+
+    bool run();
+};
+
+//-------------------------------------------
+
+class SIP_Transaction_Client_Invite_Rejected_Test : public SIP_Transaction_Client_Invite_Test
+{
+public:
+    SIP_Transaction_Client_Invite_Rejected_Test() {}
+    virtual ~SIP_Transaction_Client_Invite_Rejected_Test() {}
 
     bool run();
 };

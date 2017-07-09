@@ -27,6 +27,10 @@ bool SIP_Transaction_Test::init()
     if (!client_invite_accepted_test.run())
         return false;
 
+    SIP_Transaction_Client_Invite_Rejected_Test client_invite_rejected_test;
+    if (!client_invite_rejected_test.run())
+        return false;
+
     std::cout << "SIP transaction test completed successfully\n";
     return true;
 }
@@ -278,6 +282,87 @@ bool SIP_Transaction_Client_Invite_Test::send_response_200()
 }
 
 //-------------------------------------------
+
+bool SIP_Transaction_Client_Invite_Test::send_response_480()
+{
+    std::string str;
+    str  = "SIP/2.0 480 Temporarily Unavailable\r\n";
+    str += "Via: SIP/2.0/UDP pc33.atlanta.com;branch=z9hG4bK776asdhds;received=192.0.2.1\r\n";
+    str += "To: Bob <sip:bob@biloxi.com>;tag=a6c85cf\r\n";
+    str += "From: Alice <sip:alice@atlanta.com>;tag=1928301774\r\n";
+    str += "Call-ID: a84b4c76e66710@pc33.atlanta.com\r\n";
+    str += "CSeq: 314159 INVITE\r\n";
+    str += "Contact: <sip:bob@192.0.2.4>\r\n";
+    str += "Content-Length: 0\r\n";
+
+    SIP_Message *msg = SIP_Message::decode_msg(str);
+    SIP_Response *response = dynamic_cast<SIP_Response *>(msg);
+    if (!response)
+    {
+        std::cout << "SIP_Transaction_Client_Invite_Test::send_response_480 -> Failed to decode message\n";
+        return false;
+    }
+
+    SIP_Transaction *t = transaction.match_transaction(response);
+    if (&transaction != t)
+    {
+        std::cout << "SIP_Transaction_Client_Invite_Test::send_response_480 -> Failed to match transaction\n";
+        delete msg;
+        return false;
+    }
+
+    received_response = false;
+    sent_message = false; // ACK is sent by SIP transaction
+
+    transaction.receive_3xx_6xx(response);
+
+    if ((!received_response) || (!sent_message))
+    {
+        std::cout << "SIP_Transaction_Client_Invite_Test::send_response_480 -> Response not received or ACK not sent\n";
+        delete msg;
+        return false;
+    }
+
+    if (transaction.get_state() != SIP_Transaction_Client_Invite::sttCompleted)
+    {
+        std::cout << "SIP_Transaction_Client_Invite_Test::send_response_480 -> Invalid transaction state:\n";
+        std::cout << std::setw(12) << "Expected: " << "Completed" << "\n";
+        std::cout << std::setw(12) << "State: " << transaction.get_state_str().c_str() << "\n";
+        delete msg;
+        return false;
+    }
+
+    delete msg;
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Transaction_Client_Invite_Test::wait_timeout()
+{
+    unsigned long start = Common_Functions::get_tick();
+    unsigned long max_wait_time = SIP_Transaction::SIP_TIMER_32s + 5000;
+
+    while ((Common_Functions::get_tick() - start) < max_wait_time)
+    {
+        if (transaction.get_state() == SIP_Transaction_Client_Invite::sttTerminated)
+            break;
+
+        Common_Functions::delay(500);
+    }
+
+    if (transaction.get_state() != SIP_Transaction_Client_Invite::sttTerminated)
+    {
+        std::cout << "SIP_Transaction_Client_Invite_Test::wait_timeout -> Invalid transaction state:\n";
+        std::cout << std::setw(12) << "Expected: " << "Terminated" << "\n";
+        std::cout << std::setw(12) << "State: " << transaction.get_state_str().c_str() << "\n";
+        return false;
+    }
+
+    return true;
+}
+
+//-------------------------------------------
 //-------------------------------------------
 
 bool SIP_Transaction_Client_Invite_Accepted_Test::run()
@@ -296,6 +381,33 @@ bool SIP_Transaction_Client_Invite_Accepted_Test::run()
         return false;
 
     if (!send_response_200())
+        return false;
+
+    return true;
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+bool SIP_Transaction_Client_Invite_Rejected_Test::run()
+{
+    transaction.set_send_message_callback(send_message_callback);
+    transaction.set_receive_request_callback(receive_request_callback);
+    transaction.set_receive_response_callback(receive_response_callback);
+
+    if (!send_invite())
+        return false;
+
+    if (!send_response_100())
+        return false;
+
+    if (!send_response_180())
+        return false;
+
+    if (!send_response_480())
+        return false;
+
+    if (!wait_timeout())
         return false;
 
     return true;
