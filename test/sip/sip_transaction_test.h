@@ -53,7 +53,8 @@ protected:
     bool send_response_180();
     bool send_response_200();
     bool send_response_480();
-    bool wait_timeout();
+    bool wait_timer_B();
+    bool wait_timer_D();
 
 protected:
     SIP_Transaction_Client_Invite transaction;
@@ -77,6 +78,17 @@ class SIP_Transaction_Client_Invite_Rejected_Test : public SIP_Transaction_Clien
 public:
     SIP_Transaction_Client_Invite_Rejected_Test() {}
     virtual ~SIP_Transaction_Client_Invite_Rejected_Test() {}
+
+    bool run();
+};
+
+//-------------------------------------------
+
+class SIP_Transaction_Client_Invite_Retransmission_Test : public SIP_Transaction_Client_Invite_Test
+{
+public:
+    SIP_Transaction_Client_Invite_Retransmission_Test() {}
+    virtual ~SIP_Transaction_Client_Invite_Retransmission_Test() {}
 
     bool run();
 };
