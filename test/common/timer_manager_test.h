@@ -31,7 +31,7 @@ public:
 class Timer_Manager_Stop_Test : public Timer_Manager_Test
 {
 public:
-    Timer_Manager_Stop_Test() : _start(0), _stop(0), _time(300), _max_wait_time(_time * 3) {}
+    Timer_Manager_Stop_Test() : _start(0), _stop(0), _time(500), _max_wait_time(_time * 3) {}
     virtual ~Timer_Manager_Stop_Test() {}
 
     bool run();
@@ -50,7 +50,7 @@ private:
 class Timer_Manager_Callback_Test : public Timer_Manager_Test
 {
 public:
-    Timer_Manager_Callback_Test() : _start(0), _stop(0), _time(300), _max_wait_time(_time * 3) {}
+    Timer_Manager_Callback_Test() : _start(0), _stop(0), _time(500), _max_wait_time(_time * 3) {}
     virtual ~Timer_Manager_Callback_Test() {}
 
     bool run();

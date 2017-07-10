@@ -130,7 +130,7 @@ Timer_Manager_Multiple_Timers_Test::Timer_Manager_Multiple_Timers_Test()
     {
         _start[i] = 0;
         _stop[i] = 0;
-        _time[i] = 300 * (i + 1);
+        _time[i] = 500 * (i + 1);
         _max_wait_time[i] = _time[i] * 3;
     }
 }
