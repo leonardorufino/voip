@@ -49,10 +49,10 @@ public:
 
 protected:
     bool send_invite();
-    bool send_response_100();
-    bool send_response_180();
-    bool send_response_200();
-    bool send_response_480();
+    bool receive_response_100();
+    bool receive_response_180();
+    bool receive_response_200();
+    bool receive_response_480();
     bool wait_timer_B();
     bool wait_timer_D();
 
@@ -104,8 +104,8 @@ public:
 
 protected:
     bool send_bye();
-    bool send_response_100();
-    bool send_response_200();
+    bool receive_response_100();
+    bool receive_response_200();
     bool wait_timer_F();
     bool wait_timer_K();
 
