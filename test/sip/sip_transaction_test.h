@@ -28,6 +28,17 @@ public:
 protected:
     virtual bool run() = 0;
 
+    SIP_Request *create_invite();
+    SIP_Request *create_ack();
+    SIP_Response *create_invite_response_100();
+    SIP_Response *create_invite_response_180();
+    SIP_Response *create_invite_response_200();
+    SIP_Response *create_invite_response_480();
+
+    SIP_Request *create_bye();
+    SIP_Response *create_bye_response_100();
+    SIP_Response *create_bye_response_200();
+
     static bool send_message_callback(SIP_Message *msg);
     static bool receive_request_callback(SIP_Request *request, SIP_Transaction *transaction);
     static bool receive_response_callback(SIP_Request *request, SIP_Response *response, SIP_Transaction *transaction);
