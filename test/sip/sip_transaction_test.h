@@ -147,3 +147,26 @@ public:
 };
 
 //-------------------------------------------
+//-------------------------------------------
+
+class SIP_Transaction_Server_Invite_Test : public SIP_Transaction_Test
+{
+public:
+    SIP_Transaction_Server_Invite_Test() {}
+    virtual ~SIP_Transaction_Server_Invite_Test() {}
+
+protected:
+    bool receive_invite(bool retransmission = false);
+    bool receive_ack();
+    bool send_response_100();
+    bool send_response_180();
+    bool send_response_200();
+    bool send_response_480();
+    bool wait_timer_H();
+    bool wait_timer_I();
+
+protected:
+    SIP_Transaction_Server_Invite transaction;
+};
+
+//-------------------------------------------
