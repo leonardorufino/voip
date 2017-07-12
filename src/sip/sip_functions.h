@@ -14,7 +14,7 @@
 #include "sip_defs.h"
 #include <string>
 #include <cstdlib>
-#include <time.h>
+#include <ctime>
 
 class SIP_Functions
 {

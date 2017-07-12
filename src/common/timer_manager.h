@@ -18,9 +18,9 @@
 #ifdef WIN32
     #include <windows.h>
 #else
-    #include <signal.h>
-    #include <time.h>
-    #include <string.h>
+    #include <csignal>
+    #include <ctime>
+    #include <cstring>
 #endif
 
 typedef bool (timer_callback)(void *data);
