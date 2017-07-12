@@ -181,3 +181,14 @@ public:
 };
 
 //-------------------------------------------
+
+class SIP_Transaction_Server_Invite_Rejected_Test : public SIP_Transaction_Server_Invite_Test
+{
+public:
+    SIP_Transaction_Server_Invite_Rejected_Test() {}
+    virtual ~SIP_Transaction_Server_Invite_Rejected_Test() {}
+
+    bool run();
+};
+
+//-------------------------------------------
