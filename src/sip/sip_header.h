@@ -487,6 +487,7 @@ private:
 
 class SIP_Header_Contact : public SIP_Header
 {
+public:
     static const unsigned long INVALID_EXPIRES = INVALID_UNSIGNED_LONG;
 
 public:
