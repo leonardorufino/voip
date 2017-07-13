@@ -192,3 +192,14 @@ public:
 };
 
 //-------------------------------------------
+
+class SIP_Transaction_Server_Invite_Retransmission_Test : public SIP_Transaction_Server_Invite_Test
+{
+public:
+    SIP_Transaction_Server_Invite_Retransmission_Test() {}
+    virtual ~SIP_Transaction_Server_Invite_Retransmission_Test() {}
+
+    bool run();
+};
+
+//-------------------------------------------
