@@ -1249,3 +1249,134 @@ bool SIP_Transaction_Server_Invite_Retransmission_Test::run()
 }
 
 //-------------------------------------------
+//-------------------------------------------
+
+bool SIP_Transaction_Server_Non_Invite_Test::receive_bye(bool retransmission)
+{
+    SIP_Request *request = create_bye();
+    if (!request)
+        return false;
+
+    if (retransmission)
+    {
+        SIP_Transaction *t = transaction.match_transaction(request);
+        if (&transaction != t)
+        {
+            std::cout << "SIP_Transaction_Server_Non_Invite_Test::receive_bye -> Failed to match transaction\n";
+            delete request;
+            return false;
+        }
+    }
+
+    received_request = false;
+    transaction.receive_request(request);
+
+    if ((!received_request) && (!retransmission))
+    {
+        std::cout << "SIP_Transaction_Server_Non_Invite_Test::receive_bye -> BYE not received\n";
+        delete request;
+        return false;
+    }
+
+    if ((transaction.get_state() != SIP_Transaction_Server_Non_Invite::sttTrying) && (!retransmission))
+    {
+        std::cout << "SIP_Transaction_Server_Non_Invite_Test::receive_bye -> Invalid transaction state:\n";
+        std::cout << std::setw(12) << "Expected: " << "Trying" << "\n";
+        std::cout << std::setw(12) << "State: " << transaction.get_state_str().c_str() << "\n";
+        delete request;
+        return false;
+    }
+
+    delete request;
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Transaction_Server_Non_Invite_Test::send_response_100()
+{
+    SIP_Response *response = create_bye_response_100();
+    if (!response)
+        return false;
+
+    sent_message = false;
+    transaction.send_1xx(response);
+
+    if (!sent_message)
+    {
+        std::cout << "SIP_Transaction_Server_Non_Invite_Test::send_response_100 -> Response not sent\n";
+        delete response;
+        return false;
+    }
+
+    if (transaction.get_state() != SIP_Transaction_Server_Non_Invite::sttProceeding)
+    {
+        std::cout << "SIP_Transaction_Server_Non_Invite_Test::send_response_100 -> Invalid transaction state:\n";
+        std::cout << std::setw(12) << "Expected: " << "Proceeding " << "\n";
+        std::cout << std::setw(12) << "State: " << transaction.get_state_str().c_str() << "\n";
+        delete response;
+        return false;
+    }
+
+    delete response;
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Transaction_Server_Non_Invite_Test::send_response_200()
+{
+    SIP_Response *response = create_bye_response_200();
+    if (!response)
+        return false;
+
+    sent_message = false;
+    transaction.send_2xx_6xx(response);
+
+    if (!sent_message)
+    {
+        std::cout << "SIP_Transaction_Server_Non_Invite_Test::send_response_200 -> Response not sent\n";
+        delete response;
+        return false;
+    }
+
+    if (transaction.get_state() != SIP_Transaction_Server_Non_Invite::sttCompleted)
+    {
+        std::cout << "SIP_Transaction_Server_Non_Invite_Test::send_response_200 -> Invalid transaction state:\n";
+        std::cout << std::setw(12) << "Expected: " << "Completed" << "\n";
+        std::cout << std::setw(12) << "State: " << transaction.get_state_str().c_str() << "\n";
+        delete response;
+        return false;
+    }
+
+    delete response;
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Transaction_Server_Non_Invite_Test::wait_timer_J()
+{
+    unsigned long start = Common_Functions::get_tick();
+    unsigned long max_wait_time = (SIP_Transaction::SIP_TIMER_1 * 64) + 5000;
+
+    while ((Common_Functions::get_tick() - start) < max_wait_time)
+    {
+        if (transaction.get_state() == SIP_Transaction_Server_Non_Invite::sttTerminated)
+            break;
+
+        Common_Functions::delay(500);
+    }
+
+    if (transaction.get_state() != SIP_Transaction_Server_Non_Invite::sttTerminated)
+    {
+        std::cout << "SIP_Transaction_Server_Non_Invite_Test::wait_timer_J -> Invalid transaction state:\n";
+        std::cout << std::setw(12) << "Expected: " << "Terminated" << "\n";
+        std::cout << std::setw(12) << "State: " << transaction.get_state_str().c_str() << "\n";
+        return false;
+    }
+
+    return true;
+}
+
+//-------------------------------------------

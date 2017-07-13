@@ -203,3 +203,22 @@ public:
 };
 
 //-------------------------------------------
+//-------------------------------------------
+
+class SIP_Transaction_Server_Non_Invite_Test : public SIP_Transaction_Test
+{
+public:
+    SIP_Transaction_Server_Non_Invite_Test() {}
+    virtual ~SIP_Transaction_Server_Non_Invite_Test() {}
+
+protected:
+    bool receive_bye(bool retransmission = false);
+    bool send_response_100();
+    bool send_response_200();
+    bool wait_timer_J();
+
+protected:
+    SIP_Transaction_Server_Non_Invite transaction;
+};
+
+//-------------------------------------------
