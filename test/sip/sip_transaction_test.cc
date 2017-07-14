@@ -59,6 +59,10 @@ bool SIP_Transaction_Test::init()
     if (!server_non_invite_accepted_test.run())
         return false;
 
+    SIP_Transaction_Server_Non_Invite_Retransmission_Test server_non_invite_retransmission_test;
+    if (!server_non_invite_retransmission_test.run())
+        return false;
+
     std::cout << "SIP transaction test completed successfully\n";
     return true;
 }
@@ -1399,6 +1403,30 @@ bool SIP_Transaction_Server_Non_Invite_Accepted_Test::run()
         return false;
 
     if (!send_response_200())
+        return false;
+
+    if (!wait_timer_J())
+        return false;
+
+    return true;
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+bool SIP_Transaction_Server_Non_Invite_Retransmission_Test::run()
+{
+    transaction.set_send_message_callback(send_message_callback);
+    transaction.set_receive_request_callback(receive_request_callback);
+    transaction.set_receive_response_callback(receive_response_callback);
+
+    if (!receive_bye())
+        return false;
+
+    if (!send_response_200())
+        return false;
+
+    if (!receive_bye(true))
         return false;
 
     if (!wait_timer_J())
