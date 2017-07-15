@@ -1,0 +1,169 @@
+/*
+*                    GNU GENERAL PUBLIC LICENSE
+*                       Version 3, 29 June 2007
+*
+* Copyright (C) 2007 Free Software Foundation, Inc. <http://fsf.org/>
+* Everyone is permitted to copy and distribute verbatim copies
+* of this license document, but changing it is not allowed.
+*
+* Written by Leonardo Maccari Rufino
+*/
+
+#include "log_manager.h"
+#include "common_functions.h"
+
+//-------------------------------------------
+
+Log_Manager::Log_Manager()
+{
+    _level = LOG_ERROR | LOG_WARNING | LOG_INFO;
+    _source = LOG_TIMER_MANAGER | LOG_SIP_HEADER | LOG_SIP_MESSAGE | LOG_SIP_TRANSACTION;
+    _callback = log_cout_callback;
+}
+
+//-------------------------------------------
+
+Log_Manager &Log_Manager::instance()
+{
+    static Log_Manager manager;
+    return manager;
+}
+
+//-------------------------------------------
+
+void Log_Manager::log(Log_Level level, Log_Source source, const std::string &msg)
+{
+    if (!is_active(level, source))
+        return;
+
+    std::string str;
+    str  = prefix(level, source);
+    str += msg;
+
+    if (_callback)
+        _callback(str);
+}
+
+//-------------------------------------------
+
+void Log_Manager::log(Log_Level level, Log_Source source, const char *format, ...)
+{
+    char buffer[Log_Manager::MAX_LINE_LEN];
+
+    va_list args;
+    va_start(args, format);
+    vsnprintf(buffer, sizeof(buffer), format, args);
+    va_end(args);
+
+    std::string msg = buffer;
+    log(level, source, msg);
+}
+
+//-------------------------------------------
+
+bool Log_Manager::is_active(Log_Level level, Log_Source source)
+{
+    if (!(_level & level))
+        return false;
+
+    if (!(_source & source))
+        return false;
+
+    return true;
+}
+
+//-------------------------------------------
+
+std::string Log_Manager::prefix(Log_Level level, Log_Source source)
+{
+    std::string prefix;
+    prefix  = get_level(level);
+    prefix += "|";
+    prefix += get_datetime();
+    prefix += "|";
+    prefix += get_source(source);
+    prefix += "| ";
+    return prefix;
+}
+
+//-------------------------------------------
+
+std::string Log_Manager::get_level(Log_Level level)
+{
+    switch (level)
+    {
+        case LOG_ERROR:     return "E";
+        case LOG_WARNING:   return "W";
+        case LOG_INFO:      return "I";
+        case LOG_TRACE:     return "T";
+        default:            return " ";
+    }
+}
+
+//-------------------------------------------
+
+std::string Log_Manager::get_source(Log_Source source)
+{
+    switch (source)
+    {
+        case LOG_TIMER_MANAGER:     return "TIMER  ";
+        case LOG_SIP_HEADER:        return "SIP HDR";
+        case LOG_SIP_MESSAGE:       return "SIP MSG";
+        case LOG_SIP_TRANSACTION:   return "SIP TRA";
+        default:                    return "       ";
+    }
+}
+
+//-------------------------------------------
+
+std::string Log_Manager::get_datetime()
+{
+    auto now = std::chrono::system_clock::now();
+    std::time_t time = std::chrono::system_clock::to_time_t(now);
+
+    struct tm timeinfo;
+
+#ifdef WIN32
+    if (localtime_s(&timeinfo, &time))
+#else
+    if (!localtime_r(&time, &timeinfo))
+#endif
+        return "";
+
+    char buffer[30];
+    snprintf(buffer, sizeof(buffer), "%04d/%02d/%02d %02d:%02d:%02d", timeinfo.tm_year + 1900,
+             timeinfo.tm_mon + 1, timeinfo.tm_mday, timeinfo.tm_hour, timeinfo.tm_min, timeinfo.tm_sec);
+
+    return buffer;
+}
+
+//-------------------------------------------
+
+bool Log_Manager::log_cout_callback(const std::string &msg)
+{
+    static std::mutex LOG_COUT_MUTEX;
+    std::lock_guard<std::mutex> lock(LOG_COUT_MUTEX);
+
+    std::cout << msg.c_str() << std::endl;
+    return true;
+}
+
+//-------------------------------------------
+
+bool Log_Manager::log_file_callback(const std::string &msg)
+{
+    static std::mutex LOG_FILE_MUTEX;
+    std::lock_guard<std::mutex> lock(LOG_FILE_MUTEX);
+
+    std::ofstream file;
+    file.open("voip.log", std::ios_base::out | std::ios_base::app);
+
+    if (!file.good())
+        return false;
+
+    file << msg.c_str() << std::endl;
+    file.close();
+    return true;
+}
+
+//-------------------------------------------
