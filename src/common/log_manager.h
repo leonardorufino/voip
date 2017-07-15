@@ -19,8 +19,6 @@
 #include <chrono>
 #include <ctime>
 
-typedef bool (log_callback)(const std::string &msg);
-
 class Log_Manager
 {
 public:
@@ -36,11 +34,13 @@ public:
 
     enum Log_Source
     {
-        LOG_TIMER_MANAGER   = 0x0001,
+        LOG_TIMER           = 0x0001,
         LOG_SIP_HEADER      = 0x0002,
         LOG_SIP_MESSAGE     = 0x0004,
         LOG_SIP_TRANSACTION = 0x0008,
     };
+
+    typedef bool (log_callback)(Log_Level level, Log_Source source, const std::string &msg);
 
 public:
     Log_Manager();
@@ -48,8 +48,8 @@ public:
 
     static Log_Manager &instance();
 
-    void set_level(Log_Level level) { _level = level; }
-    void set_source(Log_Source source) { _source = source; }
+    void set_level(unsigned char level) { _level = level; }
+    void set_source(unsigned short source) { _source = source; }
     void set_callback(log_callback *callback) { _callback = callback; }
 
     void log(Log_Level level, Log_Source source, const std::string &msg);
@@ -64,8 +64,8 @@ private:
     std::string get_datetime();
 
 public:
-    static bool log_cout_callback(const std::string &msg);
-    static bool log_file_callback(const std::string &msg);
+    static bool log_cout_callback(Log_Level level, Log_Source source, const std::string &msg);
+    static bool log_file_callback(Log_Level level, Log_Source source, const std::string &msg);
 
 private:
     unsigned char _level;

@@ -17,7 +17,7 @@
 Log_Manager::Log_Manager()
 {
     _level = LOG_ERROR | LOG_WARNING | LOG_INFO;
-    _source = LOG_TIMER_MANAGER | LOG_SIP_HEADER | LOG_SIP_MESSAGE | LOG_SIP_TRANSACTION;
+    _source = LOG_TIMER | LOG_SIP_HEADER | LOG_SIP_MESSAGE | LOG_SIP_TRANSACTION;
     _callback = log_cout_callback;
 }
 
@@ -36,18 +36,17 @@ void Log_Manager::log(Log_Level level, Log_Source source, const std::string &msg
     if (!is_active(level, source))
         return;
 
-    std::string str;
-    str  = prefix(level, source);
-    str += msg;
-
     if (_callback)
-        _callback(str);
+        _callback(level, source, msg);
 }
 
 //-------------------------------------------
 
 void Log_Manager::log(Log_Level level, Log_Source source, const char *format, ...)
 {
+    if (!is_active(level, source))
+        return;
+
     char buffer[Log_Manager::MAX_LINE_LEN];
 
     va_list args;
@@ -56,7 +55,9 @@ void Log_Manager::log(Log_Level level, Log_Source source, const char *format, ..
     va_end(args);
 
     std::string msg = buffer;
-    log(level, source, msg);
+
+    if (_callback)
+        _callback(level, source, msg);
 }
 
 //-------------------------------------------
@@ -106,7 +107,7 @@ std::string Log_Manager::get_source(Log_Source source)
 {
     switch (source)
     {
-        case LOG_TIMER_MANAGER:     return "TIMER  ";
+        case LOG_TIMER:             return "TIMER  ";
         case LOG_SIP_HEADER:        return "SIP HDR";
         case LOG_SIP_MESSAGE:       return "SIP MSG";
         case LOG_SIP_TRANSACTION:   return "SIP TRA";
@@ -139,19 +140,27 @@ std::string Log_Manager::get_datetime()
 
 //-------------------------------------------
 
-bool Log_Manager::log_cout_callback(const std::string &msg)
+bool Log_Manager::log_cout_callback(Log_Level level, Log_Source source, const std::string &msg)
 {
+    Log_Manager &manager = Log_Manager::instance();
+
     static std::mutex LOG_COUT_MUTEX;
     std::lock_guard<std::mutex> lock(LOG_COUT_MUTEX);
 
-    std::cout << msg.c_str() << std::endl;
+    std::string str;
+    str = manager.prefix(level, source);
+    str += msg;
+
+    std::cout << str.c_str() << std::endl;
     return true;
 }
 
 //-------------------------------------------
 
-bool Log_Manager::log_file_callback(const std::string &msg)
+bool Log_Manager::log_file_callback(Log_Level level, Log_Source source, const std::string &msg)
 {
+    Log_Manager &manager = Log_Manager::instance();
+
     static std::mutex LOG_FILE_MUTEX;
     std::lock_guard<std::mutex> lock(LOG_FILE_MUTEX);
 
@@ -161,7 +170,11 @@ bool Log_Manager::log_file_callback(const std::string &msg)
     if (!file.good())
         return false;
 
-    file << msg.c_str() << std::endl;
+    std::string str;
+    str = manager.prefix(level, source);
+    str += msg;
+
+    file << str.c_str() << std::endl;
     file.close();
     return true;
 }
