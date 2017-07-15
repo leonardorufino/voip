@@ -72,3 +72,28 @@ private:
     unsigned short _source;
     log_callback *_callback;
 };
+
+//-------------------------------------------
+
+class Logger
+{
+public:
+    Logger(Log_Manager::Log_Source source) : _source(source) {}
+
+    void error(const std::string &msg);
+    void error(const char *format, ...);
+
+    void warning(const std::string &msg);
+    void warning(const char *format, ...);
+
+    void info(const std::string &msg);
+    void info(const char *format, ...);
+
+    void trace(const std::string &msg);
+    void trace(const char *format, ...);
+
+private:
+    Log_Manager::Log_Source _source;
+};
+
+//-------------------------------------------

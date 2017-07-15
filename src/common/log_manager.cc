@@ -167,3 +167,100 @@ bool Log_Manager::log_file_callback(const std::string &msg)
 }
 
 //-------------------------------------------
+//-------------------------------------------
+
+void Logger::error(const std::string &msg)
+{
+    Log_Manager &manager = Log_Manager::instance();
+    manager.log(Log_Manager::LOG_ERROR, _source, msg);
+}
+
+//-------------------------------------------
+
+void Logger::error(const char *format, ...)
+{
+    Log_Manager &manager = Log_Manager::instance();
+    char buffer[Log_Manager::MAX_LINE_LEN];
+
+    va_list args;
+    va_start(args, format);
+    vsnprintf(buffer, sizeof(buffer), format, args);
+    va_end(args);
+
+    std::string msg = buffer;
+    manager.log(Log_Manager::LOG_ERROR, _source, msg);
+}
+
+//-------------------------------------------
+
+void Logger::warning(const std::string &msg)
+{
+    Log_Manager &manager = Log_Manager::instance();
+    manager.log(Log_Manager::LOG_WARNING, _source, msg);
+}
+
+//-------------------------------------------
+
+void Logger::warning(const char *format, ...)
+{
+    Log_Manager &manager = Log_Manager::instance();
+    char buffer[Log_Manager::MAX_LINE_LEN];
+
+    va_list args;
+    va_start(args, format);
+    vsnprintf(buffer, sizeof(buffer), format, args);
+    va_end(args);
+
+    std::string msg = buffer;
+    manager.log(Log_Manager::LOG_WARNING, _source, msg);
+}
+
+//-------------------------------------------
+
+void Logger::info(const std::string &msg)
+{
+    Log_Manager &manager = Log_Manager::instance();
+    manager.log(Log_Manager::LOG_INFO, _source, msg);
+}
+
+//-------------------------------------------
+
+void Logger::info(const char *format, ...)
+{
+    Log_Manager &manager = Log_Manager::instance();
+    char buffer[Log_Manager::MAX_LINE_LEN];
+
+    va_list args;
+    va_start(args, format);
+    vsnprintf(buffer, sizeof(buffer), format, args);
+    va_end(args);
+
+    std::string msg = buffer;
+    manager.log(Log_Manager::LOG_INFO, _source, msg);
+}
+
+//-------------------------------------------
+
+void Logger::trace(const std::string &msg)
+{
+    Log_Manager &manager = Log_Manager::instance();
+    manager.log(Log_Manager::LOG_TRACE, _source, msg);
+}
+
+//-------------------------------------------
+
+void Logger::trace(const char *format, ...)
+{
+    Log_Manager &manager = Log_Manager::instance();
+    char buffer[Log_Manager::MAX_LINE_LEN];
+
+    va_list args;
+    va_start(args, format);
+    vsnprintf(buffer, sizeof(buffer), format, args);
+    va_end(args);
+
+    std::string msg = buffer;
+    manager.log(Log_Manager::LOG_TRACE, _source, msg);
+}
+
+//-------------------------------------------
