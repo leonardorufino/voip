@@ -12,6 +12,8 @@
 #include "timer_manager.h"
 #include "common_functions.h"
 
+Logger Timer::_logger(Log_Manager::LOG_TIMER);
+
 //-------------------------------------------
 
 Timer::Timer()
@@ -45,7 +47,7 @@ bool Timer::start(unsigned long time)
     if (!CreateTimerQueueTimer(&_timer, NULL, (WAITORTIMERCALLBACK) Timer_Manager::timer_handler, (void *) _timer_id,
                                time, 0, WT_EXECUTEDEFAULT))
     {
-        std::cout << "Timer::start -> Failed to create timer queue timer (error=" << GetLastError() << ")\n";
+        _logger.warning("Timer::start -> Failed to create timer queue timer (timer=%d, error=%d)", _timer_id, GetLastError());
         return false;
     }
 #else
@@ -55,7 +57,7 @@ bool Timer::start(unsigned long time)
 
     if (sigaction(SIGRTMIN, &_sig_action, NULL))
     {
-        std::cout << "Timer::start -> Failed to call sigaction (error=" << errno << ")\n";
+        _logger.warning("Timer::start -> Failed to call sigaction (timer=%d, error=%d)", _timer_id, errno);
         return false;
     }
 
@@ -65,7 +67,7 @@ bool Timer::start(unsigned long time)
 
     if (timer_create(CLOCK_MONOTONIC, &_sig_event, &_timer))
     {
-        std::cout << "Timer::start -> Failed to create timer (error=" << errno << ")\n";
+        _logger.warning("Timer::start -> Failed to create timer (timer=%d, error=%d)", _timer_id, errno);
         return false;
     }
 
@@ -74,12 +76,12 @@ bool Timer::start(unsigned long time)
 
     if (timer_settime(_timer, 0, &_timer_spec, NULL))
     {
-        std::cout << "Timer::start -> Failed to set time (error=" << errno << ")\n";
+        _logger.warning("Timer::start -> Failed to set time (timer=%d, error=%d)", _timer_id, errno);
         return false;
     }
 #endif
 
-    //std::cout << "Timer::start -> Timer " << _timer_id << " started\n";
+    _logger.trace("Timer::start -> Timer started (timer=%d)", _timer_id);
     return true;
 }
 
@@ -92,14 +94,14 @@ bool Timer::stop()
     {
         if (!DeleteTimerQueueTimer(NULL, _timer, NULL))
         {
-            std::cout << "Timer::stop -> Failed to delete timer (error=" << GetLastError() << ")\n";
+            _logger.warning("Timer::stop -> Failed to delete timer (timer=%d, error=%d)", _timer_id, GetLastError());
             _timer = NULL;
             return false;
         }
 
         _timer = NULL;
 
-        //std::cout << "Timer::stop -> Timer " << _timer_id << " stopped\n";
+        _logger.trace("Timer::stop -> Timer stopped (timer=%d)", _timer_id);
     }
 #else
     if (_timer)
@@ -109,19 +111,19 @@ bool Timer::stop()
 
         if (timer_settime(_timer, 0, &_timer_spec, NULL))
         {
-            std::cout << "Timer::stop -> Failed to set time (error=" << errno << ")\n";
+            _logger.warning("Timer::stop -> Failed to set time (timer=%d, error=%d)", _timer_id, errno);
             return false;
         }
 
         if (timer_delete(_timer))
         {
-            std::cout << "Timer::stop -> Failed to delete timer (error=" << errno << ")\n";
+            _logger.warning("Timer::stop -> Failed to delete timer (timer=%d, error=%d)", _timer_id, errno);
             return false;
         }
 
         _timer = 0;
 
-        //std::cout << "Timer::stop -> Timer " << _timer_id << " stopped\n";
+        _logger.trace("Timer::stop -> Timer stopped (timer=%d)", _timer_id);
     }
 #endif
 
@@ -139,16 +141,16 @@ bool Timer::expired()
             _timer = NULL;
 #endif
 
-        //std::cout << "Timer::expired -> Timer " << _timer_id << " expired\n";
+        _logger.trace("Timer::expired -> Timer expired (timer=%d)", _timer_id);
         return _callback(_data);
 
     }catch (std::exception &e)
     {
-        std::cout << "Timer::expired -> Exception in timer callback (" << e.what() << ")\n";
+        _logger.warning("Timer::expired -> Exception in timer callback (timer=%d, msg=%s)", _timer_id, e.what());
         return false;
     }catch (...)
     {
-        std::cout << "Timer::expired -> Unknown exception in timer callback\n";
+        _logger.warning("Timer::expired -> Unknown exception in timer callback (timer=%d)", _timer_id);
         return false;
     }
 }

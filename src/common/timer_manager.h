@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include <iostream>
+#include "common/log_manager.h"
 #include <list>
 #include <mutex>
 
@@ -69,6 +69,8 @@ private:
     struct itimerspec _timer_spec;
     struct sigaction _sig_action;
 #endif
+
+    static Logger _logger;
 };
 
 //-------------------------------------------
