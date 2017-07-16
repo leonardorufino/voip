@@ -17,6 +17,7 @@
 #include "sip_message.h"
 #include "common/log_manager.h"
 #include "common/timer_manager.h"
+#include <string>
 
 class SIP_Transaction;
 

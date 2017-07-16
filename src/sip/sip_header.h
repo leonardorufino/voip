@@ -14,6 +14,7 @@
 #include "sip_defs.h"
 #include "sip_address.h"
 #include "common/log_manager.h"
+#include <string>
 #include <list>
 
 class SIP_Header;

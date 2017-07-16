@@ -14,6 +14,7 @@
 #include "sip_defs.h"
 #include "sip_header.h"
 #include "common/log_manager.h"
+#include <string>
 #include <map>
 #include <list>
 

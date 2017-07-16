@@ -11,8 +11,6 @@
 
 #pragma once
 
-#include <iostream>
-
 #define SIP_VERSION             "SIP/2.0"
 #define INVALID_UNSIGNED_SHORT  0xFFFF
 #define INVALID_UNSIGNED_LONG   0xFFFFFFFF

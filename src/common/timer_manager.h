@@ -12,6 +12,7 @@
 #pragma once
 
 #include "common/log_manager.h"
+#include <string>
 #include <list>
 #include <mutex>
 
