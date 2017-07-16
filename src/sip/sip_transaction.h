@@ -15,6 +15,7 @@
 #include "sip_address.h"
 #include "sip_header.h"
 #include "sip_message.h"
+#include "common/log_manager.h"
 #include "common/timer_manager.h"
 
 class SIP_Transaction;
@@ -84,6 +85,8 @@ protected:
 
     unsigned long _timer_values[SIP_TIMER_COUNT];
     Timer_Id _timer_ids[SIP_TIMER_COUNT];
+
+    static Logger _logger;
 };
 
 //-------------------------------------------

@@ -12,6 +12,8 @@
 #include "sip_transaction.h"
 #include "sip_functions.h"
 
+Logger SIP_Transaction::_logger(Log_Manager::LOG_SIP_TRANSACTION);
+
 //-------------------------------------------
 
 SIP_Transaction::SIP_Transaction()
@@ -53,7 +55,7 @@ SIP_Transaction *SIP_Transaction::match_transaction(SIP_Message *msg)
         case SIP_TRANSACTION_CLIENT_NON_INVITE:
             if (msg->get_message_type() != SIP_RESPONSE)
             {
-                std::cout << "SIP_Transaction::match_transaction -> Invalid message type (transaction=" << get_transaction_type() << "\n";
+                _logger.warning("SIP_Transaction::match_transaction -> Invalid message type (transaction=%d)", get_transaction_type());
                 return NULL;
             }
 
@@ -62,7 +64,7 @@ SIP_Transaction *SIP_Transaction::match_transaction(SIP_Message *msg)
         case SIP_TRANSACTION_SERVER_INVITE:
             if ((msg->get_message_type() != SIP_REQUEST_INVITE) && (msg->get_message_type() != SIP_REQUEST_ACK))
             {
-                std::cout << "SIP_Transaction::match_transaction -> Invalid message type (transaction=" << get_transaction_type() << "\n";
+                _logger.warning("SIP_Transaction::match_transaction -> Invalid message type (transaction=%d)", get_transaction_type());
                 return NULL;
             }
 
@@ -72,14 +74,14 @@ SIP_Transaction *SIP_Transaction::match_transaction(SIP_Message *msg)
             if ((msg->get_message_type() == SIP_REQUEST_INVITE) || (msg->get_message_type() == SIP_REQUEST_ACK) ||
                 (msg->get_message_type() == SIP_RESPONSE))
             {
-                std::cout << "SIP_Transaction::match_transaction -> Invalid message type (transaction=" << get_transaction_type() << "\n";
+                _logger.warning("SIP_Transaction::match_transaction -> Invalid message type (transaction=%d)", get_transaction_type());
                 return NULL;
             }
 
             return match_transaction_server(msg);
 
         default:
-            std::cout << "SIP_Transaction::match_transaction -> Invalid message type (transaction=" << get_transaction_type() << "\n";
+            _logger.warning("SIP_Transaction::match_transaction -> Invalid message type (transaction=%d)", get_transaction_type());
             return NULL;
     }
 }
@@ -90,7 +92,7 @@ SIP_Transaction *SIP_Transaction::match_transaction_client(SIP_Message *msg)
 {
     if (!_saved_request)
     {
-        std::cout << "SIP_Transaction::match_transaction_client -> Invalid saved request message\n";
+        _logger.warning("SIP_Transaction::match_transaction_client -> Invalid saved request message");
         return NULL;
     }
 
@@ -99,7 +101,7 @@ SIP_Transaction *SIP_Transaction::match_transaction_client(SIP_Message *msg)
 
     if ((!saved_request_via) || (!saved_request_cseq))
     {
-        std::cout << "SIP_Transaction::match_transaction_client -> Failed to get Via or CSeq header from saved request\n";
+        _logger.warning("SIP_Transaction::match_transaction_client -> Failed to get Via or CSeq header from saved request");
         return NULL;
     }
 
@@ -108,14 +110,14 @@ SIP_Transaction *SIP_Transaction::match_transaction_client(SIP_Message *msg)
 
     if ((saved_request_via_branch.empty()) || (saved_request_cseq_method == SIP_METHOD_TYPE_INVALID))
     {
-        std::cout << "SIP_Transaction::match_transaction_client -> Invalid Via branch or CSeq method from saved request\n";
+        _logger.warning("SIP_Transaction::match_transaction_client -> Invalid Via branch or CSeq method from saved request");
         return NULL;
     }
 
     SIP_Response *response = dynamic_cast<SIP_Response *>(msg);
     if (!response)
     {
-        std::cout << "SIP_Transaction::match_transaction_client -> Invalid response message\n";
+        _logger.warning("SIP_Transaction::match_transaction_client -> Invalid response message");
         return NULL;
     }
 
@@ -124,7 +126,7 @@ SIP_Transaction *SIP_Transaction::match_transaction_client(SIP_Message *msg)
 
     if ((!response_via) || (!response_cseq))
     {
-        std::cout << "SIP_Transaction::match_transaction_client -> Failed to get Via or CSeq header from response\n";
+        _logger.warning("SIP_Transaction::match_transaction_client -> Failed to get Via or CSeq header from response");
         return NULL;
     }
 
@@ -133,13 +135,13 @@ SIP_Transaction *SIP_Transaction::match_transaction_client(SIP_Message *msg)
 
     if ((response_via_branch.empty()) || (response_cseq_method == SIP_METHOD_TYPE_INVALID))
     {
-        std::cout << "SIP_Transaction::match_transaction_client -> Invalid Via branch or CSeq method from response\n";
+        _logger.warning("SIP_Transaction::match_transaction_client -> Invalid Via branch or CSeq method from response");
         return NULL;
     }
 
     if ((saved_request_via_branch != response_via_branch) || (saved_request_cseq_method != response_cseq_method))
     {
-        std::cout << "SIP_Transaction::match_transaction_client -> Via branch or CSeq method do not match\n";
+        _logger.trace("SIP_Transaction::match_transaction_client -> Via branch or CSeq method do not match");
         return NULL;
     }
 
@@ -152,7 +154,7 @@ SIP_Transaction *SIP_Transaction::match_transaction_server(SIP_Message *msg)
 {
     if (!_saved_request)
     {
-        std::cout << "SIP_Transaction::match_transaction_server -> Invalid saved request message\n";
+        _logger.warning("SIP_Transaction::match_transaction_server -> Invalid saved request message");
         return NULL;
     }
 
@@ -160,7 +162,7 @@ SIP_Transaction *SIP_Transaction::match_transaction_server(SIP_Message *msg)
 
     if (!saved_request_via)
     {
-        std::cout << "SIP_Transaction::match_transaction_server -> Failed to get Via header from saved request\n";
+        _logger.warning("SIP_Transaction::match_transaction_server -> Failed to get Via header from saved request");
         return NULL;
     }
 
@@ -171,14 +173,14 @@ SIP_Transaction *SIP_Transaction::match_transaction_server(SIP_Message *msg)
 
     if ((saved_request_method == SIP_METHOD_TYPE_INVALID) || (saved_request_via_branch.empty()) || (saved_request_via_host.empty()))
     {
-        std::cout << "SIP_Transaction::match_transaction_server -> Invalid method, Via branch or Via host from saved request\n";
+        _logger.warning("SIP_Transaction::match_transaction_server -> Invalid method, Via branch or Via host from saved request");
         return NULL;
     }
 
     SIP_Request *request = dynamic_cast<SIP_Request *>(msg);
     if (!request)
     {
-        std::cout << "SIP_Transaction::match_transaction_server -> Invalid request message\n";
+        _logger.warning("SIP_Transaction::match_transaction_server -> Invalid request message");
         return NULL;
     }
 
@@ -186,7 +188,7 @@ SIP_Transaction *SIP_Transaction::match_transaction_server(SIP_Message *msg)
 
     if (!request_via)
     {
-        std::cout << "SIP_Transaction::match_transaction_server -> Failed to get Via header from request\n";
+        _logger.warning("SIP_Transaction::match_transaction_server -> Failed to get Via header from request");
         return NULL;
     }
 
@@ -197,7 +199,7 @@ SIP_Transaction *SIP_Transaction::match_transaction_server(SIP_Message *msg)
 
     if ((request_method == SIP_METHOD_TYPE_INVALID) || (request_via_host.empty()))
     {
-        std::cout << "SIP_Transaction::match_transaction_server -> Invalid method or Via host from request\n";
+        _logger.warning("SIP_Transaction::match_transaction_server -> Invalid method or Via host from request");
         return NULL;
     }
 
@@ -207,7 +209,7 @@ SIP_Transaction *SIP_Transaction::match_transaction_server(SIP_Message *msg)
 
     if (!magic_cookie)
     {
-        std::cout << "SIP_Transaction::match_transaction_server -> Invalid Via branch from request (magic cookie is not present)\n";
+        _logger.warning("SIP_Transaction::match_transaction_server -> Invalid Via branch from request (magic cookie is not present)");
         return NULL;
     }
 
@@ -215,7 +217,7 @@ SIP_Transaction *SIP_Transaction::match_transaction_server(SIP_Message *msg)
         (request_via_port != saved_request_via_port) || ((request_method != saved_request_method) &&
         ((saved_request_method != SIP_REQUEST_INVITE) || (request_method != SIP_REQUEST_ACK))))
     {
-        std::cout << "SIP_Transaction::match_transaction_server -> Method, Via branch, host or port do not match\n";
+        _logger.trace("SIP_Transaction::match_transaction_server -> Method, Via branch, host or port do not match");
         return NULL;
     }
 
@@ -228,7 +230,7 @@ unsigned long SIP_Transaction::get_timer_value(SIP_Timer timer)
 {
     if (timer >= SIP_TIMER_COUNT)
     {
-        std::cout << "SIP_Transaction::get_timer_value -> Invalid timer (timer=" << timer << ")\n";
+        _logger.warning("SIP_Transaction::get_timer_value -> Invalid timer (timer=%d)", timer);
         return 0;
     }
 
@@ -241,7 +243,7 @@ void SIP_Transaction::set_timer_value(SIP_Timer timer, unsigned long timer_value
 {
     if (timer >= SIP_TIMER_COUNT)
     {
-        std::cout << "SIP_Transaction::set_timer_value -> Invalid timer (timer=" << timer << ")\n";
+        _logger.warning("SIP_Transaction::set_timer_value -> Invalid timer (timer=%d)", timer);
         return;
     }
 
@@ -287,11 +289,11 @@ void SIP_Transaction::start_timer(SIP_Timer timer, SIP_Transaction *p)
             _timer_ids[SIP_TIMER_K] = tm.start_timer(_timer_values[timer], p, SIP_Transaction_Client_Non_Invite::timer_K_Callback);
             break;
         default:
-            std::cout << "SIP_Transaction::start_timer -> Invalid timer (timer=" << timer << ")\n";
+            _logger.warning("SIP_Transaction::start_timer -> Invalid timer (timer=%d)", timer);
             return;
     }
 
-    std::cout << "SIP_Transaction::start_timer -> Timer started (timer=" << timer << ")\n";
+    _logger.trace("SIP_Transaction::start_timer -> Timer started (timer=%d)", timer);
 }
 
 //-------------------------------------------
@@ -305,9 +307,9 @@ void SIP_Transaction::stop_timer(SIP_Timer timer)
 
         _timer_ids[timer] = Timer::INVALID_TIMER_ID;
 
-        std::cout << "SIP_Transaction::stop_timer -> Timer stopped (timer=" << timer << ")\n";
+        _logger.trace("SIP_Transaction::stop_timer -> Timer stopped (timer=%d)", timer);
     }else
-        std::cout << "SIP_Transaction::stop_timer -> Timer not started (timer=" << timer << ")\n";
+        _logger.trace("SIP_Transaction::stop_timer -> Timer not started (timer=%d)", timer);
 }
 
 //-------------------------------------------
@@ -356,7 +358,7 @@ void SIP_Transaction_Client_Invite::send_ack(SIP_Response *msg)
 {
     if (!_saved_request)
     {
-        std::cout << "SIP_Transaction_Client_Invite::send_ack -> Invalid saved request message\n";
+        _logger.warning("SIP_Transaction_Client_Invite::send_ack -> Invalid saved request message");
         return;
     }
 
@@ -369,7 +371,7 @@ void SIP_Transaction_Client_Invite::send_ack(SIP_Response *msg)
 
     if ((!saved_request_call_id) || (!saved_request_cseq) || (!saved_request_from) || (!saved_request_to) || (!saved_request_via))
     {
-        std::cout << "SIP_Transaction::match_transaction_server -> Failed to get Via, From, Call-ID, CSeq or To header from saved request\n";
+        _logger.warning("SIP_Transaction::match_transaction_server -> Failed to get Via, From, Call-ID, CSeq or To header from saved request");
         return;
     }
 
@@ -497,7 +499,7 @@ bool SIP_Transaction_Client_Invite::timer_A_Callback(void *p)
     SIP_Transaction_Client_Invite *transaction = reinterpret_cast<SIP_Transaction_Client_Invite *>(p);
     if (!transaction)
     {
-        std::cout << "SIP_Transaction_Client_Invite::timer_A_Callback -> Invalid parameter\n";
+        _logger.warning("SIP_Transaction_Client_Invite::timer_A_Callback -> Invalid parameter");
         return false;
     }
 
@@ -528,7 +530,7 @@ bool SIP_Transaction_Client_Invite::timer_B_Callback(void *p)
     SIP_Transaction_Client_Invite *transaction = reinterpret_cast<SIP_Transaction_Client_Invite *>(p);
     if (!transaction)
     {
-        std::cout << "SIP_Transaction_Client_Invite::timer_B_Callback -> Invalid parameter\n";
+        _logger.warning("SIP_Transaction_Client_Invite::timer_B_Callback -> Invalid parameter");
         return false;
     }
 
@@ -562,7 +564,7 @@ bool SIP_Transaction_Client_Invite::timer_D_Callback(void *p)
     SIP_Transaction_Client_Invite *transaction = reinterpret_cast<SIP_Transaction_Client_Invite *>(p);
     if (!transaction)
     {
-        std::cout << "SIP_Transaction_Client_Invite::timer_D_Callback -> Invalid parameter\n";
+        _logger.warning("SIP_Transaction_Client_Invite::timer_D_Callback -> Invalid parameter");
         return false;
     }
 
@@ -669,7 +671,7 @@ bool SIP_Transaction_Client_Non_Invite::timer_E_Callback(void *p)
     SIP_Transaction_Client_Non_Invite *transaction = reinterpret_cast<SIP_Transaction_Client_Non_Invite *>(p);
     if (!transaction)
     {
-        std::cout << "SIP_Transaction_Client_Non_Invite::timer_E_Callback -> Invalid parameter\n";
+        _logger.warning("SIP_Transaction_Client_Non_Invite::timer_E_Callback -> Invalid parameter");
         return false;
     }
 
@@ -713,7 +715,7 @@ bool SIP_Transaction_Client_Non_Invite::timer_F_Callback(void *p)
     SIP_Transaction_Client_Non_Invite *transaction = reinterpret_cast<SIP_Transaction_Client_Non_Invite *>(p);
     if (!transaction)
     {
-        std::cout << "SIP_Transaction_Client_Non_Invite::timer_F_Callback -> Invalid parameter\n";
+        _logger.warning("SIP_Transaction_Client_Non_Invite::timer_F_Callback -> Invalid parameter");
         return false;
     }
 
@@ -748,7 +750,7 @@ bool SIP_Transaction_Client_Non_Invite::timer_K_Callback(void *p)
     SIP_Transaction_Client_Non_Invite *transaction = reinterpret_cast<SIP_Transaction_Client_Non_Invite *>(p);
     if (!transaction)
     {
-        std::cout << "SIP_Transaction_Client_Non_Invite::timer_K_Callback -> Invalid parameter\n";
+        _logger.warning("SIP_Transaction_Client_Non_Invite::timer_K_Callback -> Invalid parameter");
         return false;
     }
 
@@ -912,7 +914,7 @@ bool SIP_Transaction_Server_Invite::timer_G_Callback(void *p)
     SIP_Transaction_Server_Invite *transaction = reinterpret_cast<SIP_Transaction_Server_Invite *>(p);
     if (!transaction)
     {
-        std::cout << "SIP_Transaction_Server_Invite::timer_G_Callback -> Invalid parameter\n";
+        _logger.warning("SIP_Transaction_Server_Invite::timer_G_Callback -> Invalid parameter");
         return false;
     }
 
@@ -947,7 +949,7 @@ bool SIP_Transaction_Server_Invite::timer_H_Callback(void *p)
     SIP_Transaction_Server_Invite *transaction = reinterpret_cast<SIP_Transaction_Server_Invite *>(p);
     if (!transaction)
     {
-        std::cout << "SIP_Transaction_Server_Invite::timer_H_Callback -> Invalid parameter\n";
+        _logger.warning("SIP_Transaction_Server_Invite::timer_H_Callback -> Invalid parameter");
         return false;
     }
 
@@ -974,7 +976,7 @@ bool SIP_Transaction_Server_Invite::timer_I_Callback(void *p)
     SIP_Transaction_Server_Invite *transaction = reinterpret_cast<SIP_Transaction_Server_Invite *>(p);
     if (!transaction)
     {
-        std::cout << "SIP_Transaction_Server_Invite::timer_I_Callback -> Invalid parameter\n";
+        _logger.warning("SIP_Transaction_Server_Invite::timer_I_Callback -> Invalid parameter");
         return false;
     }
 
@@ -1102,7 +1104,7 @@ bool SIP_Transaction_Server_Non_Invite::timer_J_Callback(void *p)
     SIP_Transaction_Server_Non_Invite *transaction = reinterpret_cast<SIP_Transaction_Server_Non_Invite *>(p);
     if (!transaction)
     {
-        std::cout << "SIP_Transaction_Server_Non_Invite::timer_J_Callback -> Invalid parameter\n";
+        _logger.warning("SIP_Transaction_Server_Non_Invite::timer_J_Callback -> Invalid parameter");
         return false;
     }
 
