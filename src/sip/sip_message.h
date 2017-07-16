@@ -13,6 +13,7 @@
 
 #include "sip_defs.h"
 #include "sip_header.h"
+#include "common/log_manager.h"
 #include <map>
 #include <list>
 
@@ -47,6 +48,9 @@ public:
 
 private:
     sip_header_map _headers;
+
+protected:
+    static Logger _logger;
 };
 
 //-------------------------------------------

@@ -12,6 +12,8 @@
 #include "sip_message.h"
 #include "sip_functions.h"
 
+Logger SIP_Message::_logger(Log_Manager::LOG_SIP_MESSAGE);
+
 //-------------------------------------------
 
 SIP_Message::SIP_Message(const SIP_Message &message)
@@ -66,7 +68,7 @@ SIP_Message *SIP_Message::decode_msg(std::string sip_msg)
     SIP_Method_Type method = SIP_Functions::get_method_type(msg);
     if (method == SIP_METHOD_TYPE_INVALID)
     {
-        std::cout << "SIP_Message::decode_msg -> Invalid method (method=" << msg.c_str() << ")\n";
+        _logger.warning("SIP_Message::decode_msg -> Invalid method (method=%s)", msg.c_str());
         return NULL;
     }
 
@@ -78,7 +80,7 @@ SIP_Message *SIP_Message::decode_msg(std::string sip_msg)
 
     if (!message->decode(sip_msg))
     {
-        std::cout << "SIP_Message::decode_msg -> Failed to decode message (method=" << msg.c_str() << ")\n";
+        _logger.warning("SIP_Message::decode_msg -> Failed to decode message (method=%s)", msg.c_str());
         delete message;
         return NULL;
     }
@@ -274,7 +276,7 @@ bool SIP_Request::decode_start_line(std::string &sip_msg)
     SIP_Functions::skip(line, " \t");
     if (!SIP_Functions::match(line, " ", result))
     {
-        std::cout << "SIP_Request::decode_start_line -> Failed to decode request URI (request_uri=" << line.c_str() << ")\n";
+        _logger.warning("SIP_Request::decode_start_line -> Failed to decode request URI (request_uri=%s)", line.c_str());
         return false;
     }
 
@@ -285,7 +287,7 @@ bool SIP_Request::decode_start_line(std::string &sip_msg)
     _sip_version = line;
     if ((_sip_version.empty()) || (_sip_version != SIP_VERSION))
     {
-        std::cout << "SIP_Request::decode_start_line -> Failed to decode SIP version (version=" << _sip_version.c_str() << ")\n";
+        _logger.warning("SIP_Request::decode_start_line -> Failed to decode SIP version (version=%s)", _sip_version.c_str());
         return false;
     }
 
@@ -360,14 +362,14 @@ bool SIP_Response::decode_start_line(std::string &sip_msg)
     SIP_Functions::skip(line, " \t");
     if (!SIP_Functions::match(line, " ", result))
     {
-        std::cout << "SIP_Response::decode_start_line -> Failed to decode status code (status_code=" << line.c_str() << ")\n";
+        _logger.warning("SIP_Response::decode_start_line -> Failed to decode status code (status_code=%s)", line.c_str());
         return false;
     }
 
     _status_code = SIP_Functions::str_to_us(result);
     if ((_status_code < 100) || (_status_code > 699))
     {
-        std::cout << "SIP_Response::decode_start_line -> Invalid status code (status_code=" << _status_code << ")\n";
+        _logger.warning("SIP_Response::decode_start_line -> Invalid status code (status_code=%d)", _status_code);
         return false;
     }
 
