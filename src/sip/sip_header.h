@@ -13,6 +13,7 @@
 
 #include "sip_defs.h"
 #include "sip_address.h"
+#include "common/log_manager.h"
 #include <list>
 
 class SIP_Header;
@@ -37,6 +38,8 @@ public:
 
 protected:
     std::string _header_line;
+
+    static Logger _logger;
 };
 
 //-------------------------------------------

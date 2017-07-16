@@ -12,6 +12,8 @@
 #include "sip_header.h"
 #include "sip_functions.h"
 
+Logger SIP_Header::_logger(Log_Manager::LOG_SIP_HEADER);
+
 //-------------------------------------------
 
 SIP_Header *SIP_Header::create_header(SIP_Header_Type header_type, const SIP_Header *copy)
@@ -231,7 +233,7 @@ bool SIP_Header::decode_headers(std::string &sip_msg, sip_header_list &headers)
     bool matched = SIP_Functions::match(sip_msg, ":", type);
     if (!matched)
     {
-        std::cout << "SIP_Header::decode_header -> Failed to get \":\" character (msg=" << sip_msg.c_str() << ")\n";
+        _logger.warning("SIP_Header::decode_header -> Failed to get \":\" character (msg=%s)", sip_msg.c_str());
         return false;
     }
 
@@ -240,7 +242,7 @@ bool SIP_Header::decode_headers(std::string &sip_msg, sip_header_list &headers)
     SIP_Header_Type header_type = SIP_Functions::get_header_type(type);
     if (header_type == SIP_HEADER_TYPE_INVALID)
     {
-        std::cout << "SIP_Header::decode_header -> Invalid header type (header=" << type.c_str() << ")\n";
+        _logger.warning("SIP_Header::decode_header -> Invalid header type (header=%s)", type.c_str());
         return false;
     }
 
@@ -264,7 +266,7 @@ bool SIP_Header::decode_headers(std::string &sip_msg, sip_header_list &headers)
 
         if (!header->decode(result))
         {
-            std::cout << "SIP_Header::decode_header -> Failed to decode header (header=" << header_type << ")\n";
+            _logger.warning("SIP_Header::decode_header -> Failed to decode header (header=%d)", header_type);
             delete header;
             return false;
         }
@@ -294,7 +296,7 @@ bool SIP_Header::encode_headers(std::string &sip_msg, sip_header_list &headers)
             type = SIP_Functions::get_header_type(header_type);
             if (type.empty())
             {
-                std::cout << "SIP_Header::encode_headers -> Failed to get header type (header=" << header_type << ")\n";
+                _logger.warning("SIP_Header::encode_headers -> Failed to get header type (header=%d)", header_type);
                 return false;
             }
 
@@ -313,7 +315,7 @@ bool SIP_Header::encode_headers(std::string &sip_msg, sip_header_list &headers)
 
         if (!header->encode(sip_msg))
         {
-            std::cout << "SIP_Header::encode_header -> Failed to encode header (header=" << header->get_header_type() << ")\n";
+            _logger.warning("SIP_Header::encode_header -> Failed to encode header (header=%d)", header->get_header_type());
             return false;
         }
     }
