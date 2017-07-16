@@ -457,7 +457,7 @@ void SIP_Functions::skip(std::string &str, const std::string skip)
 
 void SIP_Functions::random(std::string &buffer)
 {
-#ifdef WINDOWS
+#ifdef WIN32
     srand((unsigned int) time(NULL));
 #endif
 
