@@ -17,7 +17,7 @@
 Log_Manager::Log_Manager()
 {
     _level = LOG_ERROR | LOG_WARNING | LOG_INFO;
-    _source = LOG_TIMER | LOG_SIP_HEADER | LOG_SIP_MESSAGE | LOG_SIP_TRANSACTION;
+    _source = LOG_TIMER | LOG_SOCKET | LOG_SIP_HEADER | LOG_SIP_MESSAGE | LOG_SIP_TRANSACTION;
     _callback = log_cout_callback;
 }
 
@@ -108,6 +108,7 @@ std::string Log_Manager::get_source(Log_Source source)
     switch (source)
     {
         case LOG_TIMER:             return "TIMER  ";
+        case LOG_SOCKET:            return "SOCKET ";
         case LOG_SIP_HEADER:        return "SIP HDR";
         case LOG_SIP_MESSAGE:       return "SIP MSG";
         case LOG_SIP_TRANSACTION:   return "SIP TRA";

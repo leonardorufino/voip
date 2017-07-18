@@ -36,9 +36,10 @@ public:
     enum Log_Source
     {
         LOG_TIMER           = 0x0001,
-        LOG_SIP_HEADER      = 0x0002,
-        LOG_SIP_MESSAGE     = 0x0004,
-        LOG_SIP_TRANSACTION = 0x0008,
+        LOG_SOCKET          = 0x0002,
+        LOG_SIP_HEADER      = 0x0010,
+        LOG_SIP_MESSAGE     = 0x0020,
+        LOG_SIP_TRANSACTION = 0x0040,
     };
 
     typedef bool (log_callback)(Log_Level level, Log_Source source, const std::string &msg);
