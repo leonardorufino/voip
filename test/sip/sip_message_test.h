@@ -24,6 +24,7 @@ public:
 
     static bool init();
 
+protected:
     bool run();
 
     SIP_Message *copy_message(SIP_Message &message);

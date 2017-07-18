@@ -23,6 +23,7 @@ public:
 
     static bool init();
 
+protected:
     virtual bool run() = 0;
 };
 

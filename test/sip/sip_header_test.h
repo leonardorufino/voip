@@ -23,6 +23,7 @@ public:
 
     static bool init();
 
+protected:
     bool run();
 
     bool copy_headers(sip_header_list &headers, sip_header_list &copy);
