@@ -10,6 +10,7 @@
  */
 
 #include "timer_manager_test.h"
+#include <iostream>
 
 //-------------------------------------------
 

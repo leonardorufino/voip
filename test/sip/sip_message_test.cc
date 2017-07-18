@@ -10,6 +10,7 @@
  */
 
 #include "sip_message_test.h"
+#include <iostream>
 
 //-------------------------------------------
 
