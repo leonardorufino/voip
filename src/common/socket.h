@@ -96,3 +96,14 @@ protected:
 };
 
 //-------------------------------------------
+
+class Socket_UDP : public Socket
+{
+public:
+    Socket_UDP() {}
+    ~Socket_UDP() {}
+
+    bool create(Address_Family family);
+};
+
+//-------------------------------------------

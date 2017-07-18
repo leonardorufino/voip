@@ -564,3 +564,12 @@ bool Socket::Startup()
 #endif
 
 //-------------------------------------------
+//-------------------------------------------
+
+bool Socket_UDP::create(Address_Family family)
+{
+    int af = address_family_to_af(family);
+    return Socket::create(af, SOCK_DGRAM, IPPROTO_UDP);
+}
+
+//-------------------------------------------
