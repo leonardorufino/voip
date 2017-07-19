@@ -29,6 +29,10 @@ bool Socket_Test::init()
         Socket_UDP_Blocking_Test udp_blocking_test;
         if (!udp_blocking_test.run(family_ipv4, address_ipv4, port_ipv4))
             return false;
+
+        Socket_UDP_Blocking_Connect_Test udp_blocking_connect_test;
+        if (!udp_blocking_connect_test.run(family_ipv4, address_ipv4, port_ipv4))
+            return false;
     }else
         std::cout << "IPv4 socket test disabled\n";
 
@@ -42,6 +46,10 @@ bool Socket_Test::init()
 
         Socket_UDP_Blocking_Test udp_blocking_test;
         if (!udp_blocking_test.run(family_ipv6, address_ipv6, port_ipv6))
+            return false;
+
+        Socket_UDP_Blocking_Connect_Test udp_blocking_connect_test;
+        if (!udp_blocking_connect_test.run(family_ipv6, address_ipv6, port_ipv6))
             return false;
     }else
         std::cout << "IPv6 socket test disabled\n";
@@ -305,6 +313,58 @@ bool Socket_UDP_Blocking_Test::run(Socket::Address_Family family, std::string ad
     if (memcmp(send_buffer, receive_buffer, MSG_SIZE) != 0)
     {
         std::cout << "Socket_UDP_Blocking_Test::run -> Invalid received message\n";
+        return false;
+    }
+
+    if (!close(_socket_udp))
+        return false;
+
+    return true;
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+bool Socket_UDP_Blocking_Connect_Test::run(Socket::Address_Family family, std::string address, unsigned short port)
+{
+    if (!create(_socket_udp, family))
+        return false;
+
+    if (!set_so_snd_buf(_socket_udp))
+        return false;
+
+    if (!set_so_rcv_buf(_socket_udp))
+        return false;
+
+    if (!set_so_reuse_addr(_socket_udp))
+        return false;
+
+    if (!bind(_socket_udp, address, port))
+        return false;
+
+    if (!connect(_socket_udp, address, port))
+        return false;
+
+    const int MSG_SIZE = 256;
+    char send_buffer[MSG_SIZE];
+
+    for (int i = 0; i < MSG_SIZE; i++)
+        send_buffer[i] = i;
+
+    if (!send(_socket_udp, send_buffer, sizeof(send_buffer)))
+        return false;
+
+    if (!select_read(_socket_udp))
+        return false;
+
+    char receive_buffer[MSG_SIZE];
+
+    if (!receive(_socket_udp, receive_buffer, sizeof(receive_buffer)))
+        return false;
+
+    if (memcmp(send_buffer, receive_buffer, MSG_SIZE) != 0)
+    {
+        std::cout << "Socket_UDP_Blocking_Connect_Test::run -> Invalid received message\n";
         return false;
     }
 
