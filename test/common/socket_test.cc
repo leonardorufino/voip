@@ -18,6 +18,34 @@ bool Socket_Test::init()
 {
     std::cout << "Socket test initialized\n";
 
+    Socket::Address_Family family_ipv4 = Socket::ADDRESS_FAMILY_IPv4;
+    std::string address_ipv4 = "127.0.0.1";
+    unsigned short port_ipv4 = 33445;
+
+    if (check_network_address(family_ipv4, address_ipv4))
+    {
+        std::cout << "IPv4 socket test initialized\n";
+
+        Socket_UDP_Blocking_Test udp_blocking_test;
+        if (!udp_blocking_test.run(family_ipv4, address_ipv4, port_ipv4))
+            return false;
+    }else
+        std::cout << "IPv4 socket test disabled\n";
+
+    Socket::Address_Family family_ipv6 = Socket::ADDRESS_FAMILY_IPv6;
+    std::string address_ipv6 = "::1";
+    unsigned short port_ipv6 = 33445;
+
+    if (check_network_address(family_ipv6, address_ipv6))
+    {
+        std::cout << "IPv6 socket test initialized\n";
+
+        Socket_UDP_Blocking_Test udp_blocking_test;
+        if (!udp_blocking_test.run(family_ipv6, address_ipv6, port_ipv6))
+            return false;
+    }else
+        std::cout << "IPv6 socket test disabled\n";
+
     std::cout << "Socket test completed successfully\n";
     return true;
 }
@@ -223,6 +251,67 @@ bool Socket_Test::check_network_address(Socket::Address_Family family, std::stri
     }
 
     return false;
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+bool Socket_UDP_Blocking_Test::run(Socket::Address_Family family, std::string address, unsigned short port)
+{
+    if (!create(_socket_udp, family))
+        return false;
+
+    if (!set_so_snd_buf(_socket_udp))
+        return false;
+
+    if (!set_so_rcv_buf(_socket_udp))
+        return false;
+
+    if (!set_so_reuse_addr(_socket_udp))
+        return false;
+
+    if (!bind(_socket_udp, address, port))
+        return false;
+
+    const int MSG_SIZE = 256;
+    char send_buffer[MSG_SIZE];
+
+    for (int i = 0; i < MSG_SIZE; i++)
+        send_buffer[i] = i;
+
+    if (!send(_socket_udp, send_buffer, sizeof(send_buffer), address, port))
+        return false;
+
+    if (!select_read(_socket_udp))
+        return false;
+
+    char receive_buffer[MSG_SIZE];
+    std::string received_address;
+    unsigned short received_port;
+
+    if (!receive(_socket_udp, receive_buffer, sizeof(receive_buffer), received_address, received_port))
+        return false;
+
+    if ((address != received_address) || (port != received_port))
+    {
+        std::cout << "Socket_UDP_Blocking_Test::run -> Invalid received message\n";
+        std::cout << std::setw(20) << "Local Address: " << address << "\n";
+        std::cout << std::setw(20) << "Local Port: " << port << "\n";
+        std::cout << std::setw(20) << "Received Address: " << received_address << "\n";
+        std::cout << std::setw(20) << "Received Port: " << received_port << "\n";
+        return false;
+    }
+
+    if (memcmp(send_buffer, receive_buffer, MSG_SIZE) != 0)
+    {
+        std::cout << "Socket_UDP_Blocking_Test::run -> Invalid received message\n";
+        return false;
+    }
+
+    if (!close(_socket_udp))
+        return false;
+
+    return true;
 }
 
 //-------------------------------------------

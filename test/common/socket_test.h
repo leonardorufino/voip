@@ -47,3 +47,17 @@ protected:
 };
 
 //-------------------------------------------
+
+class Socket_UDP_Blocking_Test : public Socket_Test
+{
+public:
+    Socket_UDP_Blocking_Test() {}
+    virtual ~Socket_UDP_Blocking_Test() {}
+
+    bool run(Socket::Address_Family family, std::string address, unsigned short port);
+
+private:
+    Socket_UDP _socket_udp;
+};
+
+//-------------------------------------------
