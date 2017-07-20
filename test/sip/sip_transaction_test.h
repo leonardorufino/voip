@@ -27,6 +27,9 @@ public:
 
 protected:
     virtual bool run() = 0;
+    virtual SIP_Transaction &get_transaction() = 0;
+
+    virtual bool set_callbacks();
 
     SIP_Request *create_invite();
     SIP_Request *create_ack();
@@ -57,6 +60,8 @@ class SIP_Transaction_Client_Invite_Test : public SIP_Transaction_Test
 public:
     SIP_Transaction_Client_Invite_Test() {}
     virtual ~SIP_Transaction_Client_Invite_Test() {}
+
+    SIP_Transaction &get_transaction() { return transaction; }
 
 protected:
     bool send_invite();
@@ -113,6 +118,8 @@ public:
     SIP_Transaction_Client_Non_Invite_Test() {}
     virtual ~SIP_Transaction_Client_Non_Invite_Test() {}
 
+    SIP_Transaction &get_transaction() { return transaction; }
+
 protected:
     bool send_bye();
     bool receive_response_100();
@@ -154,6 +161,8 @@ class SIP_Transaction_Server_Invite_Test : public SIP_Transaction_Test
 public:
     SIP_Transaction_Server_Invite_Test() {}
     virtual ~SIP_Transaction_Server_Invite_Test() {}
+
+    SIP_Transaction &get_transaction() { return transaction; }
 
 protected:
     bool receive_invite(bool retransmission = false);
@@ -210,6 +219,8 @@ class SIP_Transaction_Server_Non_Invite_Test : public SIP_Transaction_Test
 public:
     SIP_Transaction_Server_Non_Invite_Test() {}
     virtual ~SIP_Transaction_Server_Non_Invite_Test() {}
+
+    SIP_Transaction &get_transaction() { return transaction; }
 
 protected:
     bool receive_bye(bool retransmission = false);

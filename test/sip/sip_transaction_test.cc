@@ -69,6 +69,18 @@ bool SIP_Transaction_Test::init()
 }
 
 //-------------------------------------------
+
+bool SIP_Transaction_Test::set_callbacks()
+{
+    SIP_Transaction &transaction = get_transaction();
+
+    transaction.set_send_message_callback(send_message_callback);
+    transaction.set_receive_request_callback(receive_request_callback);
+    transaction.set_receive_response_callback(receive_response_callback);
+    return true;
+}
+
+//-------------------------------------------
 //-------------------------------------------
 
 SIP_Request *SIP_Transaction_Test::create_invite()
@@ -616,9 +628,7 @@ bool SIP_Transaction_Client_Invite_Test::wait_timer_D()
 
 bool SIP_Transaction_Client_Invite_Accepted_Test::run()
 {
-    transaction.set_send_message_callback(send_message_callback);
-    transaction.set_receive_request_callback(receive_request_callback);
-    transaction.set_receive_response_callback(receive_response_callback);
+    set_callbacks();
 
     if (!send_invite())
         return false;
@@ -640,9 +650,7 @@ bool SIP_Transaction_Client_Invite_Accepted_Test::run()
 
 bool SIP_Transaction_Client_Invite_Rejected_Test::run()
 {
-    transaction.set_send_message_callback(send_message_callback);
-    transaction.set_receive_request_callback(receive_request_callback);
-    transaction.set_receive_response_callback(receive_response_callback);
+    set_callbacks();
 
     if (!send_invite())
         return false;
@@ -667,9 +675,7 @@ bool SIP_Transaction_Client_Invite_Rejected_Test::run()
 
 bool SIP_Transaction_Client_Invite_Retransmission_Test::run()
 {
-    transaction.set_send_message_callback(send_message_callback);
-    transaction.set_receive_request_callback(receive_request_callback);
-    transaction.set_receive_response_callback(receive_response_callback);
+    set_callbacks();
 
     if (!send_invite())
         return false;
@@ -873,9 +879,7 @@ bool SIP_Transaction_Client_Non_Invite_Test::wait_timer_K()
 
 bool SIP_Transaction_Client_Non_Invite_Accepted_Test::run()
 {
-    transaction.set_send_message_callback(send_message_callback);
-    transaction.set_receive_request_callback(receive_request_callback);
-    transaction.set_receive_response_callback(receive_response_callback);
+    set_callbacks();
 
     if (!send_bye())
         return false;
@@ -897,9 +901,7 @@ bool SIP_Transaction_Client_Non_Invite_Accepted_Test::run()
 
 bool SIP_Transaction_Client_Non_Invite_Retransmission_Test::run()
 {
-    transaction.set_send_message_callback(send_message_callback);
-    transaction.set_receive_request_callback(receive_request_callback);
-    transaction.set_receive_response_callback(receive_response_callback);
+    set_callbacks();
 
     if (!send_bye())
         return false;
@@ -1184,9 +1186,7 @@ bool SIP_Transaction_Server_Invite_Test::wait_timer_I()
 
 bool SIP_Transaction_Server_Invite_Accepted_Test::run()
 {
-    transaction.set_send_message_callback(send_message_callback);
-    transaction.set_receive_request_callback(receive_request_callback);
-    transaction.set_receive_response_callback(receive_response_callback);
+    set_callbacks();
 
     if (!receive_invite())
         return false;
@@ -1208,9 +1208,7 @@ bool SIP_Transaction_Server_Invite_Accepted_Test::run()
 
 bool SIP_Transaction_Server_Invite_Rejected_Test::run()
 {
-    transaction.set_send_message_callback(send_message_callback);
-    transaction.set_receive_request_callback(receive_request_callback);
-    transaction.set_receive_response_callback(receive_response_callback);
+    set_callbacks();
 
     if (!receive_invite())
         return false;
@@ -1238,9 +1236,7 @@ bool SIP_Transaction_Server_Invite_Rejected_Test::run()
 
 bool SIP_Transaction_Server_Invite_Retransmission_Test::run()
 {
-    transaction.set_send_message_callback(send_message_callback);
-    transaction.set_receive_request_callback(receive_request_callback);
-    transaction.set_receive_response_callback(receive_response_callback);
+    set_callbacks();
 
     if (!receive_invite())
         return false;
@@ -1393,9 +1389,7 @@ bool SIP_Transaction_Server_Non_Invite_Test::wait_timer_J()
 
 bool SIP_Transaction_Server_Non_Invite_Accepted_Test::run()
 {
-    transaction.set_send_message_callback(send_message_callback);
-    transaction.set_receive_request_callback(receive_request_callback);
-    transaction.set_receive_response_callback(receive_response_callback);
+    set_callbacks();
 
     if (!receive_bye())
         return false;
@@ -1417,9 +1411,7 @@ bool SIP_Transaction_Server_Non_Invite_Accepted_Test::run()
 
 bool SIP_Transaction_Server_Non_Invite_Retransmission_Test::run()
 {
-    transaction.set_send_message_callback(send_message_callback);
-    transaction.set_receive_request_callback(receive_request_callback);
-    transaction.set_receive_response_callback(receive_response_callback);
+    set_callbacks();
 
     if (!receive_bye())
         return false;
