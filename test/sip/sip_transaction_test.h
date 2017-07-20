@@ -47,9 +47,9 @@ protected:
     static bool receive_response_callback(SIP_Request *request, SIP_Response *response, SIP_Transaction *transaction);
 
 protected:
-    static bool sent_message;
-    static bool received_request;
-    static bool received_response;
+    static bool _sent_message;
+    static bool _received_request;
+    static bool _received_response;
 };
 
 //-------------------------------------------
@@ -61,7 +61,7 @@ public:
     SIP_Transaction_Client_Invite_Test() {}
     virtual ~SIP_Transaction_Client_Invite_Test() {}
 
-    SIP_Transaction &get_transaction() { return transaction; }
+    SIP_Transaction &get_transaction() { return _transaction; }
 
 protected:
     bool send_invite();
@@ -73,7 +73,7 @@ protected:
     bool wait_timer_D();
 
 protected:
-    SIP_Transaction_Client_Invite transaction;
+    SIP_Transaction_Client_Invite _transaction;
 };
 
 //-------------------------------------------
@@ -118,7 +118,7 @@ public:
     SIP_Transaction_Client_Non_Invite_Test() {}
     virtual ~SIP_Transaction_Client_Non_Invite_Test() {}
 
-    SIP_Transaction &get_transaction() { return transaction; }
+    SIP_Transaction &get_transaction() { return _transaction; }
 
 protected:
     bool send_bye();
@@ -128,7 +128,7 @@ protected:
     bool wait_timer_K();
 
 protected:
-    SIP_Transaction_Client_Non_Invite transaction;
+    SIP_Transaction_Client_Non_Invite _transaction;
 };
 
 //-------------------------------------------
@@ -162,7 +162,7 @@ public:
     SIP_Transaction_Server_Invite_Test() {}
     virtual ~SIP_Transaction_Server_Invite_Test() {}
 
-    SIP_Transaction &get_transaction() { return transaction; }
+    SIP_Transaction &get_transaction() { return _transaction; }
 
 protected:
     bool receive_invite(bool retransmission = false);
@@ -175,7 +175,7 @@ protected:
     bool wait_timer_I();
 
 protected:
-    SIP_Transaction_Server_Invite transaction;
+    SIP_Transaction_Server_Invite _transaction;
 };
 
 //-------------------------------------------
@@ -220,7 +220,7 @@ public:
     SIP_Transaction_Server_Non_Invite_Test() {}
     virtual ~SIP_Transaction_Server_Non_Invite_Test() {}
 
-    SIP_Transaction &get_transaction() { return transaction; }
+    SIP_Transaction &get_transaction() { return _transaction; }
 
 protected:
     bool receive_bye(bool retransmission = false);
@@ -229,7 +229,7 @@ protected:
     bool wait_timer_J();
 
 protected:
-    SIP_Transaction_Server_Non_Invite transaction;
+    SIP_Transaction_Server_Non_Invite _transaction;
 };
 
 //-------------------------------------------
