@@ -10,6 +10,7 @@
  */
 
 #include "timer_manager_test.h"
+#include "socket_test.h"
 #include <iostream>
 
 //-------------------------------------------
@@ -21,6 +22,12 @@ int main()
     if (!Timer_Manager_Test::init())
     {
         std::cout << "Timer manager test FAILED!\n";
+        return 1;
+    }
+
+    if (!Socket_Test::init())
+    {
+        std::cout << "Socket test FAILED!\n";
         return 1;
     }
 
