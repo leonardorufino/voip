@@ -91,3 +91,18 @@ private:
 };
 
 //-------------------------------------------
+
+class Socket_UDP_Non_Blocking_Test : public Socket_Test
+{
+public:
+    Socket_UDP_Non_Blocking_Test() {}
+    virtual ~Socket_UDP_Non_Blocking_Test() {}
+
+    bool run(Socket::Address_Family family, std::string address, unsigned short port);
+    Socket &get_socket() { return _socket_udp; }
+
+private:
+    Socket_UDP _socket_udp;
+};
+
+//-------------------------------------------
