@@ -232,6 +232,27 @@ bool Socket::bind(std::string address, unsigned short port)
 
 //-------------------------------------------
 
+bool Socket::listen(int backlog)
+{
+    if ((_state == STATE_IDLE) || (_state == STATE_CLOSED))
+    {
+        _logger.warning("Invalid state to listen (state=%d)", _state);
+        return false;
+    }
+
+    if (::listen(_socket, backlog))
+    {
+        _logger.warning("Failed to listen (socket=%d, backlog=%d, error=%d)", _socket, backlog, GET_LAST_ERROR);
+        return false;
+    }
+
+    _state = STATE_LISTENING;
+    _logger.trace("Socket listening (socket=%d, backlog=%d)", _socket, backlog);
+    return true;
+}
+
+//-------------------------------------------
+
 bool Socket::connect(std::string address, unsigned short port)
 {
     if ((_state == STATE_IDLE) || (_state == STATE_CLOSED))

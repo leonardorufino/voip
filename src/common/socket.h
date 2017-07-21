@@ -100,6 +100,7 @@ public:
     bool get_so_error(int &value);
 
     bool bind(std::string address, unsigned short port);
+    bool listen(int backlog);
     bool connect(std::string address, unsigned short port);
     bool send(const char *buffer, int size);
     bool send(const char *buffer, int size, std::string address, unsigned short port);
