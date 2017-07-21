@@ -32,6 +32,8 @@
     #include <netinet/udp.h>
     #include <arpa/inet.h>
     #include <ifaddrs.h>
+    #include <unistd.h>
+    #include <fcntl.h>
 
     #define INVALID_SOCKET      -1
     #define GET_LAST_ERROR      errno
@@ -42,11 +44,26 @@
 class Socket
 {
 public:
+    typedef bool (connect_callback)(bool success);
+    typedef bool (receive_callback)(const char *buffer, int size, std::string address, unsigned short port);
+
     enum Address_Family
     {
         ADDRESS_FAMILY_IPv4,
         ADDRESS_FAMILY_IPv6,
         ADDRESS_FAMILY_INVALID,
+    };
+
+    enum State
+    {
+        STATE_IDLE,
+        STATE_OPEN,
+        STATE_LISTENING,
+        STATE_CONNECTING,
+        STATE_CONNECTED,
+        STATE_CLOSING,
+        STATE_CLOSED,
+        STATE_INVALID
     };
 
     struct Network_Address
@@ -60,6 +77,17 @@ public:
     Socket();
     ~Socket();
 
+    void set_state(State state) { _state = state; }
+    State get_state() { return _state; }
+
+    socket_t &get_socket() { return _socket; }
+
+    void set_connect_callback(connect_callback *callback) { _connect_callback = callback; }
+    connect_callback *get_connect_callback() { return _connect_callback; }
+
+    void set_receive_callback(receive_callback *callback) { _receive_callback = callback; }
+    receive_callback *get_receive_callback() { return _receive_callback; }
+
     virtual bool create(Address_Family family) = 0;
 
     bool create(int af, int type, int protocol);
@@ -68,6 +96,8 @@ public:
     bool set_so_snd_buf(int size = 128 * 1024);
     bool set_so_rcv_buf(int size = 128 * 1024);
     bool set_so_reuse_addr(int value = 1);
+    bool set_non_blocking(bool non_blocking = true);
+    bool get_so_error(int &value);
 
     bool bind(std::string address, unsigned short port);
     bool connect(std::string address, unsigned short port);
@@ -89,8 +119,14 @@ public:
     static bool Startup();
 #endif
 
+    static Logger &get_logger() { return _logger; }
+
 protected:
+    State _state;
     socket_t _socket;
+
+    connect_callback *_connect_callback;
+    receive_callback *_receive_callback;
 
     static Logger _logger;
 };
