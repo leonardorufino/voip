@@ -20,7 +20,7 @@ add_library(common STATIC ${COMMON_SOURCES})
 if (WIN32)
     target_link_libraries(common Ws2_32.lib Iphlpapi.lib)
 else ()
-    target_link_libraries(common rt)
+    target_link_libraries(common rt pthread)
 endif()
 
 ### SIP library ###
