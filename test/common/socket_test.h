@@ -26,24 +26,38 @@ public:
 
 protected:
     virtual bool run(Socket::Address_Family family, std::string address, unsigned short port) = 0;
+    virtual Socket &get_socket() = 0;
 
-    bool create(Socket &socket, Socket::Address_Family family);
-    bool close(Socket &socket);
+    virtual bool set_callbacks();
 
-    bool set_so_snd_buf(Socket &socket);
-    bool set_so_rcv_buf(Socket &socket);
-    bool set_so_reuse_addr(Socket &socket);
+    bool create(Socket::Address_Family family);
+    bool close();
 
-    bool bind(Socket &socket, std::string address, unsigned short port);
-    bool connect(Socket &socket, std::string address, unsigned short port);
-    bool send(Socket &socket, const char *buffer, int size);
-    bool send(Socket &socket, const char *buffer, int size, std::string address, unsigned short port);
-    bool receive(Socket &socket, char *buffer, int size);
-    bool receive(Socket &socket, char *buffer, int size, std::string &address, unsigned short &port);
-    bool select_read(Socket &socket);
+    bool set_so_snd_buf();
+    bool set_so_rcv_buf();
+    bool set_so_reuse_addr();
+    bool set_non_blocking(bool non_blocking = true);
+
+    bool bind(std::string address, unsigned short port);
+    bool connect(std::string address, unsigned short port);
+    bool send(const char *buffer, int size);
+    bool send(const char *buffer, int size, std::string address, unsigned short port);
+    bool receive(char *buffer, int size);
+    bool receive(char *buffer, int size, std::string &address, unsigned short &port);
+    bool select_read();
 
     static bool get_network_addresses(std::list<Socket::Network_Address> &addresses);
     static bool check_network_address(Socket::Address_Family family, std::string address);
+
+    static bool connect_callback(bool success);
+    static bool receive_callback(const char *buffer, int size, std::string address, unsigned short port);
+
+protected:
+    static bool _connected;
+    static char _received_buffer[Socket_Control::RECEIVE_BUFFER_SIZE + 1];
+    static int _received_size;
+    static std::string _received_address;
+    static unsigned short _received_port;
 };
 
 //-------------------------------------------
@@ -55,6 +69,7 @@ public:
     virtual ~Socket_UDP_Blocking_Test() {}
 
     bool run(Socket::Address_Family family, std::string address, unsigned short port);
+    Socket &get_socket() { return _socket_udp; }
 
 private:
     Socket_UDP _socket_udp;
@@ -69,6 +84,7 @@ public:
     virtual ~Socket_UDP_Blocking_Connect_Test() {}
 
     bool run(Socket::Address_Family family, std::string address, unsigned short port);
+    Socket &get_socket() { return _socket_udp; }
 
 private:
     Socket_UDP _socket_udp;
