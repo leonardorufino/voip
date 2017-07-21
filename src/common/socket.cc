@@ -789,3 +789,252 @@ bool Socket_UDP::create(Address_Family family)
 }
 
 //-------------------------------------------
+//-------------------------------------------
+
+Socket_Control::~Socket_Control()
+{
+    if (!_stopped)
+        stop();
+}
+
+//-------------------------------------------
+
+Socket_Control &Socket_Control::instance()
+{
+    static Socket_Control control;
+    return control;
+}
+
+//-------------------------------------------
+
+bool Socket_Control::start()
+{
+    Logger &logger = Socket::get_logger();
+
+    if (!_stopped)
+    {
+        logger.warning("Failed to start socket control: already started");
+        return false;
+    }
+
+    logger.trace("Starting socket control");
+
+    _stopped = false;
+    _control_thread = std::thread(control_thread);
+
+    logger.trace("Socket control started");
+    return true;
+}
+
+//-------------------------------------------
+
+bool Socket_Control::stop()
+{
+    Logger &logger = Socket::get_logger();
+
+    if (_stopped)
+    {
+        logger.warning("Failed to stop socket control: already stopped");
+        return false;
+    }
+
+    logger.trace("Stopping socket control");
+
+    _stopped = true;
+    _control_thread.join();
+
+    logger.trace("Socket control stopped");
+    return true;
+}
+
+//-------------------------------------------
+
+bool Socket_Control::add_socket(Socket &socket)
+{
+    Logger &logger = Socket::get_logger();
+
+    std::lock_guard<std::mutex> lock(_socket_list_mutex);
+
+    std::list<Socket *>::iterator it = _socket_list.begin();
+    while (it != _socket_list.end())
+    {
+        Socket *sock = *it++;
+        if (sock == &socket)
+        {
+            logger.warning("Failed to add socket to control: already added (socket=%d)", socket.get_socket());
+            return false;
+        }
+    }
+
+    _socket_list.push_back(&socket);
+    logger.trace("Socket added to control (socket=%d)", socket.get_socket());
+    return true;
+}
+
+//-------------------------------------------
+
+bool Socket_Control::remove_socket(Socket &socket)
+{
+    Logger &logger = Socket::get_logger();
+
+    std::lock_guard<std::mutex> lock(_socket_list_mutex);
+
+    std::list<Socket *>::iterator it = _socket_list.begin();
+    while (it != _socket_list.end())
+    {
+        Socket *sock = *it++;
+        if (sock == &socket)
+        {
+            _socket_list.remove(&socket);
+            logger.warning("Socket removed from control (socket=%d)", socket.get_socket());
+            return true;
+        }
+    }
+
+    logger.warning("Failed to remove socket from control: not added (socket=%d)", socket.get_socket());
+    return false;
+}
+
+//-------------------------------------------
+
+void Socket_Control::control_thread()
+{
+    Socket_Control &control = Socket_Control::instance();
+    Logger &logger = Socket::get_logger();
+
+    logger.trace("Control thread running");
+
+    timeval tv;
+    tv.tv_sec = SELECT_TIMEOUT / 1000;
+    tv.tv_usec = (SELECT_TIMEOUT - (1000 * tv.tv_sec)) * 1000;
+
+    while (!control._stopped)
+    {
+        fd_set read_set, write_set, except_set;
+        FD_ZERO(&read_set);
+        FD_ZERO(&write_set);
+        FD_ZERO(&except_set);
+
+        int max_fd = -1;
+
+        Common_Functions::delay(10);
+
+        std::lock_guard<std::mutex> lock(control._socket_list_mutex);
+
+        std::list<Socket *>::iterator it = control._socket_list.begin();
+        while (it != control._socket_list.end())
+        {
+            Socket *socket = *it++;
+            Socket::State state = socket->get_state();
+            socket_t &handle = socket->get_socket();
+
+            if ((state == Socket::STATE_OPEN) || (state == Socket::STATE_LISTENING) ||
+                (state == Socket::STATE_CONNECTED) || (state == Socket::STATE_CLOSING))
+            {
+                FD_SET(handle, &read_set);
+                max_fd = (max_fd > (int) handle) ? max_fd : (int) handle;
+
+            }else if (state == Socket::STATE_CONNECTING)
+            {
+                FD_SET(handle, &write_set);
+                FD_SET(handle, &except_set);
+                max_fd = (max_fd > (int) handle) ? max_fd : (int) handle;
+            }
+        }
+
+        if (control._stopped)
+            break;
+
+        if (max_fd == -1)
+        {
+            Common_Functions::delay(SELECT_TIMEOUT);
+            continue;
+        }
+
+        int select_nb = ::select(max_fd + 1, &read_set, &write_set, &except_set, &tv);
+        if (select_nb < 0)
+        {
+            logger.warning("Failed to select in control thread (error=%d)", GET_LAST_ERROR);
+            continue;
+        }
+
+        if (select_nb == 0)
+            continue;
+
+        if (control._stopped)
+            break;
+
+        it = control._socket_list.begin();
+        while (it != control._socket_list.end())
+        {
+            Socket *socket = *it++;
+            Socket::State state = socket->get_state();
+            socket_t &handle = socket->get_socket();
+
+            if ((state == Socket::STATE_OPEN) || (state == Socket::STATE_CONNECTED) || (state == Socket::STATE_CLOSING))
+            {
+                if (FD_ISSET(handle, &read_set))
+                {
+                    std::string address;
+                    unsigned short port;
+
+                    int size = socket->receive(control._receive_buffer, sizeof(_receive_buffer), address, port);
+                    if (size < 0)
+                    {
+                        logger.warning("Failed to receive message");
+                        continue;
+                    }
+
+                    control._receive_buffer[size] = 0;
+
+                    //TODO: _receive_buffer can have % symbol
+                    logger.trace("Message received (address=%s, port=%d, size=%d):\n%s", address.c_str(), port,
+                                 size, control._receive_buffer);
+
+                    Socket::receive_callback *callback = socket->get_receive_callback();
+
+                    if (callback)
+                        callback(control._receive_buffer, size, address, port);
+                }
+            }else if (state == Socket::STATE_LISTENING)
+            {
+                if (FD_ISSET(handle, &read_set))
+                {
+                    //TODO
+                }
+            }else if (state == Socket::STATE_CONNECTING)
+            {
+                if ((FD_ISSET(handle, &write_set)) || (FD_ISSET(handle, &except_set)))
+                {
+                    int value = 0;
+                    if (!socket->get_so_error(value))
+                    {
+                        logger.warning("Failed to get socket option error");
+                        continue;
+                    }
+
+                    Socket::connect_callback *callback = socket->get_connect_callback();
+
+                    if (value == 0)
+                    {
+                        socket->set_state(Socket::STATE_CONNECTED);
+                        logger.trace("Socket connected in control thread (socket=%d)", handle);
+
+                        if (callback)
+                            callback(true);
+                    }else
+                    {
+                        logger.warning("Failed to connect in control thread (socket=%d, error=%d)", handle, value);
+
+                        if (callback)
+                            callback(false);
+                    }
+                }
+            }
+        }
+    }
+
+    logger.trace("Control thread finished");
+}
+
+//-------------------------------------------

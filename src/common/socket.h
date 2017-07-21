@@ -15,6 +15,7 @@
 #include <string>
 #include <cstring>
 #include <list>
+#include <thread>
 
 #ifdef WIN32
     #include <winsock2.h>
@@ -141,6 +142,39 @@ public:
     ~Socket_UDP() {}
 
     bool create(Address_Family family);
+};
+
+//-------------------------------------------
+
+class Socket_Control
+{
+public:
+    static const unsigned long SELECT_TIMEOUT = 100; // Milliseconds
+    static const unsigned short RECEIVE_BUFFER_SIZE = 5000;
+
+public:
+    Socket_Control() : _stopped(true) {}
+    ~Socket_Control();
+
+    static Socket_Control &instance();
+
+    bool start();
+    bool stop();
+
+    bool add_socket(Socket &socket);
+    bool remove_socket(Socket &socket);
+
+private:
+    static void control_thread();
+
+protected:
+    std::thread _control_thread;
+
+    std::list<Socket *> _socket_list;
+    std::mutex _socket_list_mutex;
+
+    char _receive_buffer[RECEIVE_BUFFER_SIZE + 1];
+    bool _stopped;
 };
 
 //-------------------------------------------
