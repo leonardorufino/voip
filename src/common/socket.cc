@@ -16,7 +16,8 @@ Logger Socket::_logger(Log_Manager::LOG_SOCKET);
 
 //-------------------------------------------
 
-Socket::Socket() : _state(STATE_IDLE), _socket(INVALID_SOCKET), _connect_callback(NULL), _receive_callback(NULL)
+Socket::Socket() : _state(STATE_IDLE), _socket(INVALID_SOCKET), _connect_callback(NULL), _connect_data(NULL),
+    _receive_callback(NULL), _receive_data(NULL)
 {
 #ifdef WIN32
     Startup();
@@ -29,6 +30,74 @@ Socket::~Socket()
 {
     if ((_state != STATE_IDLE) && (_state != STATE_CLOSED))
         close();
+}
+
+//-------------------------------------------
+
+void Socket::set_connect_callback(connect_callback *callback, void *data)
+{
+    _connect_callback = callback;
+    _connect_data = data;
+}
+
+//-------------------------------------------
+
+bool Socket::call_connect_callback(bool success)
+{
+    try
+    {
+        if (_connect_callback)
+        {
+            _logger.trace("Calling connect callback (state=%d, socket=%d, success=%d)", _state, _socket, success);
+            return _connect_callback(_connect_data, success);
+        }
+
+        return true;
+    }catch (std::exception &e)
+    {
+        _logger.warning("Exception when calling connect callback (state=%d, socket=%d, success=%d, msg=%s)",
+                        _state, _socket, success, e.what());
+        return false;
+    }catch (...)
+    {
+        _logger.warning("Exception when calling connect callback (state=%d, socket=%d, success=%d)", _state, _socket, success);
+        return false;
+    }
+}
+
+//-------------------------------------------
+
+void Socket::set_receive_callback(receive_callback *callback, void *data)
+{
+    _receive_callback = callback;
+    _receive_data = data;
+}
+
+//-------------------------------------------
+
+bool Socket::call_receive_callback(const char *buffer, int size, std::string address, unsigned short port)
+{
+    try
+    {
+        if (_receive_callback)
+        {
+            _logger.trace("Calling receive callback (state=%d, socket=%d, address=%s, port=%d, size=%d)",
+                          _state, _socket, address.c_str(), port, size);
+            return _receive_callback(_receive_data, buffer, size, address, port);
+        }
+
+        return true;
+    }catch (std::exception &e)
+    {
+        _logger.warning("Exception when calling receive callback (state=%d, socket=%d, address=%s, port=%d, size=%d, msg=%s)",
+                        _state, _socket, address.c_str(), port, size, e.what());
+        return false;
+    }catch (...)
+    {
+        _logger.warning("Exception when calling receive callback (state=%d, socket=%d, address=%s, port=%d, size=%d)",
+                        _state, _socket, address.c_str(), port, size);
+        return false;
+    }
 }
 
 //-------------------------------------------
@@ -296,11 +365,7 @@ bool Socket::connect(std::string address, unsigned short port)
 
     _state = STATE_CONNECTED;
     _logger.trace("Socket connected (socket=%d, address=%s, port=%d)", _socket, address.c_str(), port);
-
-    if (_connect_callback)
-        _connect_callback(true);
-
-    return true;
+    return call_connect_callback(true);
 }
 
 //-------------------------------------------
@@ -987,14 +1052,8 @@ void Socket_Control::control_thread()
 
                     control._receive_buffer[size] = 0;
 
-                    //TODO: _receive_buffer can have % symbol
-                    logger.trace("Message received (address=%s, port=%d, size=%d):\n%s", address.c_str(), port,
-                                 size, control._receive_buffer);
-
-                    Socket::receive_callback *callback = socket->get_receive_callback();
-
-                    if (callback)
-                        callback(control._receive_buffer, size, address, port);
+                    logger.trace("Message received (address=%s, port=%d, size=%d)", address.c_str(), port, size);
+                    socket->call_receive_callback(control._receive_buffer, size, address, port);
                 }
             }else if (state == Socket::STATE_LISTENING)
             {
@@ -1013,21 +1072,15 @@ void Socket_Control::control_thread()
                         continue;
                     }
 
-                    Socket::connect_callback *callback = socket->get_connect_callback();
-
                     if (value == 0)
                     {
                         socket->set_state(Socket::STATE_CONNECTED);
                         logger.trace("Socket connected in control thread (socket=%d)", handle);
-
-                        if (callback)
-                            callback(true);
+                        socket->call_connect_callback(true);
                     }else
                     {
                         logger.warning("Failed to connect in control thread (socket=%d, error=%d)", handle, value);
-
-                        if (callback)
-                            callback(false);
+                        socket->call_connect_callback(false);
                     }
                 }
             }

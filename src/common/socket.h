@@ -45,8 +45,8 @@
 class Socket
 {
 public:
-    typedef bool (connect_callback)(bool success);
-    typedef bool (receive_callback)(const char *buffer, int size, std::string address, unsigned short port);
+    typedef bool (connect_callback)(void *data, bool success);
+    typedef bool (receive_callback)(void *data, const char *buffer, int size, std::string address, unsigned short port);
 
     enum Address_Family
     {
@@ -83,11 +83,11 @@ public:
 
     socket_t &get_socket() { return _socket; }
 
-    void set_connect_callback(connect_callback *callback) { _connect_callback = callback; }
-    connect_callback *get_connect_callback() { return _connect_callback; }
+    void set_connect_callback(connect_callback *callback, void *data);
+    bool call_connect_callback(bool success);
 
-    void set_receive_callback(receive_callback *callback) { _receive_callback = callback; }
-    receive_callback *get_receive_callback() { return _receive_callback; }
+    void set_receive_callback(receive_callback *callback, void *data);
+    bool call_receive_callback(const char *buffer, int size, std::string address, unsigned short port);
 
     virtual bool create(Address_Family family) = 0;
 
@@ -128,7 +128,10 @@ protected:
     socket_t _socket;
 
     connect_callback *_connect_callback;
+    void *_connect_data;
+
     receive_callback *_receive_callback;
+    void *_receive_data;
 
     static Logger _logger;
 };
