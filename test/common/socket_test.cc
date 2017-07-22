@@ -43,6 +43,10 @@ bool Socket_Test::init()
         Socket_UDP_Non_Blocking_Test udp_non_blocking_test;
         if (!udp_non_blocking_test.run(family_ipv4, address_ipv4, port_ipv4))
             return false;
+
+        Socket_UDP_Non_Blocking_Connect_Test udp_non_blocking_connect_test;
+        if (!udp_non_blocking_connect_test.run(family_ipv4, address_ipv4, port_ipv4))
+            return false;
     }else
         std::cout << "IPv4 socket test disabled\n";
 
@@ -65,6 +69,10 @@ bool Socket_Test::init()
 
         Socket_UDP_Non_Blocking_Test udp_non_blocking_test;
         if (!udp_non_blocking_test.run(family_ipv6, address_ipv6, port_ipv6))
+            return false;
+
+        Socket_UDP_Non_Blocking_Connect_Test udp_non_blocking_connect_test;
+        if (!udp_non_blocking_connect_test.run(family_ipv6, address_ipv6, port_ipv6))
             return false;
     }else
         std::cout << "IPv6 socket test disabled\n";
@@ -550,6 +558,81 @@ bool Socket_UDP_Non_Blocking_Test::run(Socket::Address_Family family, std::strin
     if (memcmp(send_buffer, receive_buffer, MSG_SIZE) != 0)
     {
         std::cout << "Socket_UDP_Non_Blocking_Test::run -> Invalid received message\n";
+        return false;
+    }
+
+    if (!close())
+        return false;
+
+    return true;
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+bool Socket_UDP_Non_Blocking_Connect_Test::run(Socket::Address_Family family, std::string address, unsigned short port)
+{
+    set_callbacks();
+
+    if (!create(family))
+        return false;
+
+    if (!set_so_snd_buf())
+        return false;
+
+    if (!set_so_rcv_buf())
+        return false;
+
+    if (!set_so_reuse_addr())
+        return false;
+
+    if (!bind(address, port))
+        return false;
+
+    if (!set_non_blocking(1))
+        return false;
+
+    unsigned long start = Common_Functions::get_tick();
+    unsigned long max_wait_time = 5000;
+    _connected = false;
+
+    if (!connect(address, port))
+        return false;
+
+    while ((Common_Functions::get_tick() - start) < max_wait_time)
+    {
+        if (_connected)
+            break;
+
+        Common_Functions::delay(500);
+    }
+
+    if (!_connected)
+    {
+        std::cout << "Socket_UDP_Non_Blocking_Connect_Test::run -> Socket not connected\n";
+        return false;
+    }
+
+    const int MSG_SIZE = 256;
+    char send_buffer[MSG_SIZE];
+
+    for (int i = 0; i < MSG_SIZE; i++)
+        send_buffer[i] = i;
+
+    if (!send(send_buffer, sizeof(send_buffer)))
+        return false;
+
+    if (!select_read())
+        return false;
+
+    char receive_buffer[MSG_SIZE];
+
+    if (!receive(receive_buffer, sizeof(receive_buffer)))
+        return false;
+
+    if (memcmp(send_buffer, receive_buffer, MSG_SIZE) != 0)
+    {
+        std::cout << "Socket_UDP_Non_Blocking_Connect_Test::run -> Invalid received message\n";
         return false;
     }
 
