@@ -49,8 +49,8 @@ protected:
     static bool get_network_addresses(std::list<Socket::Network_Address> &addresses);
     static bool check_network_address(Socket::Address_Family family, std::string address);
 
-    static bool connect_callback(bool success);
-    static bool receive_callback(const char *buffer, int size, std::string address, unsigned short port);
+    static bool connect_callback(void *data, bool success);
+    static bool receive_callback(void *data, const char *buffer, int size, std::string address, unsigned short port);
 
 protected:
     static bool _connected;

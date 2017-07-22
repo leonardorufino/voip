@@ -79,8 +79,8 @@ bool Socket_Test::set_callbacks()
 {
     Socket &socket = get_socket();
 
-    socket.set_connect_callback(connect_callback);
-    socket.set_receive_callback(receive_callback);
+    socket.set_connect_callback(connect_callback, &socket);
+    socket.set_receive_callback(receive_callback, &socket);
     return true;
 }
 
@@ -331,17 +331,25 @@ bool Socket_Test::check_network_address(Socket::Address_Family family, std::stri
 //-------------------------------------------
 //-------------------------------------------
 
-bool Socket_Test::connect_callback(bool success)
+bool Socket_Test::connect_callback(void *data, bool success)
 {
+    Socket_Test *socket = reinterpret_cast<Socket_Test *>(data);
+    if (!socket)
+    {
+        std::cout << "Socket_Test::connect_callback -> Invalid parameter\n";
+        return false;
+    }
+
     _connected = success;
     return true;
 }
 
 //-------------------------------------------
 
-bool Socket_Test::receive_callback(const char *buffer, int size, std::string address, unsigned short port)
+bool Socket_Test::receive_callback(void *data, const char *buffer, int size, std::string address, unsigned short port)
 {
-    if ((!buffer) || (size < 0))
+    Socket_Test *socket = reinterpret_cast<Socket_Test *>(data);
+    if ((!socket) || (!buffer) || (size < 0))
     {
         std::cout << "Socket_Test::receive_callback -> Invalid parameters\n";
         return false;
