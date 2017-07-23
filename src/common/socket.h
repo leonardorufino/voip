@@ -76,7 +76,7 @@ public:
 
 public:
     Socket();
-    ~Socket();
+    virtual ~Socket();
 
     void set_state(State state) { _state = state; }
     State get_state() { return _state; }
@@ -107,7 +107,7 @@ public:
     bool send(const char *buffer, int size, std::string address, unsigned short port);
     int receive(char *buffer, int size);
     int receive(char *buffer, int size, std::string &address, unsigned short &port);
-    int select_read();
+    int select(unsigned long timeout, int *read, int *write, int *except);
 
     static int address_family_to_af(Address_Family family);
     static Address_Family address_to_address_family(std::string address);

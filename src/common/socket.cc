@@ -504,30 +504,65 @@ int Socket::receive(char *buffer, int size, std::string &address, unsigned short
 
 //-------------------------------------------
 
-int Socket::select_read()
+int Socket::select(unsigned long timeout, int *read, int *write, int *except)
 {
     if ((_state == STATE_IDLE) || (_state == STATE_CLOSED))
     {
-        _logger.warning("Invalid state to select read (state=%d)", _state);
-        return false;
-    }
-
-    timeval tv;
-    tv.tv_sec = 4;
-    tv.tv_usec = 0;
-
-    fd_set read_set;
-    FD_ZERO(&read_set);
-    FD_SET(_socket, &read_set);
-
-    int ret = ::select(_socket + 1, &read_set, NULL, NULL, &tv);
-    if (ret < 0)
-    {
-        _logger.warning("Failed to select read (socket=%d, error=%d)", _socket, GET_LAST_ERROR);
+        _logger.warning("Invalid state to select (state=%d)", _state);
         return -1;
     }
 
-    _logger.trace("Socket selected read (socket=%d, ret=%d)", _socket, ret);
+    timeval tv;
+    tv.tv_sec = timeout / 1000;
+    tv.tv_usec = (timeout - (1000 * tv.tv_sec)) * 1000;
+
+    fd_set read_set, write_set, except_set;
+
+    fd_set *p_read_set = NULL;
+    fd_set *p_write_set = NULL;
+    fd_set *p_except_set = NULL;
+
+    if (read)
+    {
+        FD_ZERO(&read_set);
+        FD_SET(_socket, &read_set);
+        p_read_set = &read_set;
+        *read = 0;
+    }
+
+    if (write)
+    {
+        FD_ZERO(&write_set);
+        FD_SET(_socket, &write_set);
+        p_write_set = &write_set;
+        *write = 0;
+    }
+
+    if (except)
+    {
+        FD_ZERO(&except_set);
+        FD_SET(_socket, &except_set);
+        p_except_set = &except_set;
+        *except = 0;
+    }
+
+    int ret = ::select(_socket + 1, p_read_set, p_write_set, p_except_set, &tv);
+    if (ret < 0)
+    {
+        _logger.warning("Failed to select (socket=%d, error=%d)", _socket, GET_LAST_ERROR);
+        return -1;
+    }
+
+    if ((read) && (FD_ISSET(_socket, &read_set)))
+        *read = 1;
+
+    if ((write) && (FD_ISSET(_socket, &write_set)))
+        *write = 1;
+
+    if ((except) && (FD_ISSET(_socket, &except_set)))
+        *except = 1;
+
+    _logger.trace("Socket selected (socket=%d, ret=%d)", _socket, ret);
     return ret;
 }
 

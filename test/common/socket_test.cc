@@ -298,13 +298,13 @@ bool Socket_Test::receive(char *buffer, int size, std::string &address, unsigned
 
 //-------------------------------------------
 
-bool Socket_Test::select_read()
+bool Socket_Test::select(unsigned long timeout, int *read, int *write, int *except)
 {
     Socket &socket = get_socket();
 
-    if (socket.select_read() <= 0)
+    if (socket.select(timeout, read, write, except) <= 0)
     {
-        std::cout << "Socket_Test::select_read -> Failed to select read\n";
+        std::cout << "Socket_Test::select -> Failed to select\n";
         return false;
     }
 
@@ -412,8 +412,17 @@ bool Socket_UDP_Blocking_Test::run(Socket::Address_Family family, std::string ad
     if (!send(send_buffer, sizeof(send_buffer), address, port))
         return false;
 
-    if (!select_read())
+    unsigned long timeout = 5000;
+    int read;
+
+    if (!select(timeout, &read, NULL, NULL))
         return false;
+
+    if (read != 1)
+    {
+        std::cout << "Socket_UDP_Blocking_Test::run -> Invalid select read counter\n";
+        return false;
+    }
 
     char receive_buffer[MSG_SIZE];
     std::string received_address;
@@ -489,8 +498,17 @@ bool Socket_UDP_Blocking_Connect_Test::run(Socket::Address_Family family, std::s
     if (!send(send_buffer, sizeof(send_buffer)))
         return false;
 
-    if (!select_read())
+    unsigned long timeout = 5000;
+    int read;
+
+    if (!select(timeout, &read, NULL, NULL))
         return false;
+
+    if (read != 1)
+    {
+        std::cout << "Socket_UDP_Blocking_Connect_Test::run -> Invalid select read counter\n";
+        return false;
+    }
 
     char receive_buffer[MSG_SIZE];
 
@@ -543,8 +561,17 @@ bool Socket_UDP_Non_Blocking_Test::run(Socket::Address_Family family, std::strin
     if (!send(send_buffer, sizeof(send_buffer), address, port))
         return false;
 
-    if (!select_read())
+    unsigned long timeout = 5000;
+    int read;
+
+    if (!select(timeout, &read, NULL, NULL))
         return false;
+
+    if (read != 1)
+    {
+        std::cout << "Socket_UDP_Non_Blocking_Test::run -> Invalid select read counter\n";
+        return false;
+    }
 
     char receive_buffer[MSG_SIZE];
     std::string received_address;
@@ -630,8 +657,17 @@ bool Socket_UDP_Non_Blocking_Connect_Test::run(Socket::Address_Family family, st
     if (!send(send_buffer, sizeof(send_buffer)))
         return false;
 
-    if (!select_read())
+    unsigned long timeout = 5000;
+    int read;
+
+    if (!select(timeout, &read, NULL, NULL))
         return false;
+
+    if (read != 1)
+    {
+        std::cout << "Socket_UDP_Non_Blocking_Connect_Test::run -> Invalid select read counter\n";
+        return false;
+    }
 
     char receive_buffer[MSG_SIZE];
 

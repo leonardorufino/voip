@@ -44,7 +44,7 @@ protected:
     bool send(const char *buffer, int size, std::string address, unsigned short port);
     bool receive(char *buffer, int size);
     bool receive(char *buffer, int size, std::string &address, unsigned short &port);
-    bool select_read();
+    bool select(unsigned long timeout, int *read, int *write, int *except);
 
     static bool get_network_addresses(std::list<Socket::Network_Address> &addresses);
     static bool check_network_address(Socket::Address_Family family, std::string address);
