@@ -67,6 +67,41 @@ bool Socket::call_connect_callback(bool success)
 
 //-------------------------------------------
 
+void Socket::set_accept_callback(accept_callback *callback, void *data)
+{
+    _accept_callback = callback;
+    _accept_data = data;
+}
+
+//-------------------------------------------
+
+bool Socket::call_accept_callback(socket_t socket, std::string address, unsigned short port)
+{
+    try
+    {
+        if (_accept_callback)
+        {
+            _logger.trace("Calling accept callback (state=%d, socket=%d, accept=%d, address=%s, port=%d)",
+                          _state, _socket, socket, address.c_str(), port);
+            return _accept_callback(_accept_data, socket, address, port);
+        }
+
+        return true;
+    }catch (std::exception &e)
+    {
+        _logger.warning("Exception when calling accept callback (state=%d, socket=%d, accept=%d, address=%s, port=%d)",
+                        _state, _socket, socket, address.c_str(), port, e.what());
+        return false;
+    }catch (...)
+    {
+        _logger.warning("Exception when calling accept callback (state=%d, socket=%d, accept=%d, address=%s, port=%d)",
+                        _state, _socket, socket, address.c_str(), port);
+        return false;
+    }
+}
+
+//-------------------------------------------
+
 void Socket::set_receive_callback(receive_callback *callback, void *data)
 {
     _receive_callback = callback;
@@ -317,6 +352,47 @@ bool Socket::listen(int backlog)
 
     _state = STATE_LISTENING;
     _logger.trace("Socket listening (socket=%d, backlog=%d)", _socket, backlog);
+    return true;
+}
+
+//-------------------------------------------
+
+bool Socket::accept(socket_t &accept_socket, std::string &address, unsigned short &port)
+{
+    if (_state != STATE_LISTENING)
+    {
+        _logger.warning("Invalid state to accept (state=%d)", _state);
+        return false;
+    }
+
+    sockaddr_storage ss;
+    socklen_t ss_len = sizeof(ss);
+
+    accept_socket = ::accept(_socket, (sockaddr *) &ss, &ss_len);
+    if (accept_socket == INVALID_SOCKET)
+    {
+        _logger.warning("Failed to accept (socket=%d, error=%d)", _socket, GET_LAST_ERROR);
+        return false;
+    }
+
+    if (!sockaddr_to_address(ss, address, port))
+    {
+        _logger.warning("Failed to get accept address (socket=%d, accept=%d)", _socket, accept_socket);
+
+#ifdef WIN32
+        if (::closesocket(accept_socket))
+#else
+        if (::close(accept_socket))
+#endif
+        {
+            _logger.warning("Failed to close accept socket (socket=%d, accept=%d, error=%d)", _socket, accept_socket, GET_LAST_ERROR);
+            accept_socket = INVALID_SOCKET;
+        }
+
+        return false;
+    }
+
+    _logger.trace("Socket accepted (socket=%d, accept=%d, address=%s, port=%d)", _socket, accept_socket, address.c_str(), port);
     return true;
 }
 
@@ -1094,7 +1170,18 @@ void Socket_Control::control_thread()
             {
                 if (FD_ISSET(handle, &read_set))
                 {
-                    //TODO
+                    std::string address;
+                    unsigned short port;
+
+                    socket_t accept_socket;
+                    if (!socket->accept(accept_socket, address, port))
+                    {
+                        logger.warning("Failed to accept socket");
+                        continue;
+                    }
+
+                    logger.trace("Socket accepted (address=%s, port=%d)", address.c_str(), port);
+                    socket->call_accept_callback(accept_socket, address, port);
                 }
             }else if (state == Socket::STATE_CONNECTING)
             {

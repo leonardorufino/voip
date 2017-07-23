@@ -12,7 +12,14 @@
 #include "socket_test.h"
 #include <iostream>
 
+//-------------------------------------------
+
 bool Socket_Test::_connected = false;
+
+socket_t Socket_Test::_accepted_socket = INVALID_SOCKET;
+std::string Socket_Test::_accepted_address;
+unsigned short Socket_Test::_accepted_port = 0;
+
 char Socket_Test::_received_buffer[Socket_Control::RECEIVE_BUFFER_SIZE + 1] = {0};
 int Socket_Test::_received_size = 0;
 std::string Socket_Test::_received_address;
@@ -96,6 +103,7 @@ bool Socket_Test::set_callbacks()
     Socket &socket = get_socket();
 
     socket.set_connect_callback(connect_callback, &socket);
+    socket.set_accept_callback(accept_callback, &socket);
     socket.set_receive_callback(receive_callback, &socket);
     return true;
 }
@@ -357,6 +365,23 @@ bool Socket_Test::connect_callback(void *data, bool success)
     }
 
     _connected = success;
+    return true;
+}
+
+//-------------------------------------------
+
+bool Socket_Test::accept_callback(void *data, socket_t socket, std::string address, unsigned short port)
+{
+    Socket_Test *listen_socket = reinterpret_cast<Socket_Test *>(data);
+    if ((!listen_socket) || (socket == INVALID_SOCKET))
+    {
+        std::cout << "Socket_Test::accept_callback -> Invalid parameters\n";
+        return false;
+    }
+
+    _accepted_socket = socket;
+    _accepted_address = address;
+    _accepted_port = port;
     return true;
 }
 

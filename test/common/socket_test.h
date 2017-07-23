@@ -50,10 +50,16 @@ protected:
     static bool check_network_address(Socket::Address_Family family, std::string address);
 
     static bool connect_callback(void *data, bool success);
+    static bool accept_callback(void *data, socket_t socket, std::string address, unsigned short port);
     static bool receive_callback(void *data, const char *buffer, int size, std::string address, unsigned short port);
 
 protected:
     static bool _connected;
+
+    static socket_t _accepted_socket;
+    static std::string _accepted_address;
+    static unsigned short _accepted_port;
+
     static char _received_buffer[Socket_Control::RECEIVE_BUFFER_SIZE + 1];
     static int _received_size;
     static std::string _received_address;
