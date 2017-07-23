@@ -160,6 +160,34 @@ public:
 
 //-------------------------------------------
 
+class Socket_TCP_Client : public Socket
+{
+public:
+    Socket_TCP_Client() {}
+    ~Socket_TCP_Client() {}
+
+    bool create(Address_Family family);
+
+    bool listen(int backlog) { return false; }
+    bool accept(socket_t &accept_socket, std::string &address, unsigned short &port) { return false; }
+};
+
+//-------------------------------------------
+
+class Socket_TCP_Server : public Socket
+{
+public:
+    Socket_TCP_Server() {}
+    ~Socket_TCP_Server() {}
+
+    bool create(Address_Family family);
+
+    bool connect(std::string address, unsigned short port) { return false; }
+};
+
+//-------------------------------------------
+//-------------------------------------------
+
 class Socket_Control
 {
 public:
