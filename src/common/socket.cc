@@ -17,7 +17,7 @@ Logger Socket::_logger(Log_Manager::LOG_SOCKET);
 //-------------------------------------------
 
 Socket::Socket() : _state(STATE_IDLE), _socket(INVALID_SOCKET), _connect_callback(NULL), _connect_data(NULL),
-    _receive_callback(NULL), _receive_data(NULL)
+    _accept_callback(NULL), _accept_data(NULL), _receive_callback(NULL), _receive_data(NULL)
 {
 #ifdef WIN32
     Startup();
@@ -52,7 +52,8 @@ bool Socket::call_connect_callback(bool success)
             return _connect_callback(_connect_data, success);
         }
 
-        return true;
+        _logger.trace("Connect callback not configured (state=%d, socket=%d, success=%d)", _state, _socket, success);
+        return false;
     }catch (std::exception &e)
     {
         _logger.warning("Exception when calling connect callback (state=%d, socket=%d, success=%d, msg=%s)",
@@ -75,27 +76,30 @@ void Socket::set_accept_callback(accept_callback *callback, void *data)
 
 //-------------------------------------------
 
-bool Socket::call_accept_callback(socket_t socket, std::string address, unsigned short port)
+bool Socket::call_accept_callback(Socket_TCP_Client *accepted, std::string address, unsigned short port)
 {
     try
     {
         if (_accept_callback)
         {
-            _logger.trace("Calling accept callback (state=%d, socket=%d, accept=%d, address=%s, port=%d)",
-                          _state, _socket, socket, address.c_str(), port);
-            return _accept_callback(_accept_data, socket, address, port);
+            _logger.trace("Calling accept callback (state=%d, socket=%d, accepted=%d, address=%s, port=%d)",
+                          _state, _socket, accepted->_socket, address.c_str(), port);
+
+            return _accept_callback(_accept_data, accepted, address, port);
         }
 
-        return true;
+        _logger.trace("Accept callback not configured (state=%d, socket=%d, accepted=%d, address=%s, port=%d)",
+                      _state, _socket, accepted->_socket, address.c_str(), port);
+        return false;
     }catch (std::exception &e)
     {
-        _logger.warning("Exception when calling accept callback (state=%d, socket=%d, accept=%d, address=%s, port=%d)",
-                        _state, _socket, socket, address.c_str(), port, e.what());
+        _logger.warning("Exception when calling accept callback (state=%d, socket=%d, accepted=%d, address=%s, port=%d)",
+                        _state, _socket, accepted->_socket, address.c_str(), port, e.what());
         return false;
     }catch (...)
     {
-        _logger.warning("Exception when calling accept callback (state=%d, socket=%d, accept=%d, address=%s, port=%d)",
-                        _state, _socket, socket, address.c_str(), port);
+        _logger.warning("Exception when calling accept callback (state=%d, socket=%d, accepted=%d, address=%s, port=%d)",
+                        _state, _socket, accepted->_socket, address.c_str(), port);
         return false;
     }
 }
@@ -121,7 +125,9 @@ bool Socket::call_receive_callback(const char *buffer, int size, std::string add
             return _receive_callback(_receive_data, buffer, size, address, port);
         }
 
-        return true;
+        _logger.trace("Receive callback not configured (state=%d, socket=%d, address=%s, port=%d, size=%d)",
+                      _state, _socket, address.c_str(), port, size);
+        return false;
     }catch (std::exception &e)
     {
         _logger.warning("Exception when calling receive callback (state=%d, socket=%d, address=%s, port=%d, size=%d, msg=%s)",
@@ -167,11 +173,7 @@ bool Socket::close()
         return false;
     }
 
-#ifdef WIN32
     if (::closesocket(_socket))
-#else
-    if (::close(_socket))
-#endif
     {
         _logger.warning("Failed to close socket (socket=%d, error=%d)", _socket, GET_LAST_ERROR);
         _state = STATE_CLOSED;
@@ -377,22 +379,18 @@ bool Socket::accept(socket_t &accept_socket, std::string &address, unsigned shor
 
     if (!sockaddr_to_address(ss, address, port))
     {
-        _logger.warning("Failed to get accept address (socket=%d, accept=%d)", _socket, accept_socket);
+        _logger.warning("Failed to get accept address (socket=%d, accepted=%d)", _socket, accept_socket);
 
-#ifdef WIN32
         if (::closesocket(accept_socket))
-#else
-        if (::close(accept_socket))
-#endif
         {
-            _logger.warning("Failed to close accept socket (socket=%d, accept=%d, error=%d)", _socket, accept_socket, GET_LAST_ERROR);
+            _logger.warning("Failed to close accept socket (socket=%d, accepted=%d, error=%d)", _socket, accept_socket, GET_LAST_ERROR);
             accept_socket = INVALID_SOCKET;
         }
 
         return false;
     }
 
-    _logger.trace("Socket accepted (socket=%d, accept=%d, address=%s, port=%d)", _socket, accept_socket, address.c_str(), port);
+    _logger.trace("Socket accepted (socket=%d, accepted=%d, address=%s, port=%d)", _socket, accept_socket, address.c_str(), port);
     return true;
 }
 
@@ -441,7 +439,8 @@ bool Socket::connect(std::string address, unsigned short port)
 
     _state = STATE_CONNECTED;
     _logger.trace("Socket connected (socket=%d, address=%s, port=%d)", _socket, address.c_str(), port);
-    return call_connect_callback(true);
+    call_connect_callback(true);
+    return true;
 }
 
 //-------------------------------------------
@@ -970,7 +969,7 @@ bool Socket_UDP::create(Address_Family family)
 bool Socket_TCP_Client::create(Address_Family family)
 {
     int af = address_family_to_af(family);
-    return Socket::create(af, SOCK_DGRAM, IPPROTO_UDP);
+    return Socket::create(af, SOCK_STREAM, IPPROTO_TCP);
 }
 
 //-------------------------------------------
@@ -1047,7 +1046,7 @@ bool Socket_Control::add_socket(Socket &socket)
 {
     Logger &logger = Socket::get_logger();
 
-    std::lock_guard<std::mutex> lock(_socket_list_mutex);
+    std::lock_guard<std::recursive_mutex> lock(_socket_list_mutex);
 
     std::list<Socket *>::iterator it = _socket_list.begin();
     while (it != _socket_list.end())
@@ -1071,7 +1070,7 @@ bool Socket_Control::remove_socket(Socket &socket)
 {
     Logger &logger = Socket::get_logger();
 
-    std::lock_guard<std::mutex> lock(_socket_list_mutex);
+    std::lock_guard<std::recursive_mutex> lock(_socket_list_mutex);
 
     std::list<Socket *>::iterator it = _socket_list.begin();
     while (it != _socket_list.end())
@@ -1080,7 +1079,7 @@ bool Socket_Control::remove_socket(Socket &socket)
         if (sock == &socket)
         {
             _socket_list.remove(&socket);
-            logger.warning("Socket removed from control (socket=%d)", socket.get_socket());
+            logger.trace("Socket removed from control (socket=%d)", socket.get_socket());
             return true;
         }
     }
@@ -1113,7 +1112,7 @@ void Socket_Control::control_thread()
 
         Common_Functions::delay(10);
 
-        std::lock_guard<std::mutex> lock(control._socket_list_mutex);
+        std::lock_guard<std::recursive_mutex> lock(control._socket_list_mutex);
 
         std::list<Socket *>::iterator it = control._socket_list.begin();
         while (it != control._socket_list.end())
@@ -1170,18 +1169,24 @@ void Socket_Control::control_thread()
                 if (FD_ISSET(handle, &read_set))
                 {
                     std::string address;
-                    unsigned short port;
+                    unsigned short port = 0;
+                    int size = -1;
 
-                    int size = socket->receive(control._receive_buffer, sizeof(_receive_buffer), address, port);
+                    if (socket->get_socket_type() == Socket::SOCKET_UDP)
+                        size = socket->receive(control._receive_buffer, sizeof(_receive_buffer), address, port);
+                    else
+                        size = socket->receive(control._receive_buffer, sizeof(_receive_buffer));
+
                     if (size < 0)
                     {
-                        logger.warning("Failed to receive message");
+                        logger.warning("Failed to receive message (socket=%d)", socket->get_socket());
                         continue;
                     }
 
                     control._receive_buffer[size] = 0;
 
-                    logger.trace("Message received (address=%s, port=%d, size=%d)", address.c_str(), port, size);
+                    logger.trace("Message received (socket=%d, address=%s, port=%d, size=%d)",
+                                 socket->get_socket(), address.c_str(), port, size);
                     socket->call_receive_callback(control._receive_buffer, size, address, port);
                 }
             }else if (state == Socket::STATE_LISTENING)
@@ -1198,8 +1203,15 @@ void Socket_Control::control_thread()
                         continue;
                     }
 
-                    logger.trace("Socket accepted (address=%s, port=%d)", address.c_str(), port);
-                    socket->call_accept_callback(accept_socket, address, port);
+                    logger.trace("Socket accepted in control thread (accepted=%d, address=%s, port=%d)",
+                                 accept_socket, address.c_str(), port);
+
+                    Socket_TCP_Client *accepted = new Socket_TCP_Client();
+                    accepted->set_socket(accept_socket);
+                    accepted->set_state(Socket::STATE_CONNECTED);
+
+                    if (!socket->call_accept_callback(accepted, address, port))
+                        delete accepted;
                 }
             }else if (state == Socket::STATE_CONNECTING)
             {

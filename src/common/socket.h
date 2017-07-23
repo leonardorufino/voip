@@ -38,16 +38,27 @@
 
     #define INVALID_SOCKET      -1
     #define GET_LAST_ERROR      errno
+    #define closesocket         close
 
     typedef int socket_t;
 #endif
+
+class Socket_TCP_Client;
 
 class Socket
 {
 public:
     typedef bool (connect_callback)(void *data, bool success);
-    typedef bool (accept_callback)(void *data, socket_t socket, std::string address, unsigned short port);
+    typedef bool (accept_callback)(void *data, Socket_TCP_Client *accepted, std::string address, unsigned short port);
     typedef bool (receive_callback)(void *data, const char *buffer, int size, std::string address, unsigned short port);
+
+    enum Socket_Type
+    {
+        SOCKET_UDP,
+        SOCKET_TCP_CLIENT,
+        SOCKET_TCP_SERVER,
+        SOCKET_TYPE_INVALID,
+    };
 
     enum Address_Family
     {
@@ -82,16 +93,19 @@ public:
     void set_state(State state) { _state = state; }
     State get_state() { return _state; }
 
+    void set_socket(socket_t socket) { _socket = socket; }
     socket_t &get_socket() { return _socket; }
 
     void set_connect_callback(connect_callback *callback, void *data);
     bool call_connect_callback(bool success);
 
     void set_accept_callback(accept_callback *callback, void *data);
-    bool call_accept_callback(socket_t socket, std::string address, unsigned short port);
+    bool call_accept_callback(Socket_TCP_Client *accepted, std::string address, unsigned short port);
 
     void set_receive_callback(receive_callback *callback, void *data);
     bool call_receive_callback(const char *buffer, int size, std::string address, unsigned short port);
+
+    virtual Socket_Type get_socket_type() = 0;
 
     virtual bool create(Address_Family family) = 0;
 
@@ -152,6 +166,8 @@ public:
     Socket_UDP() {}
     ~Socket_UDP() {}
 
+    Socket_Type get_socket_type() { return SOCKET_UDP; }
+
     bool create(Address_Family family);
 
     bool listen(int backlog) { return false; }
@@ -166,10 +182,14 @@ public:
     Socket_TCP_Client() {}
     ~Socket_TCP_Client() {}
 
+    Socket_Type get_socket_type() { return SOCKET_TCP_CLIENT; }
+
     bool create(Address_Family family);
 
     bool listen(int backlog) { return false; }
     bool accept(socket_t &accept_socket, std::string &address, unsigned short &port) { return false; }
+    bool send(const char *buffer, int size, std::string address, unsigned short port) { return false; }
+    int receive(char *buffer, int size, std::string &address, unsigned short &port) { return false; }
 };
 
 //-------------------------------------------
@@ -180,9 +200,15 @@ public:
     Socket_TCP_Server() {}
     ~Socket_TCP_Server() {}
 
+    Socket_Type get_socket_type() { return SOCKET_TCP_SERVER; }
+
     bool create(Address_Family family);
 
     bool connect(std::string address, unsigned short port) { return false; }
+    bool send(const char *buffer, int size) { return false; }
+    bool send(const char *buffer, int size, std::string address, unsigned short port) { return false; }
+    int receive(char *buffer, int size) { return false; }
+    int receive(char *buffer, int size, std::string &address, unsigned short &port) { return false; }
 };
 
 //-------------------------------------------
@@ -213,7 +239,7 @@ protected:
     std::thread _control_thread;
 
     std::list<Socket *> _socket_list;
-    std::mutex _socket_list_mutex;
+    std::recursive_mutex _socket_list_mutex;
 
     char _receive_buffer[RECEIVE_BUFFER_SIZE + 1];
     bool _stopped;
