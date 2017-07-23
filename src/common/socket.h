@@ -95,24 +95,24 @@ public:
 
     virtual bool create(Address_Family family) = 0;
 
-    bool create(int af, int type, int protocol);
-    bool close();
+    virtual bool create(int af, int type, int protocol);
+    virtual bool close();
 
-    bool set_so_snd_buf(int size = 128 * 1024);
-    bool set_so_rcv_buf(int size = 128 * 1024);
-    bool set_so_reuse_addr(int value = 1);
-    bool set_non_blocking(bool non_blocking = true);
-    bool get_so_error(int &value);
+    virtual bool set_so_snd_buf(int size = 128 * 1024);
+    virtual bool set_so_rcv_buf(int size = 128 * 1024);
+    virtual bool set_so_reuse_addr(int value = 1);
+    virtual bool set_non_blocking(bool non_blocking = true);
+    virtual bool get_so_error(int &value);
 
-    bool bind(std::string address, unsigned short port);
-    bool listen(int backlog);
-    bool accept(socket_t &accept_socket, std::string &address, unsigned short &port);
-    bool connect(std::string address, unsigned short port);
-    bool send(const char *buffer, int size);
-    bool send(const char *buffer, int size, std::string address, unsigned short port);
-    int receive(char *buffer, int size);
-    int receive(char *buffer, int size, std::string &address, unsigned short &port);
-    int select(unsigned long timeout, int *read, int *write, int *except);
+    virtual bool bind(std::string address, unsigned short port);
+    virtual bool listen(int backlog);
+    virtual bool accept(socket_t &accept_socket, std::string &address, unsigned short &port);
+    virtual bool connect(std::string address, unsigned short port);
+    virtual bool send(const char *buffer, int size);
+    virtual bool send(const char *buffer, int size, std::string address, unsigned short port);
+    virtual int receive(char *buffer, int size);
+    virtual int receive(char *buffer, int size, std::string &address, unsigned short &port);
+    virtual int select(unsigned long timeout, int *read, int *write, int *except);
 
     static int address_family_to_af(Address_Family family);
     static Address_Family address_to_address_family(std::string address);
@@ -153,6 +153,9 @@ public:
     ~Socket_UDP() {}
 
     bool create(Address_Family family);
+
+    bool listen(int backlog) { return false; }
+    bool accept(socket_t &accept_socket, std::string &address, unsigned short &port) { return false; }
 };
 
 //-------------------------------------------
