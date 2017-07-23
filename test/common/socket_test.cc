@@ -14,16 +14,14 @@
 
 //-------------------------------------------
 
-bool Socket_Test::_connected = false;
+Socket_Test::Socket_Test()
+{
+    _connected = false;
 
-socket_t Socket_Test::_accepted_socket = INVALID_SOCKET;
-std::string Socket_Test::_accepted_address;
-unsigned short Socket_Test::_accepted_port = 0;
-
-char Socket_Test::_received_buffer[Socket_Control::RECEIVE_BUFFER_SIZE + 1] = {0};
-int Socket_Test::_received_size = 0;
-std::string Socket_Test::_received_address;
-unsigned short Socket_Test::_received_port = 0;
+    _received_buffer[0] = 0;
+    _received_size = 0;
+    _received_port = 0;
+}
 
 //-------------------------------------------
 
@@ -102,9 +100,36 @@ bool Socket_Test::set_callbacks()
 {
     Socket &socket = get_socket();
 
-    socket.set_connect_callback(connect_callback, &socket);
-    socket.set_accept_callback(accept_callback, &socket);
-    socket.set_receive_callback(receive_callback, &socket);
+    socket.set_connect_callback(connect_callback, this);
+    socket.set_receive_callback(receive_callback, this);
+    return true;
+}
+
+//-------------------------------------------
+
+bool Socket_Test::configure_socket(Socket::Address_Family family, std::string address, unsigned short port, bool non_blocking)
+{
+    if (!set_callbacks())
+        return false;
+
+    if (!create(family))
+        return false;
+
+    if (!set_so_snd_buf())
+        return false;
+
+    if (!set_so_rcv_buf())
+        return false;
+
+    if (!set_so_reuse_addr())
+        return false;
+
+    if (!bind(address, port))
+        return false;
+
+    if (!set_non_blocking(non_blocking))
+        return false;
+
     return true;
 }
 
@@ -357,31 +382,14 @@ bool Socket_Test::check_network_address(Socket::Address_Family family, std::stri
 
 bool Socket_Test::connect_callback(void *data, bool success)
 {
-    Socket_Test *socket = reinterpret_cast<Socket_Test *>(data);
-    if (!socket)
+    Socket_Test *test = reinterpret_cast<Socket_Test *>(data);
+    if (!test)
     {
         std::cout << "Socket_Test::connect_callback -> Invalid parameter\n";
         return false;
     }
 
-    _connected = success;
-    return true;
-}
-
-//-------------------------------------------
-
-bool Socket_Test::accept_callback(void *data, socket_t socket, std::string address, unsigned short port)
-{
-    Socket_Test *listen_socket = reinterpret_cast<Socket_Test *>(data);
-    if ((!listen_socket) || (socket == INVALID_SOCKET))
-    {
-        std::cout << "Socket_Test::accept_callback -> Invalid parameters\n";
-        return false;
-    }
-
-    _accepted_socket = socket;
-    _accepted_address = address;
-    _accepted_port = port;
+    test->_connected = success;
     return true;
 }
 
@@ -389,17 +397,17 @@ bool Socket_Test::accept_callback(void *data, socket_t socket, std::string addre
 
 bool Socket_Test::receive_callback(void *data, const char *buffer, int size, std::string address, unsigned short port)
 {
-    Socket_Test *socket = reinterpret_cast<Socket_Test *>(data);
-    if ((!socket) || (!buffer) || (size < 0))
+    Socket_Test *test = reinterpret_cast<Socket_Test *>(data);
+    if ((!test) || (!buffer) || (size < 0))
     {
         std::cout << "Socket_Test::receive_callback -> Invalid parameters\n";
         return false;
     }
 
-    memcpy(_received_buffer, buffer, size);
-    _received_size = size;
-    _received_address = address;
-    _received_port = port;
+    memcpy(test->_received_buffer, buffer, size);
+    test->_received_size = size;
+    test->_received_address = address;
+    test->_received_port = port;
     return true;
 }
 
@@ -408,24 +416,7 @@ bool Socket_Test::receive_callback(void *data, const char *buffer, int size, std
 
 bool Socket_UDP_Blocking_Test::run(Socket::Address_Family family, std::string address, unsigned short port)
 {
-    set_callbacks();
-
-    if (!create(family))
-        return false;
-
-    if (!set_so_snd_buf())
-        return false;
-
-    if (!set_so_rcv_buf())
-        return false;
-
-    if (!set_so_reuse_addr())
-        return false;
-
-    if (!bind(address, port))
-        return false;
-
-    if (!set_non_blocking(0))
+    if (!configure_socket(family, address, port, false))
         return false;
 
     const int MSG_SIZE = 256;
@@ -483,24 +474,7 @@ bool Socket_UDP_Blocking_Test::run(Socket::Address_Family family, std::string ad
 
 bool Socket_UDP_Blocking_Connect_Test::run(Socket::Address_Family family, std::string address, unsigned short port)
 {
-    set_callbacks();
-
-    if (!create(family))
-        return false;
-
-    if (!set_so_snd_buf())
-        return false;
-
-    if (!set_so_rcv_buf())
-        return false;
-
-    if (!set_so_reuse_addr())
-        return false;
-
-    if (!bind(address, port))
-        return false;
-
-    if (!set_non_blocking(0))
+    if (!configure_socket(family, address, port, false))
         return false;
 
     _connected = false;
@@ -557,24 +531,7 @@ bool Socket_UDP_Blocking_Connect_Test::run(Socket::Address_Family family, std::s
 
 bool Socket_UDP_Non_Blocking_Test::run(Socket::Address_Family family, std::string address, unsigned short port)
 {
-    set_callbacks();
-
-    if (!create(family))
-        return false;
-
-    if (!set_so_snd_buf())
-        return false;
-
-    if (!set_so_rcv_buf())
-        return false;
-
-    if (!set_so_reuse_addr())
-        return false;
-
-    if (!bind(address, port))
-        return false;
-
-    if (!set_non_blocking(1))
+    if (!configure_socket(family, address, port, true))
         return false;
 
     const int MSG_SIZE = 256;
@@ -632,24 +589,7 @@ bool Socket_UDP_Non_Blocking_Test::run(Socket::Address_Family family, std::strin
 
 bool Socket_UDP_Non_Blocking_Connect_Test::run(Socket::Address_Family family, std::string address, unsigned short port)
 {
-    set_callbacks();
-
-    if (!create(family))
-        return false;
-
-    if (!set_so_snd_buf())
-        return false;
-
-    if (!set_so_rcv_buf())
-        return false;
-
-    if (!set_so_reuse_addr())
-        return false;
-
-    if (!bind(address, port))
-        return false;
-
-    if (!set_non_blocking(1))
+    if (!configure_socket(family, address, port, true))
         return false;
 
     unsigned long start = Common_Functions::get_tick();
@@ -724,9 +664,7 @@ bool Socket_UDP_Non_Blocking_Control_Test::run(Socket::Address_Family family, st
         return false;
     }
 
-    set_callbacks();
-
-    if (!create(family))
+    if (!configure_socket(family, address, port, true))
         return false;
 
     if (!control.add_socket(_socket_udp))
@@ -734,21 +672,6 @@ bool Socket_UDP_Non_Blocking_Control_Test::run(Socket::Address_Family family, st
         std::cout << "Socket_UDP_Non_Blocking_Control_Test::run -> Failed to add socket to control\n";
         return false;
     }
-
-    if (!set_so_snd_buf())
-        return false;
-
-    if (!set_so_rcv_buf())
-        return false;
-
-    if (!set_so_reuse_addr())
-        return false;
-
-    if (!bind(address, port))
-        return false;
-
-    if (!set_non_blocking(1))
-        return false;
 
     unsigned long start = Common_Functions::get_tick();
     unsigned long max_wait_time = 5000;
