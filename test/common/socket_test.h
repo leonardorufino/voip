@@ -40,6 +40,8 @@ protected:
     virtual bool set_non_blocking(bool non_blocking = true);
 
     virtual bool bind(std::string address, unsigned short port);
+    virtual bool listen(int backlog);
+    virtual bool accept(socket_t &accept_socket, std::string &address, unsigned short &port);
     virtual bool connect(std::string address, unsigned short port);
     virtual bool send(const char *buffer, int size);
     virtual bool send(const char *buffer, int size, std::string address, unsigned short port);
@@ -51,10 +53,15 @@ protected:
     static bool check_network_address(Socket::Address_Family family, std::string address);
 
     static bool connect_callback(void *data, bool success);
+    static bool accept_callback(void *data, Socket_TCP_Client *accepted, std::string address, unsigned short port);
     static bool receive_callback(void *data, const char *buffer, int size, std::string address, unsigned short port);
 
 protected:
     bool _connected;
+
+    Socket_TCP_Client *_accepted_socket;
+    std::string _accepted_address;
+    unsigned short _accepted_port;
 
     char _received_buffer[Socket_Control::RECEIVE_BUFFER_SIZE + 1];
     int _received_size;

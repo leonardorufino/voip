@@ -18,6 +18,9 @@ Socket_Test::Socket_Test()
 {
     _connected = false;
 
+    _accepted_socket = NULL;
+    _accepted_port = 0;
+
     _received_buffer[0] = 0;
     _received_size = 0;
     _received_port = 0;
@@ -101,6 +104,7 @@ bool Socket_Test::set_callbacks()
     Socket &socket = get_socket();
 
     socket.set_connect_callback(connect_callback, this);
+    socket.set_accept_callback(accept_callback, this);
     socket.set_receive_callback(receive_callback, this);
     return true;
 }
@@ -236,6 +240,37 @@ bool Socket_Test::bind(std::string address, unsigned short port)
         std::cout << "Socket_Test::bind -> Failed to bind:\n";
         std::cout << std::setw(12) << "Address: " << address.c_str() << "\n";
         std::cout << std::setw(12) << "Port: " << port << "\n";
+        return false;
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+
+bool Socket_Test::listen(int backlog)
+{
+    Socket &socket = get_socket();
+
+    if (!socket.listen(backlog))
+    {
+        std::cout << "Socket_Test::listen -> Failed to listen:\n";
+        std::cout << std::setw(12) << "Backlog: " << backlog << "\n";
+        return false;
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+
+bool Socket_Test::accept(socket_t &accept_socket, std::string &address, unsigned short &port)
+{
+    Socket &socket = get_socket();
+
+    if (!socket.accept(accept_socket, address, port))
+    {
+        std::cout << "Socket_Test::accept -> Failed to accept\n";
         return false;
     }
 
@@ -390,6 +425,23 @@ bool Socket_Test::connect_callback(void *data, bool success)
     }
 
     test->_connected = success;
+    return true;
+}
+
+//-------------------------------------------
+
+bool Socket_Test::accept_callback(void *data, Socket_TCP_Client *accepted, std::string address, unsigned short port)
+{
+    Socket_Test *test = reinterpret_cast<Socket_Test *>(data);
+    if ((!test) || (!accepted))
+    {
+        std::cout << "Socket_Test::accept_callback -> Invalid parameters\n";
+        return false;
+    }
+
+    test->_accepted_socket = accepted;
+    test->_accepted_address = address;
+    test->_accepted_port = port;
     return true;
 }
 
