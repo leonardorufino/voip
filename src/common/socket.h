@@ -133,6 +133,7 @@ public:
     static bool address_to_sockaddr(std::string address, unsigned short port, sockaddr_storage &ss);
     static bool sockaddr_to_address(sockaddr_storage &ss, std::string &address, unsigned short &port);
     static bool sockaddr_to_address(sockaddr_storage &ss, std::string &address);
+    static unsigned long get_scope_id(std::string address);
 
     static bool get_network_addresses(std::list<Network_Address> &addresses);
 

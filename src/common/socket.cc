@@ -326,6 +326,12 @@ bool Socket::bind(std::string address, unsigned short port)
         return false;
     }
 
+    if (ss.ss_family == AF_INET6)
+    {
+        sockaddr_in6 *sin = (sockaddr_in6 *) &ss;
+        sin->sin6_scope_id = get_scope_id(address);
+    }
+
     if (::bind(_socket, (sockaddr *) &ss, sizeof(ss)))
     {
         _logger.warning("Failed to bind (socket=%d, address=%s, port=%d, error=%d)", _socket, address.c_str(), port, GET_LAST_ERROR);
@@ -642,6 +648,7 @@ int Socket::select(unsigned long timeout, int *read, int *write, int *except)
 }
 
 //-------------------------------------------
+//-------------------------------------------
 
 int Socket::address_family_to_af(Address_Family family)
 {
@@ -676,7 +683,6 @@ bool Socket::address_to_sockaddr(std::string address, unsigned short port, socka
         return false;
 
     std::string addr;
-    unsigned long scope = 0; //TODO
 
     memset(&ss, 0, sizeof(ss));
 
@@ -696,7 +702,6 @@ bool Socket::address_to_sockaddr(std::string address, unsigned short port, socka
         sockaddr_in6 *sin = (sockaddr_in6 *) &ss;
         sin->sin6_family = AF_INET6;
         sin->sin6_port = htons(port);
-        sin->sin6_scope_id = scope;
         memcpy(&sin->sin6_addr, &addr6, sizeof(sin->sin6_addr));
         return true;
     }
@@ -738,8 +743,8 @@ bool Socket::sockaddr_to_address(sockaddr_storage &ss, std::string &address)
     if (ss.ss_family == AF_INET6)
     {
         sockaddr_in6 *sin = (sockaddr_in6 *) &ss;
-
         char buf[50] = {0};
+
         if (!inet_ntop(ss.ss_family, &sin->sin6_addr, buf, sizeof(buf)))
         {
             _logger.warning("Failed to convert IPv6 sockaddr to address (error=%d)", GET_LAST_ERROR);
@@ -751,6 +756,129 @@ bool Socket::sockaddr_to_address(sockaddr_storage &ss, std::string &address)
     }
 
     return false;
+}
+
+//-------------------------------------------
+
+unsigned long Socket::get_scope_id(std::string address)
+{
+    unsigned long scope_id = 0;
+    bool found = false;
+
+#ifdef WIN32
+    PIP_ADAPTER_ADDRESSES adapter_addresses = NULL;
+    ULONG size = 0;
+    DWORD ret;
+
+    for (unsigned short i = 0; i < 5; i++)
+    {
+        ret = GetAdaptersAddresses(AF_INET6, GAA_FLAG_INCLUDE_PREFIX, NULL, adapter_addresses, &size);
+
+        if ((ret == NO_ERROR) || (ret == ERROR_NO_DATA))
+            break;
+
+        if (ret == ERROR_BUFFER_OVERFLOW)
+        {
+            if (adapter_addresses)
+                free(adapter_addresses);
+
+            adapter_addresses = (IP_ADAPTER_ADDRESSES *) malloc(size);
+            continue;
+        }
+
+        if (adapter_addresses)
+        {
+            free(adapter_addresses);
+            adapter_addresses = NULL;
+        }
+
+        _logger.warning("Failed to get adapters addresses (error=%d)", ret);
+        return 0;
+    }
+
+    if ((ret == NO_ERROR) && (adapter_addresses))
+    {
+        PIP_ADAPTER_ADDRESSES it = adapter_addresses;
+        while ((it) && (!found))
+        {
+            PIP_ADAPTER_UNICAST_ADDRESS unicast = it->FirstUnicastAddress;
+            while ((unicast) && (!found))
+            {
+                if (unicast->Address.lpSockaddr->sa_family == AF_INET6)
+                {
+                    sockaddr_in6 *sin = (sockaddr_in6 *) unicast->Address.lpSockaddr;
+                    char buf[50] = {0};
+
+                    if (!inet_ntop(sin->sin6_family, &sin->sin6_addr, buf, sizeof(buf)))
+                    {
+                        _logger.warning("Failed to convert IPv6 sockaddr to address (error=%d)", GET_LAST_ERROR);
+                        return 0;
+                    }
+
+                    if (address == buf)
+                    {
+                        scope_id = sin->sin6_scope_id;
+                        found = true;
+                    }
+                }
+
+                unicast = unicast->Next;
+            }
+
+            it = it->Next;
+        }
+    }
+
+    if (adapter_addresses)
+        free(adapter_addresses);
+#else
+    ifaddrs *interfaces;
+    if (getifaddrs(&interfaces))
+    {
+        _logger.warning("Failed to get interface addresses (error=%d)", GET_LAST_ERROR);
+        return 0;
+    }
+
+    ifaddrs *it = interfaces;
+    while ((it) && (!found))
+    {
+        if (!it->ifa_addr)
+        {
+            it = it->ifa_next;
+            continue;
+        }
+
+        if (it->ifa_addr->sa_family == AF_INET6)
+        {
+            sockaddr_in6 *sin = (sockaddr_in6 *) it->ifa_addr;
+            char buf[50] = {0};
+
+            if (!inet_ntop(sin->sin6_family, &sin->sin6_addr, buf, sizeof(buf)))
+            {
+                _logger.warning("Failed to convert IPv6 sockaddr to address (error=%d)", GET_LAST_ERROR);
+                return 0;
+            }
+
+            if (address == buf)
+            {
+                scope_id = sin->sin6_scope_id;
+                found = true;
+            }
+        }
+
+        it = it->ifa_next;
+    }
+
+    freeifaddrs(interfaces);
+#endif
+
+    if (!found)
+    {
+        _logger.warning("Scope id not found (address=%s)", address.c_str());
+        return 0;
+    }
+
+    return scope_id;
 }
 
 //-------------------------------------------
@@ -801,8 +929,8 @@ bool Socket::get_network_addresses(std::list<Network_Address> &addresses)
                 if (unicast->Address.lpSockaddr->sa_family == AF_INET)
                 {
                     sockaddr_in *sin = (sockaddr_in *) unicast->Address.lpSockaddr;
-
                     char buf[50] = {0};
+
                     if (!inet_ntop(sin->sin_family, &sin->sin_addr, buf, sizeof(buf)))
                     {
                         _logger.warning("Failed to convert IPv4 sockaddr to address (error=%d)", GET_LAST_ERROR);
@@ -818,8 +946,8 @@ bool Socket::get_network_addresses(std::list<Network_Address> &addresses)
                 }else if (unicast->Address.lpSockaddr->sa_family == AF_INET6)
                 {
                     sockaddr_in6 *sin = (sockaddr_in6 *) unicast->Address.lpSockaddr;
-
                     char buf[50] = {0};
+
                     if (!inet_ntop(sin->sin6_family, &sin->sin6_addr, buf, sizeof(buf)))
                     {
                         _logger.warning("Failed to convert IPv6 sockaddr to address (error=%d)", GET_LAST_ERROR);
@@ -862,8 +990,8 @@ bool Socket::get_network_addresses(std::list<Network_Address> &addresses)
         if (it->ifa_addr->sa_family == AF_INET)
         {
             sockaddr_in *sin = (sockaddr_in *) it->ifa_addr;
-
             char buf[50] = {0};
+
             if (!inet_ntop(sin->sin_family, &sin->sin_addr, buf, sizeof(buf)))
             {
                 _logger.warning("Failed to convert IPv4 sockaddr to address (error=%d)", GET_LAST_ERROR);
@@ -879,8 +1007,8 @@ bool Socket::get_network_addresses(std::list<Network_Address> &addresses)
         }else if (it->ifa_addr->sa_family == AF_INET6)
         {
             sockaddr_in6 *sin = (sockaddr_in6 *) it->ifa_addr;
-
             char buf[50] = {0};
+
             if (!inet_ntop(sin->sin6_family, &sin->sin6_addr, buf, sizeof(buf)))
             {
                 _logger.warning("Failed to convert IPv6 sockaddr to address (error=%d)", GET_LAST_ERROR);
