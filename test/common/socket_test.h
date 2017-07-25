@@ -141,3 +141,22 @@ public:
 };
 
 //-------------------------------------------
+//-------------------------------------------
+
+class Socket_TCP_Test : public Socket_Test
+{
+public:
+    Socket_TCP_Test() : _current_socket(NULL) {}
+    virtual ~Socket_TCP_Test() {}
+
+    virtual bool run(Socket::Address_Family family, std::string address, unsigned short port) = 0;
+    Socket &get_socket() { return *_current_socket; }
+
+protected:
+    Socket_TCP_Client _socket_tcp_client;
+    Socket_TCP_Server _socket_tcp_server;
+
+    Socket *_current_socket;
+};
+
+//-------------------------------------------
