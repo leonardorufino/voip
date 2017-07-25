@@ -259,34 +259,34 @@ void SIP_Transaction::start_timer(SIP_Timer timer, SIP_Transaction *p)
     switch (timer)
     {
         case SIP_TIMER_A:
-            _timer_ids[SIP_TIMER_A] = tm.start_timer(_timer_values[timer], p, SIP_Transaction_Client_Invite::timer_A_Callback);
+            _timer_ids[SIP_TIMER_A] = tm.start_timer(_timer_values[timer], p, SIP_Transaction_Client_Invite::timer_A_callback);
             break;
         case SIP_TIMER_B:
-            _timer_ids[SIP_TIMER_B] = tm.start_timer(_timer_values[timer], p, SIP_Transaction_Client_Invite::timer_B_Callback);
+            _timer_ids[SIP_TIMER_B] = tm.start_timer(_timer_values[timer], p, SIP_Transaction_Client_Invite::timer_B_callback);
             break;
         case SIP_TIMER_D:
-            _timer_ids[SIP_TIMER_D] = tm.start_timer(_timer_values[timer], p, SIP_Transaction_Client_Invite::timer_D_Callback);
+            _timer_ids[SIP_TIMER_D] = tm.start_timer(_timer_values[timer], p, SIP_Transaction_Client_Invite::timer_D_callback);
             break;
         case SIP_TIMER_E:
-            _timer_ids[SIP_TIMER_E] = tm.start_timer(_timer_values[timer], p, SIP_Transaction_Client_Non_Invite::timer_E_Callback);
+            _timer_ids[SIP_TIMER_E] = tm.start_timer(_timer_values[timer], p, SIP_Transaction_Client_Non_Invite::timer_E_callback);
             break;
         case SIP_TIMER_F:
-            _timer_ids[SIP_TIMER_F] = tm.start_timer(_timer_values[timer], p, SIP_Transaction_Client_Non_Invite::timer_F_Callback);
+            _timer_ids[SIP_TIMER_F] = tm.start_timer(_timer_values[timer], p, SIP_Transaction_Client_Non_Invite::timer_F_callback);
             break;
         case SIP_TIMER_G:
-            _timer_ids[SIP_TIMER_G] = tm.start_timer(_timer_values[timer], p, SIP_Transaction_Server_Invite::timer_G_Callback);
+            _timer_ids[SIP_TIMER_G] = tm.start_timer(_timer_values[timer], p, SIP_Transaction_Server_Invite::timer_G_callback);
             break;
         case SIP_TIMER_H:
-            _timer_ids[SIP_TIMER_H] = tm.start_timer(_timer_values[timer], p, SIP_Transaction_Server_Invite::timer_H_Callback);
+            _timer_ids[SIP_TIMER_H] = tm.start_timer(_timer_values[timer], p, SIP_Transaction_Server_Invite::timer_H_callback);
             break;
         case SIP_TIMER_I:
-            _timer_ids[SIP_TIMER_I] = tm.start_timer(_timer_values[timer], p, SIP_Transaction_Server_Invite::timer_I_Callback);
+            _timer_ids[SIP_TIMER_I] = tm.start_timer(_timer_values[timer], p, SIP_Transaction_Server_Invite::timer_I_callback);
             break;
         case SIP_TIMER_J:
-            _timer_ids[SIP_TIMER_J] = tm.start_timer(_timer_values[timer], p, SIP_Transaction_Server_Non_Invite::timer_J_Callback);
+            _timer_ids[SIP_TIMER_J] = tm.start_timer(_timer_values[timer], p, SIP_Transaction_Server_Non_Invite::timer_J_callback);
             break;
         case SIP_TIMER_K:
-            _timer_ids[SIP_TIMER_K] = tm.start_timer(_timer_values[timer], p, SIP_Transaction_Client_Non_Invite::timer_K_Callback);
+            _timer_ids[SIP_TIMER_K] = tm.start_timer(_timer_values[timer], p, SIP_Transaction_Client_Non_Invite::timer_K_callback);
             break;
         default:
             _logger.warning("SIP_Transaction::start_timer -> Invalid timer (timer=%d)", timer);
@@ -494,12 +494,12 @@ void SIP_Transaction_Client_Invite::receive_3xx_6xx(SIP_Response *msg)
 
 //-------------------------------------------
 
-bool SIP_Transaction_Client_Invite::timer_A_Callback(void *p)
+bool SIP_Transaction_Client_Invite::timer_A_callback(void *p)
 {
     SIP_Transaction_Client_Invite *transaction = reinterpret_cast<SIP_Transaction_Client_Invite *>(p);
     if (!transaction)
     {
-        _logger.warning("SIP_Transaction_Client_Invite::timer_A_Callback -> Invalid parameter");
+        _logger.warning("SIP_Transaction_Client_Invite::timer_A_callback -> Invalid parameter");
         return false;
     }
 
@@ -525,12 +525,12 @@ bool SIP_Transaction_Client_Invite::timer_A_Callback(void *p)
 
 //-------------------------------------------
 
-bool SIP_Transaction_Client_Invite::timer_B_Callback(void *p)
+bool SIP_Transaction_Client_Invite::timer_B_callback(void *p)
 {
     SIP_Transaction_Client_Invite *transaction = reinterpret_cast<SIP_Transaction_Client_Invite *>(p);
     if (!transaction)
     {
-        _logger.warning("SIP_Transaction_Client_Invite::timer_B_Callback -> Invalid parameter");
+        _logger.warning("SIP_Transaction_Client_Invite::timer_B_callback -> Invalid parameter");
         return false;
     }
 
@@ -559,12 +559,12 @@ bool SIP_Transaction_Client_Invite::timer_B_Callback(void *p)
 
 //-------------------------------------------
 
-bool SIP_Transaction_Client_Invite::timer_D_Callback(void *p)
+bool SIP_Transaction_Client_Invite::timer_D_callback(void *p)
 {
     SIP_Transaction_Client_Invite *transaction = reinterpret_cast<SIP_Transaction_Client_Invite *>(p);
     if (!transaction)
     {
-        _logger.warning("SIP_Transaction_Client_Invite::timer_D_Callback -> Invalid parameter");
+        _logger.warning("SIP_Transaction_Client_Invite::timer_D_callback -> Invalid parameter");
         return false;
     }
 
@@ -666,12 +666,12 @@ void SIP_Transaction_Client_Non_Invite::receive_2xx_6xx(SIP_Response *msg)
 
 //-------------------------------------------
 
-bool SIP_Transaction_Client_Non_Invite::timer_E_Callback(void *p)
+bool SIP_Transaction_Client_Non_Invite::timer_E_callback(void *p)
 {
     SIP_Transaction_Client_Non_Invite *transaction = reinterpret_cast<SIP_Transaction_Client_Non_Invite *>(p);
     if (!transaction)
     {
-        _logger.warning("SIP_Transaction_Client_Non_Invite::timer_E_Callback -> Invalid parameter");
+        _logger.warning("SIP_Transaction_Client_Non_Invite::timer_E_callback -> Invalid parameter");
         return false;
     }
 
@@ -710,12 +710,12 @@ bool SIP_Transaction_Client_Non_Invite::timer_E_Callback(void *p)
 
 //-------------------------------------------
 
-bool SIP_Transaction_Client_Non_Invite::timer_F_Callback(void *p)
+bool SIP_Transaction_Client_Non_Invite::timer_F_callback(void *p)
 {
     SIP_Transaction_Client_Non_Invite *transaction = reinterpret_cast<SIP_Transaction_Client_Non_Invite *>(p);
     if (!transaction)
     {
-        _logger.warning("SIP_Transaction_Client_Non_Invite::timer_F_Callback -> Invalid parameter");
+        _logger.warning("SIP_Transaction_Client_Non_Invite::timer_F_callback -> Invalid parameter");
         return false;
     }
 
@@ -745,12 +745,12 @@ bool SIP_Transaction_Client_Non_Invite::timer_F_Callback(void *p)
 
 //-------------------------------------------
 
-bool SIP_Transaction_Client_Non_Invite::timer_K_Callback(void *p)
+bool SIP_Transaction_Client_Non_Invite::timer_K_callback(void *p)
 {
     SIP_Transaction_Client_Non_Invite *transaction = reinterpret_cast<SIP_Transaction_Client_Non_Invite *>(p);
     if (!transaction)
     {
-        _logger.warning("SIP_Transaction_Client_Non_Invite::timer_K_Callback -> Invalid parameter");
+        _logger.warning("SIP_Transaction_Client_Non_Invite::timer_K_callback -> Invalid parameter");
         return false;
     }
 
@@ -909,12 +909,12 @@ void SIP_Transaction_Server_Invite::send_3xx_6xx(SIP_Response *msg)
 
 //-------------------------------------------
 
-bool SIP_Transaction_Server_Invite::timer_G_Callback(void *p)
+bool SIP_Transaction_Server_Invite::timer_G_callback(void *p)
 {
     SIP_Transaction_Server_Invite *transaction = reinterpret_cast<SIP_Transaction_Server_Invite *>(p);
     if (!transaction)
     {
-        _logger.warning("SIP_Transaction_Server_Invite::timer_G_Callback -> Invalid parameter");
+        _logger.warning("SIP_Transaction_Server_Invite::timer_G_callback -> Invalid parameter");
         return false;
     }
 
@@ -944,12 +944,12 @@ bool SIP_Transaction_Server_Invite::timer_G_Callback(void *p)
 
 //-------------------------------------------
 
-bool SIP_Transaction_Server_Invite::timer_H_Callback(void *p)
+bool SIP_Transaction_Server_Invite::timer_H_callback(void *p)
 {
     SIP_Transaction_Server_Invite *transaction = reinterpret_cast<SIP_Transaction_Server_Invite *>(p);
     if (!transaction)
     {
-        _logger.warning("SIP_Transaction_Server_Invite::timer_H_Callback -> Invalid parameter");
+        _logger.warning("SIP_Transaction_Server_Invite::timer_H_callback -> Invalid parameter");
         return false;
     }
 
@@ -971,12 +971,12 @@ bool SIP_Transaction_Server_Invite::timer_H_Callback(void *p)
 
 //-------------------------------------------
 
-bool SIP_Transaction_Server_Invite::timer_I_Callback(void *p)
+bool SIP_Transaction_Server_Invite::timer_I_callback(void *p)
 {
     SIP_Transaction_Server_Invite *transaction = reinterpret_cast<SIP_Transaction_Server_Invite *>(p);
     if (!transaction)
     {
-        _logger.warning("SIP_Transaction_Server_Invite::timer_I_Callback -> Invalid parameter");
+        _logger.warning("SIP_Transaction_Server_Invite::timer_I_callback -> Invalid parameter");
         return false;
     }
 
@@ -1099,12 +1099,12 @@ void SIP_Transaction_Server_Non_Invite::send_2xx_6xx(SIP_Response *msg)
 
 //-------------------------------------------
 
-bool SIP_Transaction_Server_Non_Invite::timer_J_Callback(void *p)
+bool SIP_Transaction_Server_Non_Invite::timer_J_callback(void *p)
 {
     SIP_Transaction_Server_Non_Invite *transaction = reinterpret_cast<SIP_Transaction_Server_Non_Invite *>(p);
     if (!transaction)
     {
-        _logger.warning("SIP_Transaction_Server_Non_Invite::timer_J_Callback -> Invalid parameter");
+        _logger.warning("SIP_Transaction_Server_Non_Invite::timer_J_callback -> Invalid parameter");
         return false;
     }
 

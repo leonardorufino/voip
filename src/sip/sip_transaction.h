@@ -120,9 +120,9 @@ public:
     void receive_2xx(SIP_Response *msg);
     void receive_3xx_6xx(SIP_Response *msg);
 
-    static bool timer_A_Callback(void *p);
-    static bool timer_B_Callback(void *p);
-    static bool timer_D_Callback(void *p);
+    static bool timer_A_callback(void *p);
+    static bool timer_B_callback(void *p);
+    static bool timer_D_callback(void *p);
 
 private:
     State _state;
@@ -155,9 +155,9 @@ public:
     void receive_1xx(SIP_Response *msg);
     void receive_2xx_6xx(SIP_Response *msg);
 
-    static bool timer_E_Callback(void *p);
-    static bool timer_F_Callback(void *p);
-    static bool timer_K_Callback(void *p);
+    static bool timer_E_callback(void *p);
+    static bool timer_F_callback(void *p);
+    static bool timer_K_callback(void *p);
 
 private:
     State _state;
@@ -192,9 +192,9 @@ public:
     void send_2xx(SIP_Response *msg);
     void send_3xx_6xx(SIP_Response *msg);
 
-    static bool timer_G_Callback(void *p);
-    static bool timer_H_Callback(void *p);
-    static bool timer_I_Callback(void *p);
+    static bool timer_G_callback(void *p);
+    static bool timer_H_callback(void *p);
+    static bool timer_I_callback(void *p);
 
 private:
     State _state;
@@ -228,7 +228,7 @@ public:
     void send_1xx(SIP_Response *msg);
     void send_2xx_6xx(SIP_Response *msg);
 
-    static bool timer_J_Callback(void *p);
+    static bool timer_J_callback(void *p);
 
 private:
     State _state;
