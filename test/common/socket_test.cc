@@ -67,6 +67,10 @@ bool Socket_Test::init()
         Socket_TCP_Non_Blocking_Test tcp_non_blocking_test;
         if (!tcp_non_blocking_test.run(family_ipv4, address_ipv4, port_ipv4))
             return false;
+
+        Socket_TCP_Non_Blocking_Control_Test tcp_non_blocking_control_test;
+        if (!tcp_non_blocking_control_test.run(family_ipv4, address_ipv4, port_ipv4))
+            return false;
     }else
         std::cout << "IPv4 socket test disabled\n";
 
@@ -105,6 +109,10 @@ bool Socket_Test::init()
 
         Socket_TCP_Non_Blocking_Test tcp_non_blocking_test;
         if (!tcp_non_blocking_test.run(family_ipv6, address_ipv6, port_ipv6))
+            return false;
+
+        Socket_TCP_Non_Blocking_Control_Test tcp_non_blocking_control_test;
+        if (!tcp_non_blocking_control_test.run(family_ipv6, address_ipv6, port_ipv6))
             return false;
     }else
         std::cout << "IPv6 socket test disabled\n";
@@ -1045,6 +1053,194 @@ bool Socket_TCP_Non_Blocking_Test::run(Socket::Address_Family family, std::strin
     _current_socket = _accepted_socket;
     if (!close())
         return false;
+
+    return true;
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+bool Socket_TCP_Non_Blocking_Control_Test::run(Socket::Address_Family family, std::string address, unsigned short port)
+{
+    Socket_Control &control = Socket_Control::instance();
+
+    if (!control.start())
+    {
+        std::cout << "Socket_TCP_Non_Blocking_Control_Test::run -> Failed to start socket control\n";
+        return false;
+    }
+
+    _current_socket = &_socket_tcp_client;
+    if (!configure_socket(family, address, 0, true))
+        return false;
+
+    _current_socket = &_socket_tcp_server;
+    if (!configure_socket(family, address, port, true))
+        return false;
+
+    if (!control.add_socket(_socket_tcp_client))
+    {
+        std::cout << "Socket_TCP_Non_Blocking_Control_Test::run -> Failed to add client socket to control\n";
+        return false;
+    }
+
+    if (!control.add_socket(_socket_tcp_server))
+    {
+        std::cout << "Socket_TCP_Non_Blocking_Control_Test::run -> Failed to add server socket to control\n";
+        return false;
+    }
+
+    if (!listen(10))
+        return false;
+
+    unsigned long start = Common_Functions::get_tick();
+    unsigned long max_wait_time = 5000;
+    _current_socket = &_socket_tcp_client;
+    _connected = false;
+    _accepted_socket = NULL;
+    _accepted_address = "";
+    _accepted_port = 0;
+
+    if (!connect(address, port))
+        return false;
+
+    while ((Common_Functions::get_tick() - start) < max_wait_time)
+    {
+        if (_connected)
+            break;
+
+        Common_Functions::delay(500);
+    }
+
+    if (!_connected)
+    {
+        std::cout << "Socket_TCP_Non_Blocking_Control_Test::run -> Socket not connected\n";
+        return false;
+    }
+
+    start = Common_Functions::get_tick();
+    max_wait_time = 5000;
+
+    while ((Common_Functions::get_tick() - start) < max_wait_time)
+    {
+        if (_accepted_socket)
+            break;
+
+        Common_Functions::delay(500);
+    }
+
+    if (!_accepted_socket)
+    {
+        std::cout << "Socket_TCP_Non_Blocking_Control_Test::run -> Socket not accepted\n";
+        return false;
+    }
+
+    if (address != _accepted_address)
+    {
+        std::cout << "Socket_TCP_Non_Blocking_Control_Test::run -> Invalid accepted parameters:\n";
+        std::cout << std::setw(20) << "Local Address: " << address << "\n";
+        std::cout << std::setw(20) << "Accepted Address: " << _accepted_address << "\n";
+        return false;
+    }
+
+    _current_socket = _accepted_socket;
+
+    if (!set_callbacks())
+        return false;
+
+    if (!set_so_snd_buf())
+        return false;
+
+    if (!set_so_rcv_buf())
+        return false;
+
+    if (!set_so_reuse_addr())
+        return false;
+
+    if (!set_non_blocking(true))
+        return false;
+
+    if (!control.add_socket(*_accepted_socket))
+    {
+        std::cout << "Socket_TCP_Non_Blocking_Control_Test::run -> Failed to add accepted socket to control\n";
+        return false;
+    }
+
+    _current_socket = &_socket_tcp_client;
+    const int MSG_SIZE = 256;
+    char send_buffer[MSG_SIZE];
+
+    for (int i = 0; i < MSG_SIZE; i++)
+        send_buffer[i] = i;
+
+    _received_buffer[0] = 0;
+    _received_size = 0;
+    _received_address.clear();
+    _received_port = 0;
+
+    if (!send(send_buffer, sizeof(send_buffer)))
+        return false;
+
+    _current_socket = _accepted_socket;
+    start = Common_Functions::get_tick();
+
+    while ((Common_Functions::get_tick() - start) < max_wait_time)
+    {
+        if (_received_size == MSG_SIZE)
+            break;
+
+        Common_Functions::delay(500);
+    }
+
+    if (_received_size != MSG_SIZE)
+    {
+        std::cout << "Socket_TCP_Non_Blocking_Control_Test::run -> Message not received:\n";
+        std::cout << std::setw(20) << "Expected: " << MSG_SIZE << "\n";
+        std::cout << std::setw(20) << "Received: " << _received_size << "\n";
+        return false;
+    }
+
+    if (memcmp(send_buffer, _received_buffer, MSG_SIZE) != 0)
+    {
+        std::cout << "Socket_TCP_Non_Blocking_Control_Test::run -> Invalid received message\n";
+        return false;
+    }
+
+    if (!control.remove_socket(_socket_tcp_client))
+    {
+        std::cout << "Socket_TCP_Non_Blocking_Control_Test::run -> Failed to remove client socket from control\n";
+        return false;
+    }
+
+    if (!control.remove_socket(_socket_tcp_server))
+    {
+        std::cout << "Socket_TCP_Non_Blocking_Control_Test::run -> Failed to remove server socket from control\n";
+        return false;
+    }
+
+    if (!control.remove_socket(*_accepted_socket))
+    {
+        std::cout << "Socket_TCP_Non_Blocking_Control_Test::run -> Failed to remove accepted socket from control\n";
+        return false;
+    }
+
+    _current_socket = &_socket_tcp_client;
+    if (!close())
+        return false;
+
+    _current_socket = &_socket_tcp_server;
+    if (!close())
+        return false;
+
+    _current_socket = _accepted_socket;
+    if (!close())
+        return false;
+
+    if (!control.stop())
+    {
+        std::cout << "Socket_TCP_Non_Blocking_Control_Test::run -> Failed to stop socket control\n";
+        return false;
+    }
 
     return true;
 }

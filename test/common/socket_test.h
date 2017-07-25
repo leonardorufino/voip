@@ -182,3 +182,14 @@ public:
 };
 
 //-------------------------------------------
+
+class Socket_TCP_Non_Blocking_Control_Test : public Socket_TCP_Test
+{
+public:
+    Socket_TCP_Non_Blocking_Control_Test() {}
+    virtual ~Socket_TCP_Non_Blocking_Control_Test() {}
+
+    bool run(Socket::Address_Family family, std::string address, unsigned short port);
+};
+
+//-------------------------------------------
