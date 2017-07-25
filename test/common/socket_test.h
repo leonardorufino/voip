@@ -171,3 +171,14 @@ public:
 };
 
 //-------------------------------------------
+
+class Socket_TCP_Non_Blocking_Test : public Socket_TCP_Test
+{
+public:
+    Socket_TCP_Non_Blocking_Test() {}
+    virtual ~Socket_TCP_Non_Blocking_Test() {}
+
+    bool run(Socket::Address_Family family, std::string address, unsigned short port);
+};
+
+//-------------------------------------------
