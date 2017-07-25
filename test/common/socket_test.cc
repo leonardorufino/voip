@@ -59,6 +59,10 @@ bool Socket_Test::init()
         Socket_UDP_Non_Blocking_Control_Test udp_non_blocking_control_test;
         if (!udp_non_blocking_control_test.run(family_ipv4, address_ipv4, port_ipv4))
             return false;
+
+        Socket_TCP_Blocking_Test tcp_blocking_test;
+        if (!tcp_blocking_test.run(family_ipv4, address_ipv4, port_ipv4))
+            return false;
     }else
         std::cout << "IPv4 socket test disabled\n";
 
@@ -89,6 +93,10 @@ bool Socket_Test::init()
 
         Socket_UDP_Non_Blocking_Control_Test udp_non_blocking_control_test;
         if (!udp_non_blocking_control_test.run(family_ipv6, address_ipv6, port_ipv6))
+            return false;
+
+        Socket_TCP_Blocking_Test tcp_blocking_test;
+        if (!tcp_blocking_test.run(family_ipv6, address_ipv6, port_ipv6))
             return false;
     }else
         std::cout << "IPv6 socket test disabled\n";
@@ -807,6 +815,115 @@ bool Socket_UDP_Non_Blocking_Control_Test::run(Socket::Address_Family family, st
         std::cout << "Socket_UDP_Non_Blocking_Control_Test::run -> Failed to stop socket control\n";
         return false;
     }
+
+    return true;
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+bool Socket_TCP_Blocking_Test::run(Socket::Address_Family family, std::string address, unsigned short port)
+{
+    _current_socket = &_socket_tcp_client;
+    if (!configure_socket(family, address, 0, false))
+        return false;
+
+    _current_socket = &_socket_tcp_server;
+    if (!configure_socket(family, address, port, false))
+        return false;
+
+    if (!listen(10))
+        return false;
+
+    _current_socket = &_socket_tcp_client;
+    _connected = false;
+    _accepted_socket = NULL;
+    _accepted_address = "";
+    _accepted_port = 0;
+
+    if (!connect(address, port))
+        return false;
+
+    if (!_connected)
+    {
+        std::cout << "Socket_TCP_Blocking_Test::run -> Socket not connected\n";
+        return false;
+    }
+
+    _current_socket = &_socket_tcp_server;
+    unsigned long timeout = 5000;
+    int read;
+
+    if (!select(timeout, &read, NULL, NULL))
+        return false;
+
+    if (read != 1)
+    {
+        std::cout << "Socket_TCP_Blocking_Test::run -> Invalid server select read counter\n";
+        return false;
+    }
+
+    socket_t accepted = INVALID_SOCKET;
+    if (!accept(accepted, _accepted_address, _accepted_port))
+    {
+        std::cout << "Socket_TCP_Blocking_Test::run -> Failed to accept socket\n";
+        return false;
+    }
+
+    if (address != _accepted_address)
+    {
+        std::cout << "Socket_TCP_Blocking_Test::run -> Invalid accepted parameters:\n";
+        std::cout << std::setw(20) << "Local Address: " << address << "\n";
+        std::cout << std::setw(20) << "Accepted Address: " << _accepted_address << "\n";
+        return false;
+    }
+
+    _accepted_socket = new Socket_TCP_Client();
+    _accepted_socket->set_socket(accepted);
+    _accepted_socket->set_state(Socket::STATE_CONNECTED);
+
+    _current_socket = &_socket_tcp_client;
+    const int MSG_SIZE = 256;
+    char send_buffer[MSG_SIZE];
+
+    for (int i = 0; i < MSG_SIZE; i++)
+        send_buffer[i] = i;
+
+    if (!send(send_buffer, sizeof(send_buffer)))
+        return false;
+
+    _current_socket = _accepted_socket;
+    if (!select(timeout, &read, NULL, NULL))
+        return false;
+
+    if (read != 1)
+    {
+        std::cout << "Socket_TCP_Blocking_Test::run -> Invalid accepted select read counter\n";
+        return false;
+    }
+
+    char receive_buffer[MSG_SIZE];
+
+    if (!receive(receive_buffer, sizeof(receive_buffer)))
+        return false;
+
+    if (memcmp(send_buffer, receive_buffer, MSG_SIZE) != 0)
+    {
+        std::cout << "Socket_TCP_Blocking_Test::run -> Invalid received message\n";
+        return false;
+    }
+
+    _current_socket = &_socket_tcp_client;
+    if (!close())
+        return false;
+
+    _current_socket = &_socket_tcp_server;
+    if (!close())
+        return false;
+
+    _current_socket = _accepted_socket;
+    if (!close())
+        return false;
 
     return true;
 }
