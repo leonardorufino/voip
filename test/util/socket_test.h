@@ -11,6 +11,7 @@
 
 #pragma once
 
+#include "util/util_defs.h"
 #include "util/util_functions.h"
 #include "util/socket.h"
 #include <iomanip>

@@ -13,6 +13,7 @@
 
 #include "sip_defs.h"
 #include "sip_address.h"
+#include "util/util_defs.h"
 #include "util/log_manager.h"
 #include <string>
 #include <list>

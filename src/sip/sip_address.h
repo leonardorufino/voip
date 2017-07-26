@@ -12,6 +12,7 @@
 #pragma once
 
 #include "sip_defs.h"
+#include "util/util_defs.h"
 #include <string>
 #include <list>
 

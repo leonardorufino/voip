@@ -19,11 +19,11 @@ Socket_Test::Socket_Test()
     _connected = false;
 
     _accepted_socket = NULL;
-    _accepted_port = 0;
+    _accepted_port = INVALID_UNSIGNED_SHORT;
 
     _received_buffer[0] = 0;
     _received_size = 0;
-    _received_port = 0;
+    _received_port = INVALID_UNSIGNED_SHORT;
 }
 
 //-------------------------------------------
@@ -780,7 +780,7 @@ bool Socket_UDP_Non_Blocking_Control_Test::run(Socket::Address_Family family, st
     _received_buffer[0] = 0;
     _received_size = 0;
     _received_address.clear();
-    _received_port = 0;
+    _received_port = INVALID_UNSIGNED_SHORT;
 
     if (!send(send_buffer, sizeof(send_buffer)))
         return false;
@@ -855,7 +855,7 @@ bool Socket_TCP_Blocking_Test::run(Socket::Address_Family family, std::string ad
     _connected = false;
     _accepted_socket = NULL;
     _accepted_address = "";
-    _accepted_port = 0;
+    _accepted_port = INVALID_UNSIGNED_SHORT;
 
     if (!connect(address, port))
         return false;
@@ -963,7 +963,7 @@ bool Socket_TCP_Non_Blocking_Test::run(Socket::Address_Family family, std::strin
     _current_socket = &_socket_tcp_client;
     _accepted_socket = NULL;
     _accepted_address = "";
-    _accepted_port = 0;
+    _accepted_port = INVALID_UNSIGNED_SHORT;
 
     if (!connect(address, port))
         return false;
@@ -1099,7 +1099,7 @@ bool Socket_TCP_Non_Blocking_Control_Test::run(Socket::Address_Family family, st
     _connected = false;
     _accepted_socket = NULL;
     _accepted_address = "";
-    _accepted_port = 0;
+    _accepted_port = INVALID_UNSIGNED_SHORT;
 
     if (!connect(address, port))
         return false;
@@ -1176,7 +1176,7 @@ bool Socket_TCP_Non_Blocking_Control_Test::run(Socket::Address_Family family, st
     _received_buffer[0] = 0;
     _received_size = 0;
     _received_address.clear();
-    _received_port = 0;
+    _received_port = INVALID_UNSIGNED_SHORT;
 
     if (!send(send_buffer, sizeof(send_buffer)))
         return false;
