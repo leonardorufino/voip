@@ -549,7 +549,7 @@ bool SIP_Transaction_Client_Invite_Test::receive_response_480()
 
 bool SIP_Transaction_Client_Invite_Test::wait_timer_B()
 {
-    unsigned long start = Common_Functions::get_tick();
+    unsigned long start = Util_Functions::get_tick();
     unsigned long max_wait_time = (SIP_Transaction::SIP_TIMER_1 * 64) + 5000;
 
     unsigned short invite_retransmissions = 0;
@@ -558,7 +558,7 @@ bool SIP_Transaction_Client_Invite_Test::wait_timer_B()
     _sent_message = false; // INVITE retransmission
     _received_response = false; // Final rejection response
 
-    while ((Common_Functions::get_tick() - start) < max_wait_time)
+    while ((Util_Functions::get_tick() - start) < max_wait_time)
     {
         if (_sent_message)
         {
@@ -569,7 +569,7 @@ bool SIP_Transaction_Client_Invite_Test::wait_timer_B()
         if ((_transaction.get_state() == SIP_Transaction_Client_Invite::sttTerminated) && (_received_response))
             break;
 
-        Common_Functions::delay(500);
+        Util_Functions::delay(500);
     }
 
     if (!_received_response)
@@ -601,15 +601,15 @@ bool SIP_Transaction_Client_Invite_Test::wait_timer_B()
 
 bool SIP_Transaction_Client_Invite_Test::wait_timer_D()
 {
-    unsigned long start = Common_Functions::get_tick();
+    unsigned long start = Util_Functions::get_tick();
     unsigned long max_wait_time = SIP_Transaction::SIP_TIMER_32s + 5000;
 
-    while ((Common_Functions::get_tick() - start) < max_wait_time)
+    while ((Util_Functions::get_tick() - start) < max_wait_time)
     {
         if (_transaction.get_state() == SIP_Transaction_Client_Invite::sttTerminated)
             break;
 
-        Common_Functions::delay(500);
+        Util_Functions::delay(500);
     }
 
     if (_transaction.get_state() != SIP_Transaction_Client_Invite::sttTerminated)
@@ -800,7 +800,7 @@ bool SIP_Transaction_Client_Non_Invite_Test::receive_response_200()
 
 bool SIP_Transaction_Client_Non_Invite_Test::wait_timer_F()
 {
-    unsigned long start = Common_Functions::get_tick();
+    unsigned long start = Util_Functions::get_tick();
     unsigned long max_wait_time = (SIP_Transaction::SIP_TIMER_1 * 64) + 5000;
 
     unsigned short request_retransmissions = 0;
@@ -809,7 +809,7 @@ bool SIP_Transaction_Client_Non_Invite_Test::wait_timer_F()
     _sent_message = false; // Request retransmission
     _received_response = false; // Final rejection response
 
-    while ((Common_Functions::get_tick() - start) < max_wait_time)
+    while ((Util_Functions::get_tick() - start) < max_wait_time)
     {
         if (_sent_message)
         {
@@ -820,7 +820,7 @@ bool SIP_Transaction_Client_Non_Invite_Test::wait_timer_F()
         if ((_transaction.get_state() == SIP_Transaction_Client_Non_Invite::sttTerminated) && (_received_response))
             break;
 
-        Common_Functions::delay(500);
+        Util_Functions::delay(500);
     }
 
     if (!_received_response)
@@ -852,15 +852,15 @@ bool SIP_Transaction_Client_Non_Invite_Test::wait_timer_F()
 
 bool SIP_Transaction_Client_Non_Invite_Test::wait_timer_K()
 {
-    unsigned long start = Common_Functions::get_tick();
+    unsigned long start = Util_Functions::get_tick();
     unsigned long max_wait_time = SIP_Transaction::SIP_TIMER_4 + 5000;
 
-    while ((Common_Functions::get_tick() - start) < max_wait_time)
+    while ((Util_Functions::get_tick() - start) < max_wait_time)
     {
         if (_transaction.get_state() == SIP_Transaction_Client_Non_Invite::sttTerminated)
             break;
 
-        Common_Functions::delay(500);
+        Util_Functions::delay(500);
     }
 
     if (_transaction.get_state() != SIP_Transaction_Client_Non_Invite::sttTerminated)
@@ -1114,7 +1114,7 @@ bool SIP_Transaction_Server_Invite_Test::send_response_480()
 
 bool SIP_Transaction_Server_Invite_Test::wait_timer_H()
 {
-    unsigned long start = Common_Functions::get_tick();
+    unsigned long start = Util_Functions::get_tick();
     unsigned long max_wait_time = (SIP_Transaction::SIP_TIMER_1 * 64) + 5000;
 
     unsigned short response_retransmissions = 0;
@@ -1122,7 +1122,7 @@ bool SIP_Transaction_Server_Invite_Test::wait_timer_H()
 
     _sent_message = false; // Response retransmission
 
-    while ((Common_Functions::get_tick() - start) < max_wait_time)
+    while ((Util_Functions::get_tick() - start) < max_wait_time)
     {
         if (_sent_message)
         {
@@ -1133,7 +1133,7 @@ bool SIP_Transaction_Server_Invite_Test::wait_timer_H()
         if (_transaction.get_state() == SIP_Transaction_Server_Invite::sttTerminated)
             break;
 
-        Common_Functions::delay(500);
+        Util_Functions::delay(500);
     }
 
     if (response_retransmissions != expected_response_retransmissions)
@@ -1159,15 +1159,15 @@ bool SIP_Transaction_Server_Invite_Test::wait_timer_H()
 
 bool SIP_Transaction_Server_Invite_Test::wait_timer_I()
 {
-    unsigned long start = Common_Functions::get_tick();
+    unsigned long start = Util_Functions::get_tick();
     unsigned long max_wait_time = SIP_Transaction::SIP_TIMER_4 + 5000;
 
-    while ((Common_Functions::get_tick() - start) < max_wait_time)
+    while ((Util_Functions::get_tick() - start) < max_wait_time)
     {
         if (_transaction.get_state() == SIP_Transaction_Server_Invite::sttTerminated)
             break;
 
-        Common_Functions::delay(500);
+        Util_Functions::delay(500);
     }
 
     if (_transaction.get_state() != SIP_Transaction_Server_Invite::sttTerminated)
@@ -1362,15 +1362,15 @@ bool SIP_Transaction_Server_Non_Invite_Test::send_response_200()
 
 bool SIP_Transaction_Server_Non_Invite_Test::wait_timer_J()
 {
-    unsigned long start = Common_Functions::get_tick();
+    unsigned long start = Util_Functions::get_tick();
     unsigned long max_wait_time = (SIP_Transaction::SIP_TIMER_1 * 64) + 5000;
 
-    while ((Common_Functions::get_tick() - start) < max_wait_time)
+    while ((Util_Functions::get_tick() - start) < max_wait_time)
     {
         if (_transaction.get_state() == SIP_Transaction_Server_Non_Invite::sttTerminated)
             break;
 
-        Common_Functions::delay(500);
+        Util_Functions::delay(500);
     }
 
     if (_transaction.get_state() != SIP_Transaction_Server_Non_Invite::sttTerminated)

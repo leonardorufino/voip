@@ -42,16 +42,16 @@ bool Timer_Manager_Stop_Test::run()
     Timer_Manager &manager = Timer_Manager::instance();
 
     Timer_Id id = manager.start_timer(_time, this, callback);
-    _start = Common_Functions::get_tick();
+    _start = Util_Functions::get_tick();
 
-    Common_Functions::delay(_time / 10);
+    Util_Functions::delay(_time / 10);
 
     manager.stop_timer(id);
 
     unsigned long waited;
 
-    while ((_stop == 0) && ((waited = Common_Functions::get_tick() - _start) < _max_wait_time))
-        Common_Functions::delay(10);
+    while ((_stop == 0) && ((waited = Util_Functions::get_tick() - _start) < _max_wait_time))
+        Util_Functions::delay(10);
 
     if (_stop != 0)
     {
@@ -75,7 +75,7 @@ bool Timer_Manager_Stop_Test::callback(void *data)
         return false;
     }
 
-    test->_stop = Common_Functions::get_tick();
+    test->_stop = Util_Functions::get_tick();
     return true;
 }
 
@@ -87,12 +87,12 @@ bool Timer_Manager_Callback_Test::run()
     Timer_Manager &manager = Timer_Manager::instance();
 
     Timer_Id id = manager.start_timer(_time, this, callback);
-    _start = Common_Functions::get_tick();
+    _start = Util_Functions::get_tick();
 
     unsigned long waited;
 
-    while ((_stop == 0) && ((waited = Common_Functions::get_tick() - _start) < _max_wait_time))
-        Common_Functions::delay(10);
+    while ((_stop == 0) && ((waited = Util_Functions::get_tick() - _start) < _max_wait_time))
+        Util_Functions::delay(10);
 
     if (waited >= _max_wait_time)
     {
@@ -118,7 +118,7 @@ bool Timer_Manager_Callback_Test::callback(void *data)
         return false;
     }
 
-    test->_stop = Common_Functions::get_tick();
+    test->_stop = Util_Functions::get_tick();
     return true;
 }
 
@@ -145,20 +145,20 @@ bool Timer_Manager_Multiple_Timers_Test::run()
     Timer_Id id[ARRAY_SIZE];
 
     id[0] = manager.start_timer(_time[0], this, callback0);
-    _start[0] = Common_Functions::get_tick();
+    _start[0] = Util_Functions::get_tick();
 
     id[1] = manager.start_timer(_time[1], this, callback1);
-    _start[1] = Common_Functions::get_tick();
+    _start[1] = Util_Functions::get_tick();
 
     id[2] = manager.start_timer(_time[2], this, callback2);
-    _start[2] = Common_Functions::get_tick();
+    _start[2] = Util_Functions::get_tick();
 
     for (unsigned short i = 0; i < ARRAY_SIZE; i++)
     {
         unsigned long waited;
 
-        while ((_stop[i] == 0) && ((waited = Common_Functions::get_tick() - _start[i]) < _max_wait_time[i]))
-            Common_Functions::delay(10);
+        while ((_stop[i] == 0) && ((waited = Util_Functions::get_tick() - _start[i]) < _max_wait_time[i]))
+            Util_Functions::delay(10);
 
         if (waited >= _max_wait_time[i])
         {
@@ -185,7 +185,7 @@ bool Timer_Manager_Multiple_Timers_Test::callback0(void *data)
         return false;
     }
 
-    test->_stop[0] = Common_Functions::get_tick();
+    test->_stop[0] = Util_Functions::get_tick();
     return true;
 }
 
@@ -200,7 +200,7 @@ bool Timer_Manager_Multiple_Timers_Test::callback1(void *data)
         return false;
     }
 
-    test->_stop[1] = Common_Functions::get_tick();
+    test->_stop[1] = Util_Functions::get_tick();
     return true;
 }
 
@@ -215,7 +215,7 @@ bool Timer_Manager_Multiple_Timers_Test::callback2(void *data)
         return false;
     }
 
-    test->_stop[2] = Common_Functions::get_tick();
+    test->_stop[2] = Util_Functions::get_tick();
     return true;
 }
 

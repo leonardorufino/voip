@@ -14,7 +14,7 @@
 #include "sip/sip_header.h"
 #include "sip/sip_message.h"
 #include "sip/sip_transaction.h"
-#include "common/common_functions.h"
+#include "util/util_functions.h"
 #include <iomanip>
 
 class SIP_Transaction_Test

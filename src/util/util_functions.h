@@ -19,7 +19,7 @@
     #include <unistd.h>
 #endif
 
-class Common_Functions
+class Util_Functions
 {
 public:
     static void delay(unsigned int time);

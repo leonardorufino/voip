@@ -11,8 +11,8 @@
 
 #pragma once
 
-#include "common/common_functions.h"
-#include "common/socket.h"
+#include "util/util_functions.h"
+#include "util/socket.h"
 #include <iomanip>
 #include <cstring>
 

@@ -10,7 +10,7 @@
 */
 
 #include "log_manager.h"
-#include "common_functions.h"
+#include "util_functions.h"
 
 //-------------------------------------------
 

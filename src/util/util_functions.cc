@@ -9,30 +9,33 @@
  * Written by Leonardo Maccari Rufino
  */
 
-#include "timer_manager_test.h"
-#include "socket_test.h"
-#include <iostream>
+#include "util_functions.h"
 
 //-------------------------------------------
 
-int main()
+void Util_Functions::delay(unsigned int time)
 {
-    std::cout << "Common test initialized\n";
+#ifdef WIN32
+    Sleep(time);
+#else
+    usleep(time * 1000);
+#endif
+}
 
-    if (!Timer_Manager_Test::init())
-    {
-        std::cout << "Timer manager test FAILED!\n";
-        return 1;
-    }
+//-------------------------------------------
 
-    if (!Socket_Test::init())
-    {
-        std::cout << "Socket test FAILED!\n";
-        return 1;
-    }
+unsigned long Util_Functions::get_tick()
+{
+#ifdef WIN32
+    return GetTickCount();
+#else
+    struct timespec time;
 
-    std::cout << "Common test completed successfully\n";
-    return 0;
+    if (clock_gettime(CLOCK_MONOTONIC, &time))
+        return 0;
+
+    return time.tv_sec * 1000 + time.tv_nsec / 1000000;
+#endif
 }
 
 //-------------------------------------------

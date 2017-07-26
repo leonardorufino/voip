@@ -11,8 +11,8 @@
 
 #pragma once
 
-#include "common/common_functions.h"
-#include "common/timer_manager.h"
+#include "util/util_functions.h"
+#include "util/timer_manager.h"
 #include <iomanip>
 
 class Timer_Manager_Test

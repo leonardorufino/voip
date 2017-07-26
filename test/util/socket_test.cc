@@ -668,19 +668,19 @@ bool Socket_UDP_Non_Blocking_Connect_Test::run(Socket::Address_Family family, st
     if (!configure_socket(family, address, port, true))
         return false;
 
-    unsigned long start = Common_Functions::get_tick();
+    unsigned long start = Util_Functions::get_tick();
     unsigned long max_wait_time = 5000;
     _connected = false;
 
     if (!connect(address, port))
         return false;
 
-    while ((Common_Functions::get_tick() - start) < max_wait_time)
+    while ((Util_Functions::get_tick() - start) < max_wait_time)
     {
         if (_connected)
             break;
 
-        Common_Functions::delay(500);
+        Util_Functions::delay(500);
     }
 
     if (!_connected)
@@ -749,19 +749,19 @@ bool Socket_UDP_Non_Blocking_Control_Test::run(Socket::Address_Family family, st
         return false;
     }
 
-    unsigned long start = Common_Functions::get_tick();
+    unsigned long start = Util_Functions::get_tick();
     unsigned long max_wait_time = 5000;
     _connected = false;
 
     if (!connect(address, port))
         return false;
 
-    while ((Common_Functions::get_tick() - start) < max_wait_time)
+    while ((Util_Functions::get_tick() - start) < max_wait_time)
     {
         if (_connected)
             break;
 
-        Common_Functions::delay(500);
+        Util_Functions::delay(500);
     }
 
     if (!_connected)
@@ -776,7 +776,7 @@ bool Socket_UDP_Non_Blocking_Control_Test::run(Socket::Address_Family family, st
     for (int i = 0; i < MSG_SIZE; i++)
         send_buffer[i] = i;
 
-    start = Common_Functions::get_tick();
+    start = Util_Functions::get_tick();
     _received_buffer[0] = 0;
     _received_size = 0;
     _received_address.clear();
@@ -785,12 +785,12 @@ bool Socket_UDP_Non_Blocking_Control_Test::run(Socket::Address_Family family, st
     if (!send(send_buffer, sizeof(send_buffer)))
         return false;
 
-    while ((Common_Functions::get_tick() - start) < max_wait_time)
+    while ((Util_Functions::get_tick() - start) < max_wait_time)
     {
         if (_received_size == MSG_SIZE)
             break;
 
-        Common_Functions::delay(500);
+        Util_Functions::delay(500);
     }
 
     if (_received_size != MSG_SIZE)
@@ -1093,7 +1093,7 @@ bool Socket_TCP_Non_Blocking_Control_Test::run(Socket::Address_Family family, st
     if (!listen(10))
         return false;
 
-    unsigned long start = Common_Functions::get_tick();
+    unsigned long start = Util_Functions::get_tick();
     unsigned long max_wait_time = 5000;
     _current_socket = &_socket_tcp_client;
     _connected = false;
@@ -1104,12 +1104,12 @@ bool Socket_TCP_Non_Blocking_Control_Test::run(Socket::Address_Family family, st
     if (!connect(address, port))
         return false;
 
-    while ((Common_Functions::get_tick() - start) < max_wait_time)
+    while ((Util_Functions::get_tick() - start) < max_wait_time)
     {
         if (_connected)
             break;
 
-        Common_Functions::delay(500);
+        Util_Functions::delay(500);
     }
 
     if (!_connected)
@@ -1118,15 +1118,15 @@ bool Socket_TCP_Non_Blocking_Control_Test::run(Socket::Address_Family family, st
         return false;
     }
 
-    start = Common_Functions::get_tick();
+    start = Util_Functions::get_tick();
     max_wait_time = 5000;
 
-    while ((Common_Functions::get_tick() - start) < max_wait_time)
+    while ((Util_Functions::get_tick() - start) < max_wait_time)
     {
         if (_accepted_socket)
             break;
 
-        Common_Functions::delay(500);
+        Util_Functions::delay(500);
     }
 
     if (!_accepted_socket)
@@ -1182,14 +1182,14 @@ bool Socket_TCP_Non_Blocking_Control_Test::run(Socket::Address_Family family, st
         return false;
 
     _current_socket = _accepted_socket;
-    start = Common_Functions::get_tick();
+    start = Util_Functions::get_tick();
 
-    while ((Common_Functions::get_tick() - start) < max_wait_time)
+    while ((Util_Functions::get_tick() - start) < max_wait_time)
     {
         if (_received_size == MSG_SIZE)
             break;
 
-        Common_Functions::delay(500);
+        Util_Functions::delay(500);
     }
 
     if (_received_size != MSG_SIZE)

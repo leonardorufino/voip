@@ -10,7 +10,7 @@
 */
 
 #include "timer_manager.h"
-#include "common_functions.h"
+#include "util_functions.h"
 
 Logger Timer::_logger(Log_Manager::LOG_TIMER);
 

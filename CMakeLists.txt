@@ -13,14 +13,14 @@ endif()
 
 include_directories("src")
 
-### Common library ###
-message("Creating common library..")
-file(GLOB COMMON_SOURCES "src/common/*")
-add_library(common STATIC ${COMMON_SOURCES})
+### Util library ###
+message("Creating util library..")
+file(GLOB UTIL_SOURCES "src/util/*")
+add_library(util STATIC ${UTIL_SOURCES})
 if (WIN32)
-    target_link_libraries(common Ws2_32.lib Iphlpapi.lib)
+    target_link_libraries(util Ws2_32.lib Iphlpapi.lib)
 else ()
-    target_link_libraries(common rt pthread)
+    target_link_libraries(util rt pthread)
 endif()
 
 ### SIP library ###
@@ -28,18 +28,18 @@ message("Creating SIP library..")
 file(GLOB SIP_SOURCES "src/sip/*")
 add_library(sip STATIC ${SIP_SOURCES})
 
-### Common test ###
-message("Creating common test executable..")
-file(GLOB COMMON_TEST_SOURCES "test/common/*")
-add_executable(common_test ${COMMON_TEST_SOURCES})
-target_link_libraries(common_test common)
+### Util test ###
+message("Creating util test executable..")
+file(GLOB UTIL_TEST_SOURCES "test/util/*")
+add_executable(util_test ${UTIL_TEST_SOURCES})
+target_link_libraries(util_test util)
 
 ### SIP test ###
 message("Creating SIP test executable..")
 file(GLOB SIP_TEST_SOURCES "test/sip/*")
 add_executable(sip_test ${SIP_TEST_SOURCES})
-target_link_libraries(sip_test sip common)
+target_link_libraries(sip_test sip util)
 
 enable_testing()
-add_test(Common_Test ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/common_test)
+add_test(Util_Test ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/util_test)
 add_test(SIP_Test ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/sip_test)

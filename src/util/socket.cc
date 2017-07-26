@@ -10,7 +10,7 @@
 */
 
 #include "socket.h"
-#include "common_functions.h"
+#include "util_functions.h"
 
 Logger Socket::_logger(Log_Manager::LOG_SOCKET);
 
@@ -1238,7 +1238,7 @@ void Socket_Control::control_thread()
 
         int max_fd = -1;
 
-        Common_Functions::delay(10);
+        Util_Functions::delay(10);
 
         std::lock_guard<std::recursive_mutex> lock(control._socket_list_mutex);
 
@@ -1268,7 +1268,7 @@ void Socket_Control::control_thread()
 
         if (max_fd == -1)
         {
-            Common_Functions::delay(SELECT_TIMEOUT);
+            Util_Functions::delay(SELECT_TIMEOUT);
             continue;
         }
 
