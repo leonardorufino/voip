@@ -26,12 +26,12 @@
 #endif
 
 typedef bool (timer_callback)(void *data);
-typedef unsigned int Timer_Id;
+typedef unsigned int timer_id_t;
 
 class Timer
 {
 public:
-    static const Timer_Id INVALID_TIMER_ID = 0xFFFFFFFF;
+    static const timer_id_t INVALID_TIMER_ID = 0xFFFFFFFF;
 
 public:
     Timer();
@@ -41,10 +41,10 @@ public:
     bool stop();
     bool expired();
 
-    static Timer_Id next_timer_id();
+    static timer_id_t next_timer_id();
 
-    void set_timer_id(Timer_Id timer_id) { _timer_id = timer_id; }
-    Timer_Id get_timer_id() { return _timer_id; }
+    void set_timer_id(timer_id_t timer_id) { _timer_id = timer_id; }
+    timer_id_t get_timer_id() { return _timer_id; }
 
     void set_callback(timer_callback *callback) { _callback = callback; }
     timer_callback *get_callback() { return _callback; }
@@ -59,7 +59,7 @@ public:
 #endif
 
 private:
-    Timer_Id _timer_id;
+    timer_id_t _timer_id;
     timer_callback *_callback;
     void *_data;
 
@@ -85,8 +85,8 @@ public:
 
     static Timer_Manager &instance();
 
-    Timer_Id start_timer(unsigned long time, void *data, timer_callback *callback);
-    void stop_timer(Timer_Id timer_id);
+    timer_id_t start_timer(unsigned long time, void *data, timer_callback *callback);
+    void stop_timer(timer_id_t timer_id);
 
 #ifdef WIN32
     static VOID CALLBACK timer_handler(PVOID id, BOOLEAN timed_out);
@@ -95,7 +95,7 @@ public:
 #endif
 
 private:
-    Timer *get_timer(Timer_Id timer_id);
+    Timer *get_timer(timer_id_t timer_id);
 
 #ifndef WIN32
     Timer *get_timer_linux(timer_t &tid);

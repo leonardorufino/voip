@@ -85,7 +85,7 @@ protected:
     receive_response_callback *_receive_response_callback;
 
     unsigned long _timer_values[SIP_TIMER_COUNT];
-    Timer_Id _timer_ids[SIP_TIMER_COUNT];
+    timer_id_t _timer_ids[SIP_TIMER_COUNT];
 
     static Logger _logger;
 };

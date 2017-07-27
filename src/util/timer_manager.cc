@@ -157,14 +157,14 @@ bool Timer::expired()
 
 //-------------------------------------------
 
-Timer_Id Timer::next_timer_id()
+timer_id_t Timer::next_timer_id()
 {
-    static Timer_Id NEXT_TIMER_ID = 0;
+    static timer_id_t NEXT_TIMER_ID = 0;
     static std::mutex NEXT_TIMER_ID_MUTEX;
 
     std::lock_guard<std::mutex> lock(NEXT_TIMER_ID_MUTEX);
 
-    Timer_Id id = NEXT_TIMER_ID++;
+    timer_id_t id = NEXT_TIMER_ID++;
 
     if (NEXT_TIMER_ID >= INVALID_TIMER_ID)
         NEXT_TIMER_ID = 0;
@@ -190,11 +190,11 @@ Timer_Manager &Timer_Manager::instance()
 
 //-------------------------------------------
 
-Timer_Id Timer_Manager::start_timer(unsigned long time, void *data, timer_callback *callback)
+timer_id_t Timer_Manager::start_timer(unsigned long time, void *data, timer_callback *callback)
 {
     std::lock_guard<std::recursive_mutex> lock(_timer_list_mutex);
 
-    Timer_Id id = Timer::next_timer_id();
+    timer_id_t id = Timer::next_timer_id();
 
     Timer *timer = new Timer();
     timer->set_timer_id(id);
@@ -210,7 +210,7 @@ Timer_Id Timer_Manager::start_timer(unsigned long time, void *data, timer_callba
 
 //-------------------------------------------
 
-void Timer_Manager::stop_timer(Timer_Id timer_id)
+void Timer_Manager::stop_timer(timer_id_t timer_id)
 {
     std::lock_guard<std::recursive_mutex> lock(_timer_list_mutex);
 
@@ -236,7 +236,7 @@ void Timer_Manager::stop_timer(Timer_Id timer_id)
     std::lock_guard<std::recursive_mutex> lock(manager._timer_list_mutex);
 
 #ifdef WIN32
-    Timer_Id timer_id = (Timer_Id) id;
+    timer_id_t timer_id = (timer_id_t) id;
     Timer *timer = manager.get_timer(timer_id);
 #else
     timer_t tid = info->si_value.sival_ptr;
@@ -253,7 +253,7 @@ void Timer_Manager::stop_timer(Timer_Id timer_id)
 
 //-------------------------------------------
 
-Timer *Timer_Manager::get_timer(Timer_Id timer_id)
+Timer *Timer_Manager::get_timer(timer_id_t timer_id)
 {
     Timer *ret = NULL;
 

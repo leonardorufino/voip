@@ -41,7 +41,7 @@ bool Timer_Manager_Stop_Test::run()
 {
     Timer_Manager &manager = Timer_Manager::instance();
 
-    Timer_Id id = manager.start_timer(_time, this, callback);
+    timer_id_t id = manager.start_timer(_time, this, callback);
     _start = Util_Functions::get_tick();
 
     Util_Functions::delay(_time / 10);
@@ -86,7 +86,7 @@ bool Timer_Manager_Callback_Test::run()
 {
     Timer_Manager &manager = Timer_Manager::instance();
 
-    Timer_Id id = manager.start_timer(_time, this, callback);
+    timer_id_t id = manager.start_timer(_time, this, callback);
     _start = Util_Functions::get_tick();
 
     unsigned long waited;
@@ -142,7 +142,7 @@ bool Timer_Manager_Multiple_Timers_Test::run()
 {
     Timer_Manager &manager = Timer_Manager::instance();
 
-    Timer_Id id[ARRAY_SIZE];
+    timer_id_t id[ARRAY_SIZE];
 
     id[0] = manager.start_timer(_time[0], this, callback0);
     _start[0] = Util_Functions::get_tick();
