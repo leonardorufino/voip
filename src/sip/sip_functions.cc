@@ -28,7 +28,7 @@ SIP_Transport_Type SIP_Functions::get_transport_type(std::string transport)
     else if (transport == "SCTP")
         return SIP_TRANSPORT_SCTP;
 
-    return SIP_TRANSPORT_TYPE_INVALID;
+    return SIP_TRANSPORT_INVALID;
 }
 
 //-------------------------------------------
@@ -82,7 +82,7 @@ SIP_Method_Type SIP_Functions::get_method_type(const std::string method)
     else if (method == SIP_VERSION)
         return SIP_RESPONSE;
 
-    return SIP_METHOD_TYPE_INVALID;
+    return SIP_METHOD_INVALID;
 }
 
 //-------------------------------------------
@@ -213,7 +213,7 @@ SIP_Header_Type SIP_Functions::get_header_type(std::string header)
     else if (header == "WWW-Authenticate")
         return SIP_HEADER_WWW_AUTHENTICATE;
 
-    return SIP_HEADER_TYPE_INVALID;
+    return SIP_HEADER_INVALID;
 }
 
 //-------------------------------------------

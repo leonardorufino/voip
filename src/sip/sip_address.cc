@@ -230,26 +230,26 @@ SIP_Transport_Type SIP_URI::get_transport()
 
 //-------------------------------------------
 
-void SIP_URI::set_user_param(SIP_User_Param user_param)
+void SIP_URI::set_user_param(SIP_URI::User_Param user_param)
 {
     switch (user_param)
     {
-        case SIP_USER_PARAM_PHONE:  _user_param = "phone";  break;
-        case SIP_USER_PARAM_IP:     _user_param = "ip";     break;
-        default:                                            break;
+        case USER_PARAM_PHONE:  _user_param = "phone";  break;
+        case USER_PARAM_IP:     _user_param = "ip";     break;
+        default:                                        break;
     }
 }
 
 //-------------------------------------------
 
-SIP_User_Param SIP_URI::get_user_param()
+SIP_URI::User_Param SIP_URI::get_user_param()
 {
     if (_user_param == "phone")
-        return SIP_USER_PARAM_PHONE;
+        return USER_PARAM_PHONE;
     else if (_user_param == "ip")
-        return SIP_USER_PARAM_IP;
+        return USER_PARAM_IP;
 
-    return SIP_USER_PARAM_INVALID;
+    return USER_PARAM_INVALID;
 }
 
 //-------------------------------------------
@@ -345,8 +345,8 @@ bool SIP_Address::decode(std::string &sip_msg)
 
     switch (get_scheme())
     {
-        case SIP_ADDRESS_SCHEME_SIP:
-        case SIP_ADDRESS_SCHEME_SIPS:
+        case SCHEME_SIP:
+        case SCHEME_SIPS:
         {
             if (!_sip_uri.decode(uri))
                 return false;
@@ -392,8 +392,8 @@ bool SIP_Address::encode(std::string &sip_msg)
 
     switch (get_scheme())
     {
-        case SIP_ADDRESS_SCHEME_SIP:
-        case SIP_ADDRESS_SCHEME_SIPS:
+        case SCHEME_SIP:
+        case SCHEME_SIPS:
         {
             if (!_sip_uri.encode(sip_msg))
                 return false;
@@ -416,26 +416,26 @@ bool SIP_Address::encode(std::string &sip_msg)
 
 //-------------------------------------------
 
-void SIP_Address::set_scheme(SIP_Address_Scheme scheme)
+void SIP_Address::set_scheme(SIP_Address::Scheme scheme)
 {
     switch (scheme)
     {
-        case SIP_ADDRESS_SCHEME_SIP:    _scheme = "sip";    break;
-        case SIP_ADDRESS_SCHEME_SIPS:   _scheme = "sips";   break;
-        default:                                            break;
+        case SCHEME_SIP:    _scheme = "sip";    break;
+        case SCHEME_SIPS:   _scheme = "sips";   break;
+        default:                                break;
     }
 }
 
 //-------------------------------------------
 
-SIP_Address_Scheme SIP_Address::get_scheme()
+SIP_Address::Scheme SIP_Address::get_scheme()
 {
     if (_scheme == "sip")
-        return SIP_ADDRESS_SCHEME_SIP;
+        return SCHEME_SIP;
     else if (_scheme == "sips")
-        return SIP_ADDRESS_SCHEME_SIPS;
+        return SCHEME_SIPS;
 
-    return SIP_ADDRESS_SCHEME_INVALID;
+    return SCHEME_INVALID;
 }
 
 //-------------------------------------------

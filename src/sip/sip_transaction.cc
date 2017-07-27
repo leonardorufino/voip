@@ -108,7 +108,7 @@ SIP_Transaction *SIP_Transaction::match_transaction_client(SIP_Message *msg)
     std::string saved_request_via_branch = saved_request_via->get_branch();
     SIP_Method_Type saved_request_cseq_method = saved_request_cseq->get_method();
 
-    if ((saved_request_via_branch.empty()) || (saved_request_cseq_method == SIP_METHOD_TYPE_INVALID))
+    if ((saved_request_via_branch.empty()) || (saved_request_cseq_method == SIP_METHOD_INVALID))
     {
         _logger.warning("SIP_Transaction::match_transaction_client -> Invalid Via branch or CSeq method from saved request");
         return NULL;
@@ -133,7 +133,7 @@ SIP_Transaction *SIP_Transaction::match_transaction_client(SIP_Message *msg)
     std::string response_via_branch = response_via->get_branch();
     SIP_Method_Type response_cseq_method = response_cseq->get_method();
 
-    if ((response_via_branch.empty()) || (response_cseq_method == SIP_METHOD_TYPE_INVALID))
+    if ((response_via_branch.empty()) || (response_cseq_method == SIP_METHOD_INVALID))
     {
         _logger.warning("SIP_Transaction::match_transaction_client -> Invalid Via branch or CSeq method from response");
         return NULL;
@@ -171,7 +171,7 @@ SIP_Transaction *SIP_Transaction::match_transaction_server(SIP_Message *msg)
     std::string saved_request_via_host = saved_request_via->get_host();
     unsigned short saved_request_via_port = saved_request_via->get_port();
 
-    if ((saved_request_method == SIP_METHOD_TYPE_INVALID) || (saved_request_via_branch.empty()) || (saved_request_via_host.empty()))
+    if ((saved_request_method == SIP_METHOD_INVALID) || (saved_request_via_branch.empty()) || (saved_request_via_host.empty()))
     {
         _logger.warning("SIP_Transaction::match_transaction_server -> Invalid method, Via branch or Via host from saved request");
         return NULL;
@@ -197,7 +197,7 @@ SIP_Transaction *SIP_Transaction::match_transaction_server(SIP_Message *msg)
     std::string request_via_host = request_via->get_host();
     unsigned short request_via_port = request_via->get_port();
 
-    if ((request_method == SIP_METHOD_TYPE_INVALID) || (request_via_host.empty()))
+    if ((request_method == SIP_METHOD_INVALID) || (request_via_host.empty()))
     {
         _logger.warning("SIP_Transaction::match_transaction_server -> Invalid method or Via host from request");
         return NULL;

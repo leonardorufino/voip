@@ -24,6 +24,14 @@ typedef std::list<SIP_Header *> sip_header_list;
 class SIP_Header
 {
 public:
+    enum Header_Separator
+    {
+        HEADER_SEPARATOR_NONE,
+        HEADER_SEPARATOR_COMMA,
+        HEADER_SEPARATOR_CRLF,
+    };
+
+public:
     SIP_Header() {}
     virtual ~SIP_Header() {}
 
@@ -33,8 +41,8 @@ public:
 
     // Virtual pure functions
     virtual SIP_Header_Type get_header_type() = 0;
-    virtual SIP_Header_Separator decode_separator() = 0;
-    virtual SIP_Header_Separator encode_separator() = 0;
+    virtual Header_Separator decode_separator() = 0;
+    virtual Header_Separator encode_separator() = 0;
     virtual bool decode(std::string &sip_msg) = 0;
     virtual bool encode(std::string &sip_msg) = 0;
 
@@ -162,6 +170,27 @@ private:
 class SIP_Media_Range
 {
 public:
+    enum Type
+    {
+        TYPE_TEXT,
+        TYPE_IMAGE,
+        TYPE_AUDIO,
+        TYPE_VIDEO,
+        TYPE_APPLICATION,
+        TYPE_MESSAGE,
+        TYPE_MULTIPART,
+        TYPE_ASTERISK,
+        TYPE_INVALID
+    };
+
+    enum Subtype
+    {
+        SUBTYPE_APPLICATION_SDP,
+        SUBTYPE_ASTERISK,
+        SUBTYPE_INVALID
+    };
+
+public:
     SIP_Media_Range() {}
     SIP_Media_Range(const SIP_Media_Range &value) { *this = value; }
     ~SIP_Media_Range() {}
@@ -169,14 +198,14 @@ public:
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
 
-    void set_type(SIP_Media_Type type);
+    void set_type(Type type);
     void set_type(std::string type) { _type = type; }
-    SIP_Media_Type get_type();
+    Type get_type();
     std::string get_type_str() { return _type; }
 
-    void set_subtype(SIP_Media_Subtype subtype);
+    void set_subtype(Subtype subtype);
     void set_subtype(std::string subtype) { _subtype = subtype; }
-    SIP_Media_Subtype get_subtype();
+    Subtype get_subtype();
     std::string get_subtype_str() { return _subtype; }
 
     void set_q(std::string q) { _q = q; }
@@ -196,6 +225,13 @@ private:
 class SIP_Event_Type
 {
 public:
+    enum Package
+    {
+        PACKAGE_PRESENCE,
+        PACKAGE_INVALID
+    };
+
+public:
     SIP_Event_Type() {}
     SIP_Event_Type(const SIP_Event_Type &value) { *this = value; }
     ~SIP_Event_Type() {}
@@ -203,9 +239,9 @@ public:
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
 
-    void set_package(SIP_Event_Package package);
+    void set_package(Package package);
     void set_package(std::string package) { _package = package; }
-    SIP_Event_Package get_package();
+    Package get_package();
     std::string get_package_str() { return _package; }
 
     std::list<std::string> &get_templates() { return _templates; }
@@ -227,8 +263,8 @@ public:
 
     // Virtual pure functions
     SIP_Header_Type get_header_type() { return SIP_HEADER_ACCEPT; }
-    SIP_Header_Separator decode_separator() { return SIP_HEADER_SEPARATOR_COMMA; }
-    SIP_Header_Separator encode_separator() { return SIP_HEADER_SEPARATOR_COMMA; }
+    Header_Separator decode_separator() { return HEADER_SEPARATOR_COMMA; }
+    Header_Separator encode_separator() { return HEADER_SEPARATOR_COMMA; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
 
@@ -249,8 +285,8 @@ public:
 
     // Virtual pure functions
     SIP_Header_Type get_header_type() { return SIP_HEADER_ACCEPT_ENCODING; }
-    SIP_Header_Separator decode_separator() { return SIP_HEADER_SEPARATOR_COMMA; }
-    SIP_Header_Separator encode_separator() { return SIP_HEADER_SEPARATOR_COMMA; }
+    Header_Separator decode_separator() { return HEADER_SEPARATOR_COMMA; }
+    Header_Separator encode_separator() { return HEADER_SEPARATOR_COMMA; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
 
@@ -279,8 +315,8 @@ public:
 
     // Virtual pure functions
     SIP_Header_Type get_header_type() { return SIP_HEADER_ACCEPT_LANGUAGE; }
-    SIP_Header_Separator decode_separator() { return SIP_HEADER_SEPARATOR_COMMA; }
-    SIP_Header_Separator encode_separator() { return SIP_HEADER_SEPARATOR_COMMA; }
+    Header_Separator decode_separator() { return HEADER_SEPARATOR_COMMA; }
+    Header_Separator encode_separator() { return HEADER_SEPARATOR_COMMA; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
 
@@ -309,8 +345,8 @@ public:
 
     // Virtual pure functions
     SIP_Header_Type get_header_type() { return SIP_HEADER_ALERT_INFO; }
-    SIP_Header_Separator decode_separator() { return SIP_HEADER_SEPARATOR_COMMA; }
-    SIP_Header_Separator encode_separator() { return SIP_HEADER_SEPARATOR_COMMA; }
+    Header_Separator decode_separator() { return HEADER_SEPARATOR_COMMA; }
+    Header_Separator encode_separator() { return HEADER_SEPARATOR_COMMA; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
 
@@ -334,8 +370,8 @@ public:
 
     // Virtual pure functions
     SIP_Header_Type get_header_type() { return SIP_HEADER_ALLOW; }
-    SIP_Header_Separator decode_separator() { return SIP_HEADER_SEPARATOR_COMMA; }
-    SIP_Header_Separator encode_separator() { return SIP_HEADER_SEPARATOR_COMMA; }
+    Header_Separator decode_separator() { return HEADER_SEPARATOR_COMMA; }
+    Header_Separator encode_separator() { return HEADER_SEPARATOR_COMMA; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
 
@@ -359,8 +395,8 @@ public:
 
     // Virtual pure functions
     SIP_Header_Type get_header_type() { return SIP_HEADER_ALLOW_EVENTS; }
-    SIP_Header_Separator decode_separator() { return SIP_HEADER_SEPARATOR_COMMA; }
-    SIP_Header_Separator encode_separator() { return SIP_HEADER_SEPARATOR_COMMA; }
+    Header_Separator decode_separator() { return HEADER_SEPARATOR_COMMA; }
+    Header_Separator encode_separator() { return HEADER_SEPARATOR_COMMA; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
 
@@ -381,8 +417,8 @@ public:
 
     // Virtual pure functions
     SIP_Header_Type get_header_type() { return SIP_HEADER_AUTHENTICATION_INFO; }
-    SIP_Header_Separator decode_separator() { return SIP_HEADER_SEPARATOR_CRLF; }
-    SIP_Header_Separator encode_separator() { return SIP_HEADER_SEPARATOR_CRLF; }
+    Header_Separator decode_separator() { return HEADER_SEPARATOR_CRLF; }
+    Header_Separator encode_separator() { return HEADER_SEPARATOR_CRLF; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
 
@@ -423,8 +459,8 @@ public:
 
     // Virtual pure functions
     SIP_Header_Type get_header_type() { return SIP_HEADER_AUTHORIZATION; }
-    SIP_Header_Separator decode_separator() { return SIP_HEADER_SEPARATOR_CRLF; }
-    SIP_Header_Separator encode_separator() { return SIP_HEADER_SEPARATOR_CRLF; }
+    Header_Separator decode_separator() { return HEADER_SEPARATOR_CRLF; }
+    Header_Separator encode_separator() { return HEADER_SEPARATOR_CRLF; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
 
@@ -445,8 +481,8 @@ public:
 
     // Virtual pure functions
     SIP_Header_Type get_header_type() { return SIP_HEADER_CALL_ID; }
-    SIP_Header_Separator decode_separator() { return SIP_HEADER_SEPARATOR_NONE; }
-    SIP_Header_Separator encode_separator() { return SIP_HEADER_SEPARATOR_NONE; }
+    Header_Separator decode_separator() { return HEADER_SEPARATOR_NONE; }
+    Header_Separator encode_separator() { return HEADER_SEPARATOR_NONE; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
 
@@ -462,22 +498,31 @@ private:
 class SIP_Header_Call_Info : public SIP_Header
 {
 public:
+    enum Purpose
+    {
+        PURPOSE_ICON,
+        PURPOSE_INFO,
+        PURPOSE_CARD,
+        PURPOSE_INVALID
+    };
+
+public:
     SIP_Header_Call_Info() {}
     SIP_Header_Call_Info(const SIP_Header_Call_Info &header) { *this = header; }
     ~SIP_Header_Call_Info() {}
 
     // Virtual pure functions
     SIP_Header_Type get_header_type() { return SIP_HEADER_CALL_INFO; }
-    SIP_Header_Separator decode_separator() { return SIP_HEADER_SEPARATOR_COMMA; }
-    SIP_Header_Separator encode_separator() { return SIP_HEADER_SEPARATOR_COMMA; }
+    Header_Separator decode_separator() { return HEADER_SEPARATOR_COMMA; }
+    Header_Separator encode_separator() { return HEADER_SEPARATOR_COMMA; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
 
     SIP_Address &get_address() { return _address; }
 
-    void set_purpose(SIP_Call_Info_Purpose type);
+    void set_purpose(Purpose type);
     void set_purpose(std::string purpose) { _purpose = purpose; }
-    SIP_Call_Info_Purpose get_purpose();
+    Purpose get_purpose();
     std::string get_purpose_str() { return _purpose; }
 
     std::list<std::string> &get_parameters() { return _parameters; }
@@ -502,8 +547,8 @@ public:
 
     // Virtual pure functions
     SIP_Header_Type get_header_type() { return SIP_HEADER_CONTACT; }
-    SIP_Header_Separator decode_separator() { return SIP_HEADER_SEPARATOR_COMMA; }
-    SIP_Header_Separator encode_separator() { return SIP_HEADER_SEPARATOR_CRLF; }
+    Header_Separator decode_separator() { return HEADER_SEPARATOR_COMMA; }
+    Header_Separator encode_separator() { return HEADER_SEPARATOR_CRLF; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
 
@@ -533,25 +578,42 @@ private:
 class SIP_Header_Content_Disposition : public SIP_Header
 {
 public:
+    enum Type
+    {
+        TYPE_RENDER,
+        TYPE_SESSION,
+        TYPE_ICON,
+        TYPE_ALERT,
+        TYPE_INVALID
+    };
+
+    enum Handling
+    {
+        HANDLING_OPTIONAL,
+        HANDLING_REQUIRED,
+        HANDLING_INVALID
+    };
+
+public:
     SIP_Header_Content_Disposition() {}
     SIP_Header_Content_Disposition(const SIP_Header_Content_Disposition &header) { *this = header; }
     ~SIP_Header_Content_Disposition() {}
 
     // Virtual pure functions
     SIP_Header_Type get_header_type() { return SIP_HEADER_CONTENT_DISPOSITION; }
-    SIP_Header_Separator decode_separator() { return SIP_HEADER_SEPARATOR_NONE; }
-    SIP_Header_Separator encode_separator() { return SIP_HEADER_SEPARATOR_NONE; }
+    Header_Separator decode_separator() { return HEADER_SEPARATOR_NONE; }
+    Header_Separator encode_separator() { return HEADER_SEPARATOR_NONE; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
 
-    void set_type(SIP_Disposition_Type type);
+    void set_type(Type type);
     void set_type(std::string type) { _type = type; }
-    SIP_Disposition_Type get_type();
+    Type get_type();
     std::string get_type_str() { return _type; }
 
-    void set_handling(SIP_Disposition_Handling handling);
+    void set_handling(Handling handling);
     void set_handling(std::string handling) { _handling = handling; }
-    SIP_Disposition_Handling get_handling();
+    Handling get_handling();
     std::string get_handling_str() { return _handling; }
 
     std::list<std::string> &get_parameters() { return _parameters; }
@@ -573,8 +635,8 @@ public:
 
     // Virtual pure functions
     SIP_Header_Type get_header_type() { return SIP_HEADER_CONTENT_ENCODING; }
-    SIP_Header_Separator decode_separator() { return SIP_HEADER_SEPARATOR_COMMA; }
-    SIP_Header_Separator encode_separator() { return SIP_HEADER_SEPARATOR_COMMA; }
+    Header_Separator decode_separator() { return HEADER_SEPARATOR_COMMA; }
+    Header_Separator encode_separator() { return HEADER_SEPARATOR_COMMA; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
 
@@ -596,8 +658,8 @@ public:
 
     // Virtual pure functions
     SIP_Header_Type get_header_type() { return SIP_HEADER_CONTENT_LANGUAGE; }
-    SIP_Header_Separator decode_separator() { return SIP_HEADER_SEPARATOR_COMMA; }
-    SIP_Header_Separator encode_separator() { return SIP_HEADER_SEPARATOR_COMMA; }
+    Header_Separator decode_separator() { return HEADER_SEPARATOR_COMMA; }
+    Header_Separator encode_separator() { return HEADER_SEPARATOR_COMMA; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
 
@@ -622,8 +684,8 @@ public:
 
     // Virtual pure functions
     SIP_Header_Type get_header_type() { return SIP_HEADER_CONTENT_LENGTH; }
-    SIP_Header_Separator decode_separator() { return SIP_HEADER_SEPARATOR_NONE; }
-    SIP_Header_Separator encode_separator() { return SIP_HEADER_SEPARATOR_NONE; }
+    Header_Separator decode_separator() { return HEADER_SEPARATOR_NONE; }
+    Header_Separator encode_separator() { return HEADER_SEPARATOR_NONE; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
 
@@ -645,8 +707,8 @@ public:
 
     // Virtual pure functions
     SIP_Header_Type get_header_type() { return SIP_HEADER_CONTENT_TYPE; }
-    SIP_Header_Separator decode_separator() { return SIP_HEADER_SEPARATOR_NONE; }
-    SIP_Header_Separator encode_separator() { return SIP_HEADER_SEPARATOR_NONE; }
+    Header_Separator decode_separator() { return HEADER_SEPARATOR_NONE; }
+    Header_Separator encode_separator() { return HEADER_SEPARATOR_NONE; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
 
@@ -670,8 +732,8 @@ public:
 
     // Virtual pure functions
     SIP_Header_Type get_header_type() { return SIP_HEADER_CSEQ; }
-    SIP_Header_Separator decode_separator() { return SIP_HEADER_SEPARATOR_NONE; }
-    SIP_Header_Separator encode_separator() { return SIP_HEADER_SEPARATOR_NONE; }
+    Header_Separator decode_separator() { return HEADER_SEPARATOR_NONE; }
+    Header_Separator encode_separator() { return HEADER_SEPARATOR_NONE; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
 
@@ -699,6 +761,35 @@ public:
     static const unsigned short INVALID_MINUTE = INVALID_UNSIGNED_SHORT;
     static const unsigned short INVALID_SECOND = INVALID_UNSIGNED_SHORT;
 
+    enum Weekday
+    {
+        WEEKDAY_MON,
+        WEEKDAY_TUE,
+        WEEKDAY_WED,
+        WEEKDAY_THU,
+        WEEKDAY_FRI,
+        WEEKDAY_SAT,
+        WEEKDAY_SUN,
+        WEEKDAY_INVALID
+    };
+
+    enum Month
+    {
+        MONTH_JAN,
+        MONTH_FEB,
+        MONTH_MAR,
+        MONTH_APR,
+        MONTH_MAY,
+        MONTH_JUN,
+        MONTH_JUL,
+        MONTH_AUG,
+        MONTH_SEP,
+        MONTH_OCT,
+        MONTH_NOV,
+        MONTH_DEC,
+        MONTH_INVALID
+    };
+
 public:
     SIP_Header_Date();
     SIP_Header_Date(const SIP_Header_CSeq &header) { *this = header; }
@@ -706,22 +797,22 @@ public:
 
     // Virtual pure functions
     SIP_Header_Type get_header_type() { return SIP_HEADER_DATE; }
-    SIP_Header_Separator decode_separator() { return SIP_HEADER_SEPARATOR_NONE; }
-    SIP_Header_Separator encode_separator() { return SIP_HEADER_SEPARATOR_NONE; }
+    Header_Separator decode_separator() { return HEADER_SEPARATOR_NONE; }
+    Header_Separator encode_separator() { return HEADER_SEPARATOR_NONE; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
 
-    void set_weekday(SIP_Date_Weekday weekday);
+    void set_weekday(Weekday weekday);
     void set_weekday(std::string weekday) { _weekday = weekday; }
-    SIP_Date_Weekday get_weekday();
+    Weekday get_weekday();
     std::string get_weekday_str() { return _weekday; }
 
     void set_day(unsigned short day) { _day = day; }
     unsigned short get_day() { return _day; }
 
-    void set_month(SIP_Date_Month month);
+    void set_month(Month month);
     void set_month(std::string month) { _month = month; }
-    SIP_Date_Month get_month();
+    Month get_month();
     std::string get_month_str() { return _month; }
 
     void set_year(unsigned short year) { _year = year; }
@@ -761,8 +852,8 @@ public:
 
     // Virtual pure functions
     SIP_Header_Type get_header_type() { return SIP_HEADER_ERROR_INFO; }
-    SIP_Header_Separator decode_separator() { return SIP_HEADER_SEPARATOR_COMMA; }
-    SIP_Header_Separator encode_separator() { return SIP_HEADER_SEPARATOR_COMMA; }
+    Header_Separator decode_separator() { return HEADER_SEPARATOR_COMMA; }
+    Header_Separator encode_separator() { return HEADER_SEPARATOR_COMMA; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
 
@@ -786,8 +877,8 @@ public:
 
     // Virtual pure functions
     SIP_Header_Type get_header_type() { return SIP_HEADER_EVENT; }
-    SIP_Header_Separator decode_separator() { return SIP_HEADER_SEPARATOR_NONE; }
-    SIP_Header_Separator encode_separator() { return SIP_HEADER_SEPARATOR_NONE; }
+    Header_Separator decode_separator() { return HEADER_SEPARATOR_NONE; }
+    Header_Separator encode_separator() { return HEADER_SEPARATOR_NONE; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
 
@@ -818,8 +909,8 @@ public:
 
     // Virtual pure functions
     SIP_Header_Type get_header_type() { return SIP_HEADER_EXPIRES; }
-    SIP_Header_Separator decode_separator() { return SIP_HEADER_SEPARATOR_NONE; }
-    SIP_Header_Separator encode_separator() { return SIP_HEADER_SEPARATOR_NONE; }
+    Header_Separator decode_separator() { return HEADER_SEPARATOR_NONE; }
+    Header_Separator encode_separator() { return HEADER_SEPARATOR_NONE; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
 
@@ -841,8 +932,8 @@ public:
 
     // Virtual pure functions
     SIP_Header_Type get_header_type() { return SIP_HEADER_FROM; }
-    SIP_Header_Separator decode_separator() { return SIP_HEADER_SEPARATOR_NONE; }
-    SIP_Header_Separator encode_separator() { return SIP_HEADER_SEPARATOR_NONE; }
+    Header_Separator decode_separator() { return HEADER_SEPARATOR_NONE; }
+    Header_Separator encode_separator() { return HEADER_SEPARATOR_NONE; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
 
@@ -870,8 +961,8 @@ public:
 
     // Virtual pure functions
     SIP_Header_Type get_header_type() { return SIP_HEADER_IN_REPLY_TO; }
-    SIP_Header_Separator decode_separator() { return SIP_HEADER_SEPARATOR_COMMA; }
-    SIP_Header_Separator encode_separator() { return SIP_HEADER_SEPARATOR_COMMA; }
+    Header_Separator decode_separator() { return HEADER_SEPARATOR_COMMA; }
+    Header_Separator encode_separator() { return HEADER_SEPARATOR_COMMA; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
 
@@ -896,8 +987,8 @@ public:
 
     // Virtual pure functions
     SIP_Header_Type get_header_type() { return SIP_HEADER_MAX_FORWARDS; }
-    SIP_Header_Separator decode_separator() { return SIP_HEADER_SEPARATOR_NONE; }
-    SIP_Header_Separator encode_separator() { return SIP_HEADER_SEPARATOR_NONE; }
+    Header_Separator decode_separator() { return HEADER_SEPARATOR_NONE; }
+    Header_Separator encode_separator() { return HEADER_SEPARATOR_NONE; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
 
@@ -922,8 +1013,8 @@ public:
 
     // Virtual pure functions
     SIP_Header_Type get_header_type() { return SIP_HEADER_MIME_VERSION; }
-    SIP_Header_Separator decode_separator() { return SIP_HEADER_SEPARATOR_NONE; }
-    SIP_Header_Separator encode_separator() { return SIP_HEADER_SEPARATOR_NONE; }
+    Header_Separator decode_separator() { return HEADER_SEPARATOR_NONE; }
+    Header_Separator encode_separator() { return HEADER_SEPARATOR_NONE; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
 
@@ -952,8 +1043,8 @@ public:
 
     // Virtual pure functions
     SIP_Header_Type get_header_type() { return SIP_HEADER_MIN_EXPIRES; }
-    SIP_Header_Separator decode_separator() { return SIP_HEADER_SEPARATOR_NONE; }
-    SIP_Header_Separator encode_separator() { return SIP_HEADER_SEPARATOR_NONE; }
+    Header_Separator decode_separator() { return HEADER_SEPARATOR_NONE; }
+    Header_Separator encode_separator() { return HEADER_SEPARATOR_NONE; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
 
@@ -975,8 +1066,8 @@ public:
 
     // Virtual pure functions
     SIP_Header_Type get_header_type() { return SIP_HEADER_ORGANIZATION; }
-    SIP_Header_Separator decode_separator() { return SIP_HEADER_SEPARATOR_NONE; }
-    SIP_Header_Separator encode_separator() { return SIP_HEADER_SEPARATOR_NONE; }
+    Header_Separator decode_separator() { return HEADER_SEPARATOR_NONE; }
+    Header_Separator encode_separator() { return HEADER_SEPARATOR_NONE; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
 
@@ -992,20 +1083,30 @@ private:
 class SIP_Header_Priority : public SIP_Header
 {
 public:
+    enum Priority
+    {
+        PRIORITY_EMERGENCY,
+        PRIORITY_URGENT,
+        PRIORITY_NORMAL,
+        PRIORITY_NON_URGENT,
+        PRIORITY_INVALID
+    };
+
+public:
     SIP_Header_Priority() {}
     SIP_Header_Priority(const SIP_Header_Priority &header) { *this = header; }
     ~SIP_Header_Priority() {}
 
     // Virtual pure functions
     SIP_Header_Type get_header_type() { return SIP_HEADER_PRIORITY; }
-    SIP_Header_Separator decode_separator() { return SIP_HEADER_SEPARATOR_NONE; }
-    SIP_Header_Separator encode_separator() { return SIP_HEADER_SEPARATOR_NONE; }
+    Header_Separator decode_separator() { return HEADER_SEPARATOR_NONE; }
+    Header_Separator encode_separator() { return HEADER_SEPARATOR_NONE; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
 
-    void set_priority(SIP_Priority_Value priority);
+    void set_priority(Priority priority);
     void set_priority(std::string priority) { _priority = priority; }
-    SIP_Priority_Value get_priority();
+    Priority get_priority();
     std::string get_priority_str() { return _priority; }
 
 private:
@@ -1023,8 +1124,8 @@ public:
 
     // Virtual pure functions
     SIP_Header_Type get_header_type() { return SIP_HEADER_PROXY_AUTHENTICATE; }
-    SIP_Header_Separator decode_separator() { return SIP_HEADER_SEPARATOR_CRLF; }
-    SIP_Header_Separator encode_separator() { return SIP_HEADER_SEPARATOR_CRLF; }
+    Header_Separator decode_separator() { return HEADER_SEPARATOR_CRLF; }
+    Header_Separator encode_separator() { return HEADER_SEPARATOR_CRLF; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
 
@@ -1045,8 +1146,8 @@ public:
 
     // Virtual pure functions
     SIP_Header_Type get_header_type() { return SIP_HEADER_PROXY_AUTHORIZATION; }
-    SIP_Header_Separator decode_separator() { return SIP_HEADER_SEPARATOR_CRLF; }
-    SIP_Header_Separator encode_separator() { return SIP_HEADER_SEPARATOR_CRLF; }
+    Header_Separator decode_separator() { return HEADER_SEPARATOR_CRLF; }
+    Header_Separator encode_separator() { return HEADER_SEPARATOR_CRLF; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
 
@@ -1067,8 +1168,8 @@ public:
 
     // Virtual pure functions
     SIP_Header_Type get_header_type() { return SIP_HEADER_PROXY_REQUIRE; }
-    SIP_Header_Separator decode_separator() { return SIP_HEADER_SEPARATOR_COMMA; }
-    SIP_Header_Separator encode_separator() { return SIP_HEADER_SEPARATOR_COMMA; }
+    Header_Separator decode_separator() { return HEADER_SEPARATOR_COMMA; }
+    Header_Separator encode_separator() { return HEADER_SEPARATOR_COMMA; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
 
@@ -1090,8 +1191,8 @@ public:
 
     // Virtual pure functions
     SIP_Header_Type get_header_type() { return SIP_HEADER_RECORD_ROUTE; }
-    SIP_Header_Separator decode_separator() { return SIP_HEADER_SEPARATOR_COMMA; }
-    SIP_Header_Separator encode_separator() { return SIP_HEADER_SEPARATOR_CRLF; }
+    Header_Separator decode_separator() { return HEADER_SEPARATOR_COMMA; }
+    Header_Separator encode_separator() { return HEADER_SEPARATOR_CRLF; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
 
@@ -1115,8 +1216,8 @@ public:
 
     // Virtual pure functions
     SIP_Header_Type get_header_type() { return SIP_HEADER_REFER_TO; }
-    SIP_Header_Separator decode_separator() { return SIP_HEADER_SEPARATOR_NONE; }
-    SIP_Header_Separator encode_separator() { return SIP_HEADER_SEPARATOR_NONE; }
+    Header_Separator decode_separator() { return HEADER_SEPARATOR_NONE; }
+    Header_Separator encode_separator() { return HEADER_SEPARATOR_NONE; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
 
@@ -1140,8 +1241,8 @@ public:
 
     // Virtual pure functions
     SIP_Header_Type get_header_type() { return SIP_HEADER_REFERRED_BY; }
-    SIP_Header_Separator decode_separator() { return SIP_HEADER_SEPARATOR_NONE; }
-    SIP_Header_Separator encode_separator() { return SIP_HEADER_SEPARATOR_NONE; }
+    Header_Separator decode_separator() { return HEADER_SEPARATOR_NONE; }
+    Header_Separator encode_separator() { return HEADER_SEPARATOR_NONE; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
 
@@ -1169,8 +1270,8 @@ public:
 
     // Virtual pure functions
     SIP_Header_Type get_header_type() { return SIP_HEADER_REPLY_TO; }
-    SIP_Header_Separator decode_separator() { return SIP_HEADER_SEPARATOR_NONE; }
-    SIP_Header_Separator encode_separator() { return SIP_HEADER_SEPARATOR_NONE; }
+    Header_Separator decode_separator() { return HEADER_SEPARATOR_NONE; }
+    Header_Separator encode_separator() { return HEADER_SEPARATOR_NONE; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
 
@@ -1194,8 +1295,8 @@ public:
 
     // Virtual pure functions
     SIP_Header_Type get_header_type() { return SIP_HEADER_REQUIRE; }
-    SIP_Header_Separator decode_separator() { return SIP_HEADER_SEPARATOR_COMMA; }
-    SIP_Header_Separator encode_separator() { return SIP_HEADER_SEPARATOR_COMMA; }
+    Header_Separator decode_separator() { return HEADER_SEPARATOR_COMMA; }
+    Header_Separator encode_separator() { return HEADER_SEPARATOR_COMMA; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
 
@@ -1221,8 +1322,8 @@ public:
 
     // Virtual pure functions
     SIP_Header_Type get_header_type() { return SIP_HEADER_RETRY_AFTER; }
-    SIP_Header_Separator decode_separator() { return SIP_HEADER_SEPARATOR_NONE; }
-    SIP_Header_Separator encode_separator() { return SIP_HEADER_SEPARATOR_NONE; }
+    Header_Separator decode_separator() { return HEADER_SEPARATOR_NONE; }
+    Header_Separator encode_separator() { return HEADER_SEPARATOR_NONE; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
 
@@ -1255,8 +1356,8 @@ public:
 
     // Virtual pure functions
     SIP_Header_Type get_header_type() { return SIP_HEADER_ROUTE; }
-    SIP_Header_Separator decode_separator() { return SIP_HEADER_SEPARATOR_COMMA; }
-    SIP_Header_Separator encode_separator() { return SIP_HEADER_SEPARATOR_CRLF; }
+    Header_Separator decode_separator() { return HEADER_SEPARATOR_COMMA; }
+    Header_Separator encode_separator() { return HEADER_SEPARATOR_CRLF; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
 
@@ -1280,8 +1381,8 @@ public:
 
     // Virtual pure functions
     SIP_Header_Type get_header_type() { return SIP_HEADER_SERVER; }
-    SIP_Header_Separator decode_separator() { return SIP_HEADER_SEPARATOR_NONE; }
-    SIP_Header_Separator encode_separator() { return SIP_HEADER_SEPARATOR_NONE; }
+    Header_Separator decode_separator() { return HEADER_SEPARATOR_NONE; }
+    Header_Separator encode_separator() { return HEADER_SEPARATOR_NONE; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
 
@@ -1303,8 +1404,8 @@ public:
 
     // Virtual pure functions
     SIP_Header_Type get_header_type() { return SIP_HEADER_SUBJECT; }
-    SIP_Header_Separator decode_separator() { return SIP_HEADER_SEPARATOR_NONE; }
-    SIP_Header_Separator encode_separator() { return SIP_HEADER_SEPARATOR_NONE; }
+    Header_Separator decode_separator() { return HEADER_SEPARATOR_NONE; }
+    Header_Separator encode_separator() { return HEADER_SEPARATOR_NONE; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
 
@@ -1323,6 +1424,26 @@ public:
     static const unsigned long INVALID_EXPIRES = INVALID_UNSIGNED_LONG;
     static const unsigned long INVALID_RETRY_AFTER = INVALID_UNSIGNED_LONG;
 
+    enum State
+    {
+        STATE_ACTIVE,
+        STATE_PENDING,
+        STATE_TERMINATED,
+        STATE_INVALID
+    };
+
+    enum Reason
+    {
+        REASON_DEACTIVATED,
+        REASON_PROBATION,
+        REASON_REJECTED,
+        REASON_TIMEOUT,
+        REASON_GIVEUP,
+        REASON_NORESOURCE,
+        REASON_INVARIANT,
+        REASON_INVALID
+    };
+
 public:
     SIP_Header_Subscription_State() : _expires(INVALID_EXPIRES), _retry_after(INVALID_RETRY_AFTER) {}
     SIP_Header_Subscription_State(const SIP_Header_Subscription_State &header) { *this = header; }
@@ -1330,19 +1451,19 @@ public:
 
     // Virtual pure functions
     SIP_Header_Type get_header_type() { return SIP_HEADER_SUBSCRIPTION_STATE; }
-    SIP_Header_Separator decode_separator() { return SIP_HEADER_SEPARATOR_NONE; }
-    SIP_Header_Separator encode_separator() { return SIP_HEADER_SEPARATOR_NONE; }
+    Header_Separator decode_separator() { return HEADER_SEPARATOR_NONE; }
+    Header_Separator encode_separator() { return HEADER_SEPARATOR_NONE; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
 
-    void set_state(SIP_Subscription_State state);
+    void set_state(State state);
     void set_state(std::string state) { _state = state; }
-    SIP_Subscription_State get_state();
+    State get_state();
     std::string get_state_str() { return _state; }
 
-    void set_reason(SIP_Subscription_State_Reason reason);
+    void set_reason(Reason reason);
     void set_reason(std::string reason) { _reason = reason; }
-    SIP_Subscription_State_Reason get_reason();
+    Reason get_reason();
     std::string get_reason_str() { return _reason; }
 
     void set_expires(unsigned long expires) { _expires = expires; }
@@ -1372,8 +1493,8 @@ public:
 
     // Virtual pure functions
     SIP_Header_Type get_header_type() { return SIP_HEADER_SUPPORTED; }
-    SIP_Header_Separator decode_separator() { return SIP_HEADER_SEPARATOR_COMMA; }
-    SIP_Header_Separator encode_separator() { return SIP_HEADER_SEPARATOR_COMMA; }
+    Header_Separator decode_separator() { return HEADER_SEPARATOR_COMMA; }
+    Header_Separator encode_separator() { return HEADER_SEPARATOR_COMMA; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
 
@@ -1395,8 +1516,8 @@ public:
 
     // Virtual pure functions
     SIP_Header_Type get_header_type() { return SIP_HEADER_TIMESTAMP; }
-    SIP_Header_Separator decode_separator() { return SIP_HEADER_SEPARATOR_NONE; }
-    SIP_Header_Separator encode_separator() { return SIP_HEADER_SEPARATOR_NONE; }
+    Header_Separator decode_separator() { return HEADER_SEPARATOR_NONE; }
+    Header_Separator encode_separator() { return HEADER_SEPARATOR_NONE; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
 
@@ -1422,8 +1543,8 @@ public:
 
     // Virtual pure functions
     SIP_Header_Type get_header_type() { return SIP_HEADER_TO; }
-    SIP_Header_Separator decode_separator() { return SIP_HEADER_SEPARATOR_NONE; }
-    SIP_Header_Separator encode_separator() { return SIP_HEADER_SEPARATOR_NONE; }
+    Header_Separator decode_separator() { return HEADER_SEPARATOR_NONE; }
+    Header_Separator encode_separator() { return HEADER_SEPARATOR_NONE; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
 
@@ -1451,8 +1572,8 @@ public:
 
     // Virtual pure functions
     SIP_Header_Type get_header_type() { return SIP_HEADER_UNSUPPORTED; }
-    SIP_Header_Separator decode_separator() { return SIP_HEADER_SEPARATOR_COMMA; }
-    SIP_Header_Separator encode_separator() { return SIP_HEADER_SEPARATOR_COMMA; }
+    Header_Separator decode_separator() { return HEADER_SEPARATOR_COMMA; }
+    Header_Separator encode_separator() { return HEADER_SEPARATOR_COMMA; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
 
@@ -1474,8 +1595,8 @@ public:
 
     // Virtual pure functions
     SIP_Header_Type get_header_type() { return SIP_HEADER_USER_AGENT; }
-    SIP_Header_Separator decode_separator() { return SIP_HEADER_SEPARATOR_NONE; }
-    SIP_Header_Separator encode_separator() { return SIP_HEADER_SEPARATOR_NONE; }
+    Header_Separator decode_separator() { return HEADER_SEPARATOR_NONE; }
+    Header_Separator encode_separator() { return HEADER_SEPARATOR_NONE; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
 
@@ -1501,8 +1622,8 @@ public:
 
     // Virtual pure functions
     SIP_Header_Type get_header_type() { return SIP_HEADER_VIA; }
-    SIP_Header_Separator decode_separator() { return SIP_HEADER_SEPARATOR_COMMA; }
-    SIP_Header_Separator encode_separator() { return SIP_HEADER_SEPARATOR_CRLF; }
+    Header_Separator decode_separator() { return HEADER_SEPARATOR_COMMA; }
+    Header_Separator encode_separator() { return HEADER_SEPARATOR_CRLF; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
 
@@ -1564,8 +1685,8 @@ public:
 
     // Virtual pure functions
     SIP_Header_Type get_header_type() { return SIP_HEADER_WARNING; }
-    SIP_Header_Separator decode_separator() { return SIP_HEADER_SEPARATOR_COMMA; }
-    SIP_Header_Separator encode_separator() { return SIP_HEADER_SEPARATOR_CRLF; }
+    Header_Separator decode_separator() { return HEADER_SEPARATOR_COMMA; }
+    Header_Separator encode_separator() { return HEADER_SEPARATOR_CRLF; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
 
@@ -1595,8 +1716,8 @@ public:
 
     // Virtual pure functions
     SIP_Header_Type get_header_type() { return SIP_HEADER_WWW_AUTHENTICATE; }
-    SIP_Header_Separator decode_separator() { return SIP_HEADER_SEPARATOR_CRLF; }
-    SIP_Header_Separator encode_separator() { return SIP_HEADER_SEPARATOR_CRLF; }
+    Header_Separator decode_separator() { return HEADER_SEPARATOR_CRLF; }
+    Header_Separator encode_separator() { return HEADER_SEPARATOR_CRLF; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
 

@@ -240,7 +240,7 @@ bool SIP_Header::decode_headers(std::string &sip_msg, sip_header_list &headers)
     SIP_Functions::trim(type);
 
     SIP_Header_Type header_type = SIP_Functions::get_header_type(type);
-    if (header_type == SIP_HEADER_TYPE_INVALID)
+    if (header_type == SIP_HEADER_INVALID)
     {
         _logger.warning("SIP_Header::decode_header -> Invalid header type (header=%s)", type.c_str());
         return false;
@@ -253,7 +253,7 @@ bool SIP_Header::decode_headers(std::string &sip_msg, sip_header_list &headers)
     {
         SIP_Header *header = create_header(header_type);
 
-        if (header->decode_separator() == SIP_HEADER_SEPARATOR_COMMA)
+        if (header->decode_separator() == HEADER_SEPARATOR_COMMA)
         {
             // There may be more than one of these headers
             matched = SIP_Functions::match(sip_msg, ",", result);
@@ -306,10 +306,10 @@ bool SIP_Header::encode_headers(std::string &sip_msg, sip_header_list &headers)
         {
             switch (header->encode_separator())
             {
-                case SIP_HEADER_SEPARATOR_NONE:     return false;
-                case SIP_HEADER_SEPARATOR_COMMA:    sip_msg += ", ";                    break;
-                case SIP_HEADER_SEPARATOR_CRLF:     sip_msg += "\r\n" + type + ": ";    break;
-                default:                                                                break;
+                case HEADER_SEPARATOR_NONE:     return false;
+                case HEADER_SEPARATOR_COMMA:    sip_msg += ", ";                    break;
+                case HEADER_SEPARATOR_CRLF:     sip_msg += "\r\n" + type + ": ";    break;
+                default:                                                            break;
             }
         }
 
@@ -750,76 +750,68 @@ bool SIP_Media_Range::encode(std::string &sip_msg)
 
 //-------------------------------------------
 
-void SIP_Media_Range::set_type(SIP_Media_Type type)
+void SIP_Media_Range::set_type(SIP_Media_Range::Type type)
 {
     switch (type)
     {
-        case SIP_MEDIA_TEXT:            _type += "text";            break;
-        case SIP_MEDIA_IMAGE:           _type += "image";           break;
-        case SIP_MEDIA_AUDIO:           _type += "audio";           break;
-        case SIP_MEDIA_VIDEO:           _type += "video";           break;
-        case SIP_MEDIA_APPLICATION:     _type += "application";     break;
-        case SIP_MEDIA_MESSAGE:         _type += "message";         break;
-        case SIP_MEDIA_MULTIPART:       _type += "multipart";       break;
-        case SIP_MEDIA_TYPE_ASTERISK:   _type += "*";               break;
-        default:                                                    break;
+        case TYPE_TEXT:         _type = "text";         break;
+        case TYPE_IMAGE:        _type = "image";        break;
+        case TYPE_AUDIO:        _type = "audio";        break;
+        case TYPE_VIDEO:        _type = "video";        break;
+        case TYPE_APPLICATION:  _type = "application";  break;
+        case TYPE_MESSAGE:      _type = "message";      break;
+        case TYPE_MULTIPART:    _type = "multipart";    break;
+        case TYPE_ASTERISK:     _type = "*";            break;
+        default:                                        break;
     }
 }
 
 //-------------------------------------------
 
-SIP_Media_Type SIP_Media_Range::get_type()
+SIP_Media_Range::Type SIP_Media_Range::get_type()
 {
     if (_type == "text")
-        return SIP_MEDIA_TEXT;
+        return TYPE_TEXT;
     else if (_type == "image")
-        return SIP_MEDIA_IMAGE;
+        return TYPE_IMAGE;
     else if (_type == "audio")
-        return SIP_MEDIA_AUDIO;
+        return TYPE_AUDIO;
     else if (_type == "video")
-        return SIP_MEDIA_VIDEO;
+        return TYPE_VIDEO;
     else if (_type == "application")
-        return SIP_MEDIA_APPLICATION;
+        return TYPE_APPLICATION;
     else if (_type == "message")
-        return SIP_MEDIA_MESSAGE;
+        return TYPE_MESSAGE;
     else if (_type == "multipart")
-        return SIP_MEDIA_MULTIPART;
+        return TYPE_MULTIPART;
     else if (_type == "*")
-        return SIP_MEDIA_TYPE_ASTERISK;
+        return TYPE_ASTERISK;
 
-    return SIP_MEDIA_TYPE_INVALID;
+    return TYPE_INVALID;
 }
 
 //-------------------------------------------
 
-void SIP_Media_Range::set_subtype(SIP_Media_Subtype subtype)
+void SIP_Media_Range::set_subtype(SIP_Media_Range::Subtype subtype)
 {
     switch (subtype)
     {
-        case SIP_MEDIA_APPLICATION_SDP:         _subtype = "sdp";       break;
-        case SIP_MEDIA_APPLICATION_PIDF_XML:    _subtype = "pidf+xml";  break;
-        case SIP_MEDIA_TEXT_PLAIN:              _subtype = "plain";     break;
-        case SIP_MEDIA_SUBTYPE_ASTERISK:        _subtype = "*";         break;
-        default:                                                        break;
+        case SUBTYPE_APPLICATION_SDP:   _subtype = "sdp";   break;
+        case SUBTYPE_ASTERISK:          _subtype = "*";     break;
+        default:                                            break;
     }
 }
 
 //-------------------------------------------
 
-SIP_Media_Subtype SIP_Media_Range::get_subtype()
+SIP_Media_Range::Subtype SIP_Media_Range::get_subtype()
 {
     if (_type == "sdp")
-        return SIP_MEDIA_APPLICATION_SDP;
-    else if (_type == "pidf+xml")
-        return SIP_MEDIA_APPLICATION_PIDF_XML;
-    else if (_type == "text/plain")
-        return SIP_MEDIA_TEXT_PLAIN;
-    else if (_type == "text/html")
-        return SIP_MEDIA_TEXT_HTML;
+        return SUBTYPE_APPLICATION_SDP;
     else if (_type == "*")
-        return SIP_MEDIA_SUBTYPE_ASTERISK;
+        return SUBTYPE_ASTERISK;
 
-    return SIP_MEDIA_SUBTYPE_INVALID;
+    return SUBTYPE_INVALID;
 }
 
 //-------------------------------------------
@@ -870,23 +862,23 @@ bool SIP_Event_Type::encode(std::string &sip_msg)
 
 //-------------------------------------------
 
-void SIP_Event_Type::set_package(SIP_Event_Package package)
+void SIP_Event_Type::set_package(SIP_Event_Type::Package package)
 {
     switch (package)
     {
-        case SIP_EVENT_PRESENCE: _package = "presence"; break;
-        default:                                        break;
+        case PACKAGE_PRESENCE: _package = "presence"; break;
+        default:                                      break;
     }
 }
 
 //-------------------------------------------
 
-SIP_Event_Package SIP_Event_Type::get_package()
+SIP_Event_Type::Package SIP_Event_Type::get_package()
 {
     if (_package == "presence")
-        return SIP_EVENT_PRESENCE;
+        return PACKAGE_PRESENCE;
 
-    return SIP_EVENT_PACKAGE_INVALID;
+    return PACKAGE_INVALID;
 }
 
 //-------------------------------------------
@@ -1338,29 +1330,29 @@ bool SIP_Header_Call_Info::encode(std::string &sip_msg)
 
 //-------------------------------------------
 
-void SIP_Header_Call_Info::set_purpose(SIP_Call_Info_Purpose purpose)
+void SIP_Header_Call_Info::set_purpose(SIP_Header_Call_Info::Purpose purpose)
 {
     switch (purpose)
     {
-        case SIP_CALL_INFO_PURPOSE_ICON: _purpose = "icon";  break;
-        case SIP_CALL_INFO_PURPOSE_INFO: _purpose = "info";  break;
-        case SIP_CALL_INFO_PURPOSE_CARD: _purpose = "card";  break;
-        default:                                             break;
+        case PURPOSE_ICON: _purpose = "icon"; break;
+        case PURPOSE_INFO: _purpose = "info"; break;
+        case PURPOSE_CARD: _purpose = "card"; break;
+        default:                              break;
     }
 }
 
 //-------------------------------------------
 
-SIP_Call_Info_Purpose SIP_Header_Call_Info::get_purpose()
+SIP_Header_Call_Info::Purpose SIP_Header_Call_Info::get_purpose()
 {
     if (_purpose == "icon")
-        return SIP_CALL_INFO_PURPOSE_ICON;
+        return PURPOSE_ICON;
     else if (_purpose == "info")
-        return SIP_CALL_INFO_PURPOSE_INFO;
+        return PURPOSE_INFO;
     else if (_purpose == "card")
-        return SIP_CALL_INFO_PURPOSE_CARD;
+        return PURPOSE_CARD;
 
-    return SIP_CALL_INFO_PURPOSE_INVALID;
+    return PURPOSE_INVALID;
 }
 
 //-------------------------------------------
@@ -1507,56 +1499,56 @@ bool SIP_Header_Content_Disposition::encode(std::string &sip_msg)
 
 //-------------------------------------------
 
-void SIP_Header_Content_Disposition::set_type(SIP_Disposition_Type type)
+void SIP_Header_Content_Disposition::set_type(SIP_Header_Content_Disposition::Type type)
 {
     switch (type)
     {
-        case SIP_DISPOSITION_RENDER:    _type = "render";   break;
-        case SIP_DISPOSITION_SESSION:   _type = "session";  break;
-        case SIP_DISPOSITION_ICON:      _type = "icon";     break;
-        case SIP_DISPOSITION_ALERT:     _type = "alert";    break;
-        default:                                            break;
+        case TYPE_RENDER:   _type = "render";   break;
+        case TYPE_SESSION:  _type = "session";  break;
+        case TYPE_ICON:     _type = "icon";     break;
+        case TYPE_ALERT:    _type = "alert";    break;
+        default:                                break;
     }
 }
 
 //-------------------------------------------
 
-SIP_Disposition_Type SIP_Header_Content_Disposition::get_type()
+SIP_Header_Content_Disposition::Type SIP_Header_Content_Disposition::get_type()
 {
     if (_type == "render")
-        return SIP_DISPOSITION_RENDER;
+        return TYPE_RENDER;
     else if (_type == "session")
-        return SIP_DISPOSITION_SESSION;
+        return TYPE_SESSION;
     else if (_type == "icon")
-        return SIP_DISPOSITION_ICON;
+        return TYPE_ICON;
     else if (_type == "alert")
-        return SIP_DISPOSITION_ALERT;
+        return TYPE_ALERT;
 
-    return SIP_DISPOSITION_TYPE_INVALID;
+    return TYPE_INVALID;
 }
 
 //-------------------------------------------
 
-void SIP_Header_Content_Disposition::set_handling(SIP_Disposition_Handling handling)
+void SIP_Header_Content_Disposition::set_handling(SIP_Header_Content_Disposition::Handling handling)
 {
     switch (handling)
     {
-        case SIP_DISPOSITION_HANDLING_OPTIONAL: _handling = "optional"; break;
-        case SIP_DISPOSITION_HANDLING_REQUIRED: _handling = "required"; break;
-        default:                                                        break;
+        case HANDLING_OPTIONAL: _handling = "optional"; break;
+        case HANDLING_REQUIRED: _handling = "required"; break;
+        default:                                        break;
     }
 }
 
 //-------------------------------------------
 
-SIP_Disposition_Handling SIP_Header_Content_Disposition::get_handling()
+SIP_Header_Content_Disposition::Handling SIP_Header_Content_Disposition::get_handling()
 {
     if (_handling == "optional")
-        return SIP_DISPOSITION_HANDLING_OPTIONAL;
+        return HANDLING_OPTIONAL;
     else if (_handling == "required")
-        return SIP_DISPOSITION_HANDLING_REQUIRED;
+        return HANDLING_REQUIRED;
 
-    return SIP_DISPOSITION_HANDLING_INVALID;
+    return HANDLING_INVALID;
 }
 
 //-------------------------------------------
@@ -1834,95 +1826,95 @@ bool SIP_Header_Date::encode(std::string &sip_msg)
 
 //-------------------------------------------
 
-void SIP_Header_Date::set_weekday(SIP_Date_Weekday weekday)
+void SIP_Header_Date::set_weekday(SIP_Header_Date::Weekday weekday)
 {
     switch (weekday)
     {
-        case SIP_DATE_WEEKDAY_MON: _weekday = "Mon"; break;
-        case SIP_DATE_WEEKDAY_TUE: _weekday = "Tue"; break;
-        case SIP_DATE_WEEKDAY_WED: _weekday = "Wed"; break;
-        case SIP_DATE_WEEKDAY_THU: _weekday = "Thu"; break;
-        case SIP_DATE_WEEKDAY_FRI: _weekday = "Fri"; break;
-        case SIP_DATE_WEEKDAY_SAT: _weekday = "Sat"; break;
-        case SIP_DATE_WEEKDAY_SUN: _weekday = "Sun"; break;
-        default:                                     break;
+        case WEEKDAY_MON: _weekday = "Mon"; break;
+        case WEEKDAY_TUE: _weekday = "Tue"; break;
+        case WEEKDAY_WED: _weekday = "Wed"; break;
+        case WEEKDAY_THU: _weekday = "Thu"; break;
+        case WEEKDAY_FRI: _weekday = "Fri"; break;
+        case WEEKDAY_SAT: _weekday = "Sat"; break;
+        case WEEKDAY_SUN: _weekday = "Sun"; break;
+        default:                            break;
     }
 }
 
 //-------------------------------------------
 
-SIP_Date_Weekday SIP_Header_Date::get_weekday()
+SIP_Header_Date::Weekday SIP_Header_Date::get_weekday()
 {
     if (_weekday == "Mon")
-        return SIP_DATE_WEEKDAY_MON;
+        return WEEKDAY_MON;
     else if (_weekday == "Tue")
-        return SIP_DATE_WEEKDAY_TUE;
+        return WEEKDAY_TUE;
     else if (_weekday == "Wed")
-        return SIP_DATE_WEEKDAY_WED;
+        return WEEKDAY_WED;
     else if (_weekday == "Thu")
-        return SIP_DATE_WEEKDAY_THU;
+        return WEEKDAY_THU;
     else if (_weekday == "Fri")
-        return SIP_DATE_WEEKDAY_FRI;
+        return WEEKDAY_FRI;
     else if (_weekday == "Sat")
-        return SIP_DATE_WEEKDAY_SAT;
+        return WEEKDAY_SAT;
     else if (_weekday == "Sun")
-        return SIP_DATE_WEEKDAY_SUN;
+        return WEEKDAY_SUN;
 
-    return SIP_DATE_WEEKDAY_INVALID;
+    return WEEKDAY_INVALID;
 }
 
 //-------------------------------------------
 
-void SIP_Header_Date::set_month(SIP_Date_Month month)
+void SIP_Header_Date::set_month(SIP_Header_Date::Month month)
 {
     switch (month)
     {
-        case SIP_DATE_MONTH_JAN: _month = "Jan"; break;
-        case SIP_DATE_MONTH_FEB: _month = "Feb"; break;
-        case SIP_DATE_MONTH_MAR: _month = "Mar"; break;
-        case SIP_DATE_MONTH_APR: _month = "Apr"; break;
-        case SIP_DATE_MONTH_MAY: _month = "May"; break;
-        case SIP_DATE_MONTH_JUN: _month = "Jun"; break;
-        case SIP_DATE_MONTH_JUL: _month = "Jul"; break;
-        case SIP_DATE_MONTH_AUG: _month = "Aug"; break;
-        case SIP_DATE_MONTH_SEP: _month = "Sep"; break;
-        case SIP_DATE_MONTH_OCT: _month = "Oct"; break;
-        case SIP_DATE_MONTH_NOV: _month = "Nov"; break;
-        case SIP_DATE_MONTH_DEC: _month = "Dec"; break;
-        default:                                 break;
+        case MONTH_JAN: _month = "Jan"; break;
+        case MONTH_FEB: _month = "Feb"; break;
+        case MONTH_MAR: _month = "Mar"; break;
+        case MONTH_APR: _month = "Apr"; break;
+        case MONTH_MAY: _month = "May"; break;
+        case MONTH_JUN: _month = "Jun"; break;
+        case MONTH_JUL: _month = "Jul"; break;
+        case MONTH_AUG: _month = "Aug"; break;
+        case MONTH_SEP: _month = "Sep"; break;
+        case MONTH_OCT: _month = "Oct"; break;
+        case MONTH_NOV: _month = "Nov"; break;
+        case MONTH_DEC: _month = "Dec"; break;
+        default:                        break;
     }
 }
 
 //-------------------------------------------
 
-SIP_Date_Month SIP_Header_Date::get_month()
+SIP_Header_Date::Month SIP_Header_Date::get_month()
 {
     if (_month == "Jan")
-        return SIP_DATE_MONTH_JAN;
+        return MONTH_JAN;
     else if (_month == "Feb")
-        return SIP_DATE_MONTH_FEB;
+        return MONTH_FEB;
     else if (_month == "Mar")
-        return SIP_DATE_MONTH_MAR;
+        return MONTH_MAR;
     else if (_month == "Apr")
-        return SIP_DATE_MONTH_APR;
+        return MONTH_APR;
     else if (_month == "May")
-        return SIP_DATE_MONTH_MAY;
+        return MONTH_MAY;
     else if (_month == "Jun")
-        return SIP_DATE_MONTH_JUN;
+        return MONTH_JUN;
     else if (_month == "Jul")
-        return SIP_DATE_MONTH_JUL;
+        return MONTH_JUL;
     else if (_month == "Aug")
-        return SIP_DATE_MONTH_AUG;
+        return MONTH_AUG;
     else if (_month == "Sep")
-        return SIP_DATE_MONTH_SEP;
+        return MONTH_SEP;
     else if (_month == "Oct")
-        return SIP_DATE_MONTH_OCT;
+        return MONTH_OCT;
     else if (_month == "Nov")
-        return SIP_DATE_MONTH_NOV;
+        return MONTH_NOV;
     else if (_month == "Dec")
-        return SIP_DATE_MONTH_DEC;
+        return MONTH_DEC;
 
-    return SIP_DATE_MONTH_INVALID;
+    return MONTH_INVALID;
 }
 
 //-------------------------------------------
@@ -2261,32 +2253,32 @@ bool SIP_Header_Priority::encode(std::string &sip_msg)
 
 //-------------------------------------------
 
-void SIP_Header_Priority::set_priority(SIP_Priority_Value priority)
+void SIP_Header_Priority::set_priority(SIP_Header_Priority::Priority priority)
 {
     switch (priority)
     {
-        case SIP_PRIORITY_EMERGENCY:    _priority = "emergency";    break;
-        case SIP_PRIORITY_URGENT:       _priority = "urgent";       break;
-        case SIP_PRIORITY_NORMAL:       _priority = "normal";       break;
-        case SIP_PRIORITY_NON_URGENT:   _priority = "non-urgent";   break;
-        default:                                                    break;
+        case PRIORITY_EMERGENCY:    _priority = "emergency";    break;
+        case PRIORITY_URGENT:       _priority = "urgent";       break;
+        case PRIORITY_NORMAL:       _priority = "normal";       break;
+        case PRIORITY_NON_URGENT:   _priority = "non-urgent";   break;
+        default:                                                break;
     }
 }
 
 //-------------------------------------------
 
-SIP_Priority_Value SIP_Header_Priority::get_priority()
+SIP_Header_Priority::Priority SIP_Header_Priority::get_priority()
 {
     if (_priority == "emergency")
-        return SIP_PRIORITY_EMERGENCY;
+        return PRIORITY_EMERGENCY;
     else if (_priority == "urgent")
-        return SIP_PRIORITY_URGENT;
+        return PRIORITY_URGENT;
     else if (_priority == "normal")
-        return SIP_PRIORITY_NORMAL;
+        return PRIORITY_NORMAL;
     else if (_priority == "non-urgent")
-        return SIP_PRIORITY_NON_URGENT;
+        return PRIORITY_NON_URGENT;
 
-    return SIP_PRIORITY_VALUE_INVALID;
+    return PRIORITY_INVALID;
 }
 
 //-------------------------------------------
@@ -2803,68 +2795,68 @@ bool SIP_Header_Subscription_State::encode(std::string &sip_msg)
 
 //-------------------------------------------
 
-void SIP_Header_Subscription_State::set_state(SIP_Subscription_State state)
+void SIP_Header_Subscription_State::set_state(SIP_Header_Subscription_State::State state)
 {
     switch (state)
     {
-        case SIP_SUBSCRIPTION_STATE_ACTIVE:     _state = "active";      break;
-        case SIP_SUBSCRIPTION_STATE_PENDING:    _state = "pending";     break;
-        case SIP_SUBSCRIPTION_STATE_TERMINATED: _state = "terminated";  break;
-        default:                                                        break;
+        case STATE_ACTIVE:     _state = "active";      break;
+        case STATE_PENDING:    _state = "pending";     break;
+        case STATE_TERMINATED: _state = "terminated";  break;
+        default:                                       break;
     }
 }
 
 //-------------------------------------------
 
-SIP_Subscription_State SIP_Header_Subscription_State::get_state()
+SIP_Header_Subscription_State::State SIP_Header_Subscription_State::get_state()
 {
     if (_state == "active")
-        return SIP_SUBSCRIPTION_STATE_ACTIVE;
+        return STATE_ACTIVE;
     else if (_state == "pending")
-        return SIP_SUBSCRIPTION_STATE_PENDING;
+        return STATE_PENDING;
     else if (_state == "terminated")
-        return SIP_SUBSCRIPTION_STATE_TERMINATED;
+        return STATE_TERMINATED;
 
-    return SIP_SUBSCRIPTION_STATE_INVALID;
+    return STATE_INVALID;
 }
 
 //-------------------------------------------
 
-void SIP_Header_Subscription_State::set_reason(SIP_Subscription_State_Reason reason)
+void SIP_Header_Subscription_State::set_reason(SIP_Header_Subscription_State::Reason reason)
 {
     switch (reason)
     {
-        case SIP_SUBSCRIPTION_STATE_REASON_DEACTIVATED: _state = "deactivated"; break;
-        case SIP_SUBSCRIPTION_STATE_REASON_PROBATION:   _state = "probation";   break;
-        case SIP_SUBSCRIPTION_STATE_REASON_REJECTED:    _state = "rejected";    break;
-        case SIP_SUBSCRIPTION_STATE_REASON_TIMEOUT:     _state = "timeout";     break;
-        case SIP_SUBSCRIPTION_STATE_REASON_GIVEUP:      _state = "giveup";      break;
-        case SIP_SUBSCRIPTION_STATE_REASON_NORESOURCE:  _state = "noresource";  break;
-        case SIP_SUBSCRIPTION_STATE_REASON_INVARIANT:   _state = "invariant";   break;
-        default:                                                                break;
+        case REASON_DEACTIVATED: _state = "deactivated"; break;
+        case REASON_PROBATION:   _state = "probation";   break;
+        case REASON_REJECTED:    _state = "rejected";    break;
+        case REASON_TIMEOUT:     _state = "timeout";     break;
+        case REASON_GIVEUP:      _state = "giveup";      break;
+        case REASON_NORESOURCE:  _state = "noresource";  break;
+        case REASON_INVARIANT:   _state = "invariant";   break;
+        default:                                         break;
     }
 }
 
 //-------------------------------------------
 
-SIP_Subscription_State_Reason SIP_Header_Subscription_State::get_reason()
+SIP_Header_Subscription_State::Reason SIP_Header_Subscription_State::get_reason()
 {
     if (_reason == "deactivated")
-        return SIP_SUBSCRIPTION_STATE_REASON_DEACTIVATED;
+        return REASON_DEACTIVATED;
     else if (_reason == "probation")
-        return SIP_SUBSCRIPTION_STATE_REASON_PROBATION;
+        return REASON_PROBATION;
     else if (_reason == "rejected")
-        return SIP_SUBSCRIPTION_STATE_REASON_REJECTED;
+        return REASON_REJECTED;
     else if (_reason == "timeout")
-        return SIP_SUBSCRIPTION_STATE_REASON_TIMEOUT;
+        return REASON_TIMEOUT;
     else if (_reason == "giveup")
-        return SIP_SUBSCRIPTION_STATE_REASON_GIVEUP;
+        return REASON_GIVEUP;
     else if (_reason == "noresource")
-        return SIP_SUBSCRIPTION_STATE_REASON_NORESOURCE;
+        return REASON_NORESOURCE;
     else if (_reason == "invariant")
-        return SIP_SUBSCRIPTION_STATE_REASON_INVARIANT;
+        return REASON_INVARIANT;
 
-    return SIP_SUBSCRIPTION_STATE_REASON_INVALID;
+    return REASON_INVALID;
 }
 
 //-------------------------------------------

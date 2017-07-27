@@ -66,7 +66,7 @@ SIP_Message *SIP_Message::decode_msg(std::string sip_msg)
     SIP_Functions::trim(msg);
 
     SIP_Method_Type method = SIP_Functions::get_method_type(msg);
-    if (method == SIP_METHOD_TYPE_INVALID)
+    if (method == SIP_METHOD_INVALID)
     {
         _logger.warning("SIP_Message::decode_msg -> Invalid method (method=%s)", msg.c_str());
         return NULL;

@@ -98,7 +98,7 @@ SIP_Message *SIP_Message_Test::copy_message(SIP_Message &message)
             break;
         }
 
-        case SIP_METHOD_TYPE_INVALID:
+        case SIP_METHOD_INVALID:
             break;
 
         default:

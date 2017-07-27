@@ -22,6 +22,13 @@ public:
     static const unsigned short INVALID_PORT = INVALID_UNSIGNED_SHORT;
     static const unsigned short INVALID_TTL = INVALID_UNSIGNED_SHORT;
 
+    enum User_Param
+    {
+        USER_PARAM_PHONE,
+        USER_PARAM_IP,
+        USER_PARAM_INVALID
+    };
+
 public:
     SIP_URI() : _port(INVALID_PORT), _ttl(INVALID_TTL), _lr(false) {}
     SIP_URI(const SIP_URI &value) { *this = value; }
@@ -47,9 +54,9 @@ public:
     SIP_Transport_Type get_transport();
     std::string get_transport_str() { return _transport; }
 
-    void set_user_param(SIP_User_Param user_param);
+    void set_user_param(User_Param user_param);
     void set_user_param(std::string user_param) { _user_param = user_param; }
-    SIP_User_Param get_user_param();
+    User_Param get_user_param();
     std::string get_user_param_str() { return _user_param; }
 
     void set_method(SIP_Method_Type method);
@@ -110,6 +117,14 @@ private:
 class SIP_Address
 {
 public:
+    enum Scheme
+    {
+        SCHEME_SIP,
+        SCHEME_SIPS,
+        SCHEME_INVALID
+    };
+
+public:
     SIP_Address() : _display_name_double_quote(true), _uri_angle_quote(true) {}
     SIP_Address(const SIP_Address &value) { *this = value; }
     ~SIP_Address() {}
@@ -123,9 +138,9 @@ public:
     void set_display_name(std::string display_name) { _display_name = display_name; }
     std::string get_display_name() { return _display_name; }
 
-    void set_scheme(SIP_Address_Scheme scheme);
+    void set_scheme(Scheme scheme);
     void set_scheme(std::string scheme) { _scheme = scheme; }
-    SIP_Address_Scheme get_scheme();
+    Scheme get_scheme();
     std::string get_scheme_str() { return _scheme; }
 
     void set_uri_angle_quote(bool quote) { _uri_angle_quote = quote; }
