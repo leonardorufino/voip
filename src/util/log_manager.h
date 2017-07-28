@@ -40,6 +40,7 @@ public:
         LOG_SIP_HEADER      = 0x0010,
         LOG_SIP_MESSAGE     = 0x0020,
         LOG_SIP_TRANSACTION = 0x0040,
+        LOG_SIP_TRANSPORT   = 0x0080,
     };
 
     typedef bool (log_callback)(Log_Level level, Log_Source source, const std::string &msg);
