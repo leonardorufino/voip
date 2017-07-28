@@ -11,35 +11,36 @@
 
 #include "sip_header.h"
 #include "sip_functions.h"
+#include "util/string_functions.h"
 
 //-------------------------------------------
 
 bool SIP_URI::decode(std::string &sip_msg)
 {
-    SIP_Functions::trim(sip_msg);
+    String_Functions::trim(sip_msg);
 
     std::string user_host;
-    bool has_parameter = SIP_Functions::match(sip_msg, ";", user_host);
-    SIP_Functions::trim(user_host);
+    bool has_parameter = String_Functions::match(sip_msg, ";", user_host);
+    String_Functions::trim(user_host);
 
     std::string parameters;
-    bool has_headers = SIP_Functions::match(sip_msg, "?", (has_parameter ? parameters : user_host));
+    bool has_headers = String_Functions::match(sip_msg, "?", (has_parameter ? parameters : user_host));
 
     std::string user_password;
-    if (SIP_Functions::match(user_host, "@", user_password))
+    if (String_Functions::match(user_host, "@", user_password))
     {
-        SIP_Functions::trim(user_password);
+        String_Functions::trim(user_password);
         if (user_password.empty())
             return false;
 
         std::string user;
-        if (SIP_Functions::match(user_password, ":", user))
+        if (String_Functions::match(user_password, ":", user))
         {
-            SIP_Functions::trim(user);
+            String_Functions::trim(user);
             if (user.empty())
                 return false;
 
-            SIP_Functions::trim(user_password);
+            String_Functions::trim(user_password);
 
             _user = user;
             _password = user_password;
@@ -48,21 +49,21 @@ bool SIP_URI::decode(std::string &sip_msg)
     }
 
     std::string host;
-    if (SIP_Functions::match(user_host, ":", host))
+    if (String_Functions::match(user_host, ":", host))
     {
-        SIP_Functions::trim(host);
+        String_Functions::trim(host);
         if (host.empty())
             return false;
 
         _host = host;
 
-        SIP_Functions::trim(user_host);
-        _port = SIP_Functions::str_to_us(user_host);
+        String_Functions::trim(user_host);
+        _port = String_Functions::str_to_us(user_host);
         if (_port == INVALID_PORT)
             return false;
     }else
     {
-        SIP_Functions::trim(user_host);
+        String_Functions::trim(user_host);
         if (user_host.empty())
             return false;
 
@@ -73,45 +74,45 @@ bool SIP_URI::decode(std::string &sip_msg)
     while (has_parameter)
     {
         std::string param;
-        has_parameter = SIP_Functions::match(parameters, ";", param);
-        SIP_Functions::trim(param);
+        has_parameter = String_Functions::match(parameters, ";", param);
+        String_Functions::trim(param);
 
-        if (SIP_Functions::start_with(param, "transport="))
+        if (String_Functions::start_with(param, "transport="))
         {
             _transport = param.substr(10);
-            SIP_Functions::trim(_transport);
+            String_Functions::trim(_transport);
             if (_transport.empty())
                 return false;
 
-        }else if (SIP_Functions::start_with(param, "user="))
+        }else if (String_Functions::start_with(param, "user="))
         {
             _user_param = param.substr(5);
-            SIP_Functions::trim(_user_param);
+            String_Functions::trim(_user_param);
             if (_user_param.empty())
                 return false;
 
-        }else if (SIP_Functions::start_with(param, "method="))
+        }else if (String_Functions::start_with(param, "method="))
         {
             _method = param.substr(7);
-            SIP_Functions::trim(_method);
+            String_Functions::trim(_method);
             if (_method.empty())
                 return false;
 
-        }else if (SIP_Functions::start_with(param, "ttl="))
+        }else if (String_Functions::start_with(param, "ttl="))
         {
             std::string ttl = param.substr(4);
-            SIP_Functions::trim(ttl);
+            String_Functions::trim(ttl);
             if (ttl.empty())
                 return false;
 
-            _ttl = SIP_Functions::str_to_us(ttl);
+            _ttl = String_Functions::str_to_us(ttl);
             if (_ttl == INVALID_TTL)
                 return false;
 
-        }else if (SIP_Functions::start_with(param, "maddr="))
+        }else if (String_Functions::start_with(param, "maddr="))
         {
             _maddr = param.substr(6);
-            SIP_Functions::trim(_maddr);
+            String_Functions::trim(_maddr);
             if (_maddr.empty())
                 return false;
 
@@ -124,8 +125,8 @@ bool SIP_URI::decode(std::string &sip_msg)
     while (has_headers)
     {
         std::string header;
-        has_headers = SIP_Functions::match(sip_msg, "&", header);
-        SIP_Functions::trim(header);
+        has_headers = String_Functions::match(sip_msg, "&", header);
+        String_Functions::trim(header);
         _headers.push_back(header);
     }
 
@@ -271,7 +272,7 @@ SIP_Method_Type SIP_URI::get_method()
 
 bool SIP_Absolute_URI::decode(std::string &sip_msg)
 {
-    SIP_Functions::trim(sip_msg);
+    String_Functions::trim(sip_msg);
     if (sip_msg.empty())
         return false;
 
@@ -298,9 +299,9 @@ bool SIP_Address::decode(std::string &sip_msg)
     std::string display;
     std::string uri;
 
-    if (SIP_Functions::match(sip_msg, "<", display, true))
+    if (String_Functions::match(sip_msg, "<", display, true))
     {
-        SIP_Functions::trim(display);
+        String_Functions::trim(display);
 
         if (!display.empty())
         {
@@ -311,7 +312,7 @@ bool SIP_Address::decode(std::string &sip_msg)
                 display.erase(0, 1);
                 display.erase(display.size() - 1);
 
-                SIP_Functions::trim(display);
+                String_Functions::trim(display);
             }else
                 _display_name_double_quote = false;
 
@@ -319,7 +320,7 @@ bool SIP_Address::decode(std::string &sip_msg)
         }else
             _display_name_double_quote = false;
 
-        if (!SIP_Functions::match(sip_msg, ">", uri, true))
+        if (!String_Functions::match(sip_msg, ">", uri, true))
             return false;
 
         _uri_angle_quote = true;
@@ -331,13 +332,13 @@ bool SIP_Address::decode(std::string &sip_msg)
         uri = sip_msg;
     }
 
-    SIP_Functions::trim(uri);
+    String_Functions::trim(uri);
 
     std::string scheme;
-    if (!SIP_Functions::match(uri, ":", scheme))
+    if (!String_Functions::match(uri, ":", scheme))
         return false;
 
-    SIP_Functions::trim(scheme);
+    String_Functions::trim(scheme);
     if (scheme.empty())
         return false;
 

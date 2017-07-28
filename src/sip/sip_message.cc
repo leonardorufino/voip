@@ -11,6 +11,7 @@
 
 #include "sip_message.h"
 #include "sip_functions.h"
+#include "util/string_functions.h"
 
 Logger SIP_Message::_logger(Log_Manager::LOG_SIP_MESSAGE);
 
@@ -59,11 +60,11 @@ SIP_Message::~SIP_Message()
 
 SIP_Message *SIP_Message::decode_msg(std::string sip_msg)
 {
-    SIP_Functions::remove_lws(sip_msg);
+    String_Functions::remove_lws(sip_msg);
 
     std::string msg;
-    SIP_Functions::match(sip_msg, " ", msg);
-    SIP_Functions::trim(msg);
+    String_Functions::match(sip_msg, " ", msg);
+    String_Functions::trim(msg);
 
     SIP_Method_Type method = SIP_Functions::get_method_type(msg);
     if (method == SIP_METHOD_INVALID)
@@ -111,7 +112,7 @@ bool SIP_Message::decode_header(std::string &sip_msg)
     std::string line;
     while (true)
     {
-        bool ret = SIP_Functions::get_line(sip_msg, line);
+        bool ret = String_Functions::get_line(sip_msg, line);
         if ((!ret) || (line.empty()))
             return true;
 
@@ -268,13 +269,13 @@ SIP_Request::SIP_Request(const SIP_Request &request) : SIP_Message(request)
 bool SIP_Request::decode_start_line(std::string &sip_msg)
 {
     std::string line;
-    SIP_Functions::get_line(sip_msg, line);
+    String_Functions::get_line(sip_msg, line);
 
     _method = get_message_type(); // The method was already decoded by SIP_Message::decode_msg
 
     std::string result;
-    SIP_Functions::skip(line, " \t");
-    if (!SIP_Functions::match(line, " ", result))
+    String_Functions::skip(line, " \t");
+    if (!String_Functions::match(line, " ", result))
     {
         _logger.warning("SIP_Request::decode_start_line -> Failed to decode request URI (request_uri=%s)", line.c_str());
         return false;
@@ -283,7 +284,7 @@ bool SIP_Request::decode_start_line(std::string &sip_msg)
     if (!_request_uri.decode(result))
         return false;
 
-    SIP_Functions::trim(line);
+    String_Functions::trim(line);
     _sip_version = line;
     if ((_sip_version.empty()) || (_sip_version != SIP_VERSION))
     {
@@ -354,26 +355,26 @@ SIP_Response::SIP_Response(const SIP_Response &response) : SIP_Message(response)
 bool SIP_Response::decode_start_line(std::string &sip_msg)
 {
     std::string line;
-    SIP_Functions::get_line(sip_msg, line);
+    String_Functions::get_line(sip_msg, line);
 
     _sip_version = SIP_VERSION; // The version was already decoded by SIP_Message::decode_msg
 
     std::string result;
-    SIP_Functions::skip(line, " \t");
-    if (!SIP_Functions::match(line, " ", result))
+    String_Functions::skip(line, " \t");
+    if (!String_Functions::match(line, " ", result))
     {
         _logger.warning("SIP_Response::decode_start_line -> Failed to decode status code (status_code=%s)", line.c_str());
         return false;
     }
 
-    _status_code = SIP_Functions::str_to_us(result);
+    _status_code = String_Functions::str_to_us(result);
     if ((_status_code < 100) || (_status_code > 699))
     {
         _logger.warning("SIP_Response::decode_start_line -> Invalid status code (status_code=%d)", _status_code);
         return false;
     }
 
-    SIP_Functions::trim(line);
+    String_Functions::trim(line);
     _reason_phrase = line; //It can be empty!
     return true;
 }

@@ -11,6 +11,7 @@
 
 #include "sip_header.h"
 #include "sip_functions.h"
+#include "util/string_functions.h"
 
 Logger SIP_Header::_logger(Log_Manager::LOG_SIP_HEADER);
 
@@ -230,14 +231,14 @@ SIP_Header *SIP_Header::create_header(SIP_Header_Type header_type, const SIP_Hea
 bool SIP_Header::decode_headers(std::string &sip_msg, sip_header_list &headers)
 {
     std::string type;
-    bool matched = SIP_Functions::match(sip_msg, ":", type);
+    bool matched = String_Functions::match(sip_msg, ":", type);
     if (!matched)
     {
         _logger.warning("SIP_Header::decode_header -> Failed to get \":\" character (msg=%s)", sip_msg.c_str());
         return false;
     }
 
-    SIP_Functions::trim(type);
+    String_Functions::trim(type);
 
     SIP_Header_Type header_type = SIP_Functions::get_header_type(type);
     if (header_type == SIP_HEADER_INVALID)
@@ -256,11 +257,11 @@ bool SIP_Header::decode_headers(std::string &sip_msg, sip_header_list &headers)
         if (header->decode_separator() == HEADER_SEPARATOR_COMMA)
         {
             // There may be more than one of these headers
-            matched = SIP_Functions::match(sip_msg, ",", result);
+            matched = String_Functions::match(sip_msg, ",", result);
         }else
             result = sip_msg;
 
-        SIP_Functions::trim(result);
+        String_Functions::trim(result);
 
         header->_header_line = result;
 
@@ -331,12 +332,12 @@ bool SIP_Challenge::decode(std::string &sip_msg)
 {
     std::string result;
 
-    SIP_Functions::trim(sip_msg);
-    bool matched = SIP_Functions::match(sip_msg, " \t", result);
+    String_Functions::trim(sip_msg);
+    bool matched = String_Functions::match(sip_msg, " \t", result);
     if (!matched)
         return false;
 
-    SIP_Functions::trim(result);
+    String_Functions::trim(result);
     if (result.empty())
         return false;
 
@@ -344,55 +345,55 @@ bool SIP_Challenge::decode(std::string &sip_msg)
 
     while (matched)
     {
-        matched = SIP_Functions::match(sip_msg, ",", result);
-        SIP_Functions::trim(result);
+        matched = String_Functions::match(sip_msg, ",", result);
+        String_Functions::trim(result);
 
-        if (SIP_Functions::start_with(result, "realm="))
+        if (String_Functions::start_with(result, "realm="))
         {
             _realm = result.substr(6);
-            SIP_Functions::trim(_realm);
+            String_Functions::trim(_realm);
             if (_realm.empty())
                 return false;
 
-        }else if (SIP_Functions::start_with(result, "domain="))
+        }else if (String_Functions::start_with(result, "domain="))
         {
             _domain = result.substr(7);
-            SIP_Functions::trim(_domain);
+            String_Functions::trim(_domain);
             if (_domain.empty())
                 return false;
 
-        }else if (SIP_Functions::start_with(result, "nonce="))
+        }else if (String_Functions::start_with(result, "nonce="))
         {
             _nonce = result.substr(6);
-            SIP_Functions::trim(_nonce);
+            String_Functions::trim(_nonce);
             if (_nonce.empty())
                 return false;
 
-        }else if (SIP_Functions::start_with(result, "opaque="))
+        }else if (String_Functions::start_with(result, "opaque="))
         {
             _opaque = result.substr(7);
-            SIP_Functions::trim(_opaque);
+            String_Functions::trim(_opaque);
             if (_opaque.empty())
                 return false;
 
-        }else if (SIP_Functions::start_with(result, "stale="))
+        }else if (String_Functions::start_with(result, "stale="))
         {
             _stale = result.substr(6);
-            SIP_Functions::trim(_stale);
+            String_Functions::trim(_stale);
             if (_stale.empty())
                 return false;
 
-        }else if (SIP_Functions::start_with(result, "algorithm="))
+        }else if (String_Functions::start_with(result, "algorithm="))
         {
             _algorithm = result.substr(10);
-            SIP_Functions::trim(_algorithm);
+            String_Functions::trim(_algorithm);
             if (_algorithm.empty())
                 return false;
 
-        }else if (SIP_Functions::start_with(result, "qop="))
+        }else if (String_Functions::start_with(result, "qop="))
         {
             _qop = result.substr(4);
-            SIP_Functions::trim(_qop);
+            String_Functions::trim(_qop);
             if (_qop.empty())
                 return false;
         }else
@@ -487,12 +488,12 @@ bool SIP_Credential::decode(std::string &sip_msg)
 {
     std::string result;
 
-    SIP_Functions::trim(sip_msg);
-    bool matched = SIP_Functions::match(sip_msg, " \t", result);
+    String_Functions::trim(sip_msg);
+    bool matched = String_Functions::match(sip_msg, " \t", result);
     if (!matched)
         return false;
 
-    SIP_Functions::trim(result);
+    String_Functions::trim(result);
     if (result.empty())
         return false;
 
@@ -500,76 +501,76 @@ bool SIP_Credential::decode(std::string &sip_msg)
 
     while (matched)
     {
-        matched = SIP_Functions::match(sip_msg, ",", result);
-        SIP_Functions::trim(result);
+        matched = String_Functions::match(sip_msg, ",", result);
+        String_Functions::trim(result);
 
-        if (SIP_Functions::start_with(result, "username="))
+        if (String_Functions::start_with(result, "username="))
         {
             _username = result.substr(9);
-            SIP_Functions::trim(_username);
+            String_Functions::trim(_username);
             if (_username.empty())
                 return false;
 
-        }else if (SIP_Functions::start_with(result, "realm="))
+        }else if (String_Functions::start_with(result, "realm="))
         {
             _realm = result.substr(6);
-            SIP_Functions::trim(_realm);
+            String_Functions::trim(_realm);
             if (_realm.empty())
                 return false;
 
-        }else if (SIP_Functions::start_with(result, "nonce="))
+        }else if (String_Functions::start_with(result, "nonce="))
         {
             _nonce = result.substr(6);
-            SIP_Functions::trim(_nonce);
+            String_Functions::trim(_nonce);
             if (_nonce.empty())
                 return false;
 
-        }else if (SIP_Functions::start_with(result, "uri="))
+        }else if (String_Functions::start_with(result, "uri="))
         {
             _uri = result.substr(4);
-            SIP_Functions::trim(_uri);
+            String_Functions::trim(_uri);
             if (_uri.empty())
                 return false;
 
-        }else if (SIP_Functions::start_with(result, "response="))
+        }else if (String_Functions::start_with(result, "response="))
         {
             _response = result.substr(9);
-            SIP_Functions::trim(_response);
+            String_Functions::trim(_response);
             if (_response.empty())
                 return false;
 
-        }else if (SIP_Functions::start_with(result, "algorithm="))
+        }else if (String_Functions::start_with(result, "algorithm="))
         {
             _algorithm = result.substr(10);
-            SIP_Functions::trim(_algorithm);
+            String_Functions::trim(_algorithm);
             if (_algorithm.empty())
                 return false;
 
-        }else if (SIP_Functions::start_with(result, "cnonce="))
+        }else if (String_Functions::start_with(result, "cnonce="))
         {
             _cnonce = result.substr(7);
-            SIP_Functions::trim(_cnonce);
+            String_Functions::trim(_cnonce);
             if (_cnonce.empty())
                 return false;
 
-        }else if (SIP_Functions::start_with(result, "opaque="))
+        }else if (String_Functions::start_with(result, "opaque="))
         {
             _opaque = result.substr(7);
-            SIP_Functions::trim(_opaque);
+            String_Functions::trim(_opaque);
             if (_opaque.empty())
                 return false;
 
-        }else if (SIP_Functions::start_with(result, "qop="))
+        }else if (String_Functions::start_with(result, "qop="))
         {
             _qop = result.substr(4);
-            SIP_Functions::trim(_qop);
+            String_Functions::trim(_qop);
             if (_qop.empty())
                 return false;
 
-        }else if (SIP_Functions::start_with(result, "nc="))
+        }else if (String_Functions::start_with(result, "nc="))
         {
             _nonce_count = result.substr(3);
-            SIP_Functions::trim(_nonce_count);
+            String_Functions::trim(_nonce_count);
             if (_nonce_count.empty())
                 return false;
         }else
@@ -687,17 +688,17 @@ bool SIP_Credential::encode(std::string &sip_msg)
 bool SIP_Media_Range::decode(std::string &sip_msg)
 {
     std::string result;
-    if (!SIP_Functions::match(sip_msg, "/", result))
+    if (!String_Functions::match(sip_msg, "/", result))
         return false;
 
-    SIP_Functions::trim(result);
+    String_Functions::trim(result);
     if (result.empty())
         return false;
 
     _type = result;
 
-    bool matched = SIP_Functions::match(sip_msg, ";", result);
-    SIP_Functions::trim(result);
+    bool matched = String_Functions::match(sip_msg, ";", result);
+    String_Functions::trim(result);
     if (result.empty())
         return false;
 
@@ -705,13 +706,13 @@ bool SIP_Media_Range::decode(std::string &sip_msg)
 
     while (matched)
     {
-        matched = SIP_Functions::match(sip_msg, ";", result);
-        SIP_Functions::trim(result);
+        matched = String_Functions::match(sip_msg, ";", result);
+        String_Functions::trim(result);
 
-        if (SIP_Functions::start_with(result, "q="))
+        if (String_Functions::start_with(result, "q="))
         {
             _q = result.substr(2);
-            SIP_Functions::trim(_q);
+            String_Functions::trim(_q);
             if (_q.empty())
                 return false;
         }else
@@ -821,8 +822,8 @@ bool SIP_Event_Type::decode(std::string &sip_msg)
 {
     std::string result;
 
-    bool matched = SIP_Functions::match(sip_msg, ".", result);
-    SIP_Functions::trim(result);
+    bool matched = String_Functions::match(sip_msg, ".", result);
+    String_Functions::trim(result);
     if (result.empty())
         return false;
 
@@ -830,8 +831,8 @@ bool SIP_Event_Type::decode(std::string &sip_msg)
 
     while (matched)
     {
-        matched = SIP_Functions::match(sip_msg, ".", result);
-        SIP_Functions::trim(result);
+        matched = String_Functions::match(sip_msg, ".", result);
+        String_Functions::trim(result);
         if (result.empty())
             return false;
 
@@ -886,7 +887,7 @@ SIP_Event_Type::Package SIP_Event_Type::get_package()
 
 bool SIP_Header_Accept::decode(std::string &sip_msg)
 {
-    SIP_Functions::trim(sip_msg);
+    String_Functions::trim(sip_msg);
     if (sip_msg.empty())
     {
         // Accept header can be empty
@@ -919,21 +920,21 @@ bool SIP_Header_Accept_Encoding::decode(std::string &sip_msg)
 {
     std::string result;
 
-    bool matched = SIP_Functions::match(sip_msg, ";", result);
-    SIP_Functions::trim(result);
+    bool matched = String_Functions::match(sip_msg, ";", result);
+    String_Functions::trim(result);
 
     // Accept-Encoding header can be empty
     _coding = result;
 
     while (matched)
     {
-        matched = SIP_Functions::match(sip_msg, ";", result);
-        SIP_Functions::trim(result);
+        matched = String_Functions::match(sip_msg, ";", result);
+        String_Functions::trim(result);
 
-        if (SIP_Functions::start_with(result, "q="))
+        if (String_Functions::start_with(result, "q="))
         {
             _q = result.substr(2);
-            SIP_Functions::trim(_q);
+            String_Functions::trim(_q);
             if (_q.empty())
                 return false;
         }else
@@ -978,21 +979,21 @@ bool SIP_Header_Accept_Language::decode(std::string &sip_msg)
 {
     std::string result;
 
-    bool matched = SIP_Functions::match(sip_msg, ";", result);
-    SIP_Functions::trim(result);
+    bool matched = String_Functions::match(sip_msg, ";", result);
+    String_Functions::trim(result);
 
     // Accept-Language header can be empty
     _language = result;
 
     while (matched)
     {
-        matched = SIP_Functions::match(sip_msg, ";", result);
-        SIP_Functions::trim(result);
+        matched = String_Functions::match(sip_msg, ";", result);
+        String_Functions::trim(result);
 
-        if (SIP_Functions::start_with(result, "q="))
+        if (String_Functions::start_with(result, "q="))
         {
             _q = result.substr(2);
-            SIP_Functions::trim(_q);
+            String_Functions::trim(_q);
             if (_q.empty())
                 return false;
         }else
@@ -1036,15 +1037,15 @@ bool SIP_Header_Accept_Language::encode(std::string &sip_msg)
 bool SIP_Header_Alert_Info::decode(std::string &sip_msg)
 {
     std::string result;
-    bool matched = SIP_Functions::match(sip_msg, ";", result);
+    bool matched = String_Functions::match(sip_msg, ";", result);
 
     if (!_address.decode(result))
         return false;
 
     while (matched)
     {
-        matched = SIP_Functions::match(sip_msg, ";", result);
-        SIP_Functions::trim(result);
+        matched = String_Functions::match(sip_msg, ";", result);
+        String_Functions::trim(result);
         _parameters.push_back(result);
     }
 
@@ -1073,7 +1074,7 @@ bool SIP_Header_Alert_Info::encode(std::string &sip_msg)
 
 bool SIP_Header_Allow::decode(std::string &sip_msg)
 {
-    SIP_Functions::trim(sip_msg);
+    String_Functions::trim(sip_msg);
 
     // Allow header can be empty
     _method = sip_msg;
@@ -1133,43 +1134,43 @@ bool SIP_Header_Authentication_Info::decode(std::string &sip_msg)
 
     do
     {
-        matched = SIP_Functions::match(sip_msg, ",", result);
-        SIP_Functions::trim(result);
+        matched = String_Functions::match(sip_msg, ",", result);
+        String_Functions::trim(result);
         if (result.empty())
             return false;
 
-        if (SIP_Functions::start_with(result, "nextnonce="))
+        if (String_Functions::start_with(result, "nextnonce="))
         {
             _next_nonce = result.substr(10);
-            SIP_Functions::trim(_next_nonce);
+            String_Functions::trim(_next_nonce);
             if (_next_nonce.empty())
                 return false;
 
-        }else if (SIP_Functions::start_with(result, "qop="))
+        }else if (String_Functions::start_with(result, "qop="))
         {
             _qop = result.substr(4);
-            SIP_Functions::trim(_qop);
+            String_Functions::trim(_qop);
             if (_qop.empty())
                 return false;
 
-        }else if (SIP_Functions::start_with(result, "rspauth="))
+        }else if (String_Functions::start_with(result, "rspauth="))
         {
             _response = result.substr(8);
-            SIP_Functions::trim(_response);
+            String_Functions::trim(_response);
             if (_response.empty())
                 return false;
 
-        }else if (SIP_Functions::start_with(result, "cnonce="))
+        }else if (String_Functions::start_with(result, "cnonce="))
         {
             _cnonce = result.substr(7);
-            SIP_Functions::trim(_cnonce);
+            String_Functions::trim(_cnonce);
             if (_cnonce.empty())
                 return false;
 
-        }else if (SIP_Functions::start_with(result, "nc="))
+        }else if (String_Functions::start_with(result, "nc="))
         {
             _nonce_count = result.substr(3);
-            SIP_Functions::trim(_nonce_count);
+            String_Functions::trim(_nonce_count);
             if (_nonce_count.empty())
                 return false;
         }else
@@ -1257,7 +1258,7 @@ bool SIP_Header_Authorization::encode(std::string &sip_msg)
 
 bool SIP_Header_Call_ID::decode(std::string &sip_msg)
 {
-    SIP_Functions::trim(sip_msg);
+    String_Functions::trim(sip_msg);
     if (sip_msg.empty())
         return false;
 
@@ -1282,20 +1283,20 @@ bool SIP_Header_Call_ID::encode(std::string &sip_msg)
 bool SIP_Header_Call_Info::decode(std::string &sip_msg)
 {
     std::string result;
-    bool matched = SIP_Functions::match(sip_msg, ";", result);
+    bool matched = String_Functions::match(sip_msg, ";", result);
 
     if (!_address.decode(result))
         return false;
 
     while (matched)
     {
-        matched = SIP_Functions::match(sip_msg, ";", result);
-        SIP_Functions::trim(result);
+        matched = String_Functions::match(sip_msg, ";", result);
+        String_Functions::trim(result);
 
-        if (SIP_Functions::start_with(result, "purpose="))
+        if (String_Functions::start_with(result, "purpose="))
         {
             _purpose = result.substr(8);
-            SIP_Functions::trim(_purpose);
+            String_Functions::trim(_purpose);
             if (_purpose.empty())
                 return false;
         }else
@@ -1360,7 +1361,7 @@ SIP_Header_Call_Info::Purpose SIP_Header_Call_Info::get_purpose()
 
 bool SIP_Header_Contact::decode(std::string &sip_msg)
 {
-    SIP_Functions::trim(sip_msg);
+    String_Functions::trim(sip_msg);
 
     // Contact can be an asterisk
     if (sip_msg == "*")
@@ -1371,31 +1372,31 @@ bool SIP_Header_Contact::decode(std::string &sip_msg)
         _star = false;
 
     std::string result;
-    bool matched = SIP_Functions::match(sip_msg, ";", result);
+    bool matched = String_Functions::match(sip_msg, ";", result);
 
     if (!_address.decode(result))
         return false;
 
     while (matched)
     {
-        matched = SIP_Functions::match(sip_msg, ";", result);
-        SIP_Functions::trim(result);
+        matched = String_Functions::match(sip_msg, ";", result);
+        String_Functions::trim(result);
 
-        if (SIP_Functions::start_with(result, "expires="))
+        if (String_Functions::start_with(result, "expires="))
         {
             std::string exp = result.substr(8);
-            SIP_Functions::trim(exp);
+            String_Functions::trim(exp);
             if (exp.empty())
                 return false;
 
-            _expires = SIP_Functions::str_to_ul(exp);
+            _expires = String_Functions::str_to_ul(exp);
             if (_expires == INVALID_EXPIRES)
                 return false;
 
-        }else if (SIP_Functions::start_with(result, "q="))
+        }else if (String_Functions::start_with(result, "q="))
         {
             _q = result.substr(2);
-            SIP_Functions::trim(_q);
+            String_Functions::trim(_q);
             if (_q.empty())
                 return false;
         }else
@@ -1447,8 +1448,8 @@ bool SIP_Header_Content_Disposition::decode(std::string &sip_msg)
 {
     std::string result;
 
-    bool matched = SIP_Functions::match(sip_msg, ";", result);
-    SIP_Functions::trim(result);
+    bool matched = String_Functions::match(sip_msg, ";", result);
+    String_Functions::trim(result);
     if (result.empty())
         return false;
 
@@ -1456,13 +1457,13 @@ bool SIP_Header_Content_Disposition::decode(std::string &sip_msg)
 
     while (matched)
     {
-        matched = SIP_Functions::match(sip_msg, ";", result);
-        SIP_Functions::trim(result);
+        matched = String_Functions::match(sip_msg, ";", result);
+        String_Functions::trim(result);
 
-        if (SIP_Functions::start_with(result, "handling="))
+        if (String_Functions::start_with(result, "handling="))
         {
             _handling = result.substr(9);
-            SIP_Functions::trim(_handling);
+            String_Functions::trim(_handling);
             if (_handling.empty())
                 return false;
         }else
@@ -1556,7 +1557,7 @@ SIP_Header_Content_Disposition::Handling SIP_Header_Content_Disposition::get_han
 
 bool SIP_Header_Content_Encoding::decode(std::string &sip_msg)
 {
-    SIP_Functions::trim(sip_msg);
+    String_Functions::trim(sip_msg);
     if (sip_msg.empty())
         return false;
 
@@ -1580,7 +1581,7 @@ bool SIP_Header_Content_Encoding::encode(std::string &sip_msg)
 
 bool SIP_Header_Content_Language::decode(std::string &sip_msg)
 {
-    SIP_Functions::trim(sip_msg);
+    String_Functions::trim(sip_msg);
     if (sip_msg.empty())
         return false;
 
@@ -1604,11 +1605,11 @@ bool SIP_Header_Content_Language::encode(std::string &sip_msg)
 
 bool SIP_Header_Content_Length::decode(std::string &sip_msg)
 {
-    SIP_Functions::trim(sip_msg);
+    String_Functions::trim(sip_msg);
     if (sip_msg.empty())
         return false;
 
-    _length = SIP_Functions::str_to_ul(sip_msg);
+    _length = String_Functions::str_to_ul(sip_msg);
     if (_length == INVALID_LENGTH)
         return false;
 
@@ -1648,15 +1649,15 @@ bool SIP_Header_CSeq::decode(std::string &sip_msg)
 {
     std::string result;
 
-    SIP_Functions::trim(sip_msg);
-    if (!SIP_Functions::match(sip_msg, " \t", result))
+    String_Functions::trim(sip_msg);
+    if (!String_Functions::match(sip_msg, " \t", result))
         return false;
 
-    _sequence = SIP_Functions::str_to_ul(result);
+    _sequence = String_Functions::str_to_ul(result);
     if (_sequence == INVALID_SEQUENCE)
         return false;
 
-    SIP_Functions::trim(sip_msg);
+    String_Functions::trim(sip_msg);
     if (sip_msg.empty())
         return false;
 
@@ -1709,87 +1710,87 @@ bool SIP_Header_Date::decode(std::string &sip_msg)
 {
     std::string result;
 
-    SIP_Functions::trim(sip_msg);
-    if (!SIP_Functions::match(sip_msg, ",", result))
+    String_Functions::trim(sip_msg);
+    if (!String_Functions::match(sip_msg, ",", result))
         return false;
 
-    SIP_Functions::trim(result);
+    String_Functions::trim(result);
     if (result.empty())
         return false;
 
     _weekday = result;
 
-    SIP_Functions::trim(sip_msg);
-    if (!SIP_Functions::match(sip_msg, " ", result))
+    String_Functions::trim(sip_msg);
+    if (!String_Functions::match(sip_msg, " ", result))
         return false;
 
-    SIP_Functions::trim(result);
+    String_Functions::trim(result);
     if (result.empty())
         return false;
 
-    _day = SIP_Functions::str_to_us(result);
+    _day = String_Functions::str_to_us(result);
     if (_day == INVALID_DAY)
         return false;
 
-    SIP_Functions::trim(sip_msg);
-    if (!SIP_Functions::match(sip_msg, " ", result))
+    String_Functions::trim(sip_msg);
+    if (!String_Functions::match(sip_msg, " ", result))
         return false;
 
-    SIP_Functions::trim(result);
+    String_Functions::trim(result);
     if (result.empty())
         return false;
 
     _month = result;
 
-    SIP_Functions::trim(sip_msg);
-    if (!SIP_Functions::match(sip_msg, " ", result))
+    String_Functions::trim(sip_msg);
+    if (!String_Functions::match(sip_msg, " ", result))
         return false;
 
-    SIP_Functions::trim(result);
+    String_Functions::trim(result);
     if (result.empty())
         return false;
 
-    _year = SIP_Functions::str_to_us(result);
+    _year = String_Functions::str_to_us(result);
     if (_year == INVALID_YEAR)
         return false;
 
-    SIP_Functions::trim(sip_msg);
-    if (!SIP_Functions::match(sip_msg, ":", result))
+    String_Functions::trim(sip_msg);
+    if (!String_Functions::match(sip_msg, ":", result))
         return false;
 
-    SIP_Functions::trim(result);
+    String_Functions::trim(result);
     if (result.empty())
         return false;
 
-    _hour = SIP_Functions::str_to_us(result);
+    _hour = String_Functions::str_to_us(result);
     if (_hour == INVALID_HOUR)
         return false;
 
-    SIP_Functions::trim(sip_msg);
-    if (!SIP_Functions::match(sip_msg, ":", result))
+    String_Functions::trim(sip_msg);
+    if (!String_Functions::match(sip_msg, ":", result))
         return false;
 
-    SIP_Functions::trim(result);
+    String_Functions::trim(result);
     if (result.empty())
         return false;
 
-    _minute = SIP_Functions::str_to_us(result);
+    _minute = String_Functions::str_to_us(result);
     if (_minute == INVALID_MINUTE)
         return false;
 
-    SIP_Functions::trim(sip_msg);
-    if (!SIP_Functions::match(sip_msg, " ", result))
+    String_Functions::trim(sip_msg);
+    if (!String_Functions::match(sip_msg, " ", result))
         return false;
 
-    SIP_Functions::trim(result);
+    String_Functions::trim(result);
     if (result.empty())
         return false;
 
-    _second = SIP_Functions::str_to_us(result);
+    _second = String_Functions::str_to_us(result);
     if (_second == INVALID_SECOND)
         return false;
 
-    SIP_Functions::trim(sip_msg);
+    String_Functions::trim(sip_msg);
     if (sip_msg.empty())
         return false;
 
@@ -1808,17 +1809,17 @@ bool SIP_Header_Date::encode(std::string &sip_msg)
 
     sip_msg += _weekday;
     sip_msg += ", ";
-    sip_msg += SIP_Functions::add_leading_zeros(_day, 2);
+    sip_msg += String_Functions::add_leading_zeros(_day, 2);
     sip_msg += " ";
     sip_msg += _month;
     sip_msg += " ";
-    sip_msg += SIP_Functions::add_leading_zeros(_year, 4);
+    sip_msg += String_Functions::add_leading_zeros(_year, 4);
     sip_msg += " ";
-    sip_msg += SIP_Functions::add_leading_zeros(_hour, 2);
+    sip_msg += String_Functions::add_leading_zeros(_hour, 2);
     sip_msg += ":";
-    sip_msg += SIP_Functions::add_leading_zeros(_minute, 2);
+    sip_msg += String_Functions::add_leading_zeros(_minute, 2);
     sip_msg += ":";
-    sip_msg += SIP_Functions::add_leading_zeros(_second, 2);
+    sip_msg += String_Functions::add_leading_zeros(_second, 2);
     sip_msg += " ";
     sip_msg += _time_zone;
     return true;
@@ -1923,15 +1924,15 @@ SIP_Header_Date::Month SIP_Header_Date::get_month()
 bool SIP_Header_Error_Info::decode(std::string &sip_msg)
 {
     std::string result;
-    bool matched = SIP_Functions::match(sip_msg, ";", result);
+    bool matched = String_Functions::match(sip_msg, ";", result);
 
     if (!_address.decode(result))
         return false;
 
     while (matched)
     {
-        matched = SIP_Functions::match(sip_msg, ";", result);
-        SIP_Functions::trim(result);
+        matched = String_Functions::match(sip_msg, ";", result);
+        String_Functions::trim(result);
         _parameters.push_back(result);
     }
 
@@ -1961,20 +1962,20 @@ bool SIP_Header_Error_Info::encode(std::string &sip_msg)
 bool SIP_Header_Event::decode(std::string &sip_msg)
 {
     std::string result;
-    bool matched = SIP_Functions::match(sip_msg, ";", result);
+    bool matched = String_Functions::match(sip_msg, ";", result);
 
     if (!_event_type.decode(result))
         return false;
 
     while (matched)
     {
-        matched = SIP_Functions::match(sip_msg, ";", result);
-        SIP_Functions::trim(result);
+        matched = String_Functions::match(sip_msg, ";", result);
+        String_Functions::trim(result);
 
-        if (SIP_Functions::start_with(result, "id="))
+        if (String_Functions::start_with(result, "id="))
         {
             _id = result.substr(3);
-            SIP_Functions::trim(_id);
+            String_Functions::trim(_id);
             if (_id.empty())
                 return false;
         }else
@@ -2012,9 +2013,9 @@ bool SIP_Header_Event::encode(std::string &sip_msg)
 
 bool SIP_Header_Expires::decode(std::string &sip_msg)
 {
-    SIP_Functions::trim(sip_msg);
+    String_Functions::trim(sip_msg);
 
-    _expires = SIP_Functions::str_to_ul(sip_msg);
+    _expires = String_Functions::str_to_ul(sip_msg);
     if (_expires == INVALID_EXPIRES)
         return false;
 
@@ -2038,20 +2039,20 @@ bool SIP_Header_Expires::encode(std::string &sip_msg)
 bool SIP_Header_From::decode(std::string &sip_msg)
 {
     std::string result;
-    bool matched = SIP_Functions::match(sip_msg, ";", result);
+    bool matched = String_Functions::match(sip_msg, ";", result);
 
     if (!_address.decode(result))
         return false;
 
     while (matched)
     {
-        matched = SIP_Functions::match(sip_msg, ";", result);
-        SIP_Functions::trim(result);
+        matched = String_Functions::match(sip_msg, ";", result);
+        String_Functions::trim(result);
 
-        if (SIP_Functions::start_with(result, "tag="))
+        if (String_Functions::start_with(result, "tag="))
         {
             _tag = result.substr(4);
-            SIP_Functions::trim(_tag);
+            String_Functions::trim(_tag);
             if (_tag.empty())
                 return false;
         }else
@@ -2089,7 +2090,7 @@ bool SIP_Header_From::encode(std::string &sip_msg)
 
 bool SIP_Header_In_Reply_To::decode(std::string &sip_msg)
 {
-    SIP_Functions::trim(sip_msg);
+    String_Functions::trim(sip_msg);
     if (sip_msg.empty())
         return false;
 
@@ -2113,9 +2114,9 @@ bool SIP_Header_In_Reply_To::encode(std::string &sip_msg)
 
 bool SIP_Header_Max_Forwards::decode(std::string &sip_msg)
 {
-    SIP_Functions::trim(sip_msg);
+    String_Functions::trim(sip_msg);
 
-    _max_forwards = SIP_Functions::str_to_us(sip_msg);
+    _max_forwards = String_Functions::str_to_us(sip_msg);
     if (_max_forwards == INVALID_MAX_FORWARDS)
         return false;
 
@@ -2140,23 +2141,23 @@ bool SIP_Header_Mime_Version::decode(std::string &sip_msg)
 {
     std::string result;
 
-    SIP_Functions::trim(sip_msg);
-    if (!SIP_Functions::match(sip_msg, ".", result))
+    String_Functions::trim(sip_msg);
+    if (!String_Functions::match(sip_msg, ".", result))
         return false;
 
-    SIP_Functions::trim(result);
+    String_Functions::trim(result);
     if (result.empty())
         return false;
 
-    _major_version = SIP_Functions::str_to_ul(result);
+    _major_version = String_Functions::str_to_ul(result);
     if (_major_version == INVALID_MIME_VERSION)
         return false;
 
-    SIP_Functions::trim(sip_msg);
+    String_Functions::trim(sip_msg);
     if (sip_msg.empty())
         return false;
 
-    _minor_version = SIP_Functions::str_to_ul(sip_msg);
+    _minor_version = String_Functions::str_to_ul(sip_msg);
     if (_minor_version == INVALID_MIME_VERSION)
         return false;
 
@@ -2181,9 +2182,9 @@ bool SIP_Header_Mime_Version::encode(std::string &sip_msg)
 
 bool SIP_Header_Min_Expires::decode(std::string &sip_msg)
 {
-    SIP_Functions::trim(sip_msg);
+    String_Functions::trim(sip_msg);
 
-    _min_expires = SIP_Functions::str_to_ul(sip_msg);
+    _min_expires = String_Functions::str_to_ul(sip_msg);
     if (_min_expires == INVALID_MIN_EXPIRES)
         return false;
 
@@ -2206,7 +2207,7 @@ bool SIP_Header_Min_Expires::encode(std::string &sip_msg)
 
 bool SIP_Header_Organization::decode(std::string &sip_msg)
 {
-    SIP_Functions::trim(sip_msg);
+    String_Functions::trim(sip_msg);
 
     // Organization header can be empty
     _organization = sip_msg;
@@ -2232,7 +2233,7 @@ bool SIP_Header_Organization::encode(std::string &sip_msg)
 
 bool SIP_Header_Priority::decode(std::string &sip_msg)
 {
-    SIP_Functions::trim(sip_msg);
+    String_Functions::trim(sip_msg);
     if (sip_msg.empty())
         return false;
 
@@ -2316,7 +2317,7 @@ bool SIP_Header_Proxy_Authorization::encode(std::string &sip_msg)
 
 bool SIP_Header_Proxy_Require::decode(std::string &sip_msg)
 {
-    SIP_Functions::trim(sip_msg);
+    String_Functions::trim(sip_msg);
     if (sip_msg.empty())
         return false;
 
@@ -2341,15 +2342,15 @@ bool SIP_Header_Proxy_Require::encode(std::string &sip_msg)
 bool SIP_Header_Record_Route::decode(std::string &sip_msg)
 {
     std::string result;
-    bool matched = SIP_Functions::match(sip_msg, ";", result);
+    bool matched = String_Functions::match(sip_msg, ";", result);
 
     if (!_address.decode(result))
         return false;
 
     while (matched)
     {
-        matched = SIP_Functions::match(sip_msg, ";", result);
-        SIP_Functions::trim(result);
+        matched = String_Functions::match(sip_msg, ";", result);
+        String_Functions::trim(result);
         _parameters.push_back(result);
     }
 
@@ -2379,15 +2380,15 @@ bool SIP_Header_Record_Route::encode(std::string &sip_msg)
 bool SIP_Header_Refer_To::decode(std::string &sip_msg)
 {
     std::string result;
-    bool matched = SIP_Functions::match(sip_msg, ";", result);
+    bool matched = String_Functions::match(sip_msg, ";", result);
 
     if (!_address.decode(result))
         return false;
 
     while (matched)
     {
-        matched = SIP_Functions::match(sip_msg, ";", result);
-        SIP_Functions::trim(result);
+        matched = String_Functions::match(sip_msg, ";", result);
+        String_Functions::trim(result);
         _parameters.push_back(result);
     }
 
@@ -2417,20 +2418,20 @@ bool SIP_Header_Refer_To::encode(std::string &sip_msg)
 bool SIP_Header_Referred_By::decode(std::string &sip_msg)
 {
     std::string result;
-    bool matched = SIP_Functions::match(sip_msg, ";", result);
+    bool matched = String_Functions::match(sip_msg, ";", result);
 
     if (!_address.decode(result))
         return false;
 
     while (matched)
     {
-        matched = SIP_Functions::match(sip_msg, ";", result);
-        SIP_Functions::trim(result);
+        matched = String_Functions::match(sip_msg, ";", result);
+        String_Functions::trim(result);
 
-        if (SIP_Functions::start_with(result, "cid="))
+        if (String_Functions::start_with(result, "cid="))
         {
             _cid = result.substr(4);
-            SIP_Functions::trim(_cid);
+            String_Functions::trim(_cid);
             if (_cid.empty())
                 return false;
 
@@ -2470,15 +2471,15 @@ bool SIP_Header_Referred_By::encode(std::string &sip_msg)
 bool SIP_Header_Reply_To::decode(std::string &sip_msg)
 {
     std::string result;
-    bool matched = SIP_Functions::match(sip_msg, ";", result);
+    bool matched = String_Functions::match(sip_msg, ";", result);
 
     if (!_address.decode(result))
         return false;
 
     while (matched)
     {
-        matched = SIP_Functions::match(sip_msg, ";", result);
-        SIP_Functions::trim(result);
+        matched = String_Functions::match(sip_msg, ";", result);
+        String_Functions::trim(result);
         _parameters.push_back(result);
     }
 
@@ -2507,7 +2508,7 @@ bool SIP_Header_Reply_To::encode(std::string &sip_msg)
 
 bool SIP_Header_Require::decode(std::string &sip_msg)
 {
-    SIP_Functions::trim(sip_msg);
+    String_Functions::trim(sip_msg);
     if (sip_msg.empty())
         return false;
 
@@ -2534,14 +2535,14 @@ bool SIP_Header_Retry_After::decode(std::string &sip_msg)
     std::string result;
     std::string retry;
 
-    bool has_param = SIP_Functions::match(sip_msg, ";", result);
+    bool has_param = String_Functions::match(sip_msg, ";", result);
 
-    bool has_comment = SIP_Functions::match(result, "(", retry);
-    SIP_Functions::trim(retry);
+    bool has_comment = String_Functions::match(result, "(", retry);
+    String_Functions::trim(retry);
     if (retry.empty())
         return false;
 
-    _retry_after = SIP_Functions::str_to_ul(retry);
+    _retry_after = String_Functions::str_to_ul(retry);
     if (_retry_after == INVALID_RETRY_AFTER)
         return false;
 
@@ -2562,17 +2563,17 @@ bool SIP_Header_Retry_After::decode(std::string &sip_msg)
 
     while (has_param)
     {
-        has_param = SIP_Functions::match(sip_msg, ";", result);
-        SIP_Functions::trim(result);
+        has_param = String_Functions::match(sip_msg, ";", result);
+        String_Functions::trim(result);
 
-        if (SIP_Functions::start_with(result, "duration="))
+        if (String_Functions::start_with(result, "duration="))
         {
             std::string duration = result.substr(9);
-            SIP_Functions::trim(duration);
+            String_Functions::trim(duration);
             if (duration.empty())
                 return false;
 
-            _duration = SIP_Functions::str_to_ul(duration);
+            _duration = String_Functions::str_to_ul(duration);
             if (_duration == INVALID_DURATION)
                 return false;
         }else
@@ -2620,15 +2621,15 @@ bool SIP_Header_Retry_After::encode(std::string &sip_msg)
 bool SIP_Header_Route::decode(std::string &sip_msg)
 {
     std::string result;
-    bool matched = SIP_Functions::match(sip_msg, ";", result);
+    bool matched = String_Functions::match(sip_msg, ";", result);
 
     if (!_address.decode(result))
         return false;
 
     while (matched)
     {
-        matched = SIP_Functions::match(sip_msg, ";", result);
-        SIP_Functions::trim(result);
+        matched = String_Functions::match(sip_msg, ";", result);
+        String_Functions::trim(result);
         _parameters.push_back(result);
     }
 
@@ -2657,7 +2658,7 @@ bool SIP_Header_Route::encode(std::string &sip_msg)
 
 bool SIP_Header_Server::decode(std::string &sip_msg)
 {
-    SIP_Functions::trim(sip_msg);
+    String_Functions::trim(sip_msg);
     if (sip_msg.empty())
         return false;
 
@@ -2681,7 +2682,7 @@ bool SIP_Header_Server::encode(std::string &sip_msg)
 
 bool SIP_Header_Subject::decode(std::string &sip_msg)
 {
-    SIP_Functions::trim(sip_msg);
+    String_Functions::trim(sip_msg);
 
     // Subject header can be empty
     _subject = sip_msg;
@@ -2709,8 +2710,8 @@ bool SIP_Header_Subscription_State::decode(std::string &sip_msg)
 {
     std::string result;
 
-    bool matched = SIP_Functions::match(sip_msg, ";", result);
-    SIP_Functions::trim(result);
+    bool matched = String_Functions::match(sip_msg, ";", result);
+    String_Functions::trim(result);
     if (result.empty())
         return false;
 
@@ -2718,35 +2719,35 @@ bool SIP_Header_Subscription_State::decode(std::string &sip_msg)
 
     while (matched)
     {
-        matched = SIP_Functions::match(sip_msg, ";", result);
-        SIP_Functions::trim(result);
+        matched = String_Functions::match(sip_msg, ";", result);
+        String_Functions::trim(result);
 
-        if (SIP_Functions::start_with(result, "reason="))
+        if (String_Functions::start_with(result, "reason="))
         {
             _reason = result.substr(7);
-            SIP_Functions::trim(_reason);
+            String_Functions::trim(_reason);
             if (_reason.empty())
                 return false;
 
-        }else if (SIP_Functions::start_with(result, "expires="))
+        }else if (String_Functions::start_with(result, "expires="))
         {
             std::string exp = result.substr(8);
-            SIP_Functions::trim(exp);
+            String_Functions::trim(exp);
             if (exp.empty())
                 return false;
 
-            _expires = SIP_Functions::str_to_ul(exp);
+            _expires = String_Functions::str_to_ul(exp);
             if (_expires == INVALID_EXPIRES)
                 return false;
 
-        }else if (SIP_Functions::start_with(result, "retry-after="))
+        }else if (String_Functions::start_with(result, "retry-after="))
         {
             std::string retry = result.substr(12);
-            SIP_Functions::trim(retry);
+            String_Functions::trim(retry);
             if (retry.empty())
                 return false;
 
-            _retry_after = SIP_Functions::str_to_ul(retry);
+            _retry_after = String_Functions::str_to_ul(retry);
             if (_retry_after == INVALID_RETRY_AFTER)
                 return false;
         }else
@@ -2864,7 +2865,7 @@ SIP_Header_Subscription_State::Reason SIP_Header_Subscription_State::get_reason(
 
 bool SIP_Header_Supported::decode(std::string &sip_msg)
 {
-    SIP_Functions::trim(sip_msg);
+    String_Functions::trim(sip_msg);
 
     // Supported header can be empty
     _option_tag = sip_msg;
@@ -2892,10 +2893,10 @@ bool SIP_Header_Timestamp::decode(std::string &sip_msg)
 {
     std::string result;
 
-    SIP_Functions::trim(sip_msg);
+    String_Functions::trim(sip_msg);
 
-    bool matched = SIP_Functions::match(sip_msg, " \t", result);
-    SIP_Functions::trim(result);
+    bool matched = String_Functions::match(sip_msg, " \t", result);
+    String_Functions::trim(result);
     if (result.empty())
         return false;
 
@@ -2903,7 +2904,7 @@ bool SIP_Header_Timestamp::decode(std::string &sip_msg)
 
     if (matched)
     {
-        SIP_Functions::trim(sip_msg);
+        String_Functions::trim(sip_msg);
         _delay = sip_msg;
     }
 
@@ -2934,20 +2935,20 @@ bool SIP_Header_Timestamp::encode(std::string &sip_msg)
 bool SIP_Header_To::decode(std::string &sip_msg)
 {
     std::string result;
-    bool matched = SIP_Functions::match(sip_msg, ";", result);
+    bool matched = String_Functions::match(sip_msg, ";", result);
 
     if (!_address.decode(result))
         return false;
 
     while (matched)
     {
-        matched = SIP_Functions::match(sip_msg, ";", result);
-        SIP_Functions::trim(result);
+        matched = String_Functions::match(sip_msg, ";", result);
+        String_Functions::trim(result);
 
-        if (SIP_Functions::start_with(result, "tag="))
+        if (String_Functions::start_with(result, "tag="))
         {
             _tag = result.substr(4);
-            SIP_Functions::trim(_tag);
+            String_Functions::trim(_tag);
             if (_tag.empty())
                 return false;
         }else
@@ -2985,7 +2986,7 @@ bool SIP_Header_To::encode(std::string &sip_msg)
 
 bool SIP_Header_Unsupported::decode(std::string &sip_msg)
 {
-    SIP_Functions::trim(sip_msg);
+    String_Functions::trim(sip_msg);
     if (sip_msg.empty())
         return false;
 
@@ -3009,7 +3010,7 @@ bool SIP_Header_Unsupported::encode(std::string &sip_msg)
 
 bool SIP_Header_User_Agent::decode(std::string &sip_msg)
 {
-    SIP_Functions::trim(sip_msg);
+    String_Functions::trim(sip_msg);
     if (sip_msg.empty())
         return false;
 
@@ -3036,49 +3037,49 @@ bool SIP_Header_Via::decode(std::string &sip_msg)
     std::string result;
     bool matched;
 
-    matched = SIP_Functions::match(sip_msg, "/", result);
+    matched = String_Functions::match(sip_msg, "/", result);
     if (!matched)
         return false;
-    SIP_Functions::trim(result);
+    String_Functions::trim(result);
     _protocol_name = result;
     if (_protocol_name.empty())
         return false;
 
-    matched = SIP_Functions::match(sip_msg, "/", result);
+    matched = String_Functions::match(sip_msg, "/", result);
     if (!matched)
         return false;
-    SIP_Functions::trim(result);
+    String_Functions::trim(result);
     _protocol_version = result;
     if (_protocol_version.empty())
         return false;
 
-    SIP_Functions::skip(sip_msg, " \t");
-    matched = SIP_Functions::match(sip_msg, " \t", result);
+    String_Functions::skip(sip_msg, " \t");
+    matched = String_Functions::match(sip_msg, " \t", result);
     if (!matched)
         return false;
-    SIP_Functions::trim(result);
+    String_Functions::trim(result);
     _transport = result;
     if (_transport.empty())
         return false;
 
-    matched = SIP_Functions::match(sip_msg, ":", result);
+    matched = String_Functions::match(sip_msg, ":", result);
     if (matched)
     {
-        SIP_Functions::trim(result);
+        String_Functions::trim(result);
         _host = result;
         if (_host.empty())
             return false;
 
-        matched = SIP_Functions::match(sip_msg, ";", result);
-        SIP_Functions::trim(result);
+        matched = String_Functions::match(sip_msg, ";", result);
+        String_Functions::trim(result);
 
-        _port = SIP_Functions::str_to_us(result);
+        _port = String_Functions::str_to_us(result);
         if (_port == INVALID_PORT)
             return false;
     }else
     {
-        matched = SIP_Functions::match(sip_msg, ";", result);
-        SIP_Functions::trim(result);
+        matched = String_Functions::match(sip_msg, ";", result);
+        String_Functions::trim(result);
         _host = result;
         if (_host.empty())
             return false;
@@ -3088,38 +3089,38 @@ bool SIP_Header_Via::decode(std::string &sip_msg)
 
     while (matched)
     {
-        matched = SIP_Functions::match(sip_msg, ";", result);
-        SIP_Functions::trim(result);
+        matched = String_Functions::match(sip_msg, ";", result);
+        String_Functions::trim(result);
 
-        if (SIP_Functions::start_with(result, "branch="))
+        if (String_Functions::start_with(result, "branch="))
         {
             _branch = result.substr(7);
-            SIP_Functions::trim(_branch);
+            String_Functions::trim(_branch);
             if (_branch.empty())
                 return false;
 
-        }else if (SIP_Functions::start_with(result, "received="))
+        }else if (String_Functions::start_with(result, "received="))
         {
             _received = result.substr(9);
-            SIP_Functions::trim(_received);
+            String_Functions::trim(_received);
             if (_received.empty())
                 return false;
 
-        }else if (SIP_Functions::start_with(result, "ttl="))
+        }else if (String_Functions::start_with(result, "ttl="))
         {
             std::string ttl = result.substr(4);
-            SIP_Functions::trim(ttl);
+            String_Functions::trim(ttl);
             if (ttl.empty())
                 return false;
 
-            _ttl = SIP_Functions::str_to_us(ttl);
+            _ttl = String_Functions::str_to_us(ttl);
             if (_ttl == INVALID_TTL)
                 return false;
 
-        }else if (SIP_Functions::start_with(result, "maddr="))
+        }else if (String_Functions::start_with(result, "maddr="))
         {
             _maddr = result.substr(6);
-            SIP_Functions::trim(_maddr);
+            String_Functions::trim(_maddr);
             if (_maddr.empty())
                 return false;
         }else
@@ -3205,29 +3206,29 @@ bool SIP_Header_Warning::decode(std::string &sip_msg)
 {
     std::string result;
 
-    SIP_Functions::trim(sip_msg);
-    if (!SIP_Functions::match(sip_msg, " ", result))
+    String_Functions::trim(sip_msg);
+    if (!String_Functions::match(sip_msg, " ", result))
         return false;
 
-    SIP_Functions::trim(result);
+    String_Functions::trim(result);
     if (result.empty())
         return false;
 
-    _code = SIP_Functions::str_to_us(result);
+    _code = String_Functions::str_to_us(result);
     if (_code == INVALID_CODE)
         return false;
 
-    SIP_Functions::trim(sip_msg);
-    if (!SIP_Functions::match(sip_msg, " ", result))
+    String_Functions::trim(sip_msg);
+    if (!String_Functions::match(sip_msg, " ", result))
         return false;
 
-    SIP_Functions::trim(result);
+    String_Functions::trim(result);
     if (result.empty())
         return false;
 
     _agent = result;
 
-    SIP_Functions::trim(sip_msg);
+    String_Functions::trim(sip_msg);
     if (sip_msg.empty())
         return false;
 
@@ -3242,7 +3243,7 @@ bool SIP_Header_Warning::encode(std::string &sip_msg)
     if ((_code == INVALID_CODE) || (_agent.empty()) || (_text.empty()))
         return false;
 
-    sip_msg += SIP_Functions::add_leading_zeros(_code, 3);
+    sip_msg += String_Functions::add_leading_zeros(_code, 3);
     sip_msg += " ";
     sip_msg += _agent;
     sip_msg += " ";

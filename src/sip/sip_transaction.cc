@@ -10,7 +10,7 @@
  */
 
 #include "sip_transaction.h"
-#include "sip_functions.h"
+#include "util/string_functions.h"
 
 Logger SIP_Transaction::_logger(Log_Manager::LOG_SIP_TRANSACTION);
 
@@ -204,7 +204,7 @@ SIP_Transaction *SIP_Transaction::match_transaction_server(SIP_Message *msg)
     }
 
     bool magic_cookie = false; // SIP 2.0
-    if ((!request_via_branch.empty()) && (SIP_Functions::start_with(request_via_branch.c_str(), "z9hG4bK")))
+    if ((!request_via_branch.empty()) && (String_Functions::start_with(request_via_branch.c_str(), "z9hG4bK")))
         magic_cookie = true;
 
     if (!magic_cookie)
