@@ -1,0 +1,10 @@
+language: cpp
+
+os: linux
+
+script:
+  - mkdir build
+  - cd build
+  - cmake ..
+  - cmake --build . --config Release
+  - ctest
