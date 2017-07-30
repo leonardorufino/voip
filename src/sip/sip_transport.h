@@ -15,13 +15,15 @@
 #include "util/socket.h"
 #include <string>
 
+class SIP_Transport_TCP_Client;
+
 class SIP_Transport
 {
 public:
     static const unsigned short INVALID_PORT = INVALID_UNSIGNED_SHORT;
 
     typedef bool (connect_callback)(SIP_Transport *transport, bool success);
-    typedef bool (accept_callback)(SIP_Transport *transport, SIP_Transport *accepted, std::string address, unsigned short port);
+    typedef bool (accept_callback)(SIP_Transport *transport, SIP_Transport_TCP_Client *accepted, std::string address, unsigned short port);
     typedef bool (receive_callback)(SIP_Transport *transport, const char *buffer, int size, std::string address, unsigned short port);
 
 public:
@@ -69,6 +71,18 @@ public:
     ~SIP_Transport_UDP() {}
 
     bool init(std::string address, unsigned short port);
+};
+
+//-------------------------------------------
+
+class SIP_Transport_TCP_Client : public SIP_Transport
+{
+public:
+    SIP_Transport_TCP_Client() {}
+    ~SIP_Transport_TCP_Client() {}
+
+    bool init(std::string address, unsigned short port);
+    bool connect(std::string address, unsigned short port);
 };
 
 //-------------------------------------------

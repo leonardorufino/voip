@@ -222,7 +222,7 @@ bool SIP_Transport::socket_accept_callback(void *data, Socket_TCP_Client *accept
 
         if (transport->_accept_callback)
         {
-            SIP_Transport *accepted_transport = new SIP_Transport();
+            SIP_Transport_TCP_Client *accepted_transport = new SIP_Transport_TCP_Client();
             accepted_transport->_socket = accepted;
             accepted_transport->_address = transport->_address;
             accepted_transport->_port = transport->_port;
@@ -310,6 +310,34 @@ bool SIP_Transport_UDP::init(std::string address, unsigned short port)
 
     _socket = new Socket_UDP();
     return SIP_Transport::init(address, port);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+bool SIP_Transport_TCP_Client::init(std::string address, unsigned short port)
+{
+    if (_socket)
+    {
+        _logger.warning("Failed to init TCP client socket: already created");
+        return false;
+    }
+
+    _socket = new Socket_TCP_Client();
+    return SIP_Transport::init(address, port);
+}
+
+//-------------------------------------------
+
+bool SIP_Transport_TCP_Client::connect(std::string address, unsigned short port)
+{
+    if (!_socket)
+    {
+        _logger.warning("Failed to connect TCP client socket: invalid socket");
+        return false;
+    }
+
+    return _socket->connect(address, port);
 }
 
 //-------------------------------------------
