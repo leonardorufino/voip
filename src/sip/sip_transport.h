@@ -31,9 +31,9 @@ public:
     static bool start();
     static bool stop();
 
-    void set_connect_callback(connect_callback *callback, void *data) { _connect_callback = callback; }
-    void set_accept_callback(accept_callback *callback, void *data) { _accept_callback = callback; }
-    void set_receive_callback(receive_callback *callback, void *data) { _receive_callback = callback; }
+    void set_connect_callback(connect_callback *callback) { _connect_callback = callback; }
+    void set_accept_callback(accept_callback *callback) { _accept_callback = callback; }
+    void set_receive_callback(receive_callback *callback) { _receive_callback = callback; }
 
     virtual bool init(std::string address, unsigned short port);
     virtual bool close();
@@ -59,3 +59,16 @@ protected:
 
     static Logger _logger;
 };
+
+//-------------------------------------------
+
+class SIP_Transport_UDP : public SIP_Transport
+{
+public:
+    SIP_Transport_UDP() {}
+    ~SIP_Transport_UDP() {}
+
+    bool init(std::string address, unsigned short port);
+};
+
+//-------------------------------------------

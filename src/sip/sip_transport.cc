@@ -298,3 +298,18 @@ bool SIP_Transport::socket_receive_callback(void *data, const char *buffer, int 
 }
 
 //-------------------------------------------
+//-------------------------------------------
+
+bool SIP_Transport_UDP::init(std::string address, unsigned short port)
+{
+    if (_socket)
+    {
+        _logger.warning("Failed to init UDP socket: already created");
+        return false;
+    }
+
+    _socket = new Socket_UDP();
+    return SIP_Transport::init(address, port);
+}
+
+//-------------------------------------------
