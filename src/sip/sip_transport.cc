@@ -391,3 +391,44 @@ bool SIP_Transport_TCP_Client::connect(std::string address, unsigned short port)
 }
 
 //-------------------------------------------
+//-------------------------------------------
+
+bool SIP_Transport_TCP_Server::init(std::string address, unsigned short port)
+{
+    if (_socket)
+    {
+        _logger.warning("Failed to init TCP server socket: already created");
+        return false;
+    }
+
+    _socket = new Socket_TCP_Server();
+    return SIP_Transport::init(address, port);
+}
+
+//-------------------------------------------
+
+bool SIP_Transport_TCP_Server::listen(int backlog)
+{
+    if (!_socket)
+    {
+        _logger.warning("Failed to listen TCP server socket: invalid socket");
+        return false;
+    }
+
+    return _socket->listen(backlog);
+}
+
+//-------------------------------------------
+
+bool SIP_Transport_TCP_Server::accept(socket_t &accept_socket, std::string &address, unsigned short &port)
+{
+    if (!_socket)
+    {
+        _logger.warning("Failed to accept TCP server socket: invalid socket");
+        return false;
+    }
+
+    return _socket->accept(accept_socket, address, port);
+}
+
+//-------------------------------------------

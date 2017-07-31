@@ -91,3 +91,16 @@ public:
 };
 
 //-------------------------------------------
+
+class SIP_Transport_TCP_Server : public SIP_Transport
+{
+public:
+    SIP_Transport_TCP_Server() {}
+    ~SIP_Transport_TCP_Server() {}
+
+    bool init(std::string address, unsigned short port);
+    bool listen(int backlog);
+    bool accept(socket_t &accept_socket, std::string &address, unsigned short &port);
+};
+
+//-------------------------------------------
