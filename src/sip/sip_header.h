@@ -350,6 +350,7 @@ public:
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
 
+    void set_address(const SIP_Address &address) { _address = address; }
     SIP_Address &get_address() { return _address; }
 
     std::list<std::string> &get_parameters() { return _parameters; }
@@ -518,6 +519,7 @@ public:
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
 
+    void set_address(const SIP_Address &address) { _address = address; }
     SIP_Address &get_address() { return _address; }
 
     void set_purpose(Purpose type);
@@ -555,6 +557,7 @@ public:
     void set_star(bool star) { _star = star; }
     bool is_star() { return _star; }
 
+    void set_address(const SIP_Address &address) { _address = address; }
     SIP_Address &get_address() { return _address; }
 
     void set_expires(unsigned long expires) { _expires = expires; }
@@ -857,6 +860,7 @@ public:
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
 
+    void set_address(const SIP_Address &address) { _address = address; }
     SIP_Address &get_address() { return _address; }
 
     std::list<std::string> &get_parameters() { return _parameters; }
@@ -937,6 +941,7 @@ public:
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
 
+    void set_address(const SIP_Address &address) { _address = address; }
     SIP_Address &get_address() { return _address; }
 
     void set_tag(std::string tag) { _tag = tag; }
@@ -1196,6 +1201,7 @@ public:
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
 
+    void set_address(const SIP_Address &address) { _address = address; }
     SIP_Address &get_address() { return _address; }
 
     std::list<std::string> &get_parameters() { return _parameters; }
@@ -1221,6 +1227,7 @@ public:
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
 
+    void set_address(const SIP_Address &address) { _address = address; }
     SIP_Address &get_address() { return _address; }
 
     std::list<std::string> &get_parameters() { return _parameters; }
@@ -1246,6 +1253,7 @@ public:
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
 
+    void set_address(const SIP_Address &address) { _address = address; }
     SIP_Address &get_address() { return _address; }
 
     void set_cid(std::string cid) { _cid = cid; }
@@ -1275,6 +1283,7 @@ public:
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
 
+    void set_address(const SIP_Address &address) { _address = address; }
     SIP_Address &get_address() { return _address; }
 
     std::list<std::string> &get_parameters() { return _parameters; }
@@ -1361,6 +1370,7 @@ public:
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
 
+    void set_address(const SIP_Address &address) { _address = address; }
     SIP_Address &get_address() { return _address; }
 
     std::list<std::string> &get_parameters() { return _parameters; }
@@ -1548,6 +1558,7 @@ public:
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
 
+    void set_address(const SIP_Address &address) { _address = address; }
     SIP_Address &get_address() { return _address; }
 
     void set_tag(std::string tag) { _tag = tag; }
