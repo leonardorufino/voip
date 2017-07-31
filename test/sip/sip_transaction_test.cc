@@ -14,12 +14,6 @@
 
 //-------------------------------------------
 
-bool SIP_Transaction_Test::_sent_message = false;
-bool SIP_Transaction_Test::_received_request = false;
-bool SIP_Transaction_Test::_received_response = false;
-
-//-------------------------------------------
-
 bool SIP_Transaction_Test::init()
 {
     std::cout << "SIP transaction test initialized\n";
@@ -74,9 +68,9 @@ bool SIP_Transaction_Test::set_callbacks()
 {
     SIP_Transaction &transaction = get_transaction();
 
-    transaction.set_send_message_callback(send_message_callback);
-    transaction.set_receive_request_callback(receive_request_callback);
-    transaction.set_receive_response_callback(receive_response_callback);
+    transaction.set_send_message_callback(send_message_callback, this);
+    transaction.set_receive_request_callback(receive_request_callback, this);
+    transaction.set_receive_response_callback(receive_response_callback, this);
     return true;
 }
 
@@ -308,43 +302,46 @@ SIP_Response *SIP_Transaction_Test::create_bye_response_200()
 //-------------------------------------------
 //-------------------------------------------
 
-bool SIP_Transaction_Test::send_message_callback(SIP_Message *msg)
+bool SIP_Transaction_Test::send_message_callback(void *data, SIP_Transaction *transaction, SIP_Message *msg)
 {
-    if (!msg)
+    SIP_Transaction_Test *test = reinterpret_cast<SIP_Transaction_Test *>(data);
+    if ((!test) || (!transaction) || (!msg))
     {
-        std::cout << "SIP_Transaction_Test::send_message_callback -> Invalid parameter\n";
+        std::cout << "SIP_Transaction_Test::send_message_callback -> Invalid parameters\n";
         return false;
     }
 
-    _sent_message = true;
+    test->_sent_message = true;
     return true;
 }
 
 //-------------------------------------------
 
-bool SIP_Transaction_Test::receive_request_callback(SIP_Request *request, SIP_Transaction *transaction)
+bool SIP_Transaction_Test::receive_request_callback(void *data, SIP_Transaction *transaction, SIP_Request *request)
 {
-    if ((!request) || (!transaction))
+    SIP_Transaction_Test *test = reinterpret_cast<SIP_Transaction_Test *>(data);
+    if ((!test) || (!transaction) || (!request))
     {
         std::cout << "SIP_Transaction_Test::receive_request_callback -> Invalid parameters\n";
         return false;
     }
 
-    _received_request = true;
+    test->_received_request = true;
     return true;
 }
 
 //-------------------------------------------
 
-bool SIP_Transaction_Test::receive_response_callback(SIP_Request *request, SIP_Response *response, SIP_Transaction *transaction)
+bool SIP_Transaction_Test::receive_response_callback(void *data, SIP_Transaction *transaction, SIP_Request *request, SIP_Response *response)
 {
-    if ((!request) || (!response) || (!transaction))
+    SIP_Transaction_Test *test = reinterpret_cast<SIP_Transaction_Test *>(data);
+    if ((!test) || (!transaction) || (!request) || (!response))
     {
         std::cout << "SIP_Transaction_Test::receive_response_callback -> Invalid parameters\n";
         return false;
     }
 
-    _received_response = true;
+    test->_received_response = true;
     return true;
 }
 

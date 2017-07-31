@@ -20,7 +20,7 @@
 class SIP_Transaction_Test
 {
 public:
-    SIP_Transaction_Test() {}
+    SIP_Transaction_Test() : _sent_message(false), _received_request(false), _received_response(false) {}
     virtual ~SIP_Transaction_Test() {}
 
     static bool init();
@@ -42,14 +42,14 @@ protected:
     SIP_Response *create_bye_response_100();
     SIP_Response *create_bye_response_200();
 
-    static bool send_message_callback(SIP_Message *msg);
-    static bool receive_request_callback(SIP_Request *request, SIP_Transaction *transaction);
-    static bool receive_response_callback(SIP_Request *request, SIP_Response *response, SIP_Transaction *transaction);
+    static bool send_message_callback(void *data, SIP_Transaction *transaction, SIP_Message *msg);
+    static bool receive_request_callback(void *data, SIP_Transaction *transaction, SIP_Request *request);
+    static bool receive_response_callback(void *data, SIP_Transaction *transaction, SIP_Request *request, SIP_Response *response);
 
 protected:
-    static bool _sent_message;
-    static bool _received_request;
-    static bool _received_response;
+    bool _sent_message;
+    bool _received_request;
+    bool _received_response;
 };
 
 //-------------------------------------------
