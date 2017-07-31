@@ -190,19 +190,7 @@ void String_Functions::skip(std::string &str, const std::string skip)
 
 //-------------------------------------------
 
-void String_Functions::random(std::string &buffer)
-{
-#ifdef WIN32
-    srand((unsigned int) time(NULL));
-#endif
-
-    long value = (long)(((double) rand() / (double) RAND_MAX) * 0x7FFFFFFF);
-    buffer += std::to_string(value);
-}
-
-//-------------------------------------------
-
-unsigned short String_Functions::str_to_us(const std::string &str)
+unsigned short String_Functions::str_to_us(const std::string str)
 {
     unsigned short value = 0;
 
@@ -228,7 +216,7 @@ unsigned short String_Functions::str_to_us(const std::string &str)
 
 //-------------------------------------------
 
-unsigned long String_Functions::str_to_ul(const std::string &str)
+unsigned long String_Functions::str_to_ul(const std::string str)
 {
     unsigned long value = 0;
 
@@ -259,6 +247,21 @@ std::string String_Functions::add_leading_zeros(unsigned long value, unsigned sh
     std::string str = std::to_string(value);
     if (str.size() < digits)
         str.insert(0, digits - str.size(), '0');
+
+    return str;
+}
+
+//-------------------------------------------
+
+std::string String_Functions::random(unsigned short len)
+{
+    static const char ALPHANUM[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+
+    srand((unsigned int) time(NULL));
+    std::string str;
+
+    for (unsigned short i = 0; i < len; i++)
+        str += ALPHANUM[rand() % (sizeof(ALPHANUM) - 1)];
 
     return str;
 }

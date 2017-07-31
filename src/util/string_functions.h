@@ -26,8 +26,8 @@ public:
     static bool get_line(std::string &str, std::string &line);
     static void trim(std::string &str);
     static void skip(std::string &str, const std::string skip);
-    static void random(std::string &buffer);
-    static unsigned short str_to_us(const std::string &str);
-    static unsigned long str_to_ul(const std::string &str);
+    static unsigned short str_to_us(const std::string str);
+    static unsigned long str_to_ul(const std::string str);
     static std::string add_leading_zeros(unsigned long value, unsigned short digits);
+    static std::string random(unsigned short len);
 };
