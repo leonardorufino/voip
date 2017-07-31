@@ -15,8 +15,8 @@ Logger SIP_Transport::_logger(Log_Manager::LOG_SIP_TRANSPORT);
 
 //-------------------------------------------
 
-SIP_Transport::SIP_Transport() : _port(INVALID_PORT), _socket(NULL), _connect_callback(NULL), _accept_callback(NULL),
-    _receive_callback(NULL)
+SIP_Transport::SIP_Transport() : _port(INVALID_PORT), _socket(NULL), _connect_callback(NULL), _connect_data(NULL),
+    _accept_callback(NULL), _accept_data(NULL), _receive_callback(NULL), _receive_data(NULL)
 {
 }
 
@@ -54,6 +54,31 @@ bool SIP_Transport::stop()
     }
 
     return true;
+}
+
+//-------------------------------------------
+
+void SIP_Transport::set_connect_callback(connect_callback *callback, void *data)
+{
+    _connect_callback = callback;
+    _connect_data = data;
+}
+
+//-------------------------------------------
+
+
+void SIP_Transport::set_accept_callback(accept_callback *callback, void *data)
+{
+    _accept_callback = callback;
+    _accept_data = data;
+}
+
+//-------------------------------------------
+
+void SIP_Transport::set_receive_callback(receive_callback *callback, void *data)
+{
+    _receive_callback = callback;
+    _receive_data = data;
 }
 
 //-------------------------------------------
@@ -186,16 +211,18 @@ bool SIP_Transport::socket_connect_callback(void *data, bool success)
         SIP_Transport *transport = reinterpret_cast<SIP_Transport *>(data);
         if (!transport)
         {
-            _logger.warning("Socket connect callback invalid parameter");
+            _logger.warning("Socket connect callback invalid parameter (success=%d)", success);
             return false;
         }
 
-        _logger.trace("Socket connected (success=%d)", success);
-
         if (transport->_connect_callback)
-            transport->_connect_callback(transport, success);
+        {
+            _logger.trace("Socket connected (success=%d)", success);
+            return transport->_connect_callback(transport->_connect_data, transport, success);
+        }
 
-        return true;
+        _logger.trace("Connect callback not configured (success=%d)", success);
+        return false;
     }catch (std::exception &e)
     {
         _logger.warning("Exception in socket receive callback (success=%d, msg=%s)", success, e.what());
@@ -216,7 +243,7 @@ bool SIP_Transport::socket_accept_callback(void *data, Socket_TCP_Client *accept
         SIP_Transport *transport = reinterpret_cast<SIP_Transport *>(data);
         if ((!transport) || (!accepted))
         {
-            _logger.warning("Socket accept callback invalid parameter");
+            _logger.warning("Socket accept callback invalid parameter (address=%s, port=%d)", address.c_str(), port);
             return false;
         }
 
@@ -237,22 +264,43 @@ bool SIP_Transport::socket_accept_callback(void *data, Socket_TCP_Client *accept
 
             if (!accepted->set_non_blocking())
             {
-                _logger.warning("Failed to set accepted socket non-blocking");
+                _logger.warning("Failed to set accepted socket non-blocking (socket=%d, address=%s, port=%d)", accepted->get_socket(),
+                                address.c_str(), port);
+                delete accepted_transport;
                 return false;
             }
 
             Socket_Control &control = Socket_Control::instance();
             if (!control.add_socket(*accepted))
             {
-                _logger.warning("Failed to add accepted socket to control");
+                _logger.warning("Failed to add accepted socket to control (socket=%d, address=%s, port=%d)", accepted->get_socket(),
+                                address.c_str(), port);
+                delete accepted_transport;
                 return false;
             }
 
             _logger.trace("TCP transport accepted (socket=%d, address=%s, port=%d)", accepted->get_socket(), address.c_str(), port);
-            transport->_accept_callback(transport, accepted_transport, address, port);
+
+            if (!transport->_accept_callback(transport->_accept_data, transport, accepted_transport, address, port))
+            {
+                _logger.warning("Accept callback returned false (socket=%d, address=%s, port=%d)", accepted->get_socket(),
+                                address.c_str(), port);
+
+                if (!control.remove_socket(*accepted))
+                {
+                    _logger.warning("Failed to remove accepted socket from control (socket=%d, address=%s, port=%d)",
+                                    accepted->get_socket(), address.c_str(), port);
+                }
+
+                delete accepted_transport;
+                return false;
+            }
+
+            return true;
         }
 
-        return true;
+        _logger.trace("Accept callback not configured (socket=%d, address=%s, port=%d)", accepted->get_socket(), address.c_str(), port);
+        return false;
     }catch (std::exception &e)
     {
         _logger.warning("Exception in socket accept callback (socket=%d, address=%s, port=%d, msg=%s)",
@@ -275,16 +323,18 @@ bool SIP_Transport::socket_receive_callback(void *data, const char *buffer, int 
         SIP_Transport *transport = reinterpret_cast<SIP_Transport *>(data);
         if (!transport)
         {
-            _logger.warning("Socket receive callback invalid parameter");
+            _logger.warning("Socket receive callback invalid parameter (address=%s, port=%d, size=%d)", address.c_str(), port, size);
             return false;
         }
 
-        _logger.trace("Message received (address=%s, port=%d, size=%d):\n%s", address.c_str(), port, size, buffer);
-
         if (transport->_receive_callback)
-            transport->_receive_callback(transport, buffer, size, address, port);
+        {
+            _logger.trace("Message received (address=%s, port=%d, size=%d):\n%s", address.c_str(), port, size, buffer);
+            return transport->_receive_callback(transport->_receive_data, transport, buffer, size, address, port);
+        }
 
-        return true;
+        _logger.trace("Receive callback not configured (address=%s, port=%d, size=%d)", address.c_str(), port, size);
+        return false;
     }catch (std::exception &e)
     {
         _logger.warning("Exception in socket receive callback (address=%s, port=%d, size=%d, msg=%s)",

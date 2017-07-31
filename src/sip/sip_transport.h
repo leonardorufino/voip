@@ -22,20 +22,20 @@ class SIP_Transport
 public:
     static const unsigned short INVALID_PORT = INVALID_UNSIGNED_SHORT;
 
-    typedef bool (connect_callback)(SIP_Transport *transport, bool success);
-    typedef bool (accept_callback)(SIP_Transport *transport, SIP_Transport_TCP_Client *accepted, std::string address, unsigned short port);
-    typedef bool (receive_callback)(SIP_Transport *transport, const char *buffer, int size, std::string address, unsigned short port);
+    typedef bool (connect_callback)(void *data, SIP_Transport *transport, bool success);
+    typedef bool (accept_callback)(void *data, SIP_Transport *transport, SIP_Transport_TCP_Client *accepted, std::string address, unsigned short port);
+    typedef bool (receive_callback)(void *data, SIP_Transport *transport, const char *buffer, int size, std::string address, unsigned short port);
 
 public:
     SIP_Transport();
-    ~SIP_Transport();
+    virtual ~SIP_Transport();
 
     static bool start();
     static bool stop();
 
-    void set_connect_callback(connect_callback *callback) { _connect_callback = callback; }
-    void set_accept_callback(accept_callback *callback) { _accept_callback = callback; }
-    void set_receive_callback(receive_callback *callback) { _receive_callback = callback; }
+    void set_connect_callback(connect_callback *callback, void *data);
+    void set_accept_callback(accept_callback *callback, void *data);
+    void set_receive_callback(receive_callback *callback, void *data);
 
     virtual bool init(std::string address, unsigned short port);
     virtual bool close();
@@ -56,8 +56,13 @@ protected:
     Socket *_socket;
 
     connect_callback *_connect_callback;
+    void *_connect_data;
+
     accept_callback *_accept_callback;
+    void *_accept_data;
+
     receive_callback *_receive_callback;
+    void *_receive_data;
 
     static Logger _logger;
 };
