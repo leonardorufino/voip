@@ -46,7 +46,7 @@ public:
     void add_headers(sip_header_list &headers);
 
     SIP_Header *get_header(SIP_Header_Type header_type, unsigned short pos = 0);
-    unsigned short get_num_header(SIP_Header_Type header_type);
+    unsigned short get_header_size(SIP_Header_Type header_type);
 
 private:
     sip_header_map _headers;

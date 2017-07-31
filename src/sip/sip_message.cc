@@ -245,7 +245,7 @@ SIP_Header *SIP_Message::get_header(SIP_Header_Type header_type, unsigned short 
 
 //-------------------------------------------
 
-unsigned short SIP_Message::get_num_header(SIP_Header_Type header_type)
+unsigned short SIP_Message::get_header_size(SIP_Header_Type header_type)
 {
     if (_headers.count(header_type) == 0)
         return 0;
