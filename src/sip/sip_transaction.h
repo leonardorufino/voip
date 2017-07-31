@@ -21,9 +21,9 @@
 
 class SIP_Transaction;
 
-typedef bool (send_message_callback)(SIP_Message *msg);
-typedef bool (receive_request_callback)(SIP_Request *request, SIP_Transaction *transaction);
-typedef bool (receive_response_callback)(SIP_Request *request, SIP_Response *response, SIP_Transaction *transaction);
+typedef bool (send_message_callback)(void *data, SIP_Transaction *transaction, SIP_Message *msg);
+typedef bool (receive_request_callback)(void *data, SIP_Transaction *transaction, SIP_Request *request);
+typedef bool (receive_response_callback)(void *data, SIP_Transaction *transaction, SIP_Request *request, SIP_Response *response);
 
 class SIP_Transaction
 {
@@ -68,9 +68,9 @@ public:
     SIP_Transaction *match_transaction_client(SIP_Message *msg);
     SIP_Transaction *match_transaction_server(SIP_Message *msg);
 
-    void set_send_message_callback(send_message_callback *callback) { _send_message_callback = callback; }
-    void set_receive_request_callback(receive_request_callback *callback) { _receive_request_callback = callback; }
-    void set_receive_response_callback(receive_response_callback *callback) { _receive_response_callback = callback; }
+    void set_send_message_callback(send_message_callback *callback, void *data);
+    void set_receive_request_callback(receive_request_callback *callback, void *data);
+    void set_receive_response_callback(receive_response_callback *callback, void *data);
 
     unsigned long get_timer_value(SIP_Timer timer);
     void set_timer_value(SIP_Timer timer, unsigned long timer_value);
@@ -81,8 +81,13 @@ protected:
     SIP_Request *_saved_request;
 
     send_message_callback *_send_message_callback;
+    void *_send_message_data;
+
     receive_request_callback *_receive_request_callback;
+    void *_receive_request_data;
+
     receive_response_callback *_receive_response_callback;
+    void *_receive_response_data;
 
     unsigned long _timer_values[SIP_TIMER_COUNT];
     timer_id_t _timer_ids[SIP_TIMER_COUNT];
