@@ -25,13 +25,14 @@
     #include <cstring>
 #endif
 
-typedef bool (timer_callback)(void *data);
 typedef unsigned int timer_id_t;
 
 class Timer
 {
 public:
     static const timer_id_t INVALID_TIMER_ID = 0xFFFFFFFF;
+
+    typedef bool (timer_callback)(void *data);
 
 public:
     Timer();
@@ -85,7 +86,7 @@ public:
 
     static Timer_Manager &instance();
 
-    timer_id_t start_timer(unsigned long time, void *data, timer_callback *callback);
+    timer_id_t start_timer(unsigned long time, void *data, Timer::timer_callback *callback);
     void stop_timer(timer_id_t timer_id);
 
 #ifdef WIN32

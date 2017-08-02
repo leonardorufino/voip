@@ -190,7 +190,7 @@ Timer_Manager &Timer_Manager::instance()
 
 //-------------------------------------------
 
-timer_id_t Timer_Manager::start_timer(unsigned long time, void *data, timer_callback *callback)
+timer_id_t Timer_Manager::start_timer(unsigned long time, void *data, Timer::timer_callback *callback)
 {
     std::lock_guard<std::recursive_mutex> lock(_timer_list_mutex);
 
