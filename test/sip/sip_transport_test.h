@@ -53,3 +53,21 @@ protected:
     std::string _received_address;
     unsigned short _received_port;
 };
+
+//-------------------------------------------
+//-------------------------------------------
+
+class SIP_Transport_UDP_Test : public SIP_Transport_Test
+{
+public:
+    SIP_Transport_UDP_Test() {}
+    virtual ~SIP_Transport_UDP_Test() {}
+
+    bool run(Socket::Address_Family family, std::string address, unsigned short port);
+    SIP_Transport &get_transport() { return _transport_udp; }
+
+protected:
+    SIP_Transport_UDP _transport_udp;
+};
+
+//-------------------------------------------
