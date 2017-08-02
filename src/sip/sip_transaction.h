@@ -19,15 +19,13 @@
 #include "util/timer_manager.h"
 #include <string>
 
-class SIP_Transaction;
-
-typedef bool (send_message_callback)(void *data, SIP_Transaction *transaction, SIP_Message *msg);
-typedef bool (receive_request_callback)(void *data, SIP_Transaction *transaction, SIP_Request *request);
-typedef bool (receive_response_callback)(void *data, SIP_Transaction *transaction, SIP_Request *request, SIP_Response *response);
-
 class SIP_Transaction
 {
 public:
+    typedef bool (send_message_callback)(void *data, SIP_Transaction *transaction, SIP_Message *msg);
+    typedef bool (receive_request_callback)(void *data, SIP_Transaction *transaction, SIP_Request *request);
+    typedef bool (receive_response_callback)(void *data, SIP_Transaction *transaction, SIP_Request *request, SIP_Response *response);
+
     enum SIP_Transaction_Type
     {
         SIP_TRANSACTION_CLIENT_INVITE,
