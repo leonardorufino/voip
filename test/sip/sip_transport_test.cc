@@ -43,6 +43,10 @@ bool SIP_Transport_Test::init()
         SIP_Transport_UDP_Test udp_test;
         if (!udp_test.run(family_ipv4, address_ipv4, port_ipv4))
             return false;
+
+        SIP_Transport_TCP_Test tcp_test;
+        if (!tcp_test.run(family_ipv4, address_ipv4, port_ipv4))
+            return false;
     }else
         std::cout << "IPv4 SIP transport test disabled\n";
 
@@ -57,6 +61,10 @@ bool SIP_Transport_Test::init()
 
         SIP_Transport_UDP_Test udp_test;
         if (!udp_test.run(family_ipv6, address_ipv6, port_ipv6))
+            return false;
+
+        SIP_Transport_TCP_Test tcp_test;
+        if (!tcp_test.run(family_ipv6, address_ipv6, port_ipv6))
             return false;
     }else
         std::cout << "IPv6 SIP transport test disabled\n";
@@ -253,6 +261,162 @@ bool SIP_Transport_UDP_Test::run(Socket::Address_Family family, std::string addr
     if (!SIP_Transport::stop())
     {
         std::cout << "SIP_Transport_UDP_Test::run -> Failed to stop SIP transport\n";
+        return false;
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+bool SIP_Transport_TCP_Test::run(Socket::Address_Family family, std::string address, unsigned short port)
+{
+    if (!SIP_Transport::start())
+    {
+        std::cout << "SIP_Transport_TCP_Test::run -> Failed to start SIP transport\n";
+        return false;
+    }
+
+    _current_transport = &_transport_tcp_client;
+    set_callbacks();
+
+    if (!_transport_tcp_client.init(address, 0))
+    {
+        std::cout << "SIP_Transport_TCP_Test::run -> Failed to init TCP client transport\n";
+        return false;
+    }
+
+    _current_transport = &_transport_tcp_server;
+    set_callbacks();
+
+    if (!_transport_tcp_server.init(address, port))
+    {
+        std::cout << "SIP_Transport_TCP_Test::run -> Failed to init TCP server transport\n";
+        return false;
+    }
+
+    if (!_transport_tcp_server.listen(10))
+    {
+        std::cout << "SIP_Transport_TCP_Test::run -> Failed to listen TCP server transport\n";
+        return false;
+    }
+
+    unsigned long start = Util_Functions::get_tick();
+    unsigned long max_wait_time = 5000;
+    _connected = false;
+    _accepted_transport = NULL;
+    _accepted_address = "";
+    _accepted_port = SIP_Transport::INVALID_PORT;
+
+    if (!_transport_tcp_client.connect(address, port))
+    {
+        std::cout << "SIP_Transport_TCP_Test::run -> Failed to connect TCP client transport\n";
+        return false;
+    }
+
+    while ((Util_Functions::get_tick() - start) < max_wait_time)
+    {
+        if (_connected)
+            break;
+
+        Util_Functions::delay(500);
+    }
+
+    if (!_connected)
+    {
+        std::cout << "SIP_Transport_TCP_Test::run -> Transport not connected\n";
+        return false;
+    }
+
+    start = Util_Functions::get_tick();
+    max_wait_time = 5000;
+
+    while ((Util_Functions::get_tick() - start) < max_wait_time)
+    {
+        if (_accepted_transport)
+            break;
+
+        Util_Functions::delay(500);
+    }
+
+    if (!_accepted_transport)
+    {
+        std::cout << "SIP_Transport_TCP_Test::run -> Transport not accepted\n";
+        return false;
+    }
+
+    if (address != _accepted_address)
+    {
+        std::cout << "SIP_Transport_TCP_Test::run -> Invalid accepted parameters:\n";
+        std::cout << std::setw(20) << "Local Address: " << address << "\n";
+        std::cout << std::setw(20) << "Accepted Address: " << _accepted_address << "\n";
+        return false;
+    }
+
+    _current_transport = _accepted_transport;
+    if (!set_callbacks())
+        return false;
+
+    std::string request = create_request();
+
+    _received_buffer[0] = 0;
+    _received_size = 0;
+    _received_address.clear();
+    _received_port = SIP_Transport::INVALID_PORT;
+
+    if (!_transport_tcp_client.send_message(request.c_str(), request.size(), address, port))
+    {
+        std::cout << "SIP_Transport_TCP_Test::run -> Failed to send client message\n";
+        return false;
+    }
+
+    start = Util_Functions::get_tick();
+    max_wait_time = 5000;
+
+    while ((Util_Functions::get_tick() - start) < max_wait_time)
+    {
+        if (_received_size == (int) request.size())
+            break;
+
+        Util_Functions::delay(500);
+    }
+
+    if (_received_size != (int) request.size())
+    {
+        std::cout << "SIP_Transport_TCP_Test::run -> Message not received:\n";
+        std::cout << std::setw(20) << "Expected: " << request.size() << "\n";
+        std::cout << std::setw(20) << "Received: " << _received_size << "\n";
+        return false;
+    }
+
+    if (memcmp(request.c_str(), _received_buffer, request.size()) != 0)
+    {
+        std::cout << "SIP_Transport_TCP_Test::run -> Invalid received message\n";
+        return false;
+    }
+
+    if (!_transport_tcp_client.close())
+    {
+        std::cout << "SIP_Transport_UDP_Test::run -> Failed to close TCP client transport\n";
+        return false;
+    }
+
+    if (!_accepted_transport->close())
+    {
+        std::cout << "SIP_Transport_UDP_Test::run -> Failed to close TCP accepted transport\n";
+        return false;
+    }
+
+    if (!_transport_tcp_server.close())
+    {
+        std::cout << "SIP_Transport_UDP_Test::run -> Failed to close TCP server transport\n";
+        return false;
+    }
+
+    if (!SIP_Transport::stop())
+    {
+        std::cout << "SIP_Transport_TCP_Test::run -> Failed to stop SIP transport\n";
         return false;
     }
 

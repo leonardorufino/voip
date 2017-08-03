@@ -71,3 +71,22 @@ protected:
 };
 
 //-------------------------------------------
+//-------------------------------------------
+
+class SIP_Transport_TCP_Test : public SIP_Transport_Test
+{
+public:
+    SIP_Transport_TCP_Test() : _current_transport(NULL) {}
+    virtual ~SIP_Transport_TCP_Test() {}
+
+    bool run(Socket::Address_Family family, std::string address, unsigned short port);
+    SIP_Transport &get_transport() { return *_current_transport; }
+
+protected:
+    SIP_Transport_TCP_Client _transport_tcp_client;
+    SIP_Transport_TCP_Server _transport_tcp_server;
+
+    SIP_Transport *_current_transport;
+};
+
+//-------------------------------------------
