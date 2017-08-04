@@ -12,6 +12,7 @@
 #include "sip_header_test.h"
 #include "sip_message_test.h"
 #include "sip_transaction_test.h"
+#include "sip_transport_test.h"
 #include <iostream>
 
 //-------------------------------------------
@@ -35,6 +36,12 @@ int main()
     if (!SIP_Transaction_Test::init())
     {
         std::cout << "SIP transaction test FAILED!\n";
+        return 1;
+    }
+
+    if (!SIP_Transport_Test::init())
+    {
+        std::cout << "SIP transport test FAILED!\n";
         return 1;
     }
 
