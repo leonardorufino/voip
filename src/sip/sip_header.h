@@ -89,6 +89,7 @@ public:
     void set_qop(std::string qop) { _qop = qop; }
     std::string get_qop() { return _qop; }
 
+    void set_parameters(std::list<std::string> &parameters) { _parameters = parameters; }
     std::list<std::string> &get_parameters() { return _parameters; }
 
 private:
@@ -148,6 +149,7 @@ public:
     void set_nonce_count(std::string nonce_count) { _nonce_count = nonce_count; }
     std::string get_nonce_count() { return _nonce_count; }
 
+    void set_parameters(std::list<std::string> &parameters) { _parameters = parameters; }
     std::list<std::string> &get_parameters() { return _parameters; }
 
 private:
@@ -211,6 +213,7 @@ public:
     void set_q(std::string q) { _q = q; }
     std::string get_q() { return _q; }
 
+    void set_parameters(std::list<std::string> &parameters) { _parameters = parameters; }
     std::list<std::string> &get_parameters() { return _parameters; }
 
 private:
@@ -296,6 +299,7 @@ public:
     void set_q(std::string q) { _q = q; }
     std::string get_q() { return _q; }
 
+    void set_parameters(std::list<std::string> &parameters) { _parameters = parameters; }
     std::list<std::string> &get_parameters() { return _parameters; }
 
 private:
@@ -326,6 +330,7 @@ public:
     void set_q(std::string q) { _q = q; }
     std::string get_q() { return _q; }
 
+    void set_parameters(std::list<std::string> &parameters) { _parameters = parameters; }
     std::list<std::string> &get_parameters() { return _parameters; }
 
 private:
@@ -353,6 +358,7 @@ public:
     void set_address(const SIP_Address &address) { _address = address; }
     SIP_Address &get_address() { return _address; }
 
+    void set_parameters(std::list<std::string> &parameters) { _parameters = parameters; }
     std::list<std::string> &get_parameters() { return _parameters; }
 
 private:
@@ -438,6 +444,7 @@ public:
     void set_nonce_count(std::string nonce_count) { _nonce_count = nonce_count; }
     std::string get_nonce_count() { return _nonce_count; }
 
+    void set_parameters(std::list<std::string> &parameters) { _parameters = parameters; }
     std::list<std::string> &get_parameters() { return _parameters; }
 
 private:
@@ -527,6 +534,7 @@ public:
     Purpose get_purpose();
     std::string get_purpose_str() { return _purpose; }
 
+    void set_parameters(std::list<std::string> &parameters) { _parameters = parameters; }
     std::list<std::string> &get_parameters() { return _parameters; }
 
 private:
@@ -566,6 +574,7 @@ public:
     void set_q(std::string q) { _q = q; }
     std::string get_q() { return _q; }
 
+    void set_parameters(std::list<std::string> &parameters) { _parameters = parameters; }
     std::list<std::string> &get_parameters() { return _parameters; }
 
 private:
@@ -619,6 +628,7 @@ public:
     Handling get_handling();
     std::string get_handling_str() { return _handling; }
 
+    void set_parameters(std::list<std::string> &parameters) { _parameters = parameters; }
     std::list<std::string> &get_parameters() { return _parameters; }
 
 private:
@@ -863,6 +873,7 @@ public:
     void set_address(const SIP_Address &address) { _address = address; }
     SIP_Address &get_address() { return _address; }
 
+    void set_parameters(std::list<std::string> &parameters) { _parameters = parameters; }
     std::list<std::string> &get_parameters() { return _parameters; }
 
 private:
@@ -891,6 +902,7 @@ public:
     void set_id(std::string id) { _id = id; }
     std::string get_id() { return _id; }
 
+    void set_parameters(std::list<std::string> &parameters) { _parameters = parameters; }
     std::list<std::string> &get_parameters() { return _parameters; }
 
 private:
@@ -947,6 +959,7 @@ public:
     void set_tag(std::string tag) { _tag = tag; }
     std::string get_tag() { return _tag; }
 
+    void set_parameters(std::list<std::string> &parameters) { _parameters = parameters; }
     std::list<std::string> &get_parameters() { return _parameters; }
 
 private:
@@ -1204,6 +1217,7 @@ public:
     void set_address(const SIP_Address &address) { _address = address; }
     SIP_Address &get_address() { return _address; }
 
+    void set_parameters(std::list<std::string> &parameters) { _parameters = parameters; }
     std::list<std::string> &get_parameters() { return _parameters; }
 
 private:
@@ -1230,6 +1244,7 @@ public:
     void set_address(const SIP_Address &address) { _address = address; }
     SIP_Address &get_address() { return _address; }
 
+    void set_parameters(std::list<std::string> &parameters) { _parameters = parameters; }
     std::list<std::string> &get_parameters() { return _parameters; }
 
 private:
@@ -1259,6 +1274,7 @@ public:
     void set_cid(std::string cid) { _cid = cid; }
     std::string get_cid() { return _cid; }
 
+    void set_parameters(std::list<std::string> &parameters) { _parameters = parameters; }
     std::list<std::string> &get_parameters() { return _parameters; }
 
 private:
@@ -1286,6 +1302,7 @@ public:
     void set_address(const SIP_Address &address) { _address = address; }
     SIP_Address &get_address() { return _address; }
 
+    void set_parameters(std::list<std::string> &parameters) { _parameters = parameters; }
     std::list<std::string> &get_parameters() { return _parameters; }
 
 private:
@@ -1345,6 +1362,7 @@ public:
     void set_duration(unsigned long duration) { _duration = duration; }
     unsigned long get_duration() { return _duration; }
 
+    void set_parameters(std::list<std::string> &parameters) { _parameters = parameters; }
     std::list<std::string> &get_parameters() { return _parameters; }
 
 private:
@@ -1373,6 +1391,7 @@ public:
     void set_address(const SIP_Address &address) { _address = address; }
     SIP_Address &get_address() { return _address; }
 
+    void set_parameters(std::list<std::string> &parameters) { _parameters = parameters; }
     std::list<std::string> &get_parameters() { return _parameters; }
 
 private:
@@ -1482,6 +1501,7 @@ public:
     void set_retry_after(unsigned long retry_after) { _retry_after = retry_after; }
     unsigned long get_retry_after() { return _retry_after; }
 
+    void set_parameters(std::list<std::string> &parameters) { _parameters = parameters; }
     std::list<std::string> &get_parameters() { return _parameters; }
 
 private:
@@ -1564,6 +1584,7 @@ public:
     void set_tag(std::string tag) { _tag = tag; }
     std::string get_tag() { return _tag; }
 
+    void set_parameters(std::list<std::string> &parameters) { _parameters = parameters; }
     std::list<std::string> &get_parameters() { return _parameters; }
 
 private:
@@ -1667,6 +1688,7 @@ public:
     void set_maddr(std::string maddr) { _maddr = maddr; }
     std::string get_maddr() { return _maddr; }
 
+    void set_parameters(std::list<std::string> &parameters) { _parameters = parameters; }
     std::list<std::string> &get_parameters() { return _parameters; }
 
 private:
