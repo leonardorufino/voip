@@ -1278,6 +1278,19 @@ bool SIP_Header_Call_ID::encode(std::string &sip_msg)
 }
 
 //-------------------------------------------
+
+void SIP_Header_Call_ID::set_random_call_id(std::string host)
+{
+    _call_id = String_Functions::random(20);
+
+    if (!host.empty())
+    {
+        _call_id += "@";
+        _call_id += host;
+    }
+}
+
+//-------------------------------------------
 //-------------------------------------------
 
 bool SIP_Header_Call_Info::decode(std::string &sip_msg)
@@ -2083,6 +2096,13 @@ bool SIP_Header_From::encode(std::string &sip_msg)
     }
 
     return true;
+}
+
+//-------------------------------------------
+
+void SIP_Header_From::set_random_tag()
+{
+    _tag = String_Functions::random(20);
 }
 
 //-------------------------------------------
@@ -2982,6 +3002,13 @@ bool SIP_Header_To::encode(std::string &sip_msg)
 }
 
 //-------------------------------------------
+
+void SIP_Header_To::set_random_tag()
+{
+    _tag = String_Functions::random(20);
+}
+
+//-------------------------------------------
 //-------------------------------------------
 
 bool SIP_Header_Unsupported::decode(std::string &sip_msg)
@@ -3197,6 +3224,13 @@ void SIP_Header_Via::set_transport(SIP_Transport_Type transport)
 SIP_Transport_Type SIP_Header_Via::get_transport()
 {
     return SIP_Functions::get_transport_type(_transport);
+}
+
+//-------------------------------------------
+
+void SIP_Header_Via::set_random_branch()
+{
+    _branch = "z9hG4bK" + String_Functions::random(20);
 }
 
 //-------------------------------------------

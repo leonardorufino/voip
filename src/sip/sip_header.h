@@ -495,6 +495,7 @@ public:
     bool encode(std::string &sip_msg);
 
     void set_call_id(std::string call_id) { _call_id = call_id; }
+    void set_random_call_id(std::string host);
     std::string get_call_id() { return _call_id; }
 
 private:
@@ -957,6 +958,7 @@ public:
     SIP_Address &get_address() { return _address; }
 
     void set_tag(std::string tag) { _tag = tag; }
+    void set_random_tag();
     std::string get_tag() { return _tag; }
 
     void set_parameters(std::list<std::string> &parameters) { _parameters = parameters; }
@@ -1582,6 +1584,7 @@ public:
     SIP_Address &get_address() { return _address; }
 
     void set_tag(std::string tag) { _tag = tag; }
+    void set_random_tag();
     std::string get_tag() { return _tag; }
 
     void set_parameters(std::list<std::string> &parameters) { _parameters = parameters; }
@@ -1677,6 +1680,7 @@ public:
     unsigned short get_port() { return _port; }
 
     void set_branch(std::string branch) { _branch = branch; }
+    void set_random_branch();
     std::string get_branch() { return _branch; }
 
     void set_received(std::string received) { _received = received; }
