@@ -42,6 +42,7 @@ public:
         LOG_SIP_TRANSACTION = 0x0040,
         LOG_SIP_TRANSPORT   = 0x0080,
         LOG_SIP_DIALOG      = 0x0100,
+        LOG_SIP_CALL        = 0x0200,
     };
 
     typedef bool (log_callback)(Log_Level level, Log_Source source, const std::string &msg);
