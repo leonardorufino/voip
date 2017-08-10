@@ -39,6 +39,11 @@ protected:
     SIP_Response *create_invite_response_487();
     SIP_Request *create_ack();
 
+    SIP_Request *create_client_bye();
+    SIP_Response *create_server_bye_response_200();
+    SIP_Request *create_server_bye();
+    SIP_Response *create_client_bye_response_200();
+
     static SIP_Response *create_response_callback(void *data, SIP_Call *call, SIP_Request *request, unsigned short status_code);
     static bool send_response_callback(void *data, SIP_Call *call, SIP_Request *request, SIP_Response *response);
 
