@@ -238,6 +238,32 @@ SIP_Response *SIP_Call_Test::create_invite_response_487()
 }
 
 //-------------------------------------------
+
+SIP_Request *SIP_Call_Test::create_ack()
+{
+    std::string str;
+    str  = "ACK sip:bob@192.0.2.4 SIP/2.0\r\n";
+    str += "Via: SIP/2.0/UDP pc33.atlanta.com;branch=z9hG4bK79871dfs\r\n";
+    str += "Max-Forwards: 70\r\n";
+    str += "To: Bob <sip:bob@biloxi.com>;tag=a6c85cf\r\n";
+    str += "From: Alice <sip:alice@atlanta.com>;tag=1928301774\r\n";
+    str += "Call-ID: " + _call_id + "\r\n";
+    str += "CSeq: " + std::to_string(_invite_sequence) + " ACK\r\n";
+    str += "Contact: <sip:alice@pc33.atlanta.com>\r\n";
+    str += "Content-Length: 0\r\n";
+
+    SIP_Message *msg = SIP_Message::decode_msg(str);
+    SIP_Request *request = dynamic_cast<SIP_Request *>(msg);
+    if (!request)
+    {
+        std::cout << "SIP_Call_Test::create_ack -> Failed to decode message\n";
+        return NULL;
+    }
+
+    return request;
+}
+
+//-------------------------------------------
 //-------------------------------------------
 
 SIP_Response *SIP_Call_Test::create_response_callback(void *data, SIP_Call *call, SIP_Request *request, unsigned short status_code)
