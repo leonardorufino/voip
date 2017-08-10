@@ -18,7 +18,7 @@ class SIP_Call_Test
 {
 public:
     SIP_Call_Test();
-    virtual ~SIP_Call_Test() {}
+    virtual ~SIP_Call_Test();
 
     static bool init();
 
@@ -30,6 +30,14 @@ protected:
     virtual bool init_call();
     virtual bool set_callbacks();
 
+    SIP_Request *create_invite();
+    SIP_Response *create_invite_response_100();
+    SIP_Response *create_invite_response_180();
+    SIP_Response *create_invite_response_183();
+    SIP_Response *create_invite_response_200();
+    SIP_Response *create_invite_response_480();
+    SIP_Response *create_invite_response_487();
+
     static SIP_Response *create_response_callback(void *data, SIP_Call *call, SIP_Request *request, unsigned short status_code);
     static bool send_response_callback(void *data, SIP_Call *call, SIP_Request *request, SIP_Response *response);
 
@@ -40,6 +48,7 @@ protected:
     std::string _call_id;
     unsigned long _client_sequence;
     unsigned long _server_sequence;
+    unsigned long _invite_sequence;
 
     SIP_Request *_request;
     SIP_Response *_response;
