@@ -593,9 +593,18 @@ bool SIP_Call::process_send_request_ringing_in(SIP_Request *request)
     switch (method)
     {
         case SIP_REQUEST_UPDATE:
+        {
+            SIP_Dialog *dialog = get_client_dialog(request);
+            if (!dialog)
+            {
+                _logger.warning("Failed to process send request ringing in: invalid dialog (method=%d)", method);
+                return false;
+            }
+
             //_state = STATE_RINGING_IN;
             _logger.trace("Changed state in process send request ringing in (state=%d, method=%d)", _state, method);
             return true;
+        }
 
         default:
             _logger.warning("Failed to process send request ringing in: invalid method (method=%d)", method);
@@ -612,9 +621,18 @@ bool SIP_Call::process_receive_request_ringing_in(SIP_Request *request)
     switch (method)
     {
         case SIP_REQUEST_UPDATE:
+        {
+            SIP_Dialog *dialog = get_server_dialog(request);
+            if (!dialog)
+            {
+                _logger.warning("Failed to process receive request ringing in: invalid dialog (method=%d)", method);
+                return false;
+            }
+
             //_state = STATE_RINGING_IN;
             _logger.trace("Changed state in process receive request ringing in (state=%d, method=%d)", _state, method);
             return true;
+        }
 
         default:
             _logger.warning("Failed to process receive request ringing in: invalid method (method=%d)", method);
@@ -700,10 +718,20 @@ bool SIP_Call::process_send_response_ringing_in(SIP_Request *request, SIP_Respon
             }
 
         case SIP_REQUEST_UPDATE:
+        {
+            SIP_Dialog *dialog = get_server_dialog(response);
+            if (!dialog)
+            {
+                _logger.warning("Failed to process send response ringing in: invalid dialog (method=%d, status_code=%d)",
+                                method, status_code);
+                return false;
+            }
+
             //_state = STATE_RINGING_IN;
             _logger.trace("Changed state in process send response ringing in (state=%d, method=%d, status_code=%d)",
                           _state, method, status_code);
             return true;
+        }
 
         default:
             _logger.warning("Failed to process send response ringing in: invalid method (method=%d, status_code=%d)",
@@ -722,10 +750,20 @@ bool SIP_Call::process_receive_response_ringing_in(SIP_Request *request, SIP_Res
     switch (method)
     {
         case SIP_REQUEST_UPDATE:
+        {
+            SIP_Dialog *dialog = get_client_dialog(response);
+            if (!dialog)
+            {
+                _logger.warning("Failed to process receive response ringing in: invalid dialog (method=%d, status_code=%d)",
+                                method, status_code);
+                return false;
+            }
+
             //_state = STATE_RINGING_IN;
             _logger.trace("Changed state in process receive response ringing in (state=%d, method=%d, status_code=%d)",
                           _state, method, status_code);
             return true;
+        }
 
         default:
             _logger.warning("Failed to process receive response ringing in: invalid method (method=%d, status_code=%d)",
@@ -743,9 +781,18 @@ bool SIP_Call::process_send_request_ringing_out(SIP_Request *request)
     switch (method)
     {
         case SIP_REQUEST_UPDATE:
+        {
+            SIP_Dialog *dialog = get_client_dialog(request);
+            if (!dialog)
+            {
+                _logger.warning("Failed to process send request ringing out: invalid dialog (method=%d)", method);
+                return false;
+            }
+
             //_state = STATE_RINGING_OUT;
             _logger.trace("Changed state in process send request ringing out (state=%d, method=%d)", _state, method);
             return true;
+        }
 
         default:
             _logger.warning("Failed to process send request ringing out: invalid method (method=%d)", method);
@@ -762,9 +809,18 @@ bool SIP_Call::process_receive_request_ringing_out(SIP_Request *request)
     switch (method)
     {
         case SIP_REQUEST_UPDATE:
+        {
+            SIP_Dialog *dialog = get_server_dialog(request);
+            if (!dialog)
+            {
+                _logger.warning("Failed to process receive request ringing out: invalid dialog (method=%d)", method);
+                return false;
+            }
+
             //_state = STATE_RINGING_OUT;
             _logger.trace("Changed state in process receive request ringing out (state=%d, method=%d)", _state, method);
             return true;
+        }
 
         default:
             _logger.warning("Failed to process receive request ringing out: invalid method (method=%d)", method);
@@ -782,10 +838,20 @@ bool SIP_Call::process_send_response_ringing_out(SIP_Request *request, SIP_Respo
     switch (method)
     {
         case SIP_REQUEST_UPDATE:
+        {
+            SIP_Dialog *dialog = get_server_dialog(response);
+            if (!dialog)
+            {
+                _logger.warning("Failed to process send response ringing out: invalid dialog (method=%d, status_code=%d)",
+                                method, status_code);
+                return false;
+            }
+
             //_state = STATE_RINGING_OUT;
             _logger.trace("Changed state in process send response ringing out (state=%d, method=%d, status_code=%d)",
                           _state, method, status_code);
             return true;
+        }
 
         default:
             _logger.warning("Failed to process receive response ringing out: invalid method (method=%d, status_code=%d)",
@@ -882,10 +948,20 @@ bool SIP_Call::process_receive_response_ringing_out(SIP_Request *request, SIP_Re
             }
 
         case SIP_REQUEST_UPDATE:
+        {
+            SIP_Dialog *dialog = get_client_dialog(response);
+            if (!dialog)
+            {
+                _logger.warning("Failed to process receive response ringing out: invalid dialog (method=%d, status_code=%d)",
+                                method, status_code);
+                return false;
+            }
+
             //_state = STATE_RINGING_OUT;
             _logger.trace("Changed state in process receive response ringing out (state=%d, method=%d, status_code=%d)",
                           _state, method, status_code);
             return true;
+        }
 
         default:
             _logger.warning("Failed to process receive response ringing out: invalid method (method=%d, status_code=%d)",
