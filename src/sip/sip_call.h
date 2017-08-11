@@ -77,7 +77,13 @@ private:
     bool process_send_response_calling_in(SIP_Request *request, SIP_Response *response);
     bool process_receive_response_calling_out(SIP_Request *request, SIP_Response *response);
 
+    bool process_send_request_ringing_in(SIP_Request *request);
+    bool process_receive_request_ringing_in(SIP_Request *request);
     bool process_send_response_ringing_in(SIP_Request *request, SIP_Response *response);
+    bool process_receive_response_ringing_in(SIP_Request *request, SIP_Response *response);
+    bool process_send_request_ringing_out(SIP_Request *request);
+    bool process_receive_request_ringing_out(SIP_Request *request);
+    bool process_send_response_ringing_out(SIP_Request *request, SIP_Response *response);
     bool process_receive_response_ringing_out(SIP_Request *request, SIP_Response *response);
 
     bool process_receive_request_waiting_ack_in(SIP_Request *request);
