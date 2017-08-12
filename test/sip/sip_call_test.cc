@@ -243,7 +243,7 @@ SIP_Request *SIP_Call_Test::create_ack()
 {
     std::string str;
     str  = "ACK sip:bob@192.0.2.4 SIP/2.0\r\n";
-    str += "Via: SIP/2.0/UDP pc33.atlanta.com;branch=z9hG4bK79871dfs\r\n";
+    str += "Via: SIP/2.0/UDP pc33.atlanta.com;branch=z9hG4bK798711\r\n";
     str += "Max-Forwards: 70\r\n";
     str += "To: Bob <sip:bob@biloxi.com>;tag=a6c85cf\r\n";
     str += "From: Alice <sip:alice@atlanta.com>;tag=1928301774\r\n";
@@ -269,7 +269,7 @@ SIP_Request *SIP_Call_Test::create_client_bye()
 {
     std::string str;
     str  = "BYE sip:bob@192.0.2.4 SIP/2.0\r\n";
-    str += "Via: SIP/2.0/UDP pc33.atlanta.com;branch=z9hG4bKnashds10\r\n";
+    str += "Via: SIP/2.0/UDP pc33.atlanta.com;branch=z9hG4bKjhfuosd\r\n";
     str += "Max-Forwards: 70\r\n";
     str += "To: Bob <sip:bob@biloxi.com>;tag=a6c85cf\r\n";
     str += "From: Alice <sip:alice@atlanta.com>;tag=1928301774\r\n";
@@ -294,7 +294,7 @@ SIP_Response *SIP_Call_Test::create_server_bye_response_200()
 {
     std::string str;
     str  = "SIP/2.0 200 OK\r\n";
-    str += "Via: SIP/2.0/UDP pc33.atlanta.com;branch=z9hG4bKnashds10\r\n";
+    str += "Via: SIP/2.0/UDP pc33.atlanta.com;branch=z9hG4bKjhfuosd\r\n";
     str += "To: Bob <sip:bob@biloxi.com>;tag=a6c85cf\r\n";
     str += "From: Alice <sip:alice@atlanta.com>;tag=1928301774\r\n";
     str += "Call-ID: " + _call_id + "\r\n";
@@ -318,7 +318,7 @@ SIP_Request *SIP_Call_Test::create_server_bye()
 {
     std::string str;
     str  = "BYE sip:alice@pc33.atlanta.com SIP/2.0\r\n";
-    str += "Via: SIP/2.0/UDP 192.0.2.4;branch=z9hG4bKnashds10\r\n";
+    str += "Via: SIP/2.0/UDP 192.0.2.4;branch=z9hG4bKiefjddf\r\n";
     str += "Max-Forwards: 70\r\n";
     str += "From: Bob <sip:bob@biloxi.com>;tag=a6c85cf\r\n";
     str += "To: Alice <sip:alice@atlanta.com>;tag=1928301774\r\n";
@@ -343,7 +343,7 @@ SIP_Response *SIP_Call_Test::create_client_bye_response_200()
 {
     std::string str;
     str  = "SIP/2.0 200 OK\r\n";
-    str += "Via: SIP/2.0/UDP 192.0.2.4;branch=z9hG4bKnashds10\r\n";
+    str += "Via: SIP/2.0/UDP 192.0.2.4;branch=z9hG4bKiefjddf\r\n";
     str += "From: Bob <sip:bob@biloxi.com>;tag=a6c85cf\r\n";
     str += "To: Alice <sip:alice@atlanta.com>;tag=1928301774\r\n";
     str += "Call-ID: " + _call_id + "\r\n";
@@ -367,7 +367,7 @@ SIP_Request *SIP_Call_Test::create_client_update()
 {
     std::string str;
     str  = "UPDATE sip:bob@192.0.2.4 SIP/2.0\r\n";
-    str += "Via: SIP/2.0/UDP pc33.atlanta.com;branch=z9hG4bKnashds10\r\n";
+    str += "Via: SIP/2.0/UDP pc33.atlanta.com;branch=z9hG4bKoi900ks\r\n";
     str += "Max-Forwards: 70\r\n";
     str += "To: Bob <sip:bob@biloxi.com>;tag=a6c85cf\r\n";
     str += "From: Alice <sip:alice@atlanta.com>;tag=1928301774\r\n";
@@ -392,7 +392,7 @@ SIP_Response *SIP_Call_Test::create_server_update_response_200()
 {
     std::string str;
     str  = "SIP/2.0 200 OK\r\n";
-    str += "Via: SIP/2.0/UDP pc33.atlanta.com;branch=z9hG4bKnashds10\r\n";
+    str += "Via: SIP/2.0/UDP pc33.atlanta.com;branch=z9hG4bKoi900ks\r\n";
     str += "To: Bob <sip:bob@biloxi.com>;tag=a6c85cf\r\n";
     str += "From: Alice <sip:alice@atlanta.com>;tag=1928301774\r\n";
     str += "Call-ID: " + _call_id + "\r\n";
@@ -416,7 +416,7 @@ SIP_Request *SIP_Call_Test::create_server_update()
 {
     std::string str;
     str  = "UPDATE sip:alice@pc33.atlanta.com SIP/2.0\r\n";
-    str += "Via: SIP/2.0/UDP 192.0.2.4;branch=z9hG4bKnashds10\r\n";
+    str += "Via: SIP/2.0/UDP 192.0.2.4;branch=z9hG4bKppi56f\r\n";
     str += "Max-Forwards: 70\r\n";
     str += "From: Bob <sip:bob@biloxi.com>;tag=a6c85cf\r\n";
     str += "To: Alice <sip:alice@atlanta.com>;tag=1928301774\r\n";
@@ -441,7 +441,7 @@ SIP_Response *SIP_Call_Test::create_client_update_response_200()
 {
     std::string str;
     str  = "SIP/2.0 200 OK\r\n";
-    str += "Via: SIP/2.0/UDP 192.0.2.4;branch=z9hG4bKnashds10\r\n";
+    str += "Via: SIP/2.0/UDP 192.0.2.4;branch=z9hG4bKppi56f\r\n";
     str += "From: Bob <sip:bob@biloxi.com>;tag=a6c85cf\r\n";
     str += "To: Alice <sip:alice@atlanta.com>;tag=1928301774\r\n";
     str += "Call-ID: " + _call_id + "\r\n";
@@ -453,6 +453,55 @@ SIP_Response *SIP_Call_Test::create_client_update_response_200()
     if (!response)
     {
         std::cout << "SIP_Call_Test::create_client_update_response_200 -> Failed to decode message\n";
+        return NULL;
+    }
+
+    return response;
+}
+
+//-------------------------------------------
+
+SIP_Request *SIP_Call_Test::create_cancel()
+{
+    std::string str;
+    str  = "CANCEL sip:bob@192.0.2.4 SIP/2.0\r\n";
+    str += "Via: SIP/2.0/UDP pc33.atlanta.com;branch=z9hG4bKp02s2\r\n";
+    str += "Max-Forwards: 70\r\n";
+    str += "To: Bob <sip:bob@biloxi.com>\r\n";
+    str += "From: Alice <sip:alice@atlanta.com>;tag=1928301774\r\n";
+    str += "Call-ID: " + _call_id + "\r\n";
+    str += "CSeq: " + std::to_string(_invite_sequence) + " CANCEL\r\n";
+    str += "Content-Length: 0\r\n";
+
+    SIP_Message *msg = SIP_Message::decode_msg(str);
+    SIP_Request *request = dynamic_cast<SIP_Request *>(msg);
+    if (!request)
+    {
+        std::cout << "SIP_Call_Test::create_cancel -> Failed to decode message\n";
+        return NULL;
+    }
+
+    return request;
+}
+
+//-------------------------------------------
+
+SIP_Response *SIP_Call_Test::create_cancel_response_200()
+{
+    std::string str;
+    str  = "SIP/2.0 200 OK\r\n";
+    str += "Via: SIP/2.0/UDP pc33.atlanta.com;branch=z9hG4bKp02s2\r\n";
+    str += "To: Bob <sip:bob@biloxi.com>;tag=a6c85cf\r\n";
+    str += "From: Alice <sip:alice@atlanta.com>;tag=1928301774\r\n";
+    str += "Call-ID: " + _call_id + "\r\n";
+    str += "CSeq: " + std::to_string(_invite_sequence) + " CANCEL\r\n";
+    str += "Content-Length: 0\r\n";
+
+    SIP_Message *msg = SIP_Message::decode_msg(str);
+    SIP_Response *response = dynamic_cast<SIP_Response *>(msg);
+    if (!response)
+    {
+        std::cout << "SIP_Call_Test::create_cancel_response_200 -> Failed to decode message\n";
         return NULL;
     }
 
