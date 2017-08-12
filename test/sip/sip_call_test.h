@@ -74,6 +74,9 @@ protected:
     bool process_server_update();
     bool process_client_update_response_200();
 
+    bool process_info();
+    bool process_info_response_200();
+
     static SIP_Response *create_response_callback(void *data, SIP_Call *call, SIP_Request *request, unsigned short status_code);
     static bool send_response_callback(void *data, SIP_Call *call, SIP_Request *request, SIP_Response *response);
 
