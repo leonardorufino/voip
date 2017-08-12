@@ -31,6 +31,10 @@ std::string SIP_Call::get_state_str()
         case STATE_CALLING_OUT:     return "Calling Out";
         case STATE_RINGING_IN:      return "Ringing In";
         case STATE_RINGING_OUT:     return "Ringing Out";
+        case STATE_CANCELING_OUT:   return "Canceling Out";
+        case STATE_CANCELING_IN:    return "Canceling In";
+        case STATE_CANCELED_OUT:    return "Canceled Out";
+        case STATE_CANCELED_IN:     return "Canceled In";
         case STATE_WAITING_ACK_IN:  return "Waiting ACK In";
         case STATE_WAITING_ACK_OUT: return "Waiting ACK Out";
         case STATE_ACTIVE:          return "Active";
@@ -158,7 +162,8 @@ SIP_Dialog *SIP_Call::get_dialog(std::string call_id, std::string local_tag, std
     {
         SIP_Dialog *dialog = *it++;
 
-        if ((dialog->get_call_id() == call_id) && (dialog->get_local_tag() == local_tag) && (dialog->get_remote_tag() == remote_tag))
+        if ((dialog->get_call_id() == call_id) && ((local_tag.empty()) || (dialog->get_local_tag() == local_tag)) &&
+            ((remote_tag.empty()) || (dialog->get_remote_tag() == remote_tag)))
             return dialog;
     }
 
@@ -294,6 +299,12 @@ bool SIP_Call::process_send_response(SIP_Request *request, SIP_Response *respons
         case STATE_RINGING_OUT:
             return process_send_response_ringing_out(request, response);
 
+        case STATE_CANCELING_IN:
+            return process_send_response_canceling_in(request, response);
+
+        case STATE_CANCELED_IN:
+            return process_send_response_canceled_in(request, response);
+
         case STATE_ACTIVE:
             return process_send_response_active(request, response);
 
@@ -329,6 +340,12 @@ bool SIP_Call::process_receive_response(SIP_Request *request, SIP_Response *resp
 
         case STATE_RINGING_OUT:
             return process_receive_response_ringing_out(request, response);
+
+        case STATE_CANCELING_OUT:
+            return process_receive_response_canceling_out(request, response);
+
+        case STATE_CANCELED_OUT:
+            return process_receive_response_canceled_out(request, response);
 
         case STATE_ACTIVE:
             return process_receive_response_active(request, response);
@@ -500,6 +517,10 @@ bool SIP_Call::process_send_response_calling_in(SIP_Request *request, SIP_Respon
                 return true;
             }
 
+            _logger.warning("Failed to process send response calling in: invalid status code (method=%d, status_code=%d)",
+                            method, status_code);
+            return false;
+
         default:
             _logger.warning("Failed to process send response calling in (method=%d, status_code=%d)", method, status_code);
             return false;
@@ -578,6 +599,10 @@ bool SIP_Call::process_receive_response_calling_out(SIP_Request *request, SIP_Re
                 return true;
             }
 
+            _logger.warning("Failed to process receive response calling out: invalid status code (method=%d, status_code=%d)",
+                            method, status_code);
+            return false;
+
         default:
             _logger.warning("Failed to process receive response calling out (method=%d, status_code=%d)", method, status_code);
             return false;
@@ -620,6 +645,20 @@ bool SIP_Call::process_receive_request_ringing_in(SIP_Request *request)
 
     switch (method)
     {
+        case SIP_REQUEST_CANCEL:
+        {
+            SIP_Dialog *dialog = get_server_dialog(request);
+            if (!dialog)
+            {
+                _logger.warning("Failed to process receive request ringing in: invalid dialog (method=%d)", method);
+                return false;
+            }
+
+            _state = STATE_CANCELING_IN;
+            _logger.trace("Changed state in process receive request ringing in (state=%d, method=%d)", _state, method);
+            return true;
+        }
+
         case SIP_REQUEST_UPDATE:
         {
             SIP_Dialog *dialog = get_server_dialog(request);
@@ -717,6 +756,10 @@ bool SIP_Call::process_send_response_ringing_in(SIP_Request *request, SIP_Respon
                 return true;
             }
 
+            _logger.warning("Failed to process send response ringing in: invalid status code (method=%d, status_code=%d)",
+                            method, status_code);
+            return false;
+
         case SIP_REQUEST_UPDATE:
         {
             SIP_Dialog *dialog = get_server_dialog(response);
@@ -780,6 +823,20 @@ bool SIP_Call::process_send_request_ringing_out(SIP_Request *request)
 
     switch (method)
     {
+        case SIP_REQUEST_CANCEL:
+        {
+            SIP_Dialog *dialog = get_client_dialog(request);
+            if (!dialog)
+            {
+                _logger.warning("Failed to process send request ringing out: invalid dialog (method=%d)", method);
+                return false;
+            }
+
+            _state = STATE_CANCELING_OUT;
+            _logger.trace("Changed state in process send request ringing out (state=%d, method=%d)", _state, method);
+            return true;
+        }
+
         case SIP_REQUEST_UPDATE:
         {
             SIP_Dialog *dialog = get_client_dialog(request);
@@ -947,6 +1004,10 @@ bool SIP_Call::process_receive_response_ringing_out(SIP_Request *request, SIP_Re
                 return true;
             }
 
+            _logger.warning("Failed to process receive response ringing out: invalid status code (method=%d, status_code=%d)",
+                            method, status_code);
+            return false;
+
         case SIP_REQUEST_UPDATE:
         {
             SIP_Dialog *dialog = get_client_dialog(response);
@@ -965,6 +1026,152 @@ bool SIP_Call::process_receive_response_ringing_out(SIP_Request *request, SIP_Re
 
         default:
             _logger.warning("Failed to process receive response ringing out: invalid method (method=%d, status_code=%d)",
+                            method, status_code);
+            return false;
+    }
+}
+
+//-------------------------------------------
+
+bool SIP_Call::process_send_response_canceling_in(SIP_Request *request, SIP_Response *response)
+{
+    SIP_Method_Type method = request->get_message_type();
+    unsigned short status_code = response->get_status_code();
+
+    switch (method)
+    {
+        case SIP_REQUEST_CANCEL:
+        {
+            SIP_Dialog *dialog = get_server_dialog(response);
+            if (!dialog)
+            {
+                _logger.warning("Failed to process send response canceling in: invalid dialog (method=%d, status_code=%d)",
+                                method, status_code);
+                return false;
+            }
+
+            _state = STATE_CANCELED_IN;
+            _logger.trace("Changed state in process send response canceling in (state=%d, method=%d, status_code=%d)",
+                          _state, method, status_code);
+            return true;
+        }
+
+        default:
+            _logger.warning("Failed to process send response canceling in: invalid method (method=%d, status_code=%d)",
+                            method, status_code);
+            return false;
+    }
+}
+
+//-------------------------------------------
+
+bool SIP_Call::process_receive_response_canceling_out(SIP_Request *request, SIP_Response *response)
+{
+    SIP_Method_Type method = request->get_message_type();
+    unsigned short status_code = response->get_status_code();
+
+    switch (method)
+    {
+        case SIP_REQUEST_CANCEL:
+        {
+            SIP_Dialog *dialog = get_client_dialog(response);
+            if (!dialog)
+            {
+                _logger.warning("Failed to process receive response canceling out: invalid dialog (method=%d, status_code=%d)",
+                                method, status_code);
+                return false;
+            }
+
+            _state = STATE_CANCELED_OUT;
+            _logger.trace("Changed state in process receive response canceling out (state=%d, method=%d, status_code=%d)",
+                          _state, method, status_code);
+            return true;
+        }
+
+        default:
+            _logger.warning("Failed to process receive response canceling out: invalid method (method=%d, status_code=%d)",
+                            method, status_code);
+            return false;
+    }
+}
+
+//-------------------------------------------
+
+bool SIP_Call::process_send_response_canceled_in(SIP_Request *request, SIP_Response *response)
+{
+    SIP_Method_Type method = request->get_message_type();
+    unsigned short status_code = response->get_status_code();
+
+    switch (method)
+    {
+        case SIP_REQUEST_INVITE:
+        {
+            SIP_Dialog *dialog = get_server_dialog(response);
+            if (!dialog)
+            {
+                _logger.warning("Failed to process send response canceled in: invalid dialog (method=%d, status_code=%d)",
+                                method, status_code);
+                return false;
+            }
+
+            if ((status_code >= 300) && (status_code <= 699))
+            {
+                remove_dialog(dialog);
+
+                _state = STATE_CLOSED;
+                _logger.trace("Changed state in process send response canceled in (state=%d, method=%d, status_code=%d)",
+                              _state, method, status_code);
+                return true;
+            }
+
+            _logger.warning("Failed to process send response canceled in: invalid status code (method=%d, status_code=%d)",
+                            method, status_code);
+            return false;
+        }
+
+        default:
+            _logger.warning("Failed to process send response canceled in: invalid method (method=%d, status_code=%d)",
+                            method, status_code);
+            return false;
+    }
+}
+
+//-------------------------------------------
+
+bool SIP_Call::process_receive_response_canceled_out(SIP_Request *request, SIP_Response *response)
+{
+    SIP_Method_Type method = request->get_message_type();
+    unsigned short status_code = response->get_status_code();
+
+    switch (method)
+    {
+        case SIP_REQUEST_INVITE:
+        {
+            SIP_Dialog *dialog = get_client_dialog(response);
+            if (!dialog)
+            {
+                _logger.warning("Failed to process receive response canceled out: invalid dialog (method=%d, status_code=%d)",
+                                method, status_code);
+                return false;
+            }
+
+            if ((status_code >= 300) && (status_code <= 699))
+            {
+                remove_dialog(dialog);
+
+                _state = STATE_CLOSED;
+                _logger.trace("Changed state in process receive response canceled out (state=%d, method=%d, status_code=%d)",
+                              _state, method, status_code);
+                return true;
+            }
+
+            _logger.warning("Failed to process receive response canceled out: invalid status code (method=%d, status_code=%d)",
+                            method, status_code);
+            return false;
+        }
+
+        default:
+            _logger.warning("Failed to process receive response canceled out: invalid method (method=%d, status_code=%d)",
                             method, status_code);
             return false;
     }

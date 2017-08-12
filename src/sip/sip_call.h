@@ -31,6 +31,10 @@ public:
         STATE_CALLING_OUT,
         STATE_RINGING_IN,
         STATE_RINGING_OUT,
+        STATE_CANCELING_IN,
+        STATE_CANCELING_OUT,
+        STATE_CANCELED_IN,
+        STATE_CANCELED_OUT,
         STATE_WAITING_ACK_IN,
         STATE_WAITING_ACK_OUT,
         STATE_ACTIVE,
@@ -85,6 +89,12 @@ private:
     bool process_receive_request_ringing_out(SIP_Request *request);
     bool process_send_response_ringing_out(SIP_Request *request, SIP_Response *response);
     bool process_receive_response_ringing_out(SIP_Request *request, SIP_Response *response);
+
+    bool process_send_response_canceling_in(SIP_Request *request, SIP_Response *response);
+    bool process_receive_response_canceling_out(SIP_Request *request, SIP_Response *response);
+
+    bool process_send_response_canceled_in(SIP_Request *request, SIP_Response *response);
+    bool process_receive_response_canceled_out(SIP_Request *request, SIP_Response *response);
 
     bool process_receive_request_waiting_ack_in(SIP_Request *request);
     bool process_send_request_waiting_ack_out(SIP_Request *request);
