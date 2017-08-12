@@ -1042,6 +1042,228 @@ bool SIP_Call_Test::process_ack()
 }
 
 //-------------------------------------------
+
+bool SIP_Call_Test::process_client_bye()
+{
+    _bye = create_client_bye();
+    if (!_bye)
+        return false;
+
+    if (!_client_call.process_send_request(_bye))
+    {
+        std::cout << "SIP_Call_Test::process_client_bye -> Failed to process send request\n";
+        return false;
+    }
+
+    if (_client_call.get_state() != SIP_Call::STATE_CLOSING_OUT)
+    {
+        std::cout << "SIP_Call_Test::process_client_bye -> Invalid client call state:\n";
+        std::cout << std::setw(12) << "Expected: " << SIP_Call::STATE_CLOSING_OUT << "\n";
+        std::cout << std::setw(12) << "State: " << _client_call.get_state() << "\n";
+        return false;
+    }
+
+    if (!_client_call.get_client_dialog(_bye))
+    {
+        std::cout << "SIP_Call_Test::process_client_bye -> Invalid client dialog\n";
+        return false;
+    }
+
+    if (!_server_call.process_receive_request(_bye))
+    {
+        std::cout << "SIP_Call_Test::process_client_bye -> Failed to process receive request\n";
+        return false;
+    }
+
+    if (_server_call.get_state() != SIP_Call::STATE_CLOSING_IN)
+    {
+        std::cout << "SIP_Call_Test::process_client_bye -> Invalid server call state:\n";
+        std::cout << std::setw(12) << "Expected: " << SIP_Call::STATE_CLOSING_IN << "\n";
+        std::cout << std::setw(12) << "State: " << _server_call.get_state() << "\n";
+        return false;
+    }
+
+    if (!_server_call.get_server_dialog(_bye))
+    {
+        std::cout << "SIP_Call_Test::process_client_bye -> Invalid server dialog\n";
+        return false;
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Call_Test::process_server_bye_response_200()
+{
+    if (!_bye)
+    {
+        std::cout << "SIP_Call_Test::process_server_bye_response_200 -> Invalid request\n";
+        return false;
+    }
+
+    SIP_Response *bye_response_200 = create_server_bye_response_200();
+    if (!bye_response_200)
+    {
+        std::cout << "SIP_Call_Test::process_server_bye_response_200 -> Failed to create response\n";
+        return false;
+    }
+
+    if (!_server_call.process_send_response(_bye, bye_response_200))
+    {
+        std::cout << "SIP_Call_Test::process_server_bye_response_200 -> Failed to process send response\n";
+        return false;
+    }
+
+    if (_server_call.get_state() != SIP_Call::STATE_CLOSED)
+    {
+        std::cout << "SIP_Call_Test::process_server_bye_response_200 -> Invalid server call state:\n";
+        std::cout << std::setw(12) << "Expected: " << SIP_Call::STATE_CLOSED << "\n";
+        std::cout << std::setw(12) << "State: " << _server_call.get_state() << "\n";
+        return false;
+    }
+
+    if (_server_call.get_server_dialog(bye_response_200))
+    {
+        std::cout << "SIP_Call_Test::process_server_bye_response_200 -> Invalid server response dialog\n";
+        return false;
+    }
+
+    if (!_client_call.process_receive_response(_bye, bye_response_200))
+    {
+        std::cout << "SIP_Call_Test::process_server_bye_response_200 -> Failed to process receive response\n";
+        return false;
+    }
+
+    if (_client_call.get_state() != SIP_Call::STATE_CLOSED)
+    {
+        std::cout << "SIP_Call_Test::process_server_bye_response_200 -> Invalid client call state:\n";
+        std::cout << std::setw(12) << "Expected: " << SIP_Call::STATE_CLOSED << "\n";
+        std::cout << std::setw(12) << "State: " << _client_call.get_state() << "\n";
+        return false;
+    }
+
+    if (_client_call.get_client_dialog(bye_response_200))
+    {
+        std::cout << "SIP_Call_Test::process_server_bye_response_200 -> Invalid client response dialog\n";
+        return false;
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Call_Test::process_server_bye()
+{
+    _bye = create_server_bye();
+    if (!_bye)
+        return false;
+
+    if (!_server_call.process_send_request(_bye))
+    {
+        std::cout << "SIP_Call_Test::process_server_bye -> Failed to process send request\n";
+        return false;
+    }
+
+    if (_server_call.get_state() != SIP_Call::STATE_CLOSING_OUT)
+    {
+        std::cout << "SIP_Call_Test::process_server_bye -> Invalid server call state:\n";
+        std::cout << std::setw(12) << "Expected: " << SIP_Call::STATE_CLOSING_OUT << "\n";
+        std::cout << std::setw(12) << "State: " << _server_call.get_state() << "\n";
+        return false;
+    }
+
+    if (!_server_call.get_client_dialog(_bye))
+    {
+        std::cout << "SIP_Call_Test::process_server_bye -> Invalid server dialog\n";
+        return false;
+    }
+
+    if (!_client_call.process_receive_request(_bye))
+    {
+        std::cout << "SIP_Call_Test::process_server_bye -> Failed to process receive request\n";
+        return false;
+    }
+
+    if (_client_call.get_state() != SIP_Call::STATE_CLOSING_IN)
+    {
+        std::cout << "SIP_Call_Test::process_server_bye -> Invalid client call state:\n";
+        std::cout << std::setw(12) << "Expected: " << SIP_Call::STATE_CLOSING_IN << "\n";
+        std::cout << std::setw(12) << "State: " << _server_call.get_state() << "\n";
+        return false;
+    }
+
+    if (!_client_call.get_server_dialog(_bye))
+    {
+        std::cout << "SIP_Call_Test::process_server_bye -> Invalid client dialog\n";
+        return false;
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Call_Test::process_client_bye_response_200()
+{
+    if (!_bye)
+    {
+        std::cout << "SIP_Call_Test::process_client_bye_response_200 -> Invalid request\n";
+        return false;
+    }
+
+    SIP_Response *bye_response_200 = create_client_bye_response_200();
+    if (!bye_response_200)
+    {
+        std::cout << "SIP_Call_Test::process_client_bye_response_200 -> Failed to create response\n";
+        return false;
+    }
+
+    if (!_client_call.process_send_response(_bye, bye_response_200))
+    {
+        std::cout << "SIP_Call_Test::process_client_bye_response_200 -> Failed to process send response\n";
+        return false;
+    }
+
+    if (_client_call.get_state() != SIP_Call::STATE_CLOSED)
+    {
+        std::cout << "SIP_Call_Test::process_client_bye_response_200 -> Invalid client call state:\n";
+        std::cout << std::setw(12) << "Expected: " << SIP_Call::STATE_CLOSED << "\n";
+        std::cout << std::setw(12) << "State: " << _server_call.get_state() << "\n";
+        return false;
+    }
+
+    if (_client_call.get_server_dialog(bye_response_200))
+    {
+        std::cout << "SIP_Call_Test::process_client_bye_response_200 -> Invalid client response dialog\n";
+        return false;
+    }
+
+    if (!_server_call.process_receive_response(_bye, bye_response_200))
+    {
+        std::cout << "SIP_Call_Test::process_client_bye_response_200 -> Failed to process receive response\n";
+        return false;
+    }
+
+    if (_server_call.get_state() != SIP_Call::STATE_CLOSED)
+    {
+        std::cout << "SIP_Call_Test::process_client_bye_response_200 -> Invalid server call state:\n";
+        std::cout << std::setw(12) << "Expected: " << SIP_Call::STATE_CLOSED << "\n";
+        std::cout << std::setw(12) << "State: " << _server_call.get_state() << "\n";
+        return false;
+    }
+
+    if (_server_call.get_client_dialog(bye_response_200))
+    {
+        std::cout << "SIP_Call_Test::process_client_bye_response_200 -> Invalid server response dialog\n";
+        return false;
+    }
+
+    return true;
+}
+
+//-------------------------------------------
 //-------------------------------------------
 
 SIP_Response *SIP_Call_Test::create_response_callback(void *data, SIP_Call *call, SIP_Request *request, unsigned short status_code)

@@ -64,6 +64,11 @@ protected:
     bool process_invite_response_487();
     bool process_ack();
 
+    bool process_client_bye();
+    bool process_server_bye_response_200();
+    bool process_server_bye();
+    bool process_client_bye_response_200();
+
     static SIP_Response *create_response_callback(void *data, SIP_Call *call, SIP_Request *request, unsigned short status_code);
     static bool send_response_callback(void *data, SIP_Call *call, SIP_Request *request, SIP_Response *response);
 
