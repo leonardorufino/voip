@@ -55,6 +55,15 @@ protected:
     SIP_Request *create_info();
     SIP_Response *create_info_response_200();
 
+    bool process_invite();
+    bool process_invite_response_100();
+    bool process_invite_response_180();
+    bool process_invite_response_183();
+    bool process_invite_response_200();
+    bool process_invite_response_480();
+    bool process_invite_response_487();
+    bool process_ack();
+
     static SIP_Response *create_response_callback(void *data, SIP_Call *call, SIP_Request *request, unsigned short status_code);
     static bool send_response_callback(void *data, SIP_Call *call, SIP_Request *request, SIP_Response *response);
 
@@ -66,6 +75,12 @@ protected:
     unsigned long _client_sequence;
     unsigned long _server_sequence;
     unsigned long _invite_sequence;
+
+    SIP_Request *_invite;
+    SIP_Request *_bye;
+    SIP_Request *_update;
+    SIP_Request *_cancel;
+    SIP_Request *_info;
 
     SIP_Request *_request;
     SIP_Response *_response;
