@@ -1202,6 +1202,43 @@ private:
 
 //-------------------------------------------
 
+class SIP_Header_RAck : public SIP_Header
+{
+public:
+    static const unsigned long INVALID_RSEQ = INVALID_UNSIGNED_LONG;
+    static const unsigned long INVALID_CSEQ = INVALID_UNSIGNED_LONG;
+
+public:
+    SIP_Header_RAck() : _rseq(INVALID_RSEQ) {}
+    SIP_Header_RAck(const SIP_Header_RAck &header) { *this = header; }
+    ~SIP_Header_RAck() {}
+
+    // Virtual pure functions
+    SIP_Header_Type get_header_type() { return SIP_HEADER_RACK; }
+    Header_Separator decode_separator() { return HEADER_SEPARATOR_NONE; }
+    Header_Separator encode_separator() { return HEADER_SEPARATOR_NONE; }
+    bool decode(std::string &sip_msg);
+    bool encode(std::string &sip_msg);
+
+    void set_rseq(unsigned long rseq) { _rseq = rseq; }
+    unsigned long get_rseq() { return _rseq; }
+
+    void set_cseq(unsigned long cseq) { _cseq = cseq; }
+    unsigned long get_cseq() { return _cseq; }
+
+    void set_method(SIP_Method_Type method);
+    void set_method(std::string method) { _method = method; }
+    SIP_Method_Type get_method();
+    std::string get_method_str() { return _method; }
+
+private:
+    unsigned long _rseq;
+    unsigned long _cseq;
+    std::string _method;
+};
+
+//-------------------------------------------
+
 class SIP_Header_Record_Route : public SIP_Header
 {
 public:

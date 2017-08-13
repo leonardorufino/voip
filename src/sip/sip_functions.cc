@@ -176,6 +176,8 @@ SIP_Header_Type SIP_Functions::get_header_type(std::string header)
         return SIP_HEADER_PROXY_AUTHORIZATION;
     else if (header == "Proxy-Require")
         return SIP_HEADER_PROXY_REQUIRE;
+    else if (header == "RAck")
+        return SIP_HEADER_RACK;
     else if (header == "Record-Route")
         return SIP_HEADER_RECORD_ROUTE;
     else if (header == "Refer-To")
@@ -252,9 +254,10 @@ std::string SIP_Functions::get_header_type(SIP_Header_Type header)
         case SIP_HEADER_MIN_EXPIRES:            return "Min-Expires";
         case SIP_HEADER_ORGANIZATION:           return "Organization";
         case SIP_HEADER_PRIORITY:               return "Priority";
-        case SIP_HEADER_PROXY_REQUIRE:          return "Proxy-Require";
         case SIP_HEADER_PROXY_AUTHENTICATE:     return "Proxy-Authenticate";
         case SIP_HEADER_PROXY_AUTHORIZATION:    return "Proxy-Authorization";
+        case SIP_HEADER_PROXY_REQUIRE:          return "Proxy-Require";
+        case SIP_HEADER_RACK:                   return "RAck";
         case SIP_HEADER_RECORD_ROUTE:           return "Record-Route";
         case SIP_HEADER_REFER_TO:               return "Refer-To";
         case SIP_HEADER_REFERRED_BY:            return "Referred-By";

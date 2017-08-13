@@ -135,10 +135,6 @@ SIP_Header *SIP_Header::create_header(SIP_Header_Type header_type, const SIP_Hea
             header = (!copy) ? new SIP_Header_Priority()
                              : new SIP_Header_Priority(dynamic_cast<const SIP_Header_Priority &>(*copy));
             break;
-        case SIP_HEADER_PROXY_REQUIRE:
-            header = (!copy) ? new SIP_Header_Proxy_Require()
-                             : new SIP_Header_Proxy_Require(dynamic_cast<const SIP_Header_Proxy_Require &>(*copy));
-            break;
         case SIP_HEADER_PROXY_AUTHENTICATE:
             header = (!copy) ? new SIP_Header_Proxy_Authenticate()
                              : new SIP_Header_Proxy_Authenticate(dynamic_cast<const SIP_Header_Proxy_Authenticate &>(*copy));
@@ -146,6 +142,14 @@ SIP_Header *SIP_Header::create_header(SIP_Header_Type header_type, const SIP_Hea
         case SIP_HEADER_PROXY_AUTHORIZATION:
             header = (!copy) ? new SIP_Header_Proxy_Authorization()
                              : new SIP_Header_Proxy_Authorization(dynamic_cast<const SIP_Header_Proxy_Authorization &>(*copy));
+            break;
+        case SIP_HEADER_PROXY_REQUIRE:
+            header = (!copy) ? new SIP_Header_Proxy_Require()
+                             : new SIP_Header_Proxy_Require(dynamic_cast<const SIP_Header_Proxy_Require &>(*copy));
+            break;
+        case SIP_HEADER_RACK:
+            header = (!copy) ? new SIP_Header_RAck()
+                             : new SIP_Header_RAck(dynamic_cast<const SIP_Header_RAck &>(*copy));
             break;
         case SIP_HEADER_RECORD_ROUTE:
             header = (!copy) ? new SIP_Header_Record_Route()
@@ -2358,6 +2362,66 @@ bool SIP_Header_Proxy_Require::encode(std::string &sip_msg)
 
     sip_msg += _option_tag;
     return true;
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+bool SIP_Header_RAck::decode(std::string &sip_msg)
+{
+    std::string result;
+
+    String_Functions::trim(sip_msg);
+    if (!String_Functions::match(sip_msg, " \t", result))
+        return false;
+
+    _rseq = String_Functions::str_to_ul(result);
+    if (_rseq == INVALID_RSEQ)
+        return false;
+
+    String_Functions::trim(sip_msg);
+    if (!String_Functions::match(sip_msg, " \t", result))
+        return false;
+
+    _cseq = String_Functions::str_to_ul(result);
+    if (_cseq == INVALID_CSEQ)
+        return false;
+
+    String_Functions::trim(sip_msg);
+    if (sip_msg.empty())
+        return false;
+
+    _method = sip_msg;
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_RAck::encode(std::string &sip_msg)
+{
+    if ((_rseq == INVALID_RSEQ) || (_cseq == INVALID_CSEQ) || (_method.empty()))
+        return false;
+
+    sip_msg += std::to_string(_rseq);
+    sip_msg += " ";
+    sip_msg += std::to_string(_cseq);
+    sip_msg += " ";
+    sip_msg += _method;
+    return true;
+}
+
+//-------------------------------------------
+
+void SIP_Header_RAck::set_method(SIP_Method_Type method)
+{
+    _method = SIP_Functions::get_method_type(method);
+}
+
+//-------------------------------------------
+
+SIP_Method_Type SIP_Header_RAck::get_method()
+{
+    return SIP_Functions::get_method_type(_method);
 }
 
 //-------------------------------------------

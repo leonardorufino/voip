@@ -141,6 +141,10 @@ bool SIP_Header_Test::init()
     if (!header_proxy_require.run())
         return false;
 
+    SIP_Header_RAck_Test header_rack;
+    if (!header_rack.run())
+        return false;
+
     SIP_Header_Record_Route_Test header_record_route;
     if (!header_record_route.run())
         return false;
@@ -1808,6 +1812,39 @@ SIP_Header_Proxy_Require_Test::SIP_Header_Proxy_Require_Test()
     hdr3._input          = "Proxy-Require:req1,req2";
     hdr3._output         = "Proxy-Require: req1, req2\r\n";
     hdr3._header_nb      = 2;
+    hdr3._decode_success = true;
+    hdr3._encode_success = true;
+    _header_input_output.push_back(hdr3);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+SIP_Header_RAck_Test::SIP_Header_RAck_Test()
+{
+    SIP_Header_Input_Output hdr1;
+    hdr1._header_type    = SIP_HEADER_RACK;
+    hdr1._input          = "RAck: 776656 1 INVITE";
+    hdr1._output         = "RAck: 776656 1 INVITE\r\n";
+    hdr1._header_nb      = 1;
+    hdr1._decode_success = true;
+    hdr1._encode_success = true;
+    _header_input_output.push_back(hdr1);
+
+    SIP_Header_Input_Output hdr2;
+    hdr2._header_type    = SIP_HEADER_RACK;
+    hdr2._input          = "RAck:1   23456    INVITE  ";
+    hdr2._output         = "RAck: 1 23456 INVITE\r\n";
+    hdr2._header_nb      = 1;
+    hdr2._decode_success = true;
+    hdr2._encode_success = true;
+    _header_input_output.push_back(hdr2);
+
+    SIP_Header_Input_Output hdr3;
+    hdr3._header_type    = SIP_HEADER_RACK;
+    hdr3._input          = "RAck:   349940055  99988877   INVITE";
+    hdr3._output         = "RAck: 349940055 99988877 INVITE\r\n";
+    hdr3._header_nb      = 1;
     hdr3._decode_success = true;
     hdr3._encode_success = true;
     _header_input_output.push_back(hdr3);
