@@ -668,6 +668,10 @@ bool SIP_Call::process_receive_request_ringing_in(SIP_Request *request)
                 return false;
             }
 
+            SIP_Header_Contact *header_contact = dynamic_cast<SIP_Header_Contact *>(request->get_header(SIP_HEADER_CONTACT));
+            if (header_contact)
+                dialog->set_remote_target(header_contact->get_address());
+
             //_state = STATE_RINGING_IN;
             _logger.trace("Changed state in process receive request ringing in (state=%d, method=%d)", _state, method);
             return true;
@@ -802,6 +806,10 @@ bool SIP_Call::process_receive_response_ringing_in(SIP_Request *request, SIP_Res
                 return false;
             }
 
+            SIP_Header_Contact *header_contact = dynamic_cast<SIP_Header_Contact *>(response->get_header(SIP_HEADER_CONTACT));
+            if (header_contact)
+                dialog->set_remote_target(header_contact->get_address());
+
             //_state = STATE_RINGING_IN;
             _logger.trace("Changed state in process receive response ringing in (state=%d, method=%d, status_code=%d)",
                           _state, method, status_code);
@@ -873,6 +881,10 @@ bool SIP_Call::process_receive_request_ringing_out(SIP_Request *request)
                 _logger.warning("Failed to process receive request ringing out: invalid dialog (method=%d)", method);
                 return false;
             }
+
+            SIP_Header_Contact *header_contact = dynamic_cast<SIP_Header_Contact *>(request->get_header(SIP_HEADER_CONTACT));
+            if (header_contact)
+                dialog->set_remote_target(header_contact->get_address());
 
             //_state = STATE_RINGING_OUT;
             _logger.trace("Changed state in process receive request ringing out (state=%d, method=%d)", _state, method);
@@ -1017,6 +1029,10 @@ bool SIP_Call::process_receive_response_ringing_out(SIP_Request *request, SIP_Re
                                 method, status_code);
                 return false;
             }
+
+            SIP_Header_Contact *header_contact = dynamic_cast<SIP_Header_Contact *>(response->get_header(SIP_HEADER_CONTACT));
+            if (header_contact)
+                dialog->set_remote_target(header_contact->get_address());
 
             //_state = STATE_RINGING_OUT;
             _logger.trace("Changed state in process receive response ringing out (state=%d, method=%d, status_code=%d)",
