@@ -1403,6 +1403,32 @@ private:
 
 //-------------------------------------------
 
+class SIP_Header_RSeq : public SIP_Header
+{
+public:
+    static const unsigned long INVALID_RSEQ = INVALID_UNSIGNED_LONG;
+
+public:
+    SIP_Header_RSeq() : _rseq(INVALID_RSEQ) {}
+    SIP_Header_RSeq(const SIP_Header_RSeq &header) { *this = header; }
+    ~SIP_Header_RSeq() {}
+
+    // Virtual pure functions
+    SIP_Header_Type get_header_type() { return SIP_HEADER_RSEQ; }
+    Header_Separator decode_separator() { return HEADER_SEPARATOR_NONE; }
+    Header_Separator encode_separator() { return HEADER_SEPARATOR_NONE; }
+    bool decode(std::string &sip_msg);
+    bool encode(std::string &sip_msg);
+
+    void set_rseq(unsigned long rseq) { _rseq = rseq; }
+    unsigned long get_rseq() { return _rseq; }
+
+private:
+    unsigned long _rseq;
+};
+
+//-------------------------------------------
+
 class SIP_Header_Server : public SIP_Header
 {
 public:
@@ -1647,6 +1673,8 @@ private:
 class SIP_Header_Via : public SIP_Header
 {
 public:
+    static const std::string PROTOCOL_NAME_SIP;
+    static const std::string PROTOCOL_VERSION_2_0;
     static const unsigned short INVALID_PORT = INVALID_UNSIGNED_SHORT;
     static const unsigned short INVALID_TTL = INVALID_UNSIGNED_SHORT;
 

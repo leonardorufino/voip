@@ -190,6 +190,8 @@ SIP_Header_Type SIP_Functions::get_header_type(std::string header)
         return SIP_HEADER_RETRY_AFTER;
     else if (header == "Route")
         return SIP_HEADER_ROUTE;
+    else if (header == "RSeq")
+        return SIP_HEADER_RSEQ;
     else if (header == "Server")
         return SIP_HEADER_SERVER;
     else if ((header == "Subject") || (header == "s"))
@@ -260,6 +262,7 @@ std::string SIP_Functions::get_header_type(SIP_Header_Type header)
         case SIP_HEADER_REQUIRE:                return "Require";
         case SIP_HEADER_RETRY_AFTER:            return "Retry-After";
         case SIP_HEADER_ROUTE:                  return "Route";
+        case SIP_HEADER_RSEQ:                   return "RSeq";
         case SIP_HEADER_SERVER:                 return "Server";
         case SIP_HEADER_SUBJECT:                return "Subject";
         case SIP_HEADER_SUBSCRIPTION_STATE:     return "Subscription-State";

@@ -169,6 +169,10 @@ bool SIP_Header_Test::init()
     if (!header_route.run())
         return false;
 
+    SIP_Header_RSeq_Test header_rseq;
+    if (!header_rseq.run())
+        return false;
+
     SIP_Header_Server_Test header_server;
     if (!header_server.run())
         return false;
@@ -2154,6 +2158,39 @@ SIP_Header_Route_Test::SIP_Header_Route_Test()
     hdr5._decode_success = true;
     hdr5._encode_success = true;
     _header_input_output.push_back(hdr5);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+SIP_Header_RSeq_Test::SIP_Header_RSeq_Test()
+{
+    SIP_Header_Input_Output hdr1;
+    hdr1._header_type    = SIP_HEADER_RSEQ;
+    hdr1._input          = "RSeq: 988789";
+    hdr1._output         = "RSeq: 988789\r\n";
+    hdr1._header_nb      = 1;
+    hdr1._decode_success = true;
+    hdr1._encode_success = true;
+    _header_input_output.push_back(hdr1);
+
+    SIP_Header_Input_Output hdr2;
+    hdr2._header_type    = SIP_HEADER_RSEQ;
+    hdr2._input          = "RSeq:1";
+    hdr2._output         = "RSeq: 1\r\n";
+    hdr2._header_nb      = 1;
+    hdr2._decode_success = true;
+    hdr2._encode_success = true;
+    _header_input_output.push_back(hdr2);
+
+    SIP_Header_Input_Output hdr3;
+    hdr3._header_type    = SIP_HEADER_RSEQ;
+    hdr3._input          = "RSeq:   349940055  ";
+    hdr3._output         = "RSeq: 349940055\r\n";
+    hdr3._header_nb      = 1;
+    hdr3._decode_success = true;
+    hdr3._encode_success = true;
+    _header_input_output.push_back(hdr3);
 }
 
 //-------------------------------------------

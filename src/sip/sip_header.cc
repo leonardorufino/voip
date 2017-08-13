@@ -175,6 +175,10 @@ SIP_Header *SIP_Header::create_header(SIP_Header_Type header_type, const SIP_Hea
             header = (!copy) ? new SIP_Header_Route()
                              : new SIP_Header_Route(dynamic_cast<const SIP_Header_Route &>(*copy));
             break;
+        case SIP_HEADER_RSEQ:
+            header = (!copy) ? new SIP_Header_RSeq()
+                             : new SIP_Header_RSeq(dynamic_cast<const SIP_Header_RSeq &>(*copy));
+            break;
         case SIP_HEADER_SERVER:
             header = (!copy) ? new SIP_Header_Server()
                              : new SIP_Header_Server(dynamic_cast<const SIP_Header_Server &>(*copy));
@@ -2676,6 +2680,31 @@ bool SIP_Header_Route::encode(std::string &sip_msg)
 //-------------------------------------------
 //-------------------------------------------
 
+bool SIP_Header_RSeq::decode(std::string &sip_msg)
+{
+    String_Functions::trim(sip_msg);
+
+    _rseq = String_Functions::str_to_ul(sip_msg);
+    if (_rseq == INVALID_RSEQ)
+        return false;
+
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_RSeq::encode(std::string &sip_msg)
+{
+    if (_rseq == INVALID_RSEQ)
+        return false;
+
+    sip_msg += std::to_string(_rseq);
+    return true;
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
 bool SIP_Header_Server::decode(std::string &sip_msg)
 {
     String_Functions::trim(sip_msg);
@@ -3057,6 +3086,11 @@ bool SIP_Header_User_Agent::encode(std::string &sip_msg)
 }
 
 //-------------------------------------------
+//-------------------------------------------
+
+const std::string SIP_Header_Via::PROTOCOL_NAME_SIP = "SIP";
+const std::string SIP_Header_Via::PROTOCOL_VERSION_2_0 = "2.0";
+
 //-------------------------------------------
 
 bool SIP_Header_Via::decode(std::string &sip_msg)

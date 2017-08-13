@@ -351,6 +351,14 @@ public:
 
 //-------------------------------------------
 
+class SIP_Header_RSeq_Test : public SIP_Header_Test
+{
+public:
+    SIP_Header_RSeq_Test();
+};
+
+//-------------------------------------------
+
 class SIP_Header_Server_Test : public SIP_Header_Test
 {
 public:
