@@ -677,6 +677,20 @@ bool SIP_Call::process_receive_request_ringing_in(SIP_Request *request)
             return true;
         }
 
+        case SIP_REQUEST_PRACK:
+        {
+            SIP_Dialog *dialog = get_server_dialog(request);
+            if (!dialog)
+            {
+                _logger.warning("Failed to process receive request ringing in: invalid dialog (method=%d)", method);
+                return false;
+            }
+
+            //_state = STATE_RINGING_IN;
+            _logger.trace("Changed state in process receive request ringing in (state=%d, method=%d)", _state, method);
+            return true;
+        }
+
         default:
             _logger.warning("Failed to process receive request ringing in: invalid method (method=%d)", method);
             return false;
@@ -765,6 +779,7 @@ bool SIP_Call::process_send_response_ringing_in(SIP_Request *request, SIP_Respon
             return false;
 
         case SIP_REQUEST_UPDATE:
+        case SIP_REQUEST_PRACK:
         {
             SIP_Dialog *dialog = get_server_dialog(response);
             if (!dialog)
@@ -846,6 +861,7 @@ bool SIP_Call::process_send_request_ringing_out(SIP_Request *request)
         }
 
         case SIP_REQUEST_UPDATE:
+        case SIP_REQUEST_PRACK:
         {
             SIP_Dialog *dialog = get_client_dialog(request);
             if (!dialog)
@@ -1033,6 +1049,22 @@ bool SIP_Call::process_receive_response_ringing_out(SIP_Request *request, SIP_Re
             SIP_Header_Contact *header_contact = dynamic_cast<SIP_Header_Contact *>(response->get_header(SIP_HEADER_CONTACT));
             if (header_contact)
                 dialog->set_remote_target(header_contact->get_address());
+
+            //_state = STATE_RINGING_OUT;
+            _logger.trace("Changed state in process receive response ringing out (state=%d, method=%d, status_code=%d)",
+                          _state, method, status_code);
+            return true;
+        }
+
+        case SIP_REQUEST_PRACK:
+        {
+            SIP_Dialog *dialog = get_client_dialog(response);
+            if (!dialog)
+            {
+                _logger.warning("Failed to process receive response ringing out: invalid dialog (method=%d, status_code=%d)",
+                                method, status_code);
+                return false;
+            }
 
             //_state = STATE_RINGING_OUT;
             _logger.trace("Changed state in process receive response ringing out (state=%d, method=%d, status_code=%d)",
