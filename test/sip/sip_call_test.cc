@@ -14,8 +14,9 @@
 
 //-------------------------------------------
 
-SIP_Call_Test::SIP_Call_Test() : _client_sequence(314158), _server_sequence(230), _invite_sequence(0), _invite(NULL),
-        _bye(NULL), _update(NULL), _cancel(NULL), _info(NULL), _request(NULL), _response(NULL), _status_code(0)
+SIP_Call_Test::SIP_Call_Test() : use_prack(false), _client_sequence(314158), _server_sequence(230), _invite_sequence(0),
+    _prack_rseq(988788), _invite(NULL), _bye(NULL), _update(NULL), _cancel(NULL), _prack(NULL), _info(NULL), _request(NULL),
+    _response(NULL), _status_code(0)
 {
 }
 
@@ -91,6 +92,9 @@ SIP_Request *SIP_Call_Test::create_invite()
     str += "Contact: <sip:alice@pc33.atlanta.com>\r\n";
     str += "Content-Length: 0\r\n";
 
+    if (use_prack)
+        str += "Supported: 100rel\r\n";
+
     _invite_sequence = _client_sequence;
 
     SIP_Message *msg = SIP_Message::decode_msg(str);
@@ -139,7 +143,14 @@ SIP_Response *SIP_Call_Test::create_invite_response_180()
     str += "From: Alice <sip:alice@atlanta.com>;tag=1928301774\r\n";
     str += "Call-ID: " + _call_id + "\r\n";
     str += "CSeq: " + std::to_string(_client_sequence) + " INVITE\r\n";
+    str += "Contact: <sip:bob@192.0.2.4>\r\n";
     str += "Content-Length: 0\r\n";
+
+    if (use_prack)
+    {
+        str += "Require: 100rel\r\n";
+        str += "RSeq: " + std::to_string(++_prack_rseq) + "\r\n";
+    }
 
     SIP_Message *msg = SIP_Message::decode_msg(str);
     SIP_Response *response = dynamic_cast<SIP_Response *>(msg);
@@ -165,6 +176,12 @@ SIP_Response *SIP_Call_Test::create_invite_response_183()
     str += "CSeq: " + std::to_string(_client_sequence) + " INVITE\r\n";
     str += "Contact: <sip:bob@192.0.2.4>\r\n";
     str += "Content-Length: 0\r\n";
+
+    if (use_prack)
+    {
+        str += "Require: 100rel\r\n";
+        str += "RSeq: " + std::to_string(++_prack_rseq) + "\r\n";
+    }
 
     SIP_Message *msg = SIP_Message::decode_msg(str);
     SIP_Response *response = dynamic_cast<SIP_Response *>(msg);
@@ -213,7 +230,6 @@ SIP_Response *SIP_Call_Test::create_invite_response_480()
     str += "From: Alice <sip:alice@atlanta.com>;tag=1928301774\r\n";
     str += "Call-ID: " + _call_id + "\r\n";
     str += "CSeq: " + std::to_string(_client_sequence) + " INVITE\r\n";
-    str += "Contact: <sip:bob@192.0.2.4>\r\n";
     str += "Content-Length: 0\r\n";
 
     SIP_Message *msg = SIP_Message::decode_msg(str);
@@ -238,7 +254,6 @@ SIP_Response *SIP_Call_Test::create_invite_response_487()
     str += "From: Alice <sip:alice@atlanta.com>;tag=1928301774\r\n";
     str += "Call-ID: " + _call_id + "\r\n";
     str += "CSeq: " + std::to_string(_client_sequence) + " INVITE\r\n";
-    str += "Contact: <sip:bob@192.0.2.4>\r\n";
     str += "Content-Length: 0\r\n";
 
     SIP_Message *msg = SIP_Message::decode_msg(str);
@@ -525,6 +540,56 @@ SIP_Response *SIP_Call_Test::create_cancel_response_200()
 
 //-------------------------------------------
 
+SIP_Request *SIP_Call_Test::create_prack()
+{
+    std::string str;
+    str  = "PRACK sip:bob@192.0.2.4 SIP/2.0\r\n";
+    str += "Via: SIP/2.0/UDP pc33.atlanta.com;branch=z9hG4bK99231\r\n";
+    str += "Max-Forwards: 70\r\n";
+    str += "To: Bob <sip:bob@biloxi.com>;tag=a6c85cf\r\n";
+    str += "From: Alice <sip:alice@atlanta.com>;tag=1928301774\r\n";
+    str += "Call-ID: " + _call_id + "\r\n";
+    str += "CSeq: " + std::to_string(++_client_sequence) + " PRACK\r\n";
+    str += "RAck: " + std::to_string(_prack_rseq) + " " + std::to_string(_invite_sequence) + " INVITE\r\n";
+    str += "Content-Length: 0\r\n";
+
+    SIP_Message *msg = SIP_Message::decode_msg(str);
+    SIP_Request *request = dynamic_cast<SIP_Request *>(msg);
+    if (!request)
+    {
+        std::cout << "SIP_Call_Test::create_prack -> Failed to decode message\n";
+        return NULL;
+    }
+
+    return request;
+}
+
+//-------------------------------------------
+
+SIP_Response *SIP_Call_Test::create_prack_response_200()
+{
+    std::string str;
+    str  = "SIP/2.0 200 OK\r\n";
+    str += "Via: SIP/2.0/UDP pc33.atlanta.com;branch=z9hG4bK99231\r\n";
+    str += "To: Bob <sip:bob@biloxi.com>;tag=a6c85cf\r\n";
+    str += "From: Alice <sip:alice@atlanta.com>;tag=1928301774\r\n";
+    str += "Call-ID: " + _call_id + "\r\n";
+    str += "CSeq: " + std::to_string(_client_sequence) + " PRACK\r\n";
+    str += "Content-Length: 0\r\n";
+
+    SIP_Message *msg = SIP_Message::decode_msg(str);
+    SIP_Response *response = dynamic_cast<SIP_Response *>(msg);
+    if (!response)
+    {
+        std::cout << "SIP_Call_Test::create_prack_response_200 -> Failed to decode message\n";
+        return NULL;
+    }
+
+    return response;
+}
+
+//-------------------------------------------
+
 SIP_Request *SIP_Call_Test::create_info()
 {
     std::string str;
@@ -715,7 +780,7 @@ bool SIP_Call_Test::process_invite_response_180()
         return false;
     }
 
-    if (_server_call.get_server_dialog(invite_response_180))
+    if (!_server_call.get_server_dialog(invite_response_180))
     {
         std::cout << "SIP_Call_Test::process_invite_response_180 -> Invalid server response dialog\n";
         return false;
@@ -735,7 +800,7 @@ bool SIP_Call_Test::process_invite_response_180()
         return false;
     }
 
-    if (_client_call.get_client_dialog(invite_response_180))
+    if (!_client_call.get_client_dialog(invite_response_180))
     {
         std::cout << "SIP_Call_Test::process_invite_response_180 -> Invalid client response dialog\n";
         return false;

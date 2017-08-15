@@ -29,6 +29,7 @@ protected:
 
     virtual bool init_call();
     virtual bool set_callbacks();
+    virtual void set_use_prack(bool prack) { use_prack = prack; }
 
     SIP_Request *create_invite();
     SIP_Response *create_invite_response_100();
@@ -51,6 +52,9 @@ protected:
 
     SIP_Request *create_cancel();
     SIP_Response *create_cancel_response_200();
+
+    SIP_Request *create_prack();
+    SIP_Response *create_prack_response_200();
 
     SIP_Request *create_info();
     SIP_Response *create_info_response_200();
@@ -85,14 +89,18 @@ protected:
     SIP_Call _server_call;
 
     std::string _call_id;
+    bool use_prack;
+
     unsigned long _client_sequence;
     unsigned long _server_sequence;
     unsigned long _invite_sequence;
+    unsigned long _prack_rseq;
 
     SIP_Request *_invite;
     SIP_Request *_bye;
     SIP_Request *_update;
     SIP_Request *_cancel;
+    SIP_Request *_prack;
     SIP_Request *_info;
 
     SIP_Request *_request;
