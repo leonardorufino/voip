@@ -78,6 +78,9 @@ protected:
     bool process_server_update();
     bool process_client_update_response_200();
 
+    bool process_cancel();
+    bool process_cancel_response_200();
+
     bool process_info();
     bool process_info_response_200();
 
