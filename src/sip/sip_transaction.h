@@ -117,11 +117,11 @@ public:
     State get_state() { return _state; }
     std::string get_state_str();
 
-    void send_invite(SIP_Request *msg);
-    void send_ack(SIP_Response *msg);
-    void receive_1xx(SIP_Response *msg);
-    void receive_2xx(SIP_Response *msg);
-    void receive_3xx_6xx(SIP_Response *msg);
+    bool send_invite(SIP_Request *msg);
+    bool send_ack(SIP_Response *msg);
+    bool receive_1xx(SIP_Response *msg);
+    bool receive_2xx(SIP_Response *msg);
+    bool receive_3xx_6xx(SIP_Response *msg);
 
     static bool timer_A_callback(void *p);
     static bool timer_B_callback(void *p);
@@ -154,9 +154,9 @@ public:
     State get_state() { return _state; }
     std::string get_state_str();
 
-    void send_request(SIP_Request *msg);
-    void receive_1xx(SIP_Response *msg);
-    void receive_2xx_6xx(SIP_Response *msg);
+    bool send_request(SIP_Request *msg);
+    bool receive_1xx(SIP_Response *msg);
+    bool receive_2xx_6xx(SIP_Response *msg);
 
     static bool timer_E_callback(void *p);
     static bool timer_F_callback(void *p);
@@ -189,11 +189,11 @@ public:
     State get_state() { return _state; }
     std::string get_state_str();
 
-    void receive_invite(SIP_Request *msg);
-    void receive_ack(SIP_Request *msg);
-    void send_1xx(SIP_Response *msg);
-    void send_2xx(SIP_Response *msg);
-    void send_3xx_6xx(SIP_Response *msg);
+    bool receive_invite(SIP_Request *msg);
+    bool receive_ack(SIP_Request *msg);
+    bool send_1xx(SIP_Response *msg);
+    bool send_2xx(SIP_Response *msg);
+    bool send_3xx_6xx(SIP_Response *msg);
 
     static bool timer_G_callback(void *p);
     static bool timer_H_callback(void *p);
@@ -227,9 +227,9 @@ public:
     State get_state() { return _state; }
     std::string get_state_str();
 
-    void receive_request(SIP_Request *msg);
-    void send_1xx(SIP_Response *msg);
-    void send_2xx_6xx(SIP_Response *msg);
+    bool receive_request(SIP_Request *msg);
+    bool send_1xx(SIP_Response *msg);
+    bool send_2xx_6xx(SIP_Response *msg);
 
     static bool timer_J_callback(void *p);
 

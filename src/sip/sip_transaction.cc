@@ -349,7 +349,7 @@ std::string SIP_Transaction_Client_Invite::get_state_str()
 
 //-------------------------------------------
 
-void SIP_Transaction_Client_Invite::send_invite(SIP_Request *msg)
+bool SIP_Transaction_Client_Invite::send_invite(SIP_Request *msg)
 {
     switch (_state)
     {
@@ -358,27 +358,30 @@ void SIP_Transaction_Client_Invite::send_invite(SIP_Request *msg)
             _saved_request = new SIP_Request(*msg);
 
             if (_send_message_callback)
-                _send_message_callback(_send_message_data, this, _saved_request);
+            {
+                if (!_send_message_callback(_send_message_data, this, _saved_request))
+                    return false;
+            }
 
             set_timer_value(SIP_TIMER_A, SIP_TIMER_1);
             start_timer(SIP_TIMER_A, this);
             set_timer_value(SIP_TIMER_B, SIP_TIMER_1 * 64);
             start_timer(SIP_TIMER_B, this);
-            break;
+            return true;
 
         default:
-            break;
+            return false;
     }
 }
 
 //-------------------------------------------
 
-void SIP_Transaction_Client_Invite::send_ack(SIP_Response *msg)
+bool SIP_Transaction_Client_Invite::send_ack(SIP_Response *msg)
 {
     if (!_saved_request)
     {
         _logger.warning("SIP_Transaction_Client_Invite::send_ack -> Invalid saved request message");
-        return;
+        return false;
     }
 
     SIP_Address &saved_request_uri = _saved_request->get_request_uri();
@@ -391,7 +394,7 @@ void SIP_Transaction_Client_Invite::send_ack(SIP_Response *msg)
     if ((!saved_request_call_id) || (!saved_request_cseq) || (!saved_request_from) || (!saved_request_to) || (!saved_request_via))
     {
         _logger.warning("SIP_Transaction::match_transaction_server -> Failed to get Via, From, Call-ID, CSeq or To header from saved request");
-        return;
+        return false;
     }
 
     SIP_Request ack(SIP_REQUEST_ACK);
@@ -418,12 +421,14 @@ void SIP_Transaction_Client_Invite::send_ack(SIP_Response *msg)
     }
 
     if (_send_message_callback)
-        _send_message_callback(_send_message_data, this, &ack);
+        return _send_message_callback(_send_message_data, this, &ack);
+
+    return false;
 }
 
 //-------------------------------------------
 
-void SIP_Transaction_Client_Invite::receive_1xx(SIP_Response *msg)
+bool SIP_Transaction_Client_Invite::receive_1xx(SIP_Response *msg)
 {
     switch (_state)
     {
@@ -433,23 +438,23 @@ void SIP_Transaction_Client_Invite::receive_1xx(SIP_Response *msg)
             stop_timer(SIP_TIMER_B);
 
             if (_receive_response_callback)
-                _receive_response_callback(_receive_response_data, this, _saved_request, msg);
-            break;
+                return _receive_response_callback(_receive_response_data, this, _saved_request, msg);
+            return false;
 
         case sttProceeding:
             //_state = sttProceeding;
             if (_receive_response_callback)
-                _receive_response_callback(_receive_response_data, this, _saved_request, msg);
-            break;
+                return _receive_response_callback(_receive_response_data, this, _saved_request, msg);
+            return false;
 
         default:
-            break;
+            return false;
     }
 }
 
 //-------------------------------------------
 
-void SIP_Transaction_Client_Invite::receive_2xx(SIP_Response *msg)
+bool SIP_Transaction_Client_Invite::receive_2xx(SIP_Response *msg)
 {
     switch (_state)
     {
@@ -459,23 +464,23 @@ void SIP_Transaction_Client_Invite::receive_2xx(SIP_Response *msg)
             stop_timer(SIP_TIMER_B);
 
             if (_receive_response_callback)
-                _receive_response_callback(_receive_response_data, this, _saved_request, msg);
-            break;
+                return _receive_response_callback(_receive_response_data, this, _saved_request, msg);
+            return false;
 
         case sttProceeding:
             _state = sttTerminated;
             if (_receive_response_callback)
-                _receive_response_callback(_receive_response_data, this, _saved_request, msg);
-            break;
+                return _receive_response_callback(_receive_response_data, this, _saved_request, msg);
+            return false;
 
         default:
-            break;
+            return false;
     }
 }
 
 //-------------------------------------------
 
-void SIP_Transaction_Client_Invite::receive_3xx_6xx(SIP_Response *msg)
+bool SIP_Transaction_Client_Invite::receive_3xx_6xx(SIP_Response *msg)
 {
     switch (_state)
     {
@@ -488,8 +493,8 @@ void SIP_Transaction_Client_Invite::receive_3xx_6xx(SIP_Response *msg)
             stop_timer(SIP_TIMER_B);
 
             if (_receive_response_callback)
-                _receive_response_callback(_receive_response_data, this, _saved_request, msg);
-            break;
+                return _receive_response_callback(_receive_response_data, this, _saved_request, msg);
+            return false;
 
         case sttProceeding:
             _state = sttCompleted;
@@ -498,16 +503,15 @@ void SIP_Transaction_Client_Invite::receive_3xx_6xx(SIP_Response *msg)
             start_timer(SIP_TIMER_D, this);
 
             if (_receive_response_callback)
-                _receive_response_callback(_receive_response_data, this, _saved_request, msg);
-            break;
+                return _receive_response_callback(_receive_response_data, this, _saved_request, msg);
+            return false;
 
         case sttCompleted:
             //_state = sttCompleted;
-            send_ack(msg);
-            break;
+            return send_ack(msg);
 
         default:
-            break;
+            return false;
     }
 }
 
@@ -532,14 +536,12 @@ bool SIP_Transaction_Client_Invite::timer_A_callback(void *p)
             transaction->start_timer(SIP_TIMER_A, transaction);
 
             if (transaction->_send_message_callback)
-                transaction->_send_message_callback(transaction->_send_message_data, transaction, transaction->_saved_request);
-            break;
+                return transaction->_send_message_callback(transaction->_send_message_data, transaction, transaction->_saved_request);
+            return false;
 
         default:
-            break;
+            return false;
     }
-
-    return true;
 }
 
 //-------------------------------------------
@@ -565,16 +567,14 @@ bool SIP_Transaction_Client_Invite::timer_B_callback(void *p)
             SIP_Response response(408);
 
             if (transaction->_receive_response_callback)
-                transaction->_receive_response_callback(transaction->_receive_response_data, transaction,
-                                                        transaction->_saved_request, &response);
-            break;
+                return transaction->_receive_response_callback(transaction->_receive_response_data, transaction,
+                                                               transaction->_saved_request, &response);
+            return false;
         }
 
         default:
-            break;
+            return false;
     }
-
-    return true;
 }
 
 //-------------------------------------------
@@ -594,13 +594,11 @@ bool SIP_Transaction_Client_Invite::timer_D_callback(void *p)
     {
         case sttCompleted:
             transaction->_state = sttTerminated;
-            break;
+            return true;
 
         default:
-            break;
+            return false;
     }
-
-    return true;
 }
 
 //-------------------------------------------
@@ -621,7 +619,7 @@ std::string SIP_Transaction_Client_Non_Invite::get_state_str()
 
 //-------------------------------------------
 
-void SIP_Transaction_Client_Non_Invite::send_request(SIP_Request *msg)
+bool SIP_Transaction_Client_Non_Invite::send_request(SIP_Request *msg)
 {
     switch (_state)
     {
@@ -630,22 +628,25 @@ void SIP_Transaction_Client_Non_Invite::send_request(SIP_Request *msg)
             _saved_request = new SIP_Request(*msg);
 
             if (_send_message_callback)
-                _send_message_callback(_send_message_data, this, _saved_request);
+            {
+                if (!_send_message_callback(_send_message_data, this, _saved_request))
+                    return false;
+            }
 
             set_timer_value(SIP_TIMER_E, SIP_TIMER_1);
             start_timer(SIP_TIMER_E, this);
             set_timer_value(SIP_TIMER_F, SIP_TIMER_1 * 64);
             start_timer(SIP_TIMER_F, this);
-            break;
+            return true;
 
         default:
-            break;
+            return false;
     }
 }
 
 //-------------------------------------------
 
-void SIP_Transaction_Client_Non_Invite::receive_1xx(SIP_Response *msg)
+bool SIP_Transaction_Client_Non_Invite::receive_1xx(SIP_Response *msg)
 {
     switch (_state)
     {
@@ -653,17 +654,17 @@ void SIP_Transaction_Client_Non_Invite::receive_1xx(SIP_Response *msg)
         case sttProceeding:
             _state = sttProceeding;
             if (_receive_response_callback)
-                _receive_response_callback(_receive_response_data, this, _saved_request, msg);
-            break;
+                return _receive_response_callback(_receive_response_data, this, _saved_request, msg);
+            return false;
 
         default:
-            break;
+            return false;
     }
 }
 
 //-------------------------------------------
 
-void SIP_Transaction_Client_Non_Invite::receive_2xx_6xx(SIP_Response *msg)
+bool SIP_Transaction_Client_Non_Invite::receive_2xx_6xx(SIP_Response *msg)
 {
     switch (_state)
     {
@@ -676,11 +677,11 @@ void SIP_Transaction_Client_Non_Invite::receive_2xx_6xx(SIP_Response *msg)
             stop_timer(SIP_TIMER_F);
 
             if (_receive_response_callback)
-                _receive_response_callback(_receive_response_data, this, _saved_request, msg);
-            break;
+                return _receive_response_callback(_receive_response_data, this, _saved_request, msg);
+            return false;
 
         default:
-            break;
+            return false;
     }
 }
 
@@ -708,8 +709,8 @@ bool SIP_Transaction_Client_Non_Invite::timer_E_callback(void *p)
             transaction->start_timer(SIP_TIMER_E, transaction);
 
             if (transaction->_send_message_callback)
-                transaction->_send_message_callback(transaction->_send_message_data, transaction, transaction->_saved_request);
-            break;
+                return transaction->_send_message_callback(transaction->_send_message_data, transaction, transaction->_saved_request);
+            return false;
         }
 
         case sttProceeding:
@@ -718,14 +719,12 @@ bool SIP_Transaction_Client_Non_Invite::timer_E_callback(void *p)
             transaction->start_timer(SIP_TIMER_E, transaction);
 
             if (transaction->_send_message_callback)
-                transaction->_send_message_callback(transaction->_send_message_data, transaction, transaction->_saved_request);
-            break;
+                return transaction->_send_message_callback(transaction->_send_message_data, transaction, transaction->_saved_request);
+            return false;
 
         default:
-            break;
+            return false;
     }
-
-    return true;
 }
 
 //-------------------------------------------
@@ -752,16 +751,14 @@ bool SIP_Transaction_Client_Non_Invite::timer_F_callback(void *p)
             SIP_Response response(408);
 
             if (transaction->_receive_response_callback)
-                transaction->_receive_response_callback(transaction->_receive_response_data, transaction,
-                                                        transaction->_saved_request, &response);
-            break;
+                return transaction->_receive_response_callback(transaction->_receive_response_data, transaction,
+                                                               transaction->_saved_request, &response);
+            return false;
         }
 
         default:
-            break;
+            return false;
     }
-
-    return true;
 }
 
 //-------------------------------------------
@@ -781,13 +778,11 @@ bool SIP_Transaction_Client_Non_Invite::timer_K_callback(void *p)
     {
         case sttCompleted:
             transaction->_state = sttTerminated;
-            break;
+            return true;
 
         default:
-            break;
+            return false;
     }
-
-    return true;
 }
 
 //-------------------------------------------
@@ -816,7 +811,7 @@ std::string SIP_Transaction_Server_Invite::get_state_str()
 
 //-------------------------------------------
 
-void SIP_Transaction_Server_Invite::receive_invite(SIP_Request *msg)
+bool SIP_Transaction_Server_Invite::receive_invite(SIP_Request *msg)
 {
     switch (_state)
     {
@@ -825,20 +820,20 @@ void SIP_Transaction_Server_Invite::receive_invite(SIP_Request *msg)
             _saved_request = new SIP_Request(*msg);
 
             if (_receive_request_callback)
-                _receive_request_callback(_receive_request_data, this, _saved_request);
-            break;
+                return _receive_request_callback(_receive_request_data, this, _saved_request);
+            return false;
 
         case sttProceeding:
             //_state = sttProceeding;
             if ((_last_response) && (_send_message_callback))
-                _send_message_callback(_send_message_data, this, _last_response);
-            break;
+                return _send_message_callback(_send_message_data, this, _last_response);
+            return false;
 
         case sttCompleted:
             //_state = sttCompleted;
             if ((_last_response) && (_send_message_callback))
-                _send_message_callback(_send_message_data, this, _last_response);
-            break;
+                return _send_message_callback(_send_message_data, this, _last_response);
+            return false;
 
         default:
             break;
@@ -847,7 +842,7 @@ void SIP_Transaction_Server_Invite::receive_invite(SIP_Request *msg)
 
 //-------------------------------------------
 
-void SIP_Transaction_Server_Invite::receive_ack(SIP_Request *msg)
+bool SIP_Transaction_Server_Invite::receive_ack(SIP_Request *msg)
 {
     switch (_state)
     {
@@ -857,16 +852,16 @@ void SIP_Transaction_Server_Invite::receive_ack(SIP_Request *msg)
             start_timer(SIP_TIMER_I, this);
             stop_timer(SIP_TIMER_G);
             stop_timer(SIP_TIMER_H);
-            break;
+            return true;
 
         default:
-            break;
+            return false;
     }
 }
 
 //-------------------------------------------
 
-void SIP_Transaction_Server_Invite::send_1xx(SIP_Response *msg)
+bool SIP_Transaction_Server_Invite::send_1xx(SIP_Response *msg)
 {
     switch (_state)
     {
@@ -877,34 +872,34 @@ void SIP_Transaction_Server_Invite::send_1xx(SIP_Response *msg)
             _last_response = new SIP_Response(*msg);
 
             if ((_last_response) && (_send_message_callback))
-                _send_message_callback(_send_message_data, this, _last_response);
-            break;
+                return _send_message_callback(_send_message_data, this, _last_response);
+            return false;
 
         default:
-            break;
+            return false;
     }
 }
 
 //-------------------------------------------
 
-void SIP_Transaction_Server_Invite::send_2xx(SIP_Response *msg)
+bool SIP_Transaction_Server_Invite::send_2xx(SIP_Response *msg)
 {
     switch (_state)
     {
         case sttProceeding:
             _state = sttTerminated;
             if (_send_message_callback)
-                _send_message_callback(_send_message_data, this, msg);
-            break;
+                return _send_message_callback(_send_message_data, this, msg);
+            return false;
 
         default:
-            break;
+            return false;
     }
 }
 
 //-------------------------------------------
 
-void SIP_Transaction_Server_Invite::send_3xx_6xx(SIP_Response *msg)
+bool SIP_Transaction_Server_Invite::send_3xx_6xx(SIP_Response *msg)
 {
     switch (_state)
     {
@@ -915,16 +910,19 @@ void SIP_Transaction_Server_Invite::send_3xx_6xx(SIP_Response *msg)
             _last_response = new SIP_Response(*msg);
 
             if ((_last_response) && (_send_message_callback))
-                _send_message_callback(_send_message_data, this, _last_response);
+            {
+                if (!_send_message_callback(_send_message_data, this, _last_response))
+                    return false;
+            }
 
             set_timer_value(SIP_TIMER_G, SIP_TIMER_1);
             start_timer(SIP_TIMER_G, this);
             set_timer_value(SIP_TIMER_H, SIP_TIMER_1 * 64);
             start_timer(SIP_TIMER_H, this);
-            break;
+            return true;
 
         default:
-            break;
+            return false;
     }
 }
 
@@ -952,15 +950,13 @@ bool SIP_Transaction_Server_Invite::timer_G_callback(void *p)
             transaction->start_timer(SIP_TIMER_G, transaction);
 
             if ((transaction->_last_response) && (transaction->_send_message_callback))
-                transaction->_send_message_callback(transaction->_send_message_data, transaction, transaction->_last_response);
-            break;
+                return transaction->_send_message_callback(transaction->_send_message_data, transaction, transaction->_last_response);
+            return false;
         }
 
         default:
-            break;
+            return false;
     }
-
-    return true;
 }
 
 //-------------------------------------------
@@ -981,13 +977,11 @@ bool SIP_Transaction_Server_Invite::timer_H_callback(void *p)
         case sttCompleted:
             transaction->_state = sttTerminated;
             transaction->stop_timer(SIP_TIMER_G);
-            break;
+            return true;
 
         default:
-            break;
+            return false;
     }
-
-    return true;
 }
 
 //-------------------------------------------
@@ -1007,13 +1001,11 @@ bool SIP_Transaction_Server_Invite::timer_I_callback(void *p)
     {
         case sttConfirmed:
             transaction->_state = sttTerminated;
-            break;
+            return true;
 
         default:
-            break;
+            return false;
     }
-
-    return true;
 }
 
 //-------------------------------------------
@@ -1042,7 +1034,7 @@ std::string SIP_Transaction_Server_Non_Invite::get_state_str()
 
 //-------------------------------------------
 
-void SIP_Transaction_Server_Non_Invite::receive_request(SIP_Request *msg)
+bool SIP_Transaction_Server_Non_Invite::receive_request(SIP_Request *msg)
 {
     switch (_state)
     {
@@ -1051,29 +1043,29 @@ void SIP_Transaction_Server_Non_Invite::receive_request(SIP_Request *msg)
             _saved_request = new SIP_Request(*msg);
 
             if (_receive_request_callback)
-                _receive_request_callback(_receive_request_data, this, _saved_request);
-            break;
+                return _receive_request_callback(_receive_request_data, this, _saved_request);
+            return false;
 
         case sttProceeding:
             //_state = sttProceeding;
             if ((_last_response) && (_send_message_callback))
-                _send_message_callback(_send_message_data, this, _last_response);
-            break;
+                return _send_message_callback(_send_message_data, this, _last_response);
+            return false;
 
         case sttCompleted:
             //_state = sttCompleted;
             if ((_last_response) && (_send_message_callback))
-                _send_message_callback(_send_message_data, this, _last_response);
-            break;
+                return _send_message_callback(_send_message_data, this, _last_response);
+            return false;
 
         default:
-            break;
+            return false;
     }
 }
 
 //-------------------------------------------
 
-void SIP_Transaction_Server_Non_Invite::send_1xx(SIP_Response *msg)
+bool SIP_Transaction_Server_Non_Invite::send_1xx(SIP_Response *msg)
 {
     switch (_state)
     {
@@ -1085,17 +1077,17 @@ void SIP_Transaction_Server_Non_Invite::send_1xx(SIP_Response *msg)
             _last_response = new SIP_Response(*msg);
 
             if ((_last_response) && (_send_message_callback))
-                _send_message_callback(_send_message_data, this, _last_response);
-            break;
+                return _send_message_callback(_send_message_data, this, _last_response);
+            return false;
 
         default:
-            break;
+            return false;
     }
 }
 
 //-------------------------------------------
 
-void SIP_Transaction_Server_Non_Invite::send_2xx_6xx(SIP_Response *msg)
+bool SIP_Transaction_Server_Non_Invite::send_2xx_6xx(SIP_Response *msg)
 {
     switch (_state)
     {
@@ -1107,14 +1099,17 @@ void SIP_Transaction_Server_Non_Invite::send_2xx_6xx(SIP_Response *msg)
             _last_response = new SIP_Response(*msg);
 
             if ((_last_response) && (_send_message_callback))
-                _send_message_callback(_send_message_data, this, _last_response);
+            {
+                if (!_send_message_callback(_send_message_data, this, _last_response))
+                    return false;
+            }
 
             set_timer_value(SIP_TIMER_J, SIP_TIMER_1 * 64);
             start_timer(SIP_TIMER_J, this);
-            break;
+            return true;
 
         default:
-            break;
+            return false;
     }
 }
 
@@ -1135,13 +1130,11 @@ bool SIP_Transaction_Server_Non_Invite::timer_J_callback(void *p)
     {
         case sttCompleted:
             transaction->_state = sttTerminated;
-            break;
+            return true;
 
         default:
-            break;
+            return false;
     }
-
-    return true;
 }
 
 //-------------------------------------------
