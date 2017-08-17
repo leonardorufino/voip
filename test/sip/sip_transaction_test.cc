@@ -355,7 +355,13 @@ bool SIP_Transaction_Client_Invite_Test::send_invite()
         return false;
 
     _sent_message = false;
-    _transaction.send_invite(request);
+
+    if (!_transaction.send_invite(request))
+    {
+        std::cout << "SIP_Transaction_Client_Invite_Test::send_invite -> Failed to send INVITE\n";
+        delete request;
+        return false;
+    }
 
     if (!_sent_message)
     {
@@ -394,7 +400,13 @@ bool SIP_Transaction_Client_Invite_Test::receive_response_100()
     }
 
     _received_response = false;
-    _transaction.receive_1xx(response);
+
+    if (!_transaction.receive_1xx(response))
+    {
+        std::cout << "SIP_Transaction_Client_Invite_Test::receive_response_100 -> Failed to receive response\n";
+        delete response;
+        return false;
+    }
 
     if (!_received_response)
     {
@@ -433,7 +445,13 @@ bool SIP_Transaction_Client_Invite_Test::receive_response_180()
     }
 
     _received_response = false;
-    _transaction.receive_1xx(response);
+
+    if (!_transaction.receive_1xx(response))
+    {
+        std::cout << "SIP_Transaction_Client_Invite_Test::receive_response_180 -> Failed to receive response\n";
+        delete response;
+        return false;
+    }
 
     if (!_received_response)
     {
@@ -472,7 +490,13 @@ bool SIP_Transaction_Client_Invite_Test::receive_response_200()
     }
 
     _received_response = false;
-    _transaction.receive_2xx(response);
+
+    if (!_transaction.receive_2xx(response))
+    {
+        std::cout << "SIP_Transaction_Client_Invite_Test::receive_response_200 -> Failed to receive response\n";
+        delete response;
+        return false;
+    }
 
     if (!_received_response)
     {
@@ -513,7 +537,12 @@ bool SIP_Transaction_Client_Invite_Test::receive_response_480()
     _received_response = false;
     _sent_message = false; // ACK is sent by SIP transaction
 
-    _transaction.receive_3xx_6xx(response);
+    if (!_transaction.receive_3xx_6xx(response))
+    {
+        std::cout << "SIP_Transaction_Client_Invite_Test::receive_response_480 -> Failed to receive response\n";
+        delete response;
+        return false;
+    }
 
     if (!_received_response)
     {
@@ -693,7 +722,13 @@ bool SIP_Transaction_Client_Non_Invite_Test::send_bye()
         return false;
 
     _sent_message = false;
-    _transaction.send_request(request);
+
+    if (!_transaction.send_request(request))
+    {
+        std::cout << "SIP_Transaction_Client_Non_Invite_Test::send_bye -> Failed to send BYE\n";
+        delete request;
+        return false;
+    }
 
     if (!_sent_message)
     {
@@ -732,7 +767,13 @@ bool SIP_Transaction_Client_Non_Invite_Test::receive_response_100()
     }
 
     _received_response = false;
-    _transaction.receive_1xx(response);
+
+    if (!_transaction.receive_1xx(response))
+    {
+        std::cout << "SIP_Transaction_Client_Non_Invite_Test::receive_response_100 -> Failed to receive response\n";
+        delete response;
+        return false;
+    }
 
     if (!_received_response)
     {
@@ -771,7 +812,13 @@ bool SIP_Transaction_Client_Non_Invite_Test::receive_response_200()
     }
 
     _received_response = false;
-    _transaction.receive_2xx_6xx(response);
+
+    if (!_transaction.receive_2xx_6xx(response))
+    {
+        std::cout << "SIP_Transaction_Client_Non_Invite_Test::receive_response_200 -> Failed to receive response\n";
+        delete response;
+        return false;
+    }
 
     if (!_received_response)
     {
@@ -930,7 +977,13 @@ bool SIP_Transaction_Server_Invite_Test::receive_invite(bool retransmission)
     }
 
     _received_request = false;
-    _transaction.receive_invite(request);
+
+    if (!_transaction.receive_invite(request))
+    {
+        std::cout << "SIP_Transaction_Server_Invite_Test::receive_invite -> Failed to receive INVITE\n";
+        delete request;
+        return false;
+    }
 
     if ((!_received_request) && (!retransmission))
     {
@@ -968,7 +1021,12 @@ bool SIP_Transaction_Server_Invite_Test::receive_ack()
         return false;
     }
 
-    _transaction.receive_ack(request);
+    if (!_transaction.receive_ack(request))
+    {
+        std::cout << "SIP_Transaction_Server_Invite_Test::receive_ack -> Failed to receive ACK\n";
+        delete request;
+        return false;
+    }
 
     if (_transaction.get_state() != SIP_Transaction_Server_Invite::sttConfirmed)
     {
@@ -992,7 +1050,13 @@ bool SIP_Transaction_Server_Invite_Test::send_response_100()
         return false;
 
     _sent_message = false;
-    _transaction.send_1xx(response);
+
+    if (!_transaction.send_1xx(response))
+    {
+        std::cout << "SIP_Transaction_Server_Invite_Test::send_response_100 -> Failed to send response\n";
+        delete response;
+        return false;
+    }
 
     if (!_sent_message)
     {
@@ -1023,7 +1087,13 @@ bool SIP_Transaction_Server_Invite_Test::send_response_180()
         return false;
 
     _sent_message = false;
-    _transaction.send_1xx(response);
+
+    if (!_transaction.send_1xx(response))
+    {
+        std::cout << "SIP_Transaction_Server_Invite_Test::send_response_180 -> Failed to send response\n";
+        delete response;
+        return false;
+    }
 
     if (!_sent_message)
     {
@@ -1054,7 +1124,13 @@ bool SIP_Transaction_Server_Invite_Test::send_response_200()
         return false;
 
     _sent_message = false;
-    _transaction.send_2xx(response);
+
+    if (!_transaction.send_2xx(response))
+    {
+        std::cout << "SIP_Transaction_Server_Invite_Test::send_response_200 -> Failed to send response\n";
+        delete response;
+        return false;
+    }
 
     if (!_sent_message)
     {
@@ -1085,7 +1161,13 @@ bool SIP_Transaction_Server_Invite_Test::send_response_480()
         return false;
 
     _sent_message = false;
-    _transaction.send_3xx_6xx(response);
+
+    if (!_transaction.send_3xx_6xx(response))
+    {
+        std::cout << "SIP_Transaction_Server_Invite_Test::send_response_480 -> Failed to send response\n";
+        delete response;
+        return false;
+    }
 
     if (!_sent_message)
     {
@@ -1271,7 +1353,13 @@ bool SIP_Transaction_Server_Non_Invite_Test::receive_bye(bool retransmission)
     }
 
     _received_request = false;
-    _transaction.receive_request(request);
+
+    if (!_transaction.receive_request(request))
+    {
+        std::cout << "SIP_Transaction_Server_Non_Invite_Test::receive_bye -> Failed to receive BYE\n";
+        delete request;
+        return false;
+    }
 
     if ((!_received_request) && (!retransmission))
     {
@@ -1302,7 +1390,13 @@ bool SIP_Transaction_Server_Non_Invite_Test::send_response_100()
         return false;
 
     _sent_message = false;
-    _transaction.send_1xx(response);
+
+    if (!_transaction.send_1xx(response))
+    {
+        std::cout << "SIP_Transaction_Server_Non_Invite_Test::send_response_100 -> Failed to send response\n";
+        delete response;
+        return false;
+    }
 
     if (!_sent_message)
     {
@@ -1333,7 +1427,13 @@ bool SIP_Transaction_Server_Non_Invite_Test::send_response_200()
         return false;
 
     _sent_message = false;
-    _transaction.send_2xx_6xx(response);
+
+    if (!_transaction.send_2xx_6xx(response))
+    {
+        std::cout << "SIP_Transaction_Server_Non_Invite_Test::send_response_200 -> Failed to send response\n";
+        delete response;
+        return false;
+    }
 
     if (!_sent_message)
     {
