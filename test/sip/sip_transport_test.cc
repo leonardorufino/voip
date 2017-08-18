@@ -28,6 +28,14 @@ SIP_Transport_Test::SIP_Transport_Test()
 
 //-------------------------------------------
 
+SIP_Transport_Test::~SIP_Transport_Test()
+{
+    if (_accepted_transport)
+        delete _accepted_transport;
+}
+
+//-------------------------------------------
+
 bool SIP_Transport_Test::init()
 {
     std::cout << "SIP transport test initialized\n";

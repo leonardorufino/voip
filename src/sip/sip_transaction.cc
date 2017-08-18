@@ -49,29 +49,20 @@ SIP_Transaction *SIP_Transaction::match_transaction(SIP_Message *msg)
         case SIP_TRANSACTION_CLIENT_INVITE:
         case SIP_TRANSACTION_CLIENT_NON_INVITE:
             if (msg->get_message_type() != SIP_RESPONSE)
-            {
-                _logger.warning("SIP_Transaction::match_transaction -> Invalid message type (transaction=%d)", get_transaction_type());
                 return NULL;
-            }
 
             return match_transaction_client(msg);
 
         case SIP_TRANSACTION_SERVER_INVITE:
             if ((msg->get_message_type() != SIP_REQUEST_INVITE) && (msg->get_message_type() != SIP_REQUEST_ACK))
-            {
-                _logger.warning("SIP_Transaction::match_transaction -> Invalid message type (transaction=%d)", get_transaction_type());
                 return NULL;
-            }
 
             return match_transaction_server(msg);
 
         case SIP_TRANSACTION_SERVER_NON_INVITE:
             if ((msg->get_message_type() == SIP_REQUEST_INVITE) || (msg->get_message_type() == SIP_REQUEST_ACK) ||
                 (msg->get_message_type() == SIP_RESPONSE))
-            {
-                _logger.warning("SIP_Transaction::match_transaction -> Invalid message type (transaction=%d)", get_transaction_type());
                 return NULL;
-            }
 
             return match_transaction_server(msg);
 
@@ -423,7 +414,7 @@ bool SIP_Transaction_Client_Invite::send_ack(SIP_Response *msg)
     if (_send_message_callback)
         return _send_message_callback(_send_message_data, this, &ack);
 
-    return false;
+    return true;
 }
 
 //-------------------------------------------
@@ -439,13 +430,13 @@ bool SIP_Transaction_Client_Invite::receive_1xx(SIP_Response *msg)
 
             if (_receive_response_callback)
                 return _receive_response_callback(_receive_response_data, this, _saved_request, msg);
-            return false;
+            return true;
 
         case sttProceeding:
             //_state = sttProceeding;
             if (_receive_response_callback)
                 return _receive_response_callback(_receive_response_data, this, _saved_request, msg);
-            return false;
+            return true;
 
         default:
             return false;
@@ -465,13 +456,13 @@ bool SIP_Transaction_Client_Invite::receive_2xx(SIP_Response *msg)
 
             if (_receive_response_callback)
                 return _receive_response_callback(_receive_response_data, this, _saved_request, msg);
-            return false;
+            return true;
 
         case sttProceeding:
             _state = sttTerminated;
             if (_receive_response_callback)
                 return _receive_response_callback(_receive_response_data, this, _saved_request, msg);
-            return false;
+            return true;
 
         default:
             return false;
@@ -494,7 +485,7 @@ bool SIP_Transaction_Client_Invite::receive_3xx_6xx(SIP_Response *msg)
 
             if (_receive_response_callback)
                 return _receive_response_callback(_receive_response_data, this, _saved_request, msg);
-            return false;
+            return true;
 
         case sttProceeding:
             _state = sttCompleted;
@@ -504,7 +495,7 @@ bool SIP_Transaction_Client_Invite::receive_3xx_6xx(SIP_Response *msg)
 
             if (_receive_response_callback)
                 return _receive_response_callback(_receive_response_data, this, _saved_request, msg);
-            return false;
+            return true;
 
         case sttCompleted:
             //_state = sttCompleted;
@@ -537,7 +528,7 @@ bool SIP_Transaction_Client_Invite::timer_A_callback(void *p)
 
             if (transaction->_send_message_callback)
                 return transaction->_send_message_callback(transaction->_send_message_data, transaction, transaction->_saved_request);
-            return false;
+            return true;
 
         default:
             return false;
@@ -569,7 +560,7 @@ bool SIP_Transaction_Client_Invite::timer_B_callback(void *p)
             if (transaction->_receive_response_callback)
                 return transaction->_receive_response_callback(transaction->_receive_response_data, transaction,
                                                                transaction->_saved_request, &response);
-            return false;
+            return true;
         }
 
         default:
@@ -655,7 +646,7 @@ bool SIP_Transaction_Client_Non_Invite::receive_1xx(SIP_Response *msg)
             _state = sttProceeding;
             if (_receive_response_callback)
                 return _receive_response_callback(_receive_response_data, this, _saved_request, msg);
-            return false;
+            return true;
 
         default:
             return false;
@@ -678,7 +669,7 @@ bool SIP_Transaction_Client_Non_Invite::receive_2xx_6xx(SIP_Response *msg)
 
             if (_receive_response_callback)
                 return _receive_response_callback(_receive_response_data, this, _saved_request, msg);
-            return false;
+            return true;
 
         default:
             return false;
@@ -710,7 +701,7 @@ bool SIP_Transaction_Client_Non_Invite::timer_E_callback(void *p)
 
             if (transaction->_send_message_callback)
                 return transaction->_send_message_callback(transaction->_send_message_data, transaction, transaction->_saved_request);
-            return false;
+            return true;
         }
 
         case sttProceeding:
@@ -720,7 +711,7 @@ bool SIP_Transaction_Client_Non_Invite::timer_E_callback(void *p)
 
             if (transaction->_send_message_callback)
                 return transaction->_send_message_callback(transaction->_send_message_data, transaction, transaction->_saved_request);
-            return false;
+            return true;
 
         default:
             return false;
@@ -753,7 +744,7 @@ bool SIP_Transaction_Client_Non_Invite::timer_F_callback(void *p)
             if (transaction->_receive_response_callback)
                 return transaction->_receive_response_callback(transaction->_receive_response_data, transaction,
                                                                transaction->_saved_request, &response);
-            return false;
+            return true;
         }
 
         default:
@@ -821,19 +812,19 @@ bool SIP_Transaction_Server_Invite::receive_invite(SIP_Request *msg)
 
             if (_receive_request_callback)
                 return _receive_request_callback(_receive_request_data, this, _saved_request);
-            return false;
+            return true;
 
         case sttProceeding:
             //_state = sttProceeding;
             if ((_last_response) && (_send_message_callback))
                 return _send_message_callback(_send_message_data, this, _last_response);
-            return false;
+            return true;
 
         case sttCompleted:
             //_state = sttCompleted;
             if ((_last_response) && (_send_message_callback))
                 return _send_message_callback(_send_message_data, this, _last_response);
-            return false;
+            return true;
 
         default:
             break;
@@ -873,7 +864,7 @@ bool SIP_Transaction_Server_Invite::send_1xx(SIP_Response *msg)
 
             if ((_last_response) && (_send_message_callback))
                 return _send_message_callback(_send_message_data, this, _last_response);
-            return false;
+            return true;
 
         default:
             return false;
@@ -890,7 +881,7 @@ bool SIP_Transaction_Server_Invite::send_2xx(SIP_Response *msg)
             _state = sttTerminated;
             if (_send_message_callback)
                 return _send_message_callback(_send_message_data, this, msg);
-            return false;
+            return true;
 
         default:
             return false;
@@ -951,7 +942,7 @@ bool SIP_Transaction_Server_Invite::timer_G_callback(void *p)
 
             if ((transaction->_last_response) && (transaction->_send_message_callback))
                 return transaction->_send_message_callback(transaction->_send_message_data, transaction, transaction->_last_response);
-            return false;
+            return true;
         }
 
         default:
@@ -1044,19 +1035,19 @@ bool SIP_Transaction_Server_Non_Invite::receive_request(SIP_Request *msg)
 
             if (_receive_request_callback)
                 return _receive_request_callback(_receive_request_data, this, _saved_request);
-            return false;
+            return true;
 
         case sttProceeding:
             //_state = sttProceeding;
             if ((_last_response) && (_send_message_callback))
                 return _send_message_callback(_send_message_data, this, _last_response);
-            return false;
+            return true;
 
         case sttCompleted:
             //_state = sttCompleted;
             if ((_last_response) && (_send_message_callback))
                 return _send_message_callback(_send_message_data, this, _last_response);
-            return false;
+            return true;
 
         default:
             return false;
@@ -1078,7 +1069,7 @@ bool SIP_Transaction_Server_Non_Invite::send_1xx(SIP_Response *msg)
 
             if ((_last_response) && (_send_message_callback))
                 return _send_message_callback(_send_message_data, this, _last_response);
-            return false;
+            return true;
 
         default:
             return false;

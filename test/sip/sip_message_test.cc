@@ -53,6 +53,7 @@ bool SIP_Message_Test::run()
         {
             std::cout << "SIP_Message_Test::run -> Failed to copy message:\n";
             std::cout << std::setw(12) << "Input: " << message_input_output._input.c_str() << "\n";
+            delete message;
             return false;
         }
 
@@ -64,6 +65,7 @@ bool SIP_Message_Test::run()
         {
             std::cout << "SIP_Message_Test::run -> Failed to encode message:\n";
             std::cout << std::setw(12) << "Input: " << message_input_output._input.c_str() << "\n";
+            delete copy;
             return false;
         }
 
@@ -73,6 +75,7 @@ bool SIP_Message_Test::run()
             std::cout << std::setw(12) << "Input: " << message_input_output._input.c_str() << "\n";
             std::cout << std::setw(12) << "Expected: " << message_input_output._output.c_str() << "\n";
             std::cout << std::setw(12) << "Output: " << output.c_str() << "\n";
+            delete copy;
             return false;
         }
 

@@ -21,7 +21,7 @@ class Socket_Test
 {
 public:
     Socket_Test();
-    virtual ~Socket_Test() {}
+    virtual ~Socket_Test();
 
     static bool init();
 

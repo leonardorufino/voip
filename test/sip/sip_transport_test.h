@@ -20,7 +20,7 @@ class SIP_Transport_Test
 {
 public:
     SIP_Transport_Test();
-    virtual ~SIP_Transport_Test() {}
+    virtual ~SIP_Transport_Test();
 
     static bool init();
 

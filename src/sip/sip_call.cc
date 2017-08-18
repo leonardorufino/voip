@@ -236,10 +236,8 @@ bool SIP_Call::process_send_request(SIP_Request *request)
             return process_send_request_active(request);
 
         default:
-        {
             _logger.warning("Failed to process send request: invalid state (state=%d, method=%d)", _state, request->get_message_type());
             return false;
-        }
     }
 }
 
@@ -271,10 +269,8 @@ bool SIP_Call::process_receive_request(SIP_Request *request)
             return process_receive_request_active(request);
 
         default:
-        {
             _logger.warning("Failed to process receive request: invalid state (state=%d, method=%d)", _state, request->get_message_type());
             return false;
-        }
     }
 }
 
@@ -312,11 +308,9 @@ bool SIP_Call::process_send_response(SIP_Request *request, SIP_Response *respons
             return process_send_response_closing_in(request, response);
 
         default:
-        {
             _logger.warning("Failed to process receive request: invalid state (state=%d, method=%d, status_code=%d)",
                             _state, request->get_message_type(), response->get_status_code());
             return false;
-        }
     };
 }
 
@@ -354,11 +348,9 @@ bool SIP_Call::process_receive_response(SIP_Request *request, SIP_Response *resp
             return process_receive_response_closing_out(request, response);
 
         default:
-        {
             _logger.warning("Failed to process receive request: invalid state (state=%d, method=%d, status_code=%d)",
                             _state, request->get_message_type(), response->get_status_code());
             return false;
-        }
     };
 }
 

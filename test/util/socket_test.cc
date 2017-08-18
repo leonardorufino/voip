@@ -28,6 +28,14 @@ Socket_Test::Socket_Test()
 
 //-------------------------------------------
 
+Socket_Test::~Socket_Test()
+{
+    if (_accepted_socket)
+        delete _accepted_socket;
+}
+
+//-------------------------------------------
+
 bool Socket_Test::init()
 {
     std::cout << "Socket test initialized\n";

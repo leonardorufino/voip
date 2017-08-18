@@ -162,7 +162,9 @@ bool Timer_Manager_Multiple_Timers_Test::run()
 
         if (waited >= _max_wait_time[i])
         {
-            manager.stop_timer(id[i]);
+            for (unsigned short j = i; j < ARRAY_SIZE; j++)
+                manager.stop_timer(id[j]);
+
             std::cout << "Timer_Manager_Multiple_Timers_Test::run -> Callback " << i << " was not called:\n";
             std::cout << std::setw(12) << "Time: " << _time[i] << "\n";
             std::cout << std::setw(12) << "Waited: " << waited << "\n";
