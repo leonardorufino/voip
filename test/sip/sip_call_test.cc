@@ -56,6 +56,10 @@ bool SIP_Call_Test::init()
     if (!success_test.run())
         return false;
 
+    SIP_Call_Success_No_100_Test success_no_100_test;
+    if (!success_no_100_test.run())
+        return false;
+
     std::cout << "SIP call test completed successfully\n";
     return true;
 }
@@ -2163,6 +2167,37 @@ bool SIP_Call_Success_Test::run()
         return false;
 
     if (!process_server_bye_response_200())
+        return false;
+
+    return true;
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+bool SIP_Call_Success_No_100_Test::run()
+{
+    set_callbacks();
+    set_call_id("a84b4c76e66710@pc33.atlanta.com");
+
+    init_call();
+
+    if (!process_invite())
+        return false;
+
+    if (!process_invite_response_183())
+        return false;
+
+    if (!process_invite_response_200())
+        return false;
+
+    if (!process_ack())
+        return false;
+
+    if (!process_server_bye())
+        return false;
+
+    if (!process_client_bye_response_200())
         return false;
 
     return true;

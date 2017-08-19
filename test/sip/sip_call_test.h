@@ -127,3 +127,15 @@ public:
 };
 
 //-------------------------------------------
+//-------------------------------------------
+
+class SIP_Call_Success_No_100_Test : public SIP_Call_Test
+{
+public:
+    SIP_Call_Success_No_100_Test() {}
+    virtual ~SIP_Call_Success_No_100_Test() {}
+
+    bool run();
+};
+
+//-------------------------------------------
