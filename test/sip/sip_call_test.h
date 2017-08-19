@@ -115,3 +115,15 @@ protected:
 };
 
 //-------------------------------------------
+//-------------------------------------------
+
+class SIP_Call_Success_Test : public SIP_Call_Test
+{
+public:
+    SIP_Call_Success_Test() {}
+    virtual ~SIP_Call_Success_Test() {}
+
+    bool run();
+};
+
+//-------------------------------------------
