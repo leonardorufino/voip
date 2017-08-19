@@ -139,3 +139,15 @@ public:
 };
 
 //-------------------------------------------
+//-------------------------------------------
+
+class SIP_Call_Success_No_1xx_Test : public SIP_Call_Test
+{
+public:
+    SIP_Call_Success_No_1xx_Test() {}
+    virtual ~SIP_Call_Success_No_1xx_Test() {}
+
+    bool run();
+};
+
+//-------------------------------------------
