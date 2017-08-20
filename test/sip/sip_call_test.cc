@@ -68,6 +68,10 @@ bool SIP_Call_Test::init()
     if (!reject_test.run())
         return false;
 
+    SIP_Call_Reject_No_100_Test reject_no_100_test;
+    if (!reject_no_100_test.run())
+        return false;
+
     std::cout << "SIP call test completed successfully\n";
     return true;
 }
@@ -2256,6 +2260,28 @@ bool SIP_Call_Reject_Test::run()
         return false;
 
     if (!process_invite_response_180())
+        return false;
+
+    if (!process_invite_response_183())
+        return false;
+
+    if (!process_invite_response_480())
+        return false;
+
+    return true;
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+bool SIP_Call_Reject_No_100_Test::run()
+{
+    set_callbacks();
+    set_call_id("a84b4c76e66710@pc33.atlanta.com");
+
+    init_call();
+
+    if (!process_invite())
         return false;
 
     if (!process_invite_response_183())
