@@ -151,3 +151,15 @@ public:
 };
 
 //-------------------------------------------
+//-------------------------------------------
+
+class SIP_Call_Reject_Test : public SIP_Call_Test
+{
+public:
+    SIP_Call_Reject_Test() {}
+    virtual ~SIP_Call_Reject_Test() {}
+
+    bool run();
+};
+
+//-------------------------------------------
