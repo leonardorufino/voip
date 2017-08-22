@@ -354,6 +354,13 @@ bool SIP_Transaction_Client_Invite_Test::send_invite()
     if (!request)
         return false;
 
+    if (_transaction.match_transaction(request))
+    {
+        std::cout << "SIP_Transaction_Client_Invite_Test::send_invite -> Failed to match transaction\n";
+        delete request;
+        return false;
+    }
+
     _sent_message = false;
 
     if (!_transaction.send_invite(request))
@@ -391,8 +398,7 @@ bool SIP_Transaction_Client_Invite_Test::receive_response_100()
     if (!response)
         return false;
 
-    SIP_Transaction *t = _transaction.match_transaction(response);
-    if (&_transaction != t)
+    if (!_transaction.match_transaction(response))
     {
         std::cout << "SIP_Transaction_Client_Invite_Test::receive_response_100 -> Failed to match transaction\n";
         delete response;
@@ -436,8 +442,7 @@ bool SIP_Transaction_Client_Invite_Test::receive_response_180()
     if (!response)
         return false;
 
-    SIP_Transaction *t = _transaction.match_transaction(response);
-    if (&_transaction != t)
+    if (!_transaction.match_transaction(response))
     {
         std::cout << "SIP_Transaction_Client_Invite_Test::receive_response_180 -> Failed to match transaction\n";
         delete response;
@@ -481,8 +486,7 @@ bool SIP_Transaction_Client_Invite_Test::receive_response_200()
     if (!response)
         return false;
 
-    SIP_Transaction *t = _transaction.match_transaction(response);
-    if (&_transaction != t)
+    if (!_transaction.match_transaction(response))
     {
         std::cout << "SIP_Transaction_Client_Invite_Test::receive_response_200 -> Failed to match transaction\n";
         delete response;
@@ -526,8 +530,7 @@ bool SIP_Transaction_Client_Invite_Test::receive_response_480()
     if (!response)
         return false;
 
-    SIP_Transaction *t = _transaction.match_transaction(response);
-    if (&_transaction != t)
+    if (!_transaction.match_transaction(response))
     {
         std::cout << "SIP_Transaction_Client_Invite_Test::receive_response_480 -> Failed to match transaction\n";
         delete response;
@@ -721,6 +724,13 @@ bool SIP_Transaction_Client_Non_Invite_Test::send_bye()
     if (!request)
         return false;
 
+    if (_transaction.match_transaction(request))
+    {
+        std::cout << "SIP_Transaction_Client_Non_Invite_Test::send_bye -> Failed to match transaction\n";
+        delete request;
+        return false;
+    }
+
     _sent_message = false;
 
     if (!_transaction.send_request(request))
@@ -758,8 +768,7 @@ bool SIP_Transaction_Client_Non_Invite_Test::receive_response_100()
     if (!response)
         return false;
 
-    SIP_Transaction *t = _transaction.match_transaction(response);
-    if (&_transaction != t)
+    if (!_transaction.match_transaction(response))
     {
         std::cout << "SIP_Transaction_Client_Non_Invite_Test::receive_response_100 -> Failed to match transaction\n";
         delete response;
@@ -803,8 +812,7 @@ bool SIP_Transaction_Client_Non_Invite_Test::receive_response_200()
     if (!response)
         return false;
 
-    SIP_Transaction *t = _transaction.match_transaction(response);
-    if (&_transaction != t)
+    if (!_transaction.match_transaction(response))
     {
         std::cout << "SIP_Transaction_Client_Non_Invite_Test::receive_response_200 -> Failed to match transaction\n";
         delete response;
@@ -965,15 +973,12 @@ bool SIP_Transaction_Server_Invite_Test::receive_invite(bool retransmission)
     if (!request)
         return false;
 
-    if (retransmission)
+    if (((!retransmission) && (_transaction.match_transaction(request))) ||
+        ((retransmission) && (!_transaction.match_transaction(request))))
     {
-        SIP_Transaction *t = _transaction.match_transaction(request);
-        if (&_transaction != t)
-        {
-            std::cout << "SIP_Transaction_Server_Invite_Test::receive_invite -> Failed to match transaction\n";
-            delete request;
-            return false;
-        }
+        std::cout << "SIP_Transaction_Server_Invite_Test::receive_invite -> Failed to match transaction\n";
+        delete request;
+        return false;
     }
 
     _received_request = false;
@@ -1013,8 +1018,7 @@ bool SIP_Transaction_Server_Invite_Test::receive_ack()
     if (!request)
         return false;
 
-    SIP_Transaction *t = _transaction.match_transaction(request);
-    if (&_transaction != t)
+    if (!_transaction.match_transaction(request))
     {
         std::cout << "SIP_Transaction_Server_Invite_Test::receive_ack -> Failed to match transaction\n";
         delete request;
@@ -1048,6 +1052,13 @@ bool SIP_Transaction_Server_Invite_Test::send_response_100()
     SIP_Response *response = create_invite_response_100();
     if (!response)
         return false;
+
+    if (!_transaction.match_transaction(response))
+    {
+        std::cout << "SIP_Transaction_Server_Invite_Test::send_response_100 -> Failed to match transaction\n";
+        delete response;
+        return false;
+    }
 
     _sent_message = false;
 
@@ -1086,6 +1097,13 @@ bool SIP_Transaction_Server_Invite_Test::send_response_180()
     if (!response)
         return false;
 
+    if (!_transaction.match_transaction(response))
+    {
+        std::cout << "SIP_Transaction_Server_Invite_Test::send_response_180 -> Failed to match transaction\n";
+        delete response;
+        return false;
+    }
+
     _sent_message = false;
 
     if (!_transaction.send_1xx(response))
@@ -1123,6 +1141,13 @@ bool SIP_Transaction_Server_Invite_Test::send_response_200()
     if (!response)
         return false;
 
+    if (!_transaction.match_transaction(response))
+    {
+        std::cout << "SIP_Transaction_Server_Invite_Test::send_response_200 -> Failed to match transaction\n";
+        delete response;
+        return false;
+    }
+
     _sent_message = false;
 
     if (!_transaction.send_2xx(response))
@@ -1159,6 +1184,13 @@ bool SIP_Transaction_Server_Invite_Test::send_response_480()
     SIP_Response *response = create_invite_response_480();
     if (!response)
         return false;
+
+    if (!_transaction.match_transaction(response))
+    {
+        std::cout << "SIP_Transaction_Server_Invite_Test::send_response_480 -> Failed to match transaction\n";
+        delete response;
+        return false;
+    }
 
     _sent_message = false;
 
@@ -1341,15 +1373,12 @@ bool SIP_Transaction_Server_Non_Invite_Test::receive_bye(bool retransmission)
     if (!request)
         return false;
 
-    if (retransmission)
+    if (((!retransmission) && (_transaction.match_transaction(request))) ||
+        ((retransmission) && (!_transaction.match_transaction(request))))
     {
-        SIP_Transaction *t = _transaction.match_transaction(request);
-        if (&_transaction != t)
-        {
-            std::cout << "SIP_Transaction_Server_Non_Invite_Test::receive_bye -> Failed to match transaction\n";
-            delete request;
-            return false;
-        }
+        std::cout << "SIP_Transaction_Server_Non_Invite_Test::receive_bye -> Failed to match transaction\n";
+        delete request;
+        return false;
     }
 
     _received_request = false;
@@ -1389,6 +1418,13 @@ bool SIP_Transaction_Server_Non_Invite_Test::send_response_100()
     if (!response)
         return false;
 
+    if (!_transaction.match_transaction(response))
+    {
+        std::cout << "SIP_Transaction_Server_Non_Invite_Test::send_response_100 -> Failed to match transaction\n";
+        delete response;
+        return false;
+    }
+
     _sent_message = false;
 
     if (!_transaction.send_1xx(response))
@@ -1425,6 +1461,13 @@ bool SIP_Transaction_Server_Non_Invite_Test::send_response_200()
     SIP_Response *response = create_bye_response_200();
     if (!response)
         return false;
+
+    if (!_transaction.match_transaction(response))
+    {
+        std::cout << "SIP_Transaction_Server_Non_Invite_Test::send_response_200 -> Failed to match transaction\n";
+        delete response;
+        return false;
+    }
 
     _sent_message = false;
 
