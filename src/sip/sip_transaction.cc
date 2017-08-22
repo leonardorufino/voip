@@ -42,44 +42,60 @@ SIP_Transaction::~SIP_Transaction()
 
 //-------------------------------------------
 
-SIP_Transaction *SIP_Transaction::match_transaction(SIP_Message *msg)
+bool SIP_Transaction::match_transaction(SIP_Message *msg)
 {
     switch (get_transaction_type())
     {
         case SIP_TRANSACTION_CLIENT_INVITE:
-        case SIP_TRANSACTION_CLIENT_NON_INVITE:
-            if (msg->get_message_type() != SIP_RESPONSE)
-                return NULL;
+            if (msg->get_message_type() == SIP_RESPONSE)
+                return match_transaction_response(msg);
 
-            return match_transaction_client(msg);
+            else if ((msg->get_message_type() == SIP_REQUEST_INVITE) || (msg->get_message_type() == SIP_REQUEST_ACK))
+                return match_transaction_request(msg);
+
+            return false;
+
+        case SIP_TRANSACTION_CLIENT_NON_INVITE:
+            if (msg->get_message_type() == SIP_RESPONSE)
+                return match_transaction_response(msg);
+
+            else if ((msg->get_message_type() != SIP_REQUEST_INVITE) && (msg->get_message_type() != SIP_REQUEST_ACK))
+                return match_transaction_request(msg);
+
+            return false;
 
         case SIP_TRANSACTION_SERVER_INVITE:
-            if ((msg->get_message_type() != SIP_REQUEST_INVITE) && (msg->get_message_type() != SIP_REQUEST_ACK))
-                return NULL;
+            if (msg->get_message_type() == SIP_RESPONSE)
+                return match_transaction_response(msg);
 
-            return match_transaction_server(msg);
+            else if ((msg->get_message_type() == SIP_REQUEST_INVITE) || (msg->get_message_type() == SIP_REQUEST_ACK))
+                return match_transaction_request(msg);
+
+            return false;
 
         case SIP_TRANSACTION_SERVER_NON_INVITE:
-            if ((msg->get_message_type() == SIP_REQUEST_INVITE) || (msg->get_message_type() == SIP_REQUEST_ACK) ||
-                (msg->get_message_type() == SIP_RESPONSE))
-                return NULL;
+            if (msg->get_message_type() == SIP_RESPONSE)
+                return match_transaction_response(msg);
 
-            return match_transaction_server(msg);
+            else if ((msg->get_message_type() != SIP_REQUEST_INVITE) && (msg->get_message_type() != SIP_REQUEST_ACK))
+                return match_transaction_request(msg);
+
+            return false;
 
         default:
             _logger.warning("SIP_Transaction::match_transaction -> Invalid message type (transaction=%d)", get_transaction_type());
-            return NULL;
+            return false;
     }
 }
 
 //-------------------------------------------
 
-SIP_Transaction *SIP_Transaction::match_transaction_client(SIP_Message *msg)
+bool SIP_Transaction::match_transaction_response(SIP_Message *msg)
 {
     if (!_saved_request)
     {
-        _logger.warning("SIP_Transaction::match_transaction_client -> Invalid saved request message");
-        return NULL;
+        //_logger.trace("SIP_Transaction::match_transaction_response -> Invalid saved request message");
+        return false;
     }
 
     SIP_Header_Via *saved_request_via = dynamic_cast<SIP_Header_Via *>(_saved_request->get_header(SIP_HEADER_VIA));
@@ -87,8 +103,8 @@ SIP_Transaction *SIP_Transaction::match_transaction_client(SIP_Message *msg)
 
     if ((!saved_request_via) || (!saved_request_cseq))
     {
-        _logger.warning("SIP_Transaction::match_transaction_client -> Failed to get Via or CSeq header from saved request");
-        return NULL;
+        _logger.warning("SIP_Transaction::match_transaction_response -> Failed to get Via or CSeq header from saved request");
+        return false;
     }
 
     std::string saved_request_via_branch = saved_request_via->get_branch();
@@ -96,15 +112,15 @@ SIP_Transaction *SIP_Transaction::match_transaction_client(SIP_Message *msg)
 
     if ((saved_request_via_branch.empty()) || (saved_request_cseq_method == SIP_METHOD_INVALID))
     {
-        _logger.warning("SIP_Transaction::match_transaction_client -> Invalid Via branch or CSeq method from saved request");
-        return NULL;
+        _logger.warning("SIP_Transaction::match_transaction_response -> Invalid Via branch or CSeq method from saved request");
+        return false;
     }
 
     SIP_Response *response = dynamic_cast<SIP_Response *>(msg);
     if (!response)
     {
-        _logger.warning("SIP_Transaction::match_transaction_client -> Invalid response message");
-        return NULL;
+        _logger.warning("SIP_Transaction::match_transaction_response -> Invalid response message");
+        return false;
     }
 
     SIP_Header_Via *response_via = dynamic_cast<SIP_Header_Via *>(response->get_header(SIP_HEADER_VIA));
@@ -112,8 +128,8 @@ SIP_Transaction *SIP_Transaction::match_transaction_client(SIP_Message *msg)
 
     if ((!response_via) || (!response_cseq))
     {
-        _logger.warning("SIP_Transaction::match_transaction_client -> Failed to get Via or CSeq header from response");
-        return NULL;
+        _logger.warning("SIP_Transaction::match_transaction_response -> Failed to get Via or CSeq header from response");
+        return false;
     }
 
     std::string response_via_branch = response_via->get_branch();
@@ -121,35 +137,34 @@ SIP_Transaction *SIP_Transaction::match_transaction_client(SIP_Message *msg)
 
     if ((response_via_branch.empty()) || (response_cseq_method == SIP_METHOD_INVALID))
     {
-        _logger.warning("SIP_Transaction::match_transaction_client -> Invalid Via branch or CSeq method from response");
-        return NULL;
+        _logger.warning("SIP_Transaction::match_transaction_response -> Invalid Via branch or CSeq method from response");
+        return false;
     }
 
     if ((saved_request_via_branch != response_via_branch) || (saved_request_cseq_method != response_cseq_method))
     {
-        _logger.trace("SIP_Transaction::match_transaction_client -> Via branch or CSeq method do not match");
-        return NULL;
+        _logger.trace("SIP_Transaction::match_transaction_response -> Via branch or CSeq method do not match");
+        return false;
     }
 
-    return this;
+    return true;
 }
 
 //-------------------------------------------
 
-SIP_Transaction *SIP_Transaction::match_transaction_server(SIP_Message *msg)
+bool SIP_Transaction::match_transaction_request(SIP_Message *msg)
 {
     if (!_saved_request)
     {
-        _logger.warning("SIP_Transaction::match_transaction_server -> Invalid saved request message");
-        return NULL;
+        //_logger.trace("SIP_Transaction::match_transaction_request -> Invalid saved request message");
+        return false;
     }
 
     SIP_Header_Via *saved_request_via = dynamic_cast<SIP_Header_Via *>(_saved_request->get_header(SIP_HEADER_VIA));
-
     if (!saved_request_via)
     {
-        _logger.warning("SIP_Transaction::match_transaction_server -> Failed to get Via header from saved request");
-        return NULL;
+        _logger.warning("SIP_Transaction::match_transaction_request -> Failed to get Via header from saved request");
+        return false;
     }
 
     SIP_Method_Type saved_request_method = _saved_request->get_message_type();
@@ -159,23 +174,22 @@ SIP_Transaction *SIP_Transaction::match_transaction_server(SIP_Message *msg)
 
     if ((saved_request_method == SIP_METHOD_INVALID) || (saved_request_via_branch.empty()) || (saved_request_via_host.empty()))
     {
-        _logger.warning("SIP_Transaction::match_transaction_server -> Invalid method, Via branch or Via host from saved request");
-        return NULL;
+        _logger.warning("SIP_Transaction::match_transaction_request -> Invalid method, Via branch or Via host from saved request");
+        return false;
     }
 
     SIP_Request *request = dynamic_cast<SIP_Request *>(msg);
     if (!request)
     {
-        _logger.warning("SIP_Transaction::match_transaction_server -> Invalid request message");
-        return NULL;
+        _logger.warning("SIP_Transaction::match_transaction_request -> Invalid request message");
+        return false;
     }
 
     SIP_Header_Via *request_via = dynamic_cast<SIP_Header_Via *>(request->get_header(SIP_HEADER_VIA));
-
     if (!request_via)
     {
-        _logger.warning("SIP_Transaction::match_transaction_server -> Failed to get Via header from request");
-        return NULL;
+        _logger.warning("SIP_Transaction::match_transaction_request -> Failed to get Via header from request");
+        return false;
     }
 
     SIP_Method_Type request_method = request->get_message_type();
@@ -185,8 +199,8 @@ SIP_Transaction *SIP_Transaction::match_transaction_server(SIP_Message *msg)
 
     if ((request_method == SIP_METHOD_INVALID) || (request_via_host.empty()))
     {
-        _logger.warning("SIP_Transaction::match_transaction_server -> Invalid method or Via host from request");
-        return NULL;
+        _logger.warning("SIP_Transaction::match_transaction_request -> Invalid method or Via host from request");
+        return false;
     }
 
     bool magic_cookie = false; // SIP 2.0
@@ -195,19 +209,19 @@ SIP_Transaction *SIP_Transaction::match_transaction_server(SIP_Message *msg)
 
     if (!magic_cookie)
     {
-        _logger.warning("SIP_Transaction::match_transaction_server -> Invalid Via branch from request (magic cookie is not present)");
-        return NULL;
+        _logger.warning("SIP_Transaction::match_transaction_request -> Invalid Via branch from request (magic cookie is not present)");
+        return false;
     }
 
     if ((request_via_branch != saved_request_via_branch) || (request_via_host != saved_request_via_host) ||
         (request_via_port != saved_request_via_port) || ((request_method != saved_request_method) &&
         ((saved_request_method != SIP_REQUEST_INVITE) || (request_method != SIP_REQUEST_ACK))))
     {
-        _logger.trace("SIP_Transaction::match_transaction_server -> Method, Via branch, host or port do not match");
-        return NULL;
+        _logger.trace("SIP_Transaction::match_transaction_request -> Method, Via branch, host or port do not match");
+        return false;
     }
 
-    return this;
+    return true;
 }
 
 //-------------------------------------------
@@ -384,7 +398,7 @@ bool SIP_Transaction_Client_Invite::send_ack(SIP_Response *msg)
 
     if ((!saved_request_call_id) || (!saved_request_cseq) || (!saved_request_from) || (!saved_request_to) || (!saved_request_via))
     {
-        _logger.warning("SIP_Transaction::match_transaction_server -> Failed to get Via, From, Call-ID, CSeq or To header from saved request");
+        _logger.warning("SIP_Transaction_Client_Invite::send_ack -> Invalid headers from saved request");
         return false;
     }
 
@@ -827,7 +841,7 @@ bool SIP_Transaction_Server_Invite::receive_invite(SIP_Request *msg)
             return true;
 
         default:
-            break;
+            return false;
     }
 }
 

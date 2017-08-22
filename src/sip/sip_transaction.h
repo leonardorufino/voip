@@ -62,9 +62,11 @@ public:
 
     virtual SIP_Transaction_Type get_transaction_type() = 0;
 
-    SIP_Transaction *match_transaction(SIP_Message *msg);
-    SIP_Transaction *match_transaction_client(SIP_Message *msg);
-    SIP_Transaction *match_transaction_server(SIP_Message *msg);
+    bool match_transaction(SIP_Message *msg);
+    bool match_transaction_response(SIP_Message *msg);
+    bool match_transaction_request(SIP_Message *msg);
+
+    SIP_Request *get_saved_request() { return _saved_request; }
 
     void set_send_message_callback(send_message_callback *callback, void *data);
     void set_receive_request_callback(receive_request_callback *callback, void *data);
