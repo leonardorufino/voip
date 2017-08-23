@@ -18,6 +18,7 @@ Logger SIP_Call::_logger(Log_Manager::LOG_SIP_CALL);
 SIP_Call::~SIP_Call()
 {
     clear_dialogs();
+    clear_transactions();
 }
 
 //-------------------------------------------
@@ -47,68 +48,34 @@ std::string SIP_Call::get_state_str()
 
 //-------------------------------------------
 
+void SIP_Call::set_send_message_callback(send_message_callback *callback, void *data)
+{
+    _send_message_callback = callback;
+    _send_message_callback_data = data;
+}
+
+//-------------------------------------------
+
+void SIP_Call::set_receive_request_callback(receive_request_callback *callback, void *data)
+{
+    _receive_request_callback = callback;
+    _receive_request_callback_data = data;
+}
+
+//-------------------------------------------
+
+void SIP_Call::set_receive_response_callback(receive_response_callback *callback, void *data)
+{
+    _receive_response_callback = callback;
+    _receive_response_callback_data = data;
+}
+
+//-------------------------------------------
+
 void SIP_Call::set_create_response_callback(create_response_callback *callback, void *data)
 {
     _create_response_callback = callback;
-    _create_response_data = data;
-}
-
-//-------------------------------------------
-
-SIP_Response *SIP_Call::call_create_response_callback(SIP_Request *request, unsigned short status_code)
-{
-    try
-    {
-        if (_create_response_callback)
-        {
-            _logger.trace("Calling create response callback");
-            return _create_response_callback(_create_response_data, this, request, status_code);
-        }
-
-        _logger.trace("Create response callback not configured");
-        return NULL;
-    }catch (std::exception &e)
-    {
-        _logger.warning("Exception when calling create response callback (msg=%s)", e.what());
-        return NULL;
-    }catch (...)
-    {
-        _logger.warning("Exception when calling create response callback");
-        return NULL;
-    }
-}
-
-//-------------------------------------------
-
-void SIP_Call::set_send_response_callback(send_response_callback *callback, void *data)
-{
-    _send_response_callback = callback;
-    _send_response_data = data;
-}
-
-//-------------------------------------------
-
-bool SIP_Call::call_send_response_callback(SIP_Request *request, SIP_Response *response)
-{
-    try
-    {
-        if (_send_response_callback)
-        {
-            _logger.trace("Calling send response callback");
-            return _send_response_callback(_send_response_data, this, request, response);
-        }
-
-        _logger.trace("Send response callback not configured");
-        return false;
-    }catch (std::exception &e)
-    {
-        _logger.warning("Exception when calling send response callback (msg=%s)", e.what());
-        return false;
-    }catch (...)
-    {
-        _logger.warning("Exception when calling send response callback");
-        return false;
-    }
+    _create_response_callback_data = data;
 }
 
 //-------------------------------------------
@@ -121,7 +88,7 @@ SIP_Dialog *SIP_Call::get_client_dialog(SIP_Message *msg)
 
     if ((!header_call_id) || (!header_from) || (!header_to))
     {
-        _logger.warning("Failed to get client dialog: invalid headers");
+        _logger.warning("Failed to get client dialog: invalid headers (call_id=%d)", _call_id);
         return NULL;
     }
 
@@ -142,7 +109,7 @@ SIP_Dialog *SIP_Call::get_server_dialog(SIP_Message *msg)
 
     if ((!header_call_id) || (!header_from) || (!header_to))
     {
-        _logger.warning("Failed to get server dialog: invalid headers");
+        _logger.warning("Failed to get server dialog: invalid headers (call_id=%d)", _call_id);
         return NULL;
     }
 
@@ -210,11 +177,324 @@ void SIP_Call::clear_dialogs()
 
 //-------------------------------------------
 
+SIP_Transaction *SIP_Call::get_transaction(SIP_Message *msg)
+{
+    std::list<SIP_Transaction *>::iterator it = _transactions.begin();
+    while (it != _transactions.end())
+    {
+        SIP_Transaction *transaction = *it++;
+
+        if (transaction->match_transaction(msg))
+            return transaction;
+    }
+
+    return NULL;
+}
+
+//-------------------------------------------
+
+void SIP_Call::add_transaction(SIP_Transaction *transaction)
+{
+    transaction->set_send_message_callback(transaction_send_message_callback, this);
+    transaction->set_receive_request_callback(transaction_receive_request_callback, this);
+    transaction->set_receive_response_callback(transaction_receive_response_callback, this);
+
+    _transactions.push_back(transaction);
+}
+
+//-------------------------------------------
+
+void SIP_Call::remove_transaction(SIP_Transaction *transaction)
+{
+    _transactions.remove(transaction);
+    delete transaction;
+}
+
+//-------------------------------------------
+
+void SIP_Call::clear_transactions()
+{
+    std::list<SIP_Transaction *>::iterator it = _transactions.begin();
+    while (it != _transactions.end())
+    {
+        SIP_Transaction *transaction = *it++;
+        _transactions.pop_front();
+        delete transaction;
+    }
+}
+
+//-------------------------------------------
+
+bool SIP_Call::send_request(SIP_Request *request)
+{
+    if (!request)
+    {
+        _logger.warning("Failed to send request: invalid request (call_id=%d)", _call_id);
+        return false;
+    }
+
+    SIP_Method_Type method = request->get_message_type();
+
+    SIP_Transaction *transaction = get_transaction(request);
+    if (transaction)
+    {
+        _logger.warning("Failed to send request: transaction already exist (call_id=%d, method=%d)", _call_id, method);
+        return false;
+    }
+
+    if (!process_send_request(request))
+    {
+        _logger.warning("Failed to send request: process send request returned false (call_id=%d, method=%d)", _call_id, method);
+        return false;
+    }
+
+    if (method == SIP_REQUEST_INVITE)
+    {
+        SIP_Transaction_Client_Invite *transaction = new SIP_Transaction_Client_Invite();
+        add_transaction(transaction);
+        return transaction->send_invite(request);
+
+    }else if (method == SIP_REQUEST_ACK)
+    {
+        if (_send_message_callback)
+            return _send_message_callback(_send_message_callback_data, this, request);
+        return true;
+    }else
+    {
+        SIP_Transaction_Client_Non_Invite *transaction = new SIP_Transaction_Client_Non_Invite();
+        add_transaction(transaction);
+        return transaction->send_request(request);
+    }
+}
+
+//-------------------------------------------
+
+bool SIP_Call::receive_request(SIP_Request *request)
+{
+    if (!request)
+    {
+        _logger.warning("Failed to receive request: invalid request (call_id=%d)", _call_id);
+        return false;
+    }
+
+    SIP_Method_Type method = request->get_message_type();
+
+    SIP_Transaction *transaction = get_transaction(request);
+    if (!transaction)
+    {
+        if (method == SIP_REQUEST_INVITE)
+        {
+            transaction = new SIP_Transaction_Server_Invite();
+            add_transaction(transaction);
+
+        }else if (method == SIP_REQUEST_ACK)
+        {
+            return process_receive_request(request);
+        }else
+        {
+            transaction = new SIP_Transaction_Server_Non_Invite();
+            add_transaction(transaction);
+        }
+    }
+
+    if (transaction)
+    {
+        if ((method == SIP_REQUEST_INVITE) || (method == SIP_REQUEST_ACK))
+        {
+            SIP_Transaction_Server_Invite *transaction_server_invite = dynamic_cast<SIP_Transaction_Server_Invite *>(transaction);
+            if (!transaction_server_invite)
+            {
+                _logger.warning("Failed to receive request: invalid invite server transaction (call_id=%d, method=%d)",
+                                _call_id, method);
+                return false;
+            }
+
+            if (method == SIP_REQUEST_INVITE)
+                return transaction_server_invite->receive_invite(request);
+            else
+                return transaction_server_invite->receive_ack(request);
+        }else
+        {
+            SIP_Transaction_Server_Non_Invite *transaction_server_non_invite = dynamic_cast<SIP_Transaction_Server_Non_Invite *>(transaction);
+            if (!transaction_server_non_invite)
+            {
+                _logger.warning("Failed to receive request: invalid non-invite server transaction (call_id=%d, method=%d)",
+                                _call_id, method);
+                return false;
+            }
+
+            return transaction_server_non_invite->receive_request(request);
+        }
+    }
+
+    _logger.warning("Failed to receive request: invalid transaction (call_id=%d, method=%d)", _call_id, method);
+    return false;
+}
+
+//-------------------------------------------
+
+bool SIP_Call::send_response(SIP_Response *response)
+{
+    if (!response)
+    {
+        _logger.warning("Failed to send response: invalid response (call_id=%d)", _call_id);
+        return false;
+    }
+
+    unsigned short status_code = response->get_status_code();
+
+    SIP_Transaction *transaction = get_transaction(response);
+    if (!transaction)
+    {
+        _logger.warning("Failed to send response: transaction not found (call_id=%d, status_code=%d)", _call_id, status_code);
+        return false;
+    }
+
+    SIP_Request *request = transaction->get_saved_request();
+    if (!request)
+    {
+        _logger.warning("Failed to send response: invalid request (call_id=%d, status_code=%d)", _call_id, status_code);
+        return false;
+    }
+
+    SIP_Method_Type method = request->get_message_type();
+
+    if (!process_send_response(request, response))
+    {
+        _logger.warning("Failed to send request: process send request returned false (call_id=%d, method=%d)", _call_id, method);
+        return false;
+    }
+
+    if (method == SIP_REQUEST_INVITE)
+    {
+        SIP_Transaction_Server_Invite *transaction_server_invite = dynamic_cast<SIP_Transaction_Server_Invite *>(transaction);
+        if (!transaction_server_invite)
+        {
+            _logger.warning("Failed to send response: invalid invite server transaction (call_id=%d, method=%d, status_code=%d)",
+                            _call_id, method, status_code);
+            return false;
+        }
+
+        if ((status_code >= 100) && (status_code <= 199))
+            return transaction_server_invite->send_1xx(response);
+
+        else if ((status_code >= 200) && (status_code <= 299))
+            return transaction_server_invite->send_2xx(response);
+
+        else if ((status_code >= 300) && (status_code <= 699))
+            return transaction_server_invite->send_3xx_6xx(response);
+    }else
+    {
+        SIP_Transaction_Server_Non_Invite *transaction_server_non_invite = dynamic_cast<SIP_Transaction_Server_Non_Invite *>(transaction);
+        if (!transaction_server_non_invite)
+        {
+            _logger.warning("Failed to send response: invalid non-invite server transaction (call_id=%d, method=%d, status_code=%d)",
+                            _call_id, method, status_code);
+            return false;
+        }
+
+        if ((status_code >= 100) && (status_code <= 199))
+            return transaction_server_non_invite->send_1xx(response);
+
+        else if ((status_code >= 200) && (status_code <= 699))
+            return transaction_server_non_invite->send_2xx_6xx(response);
+    }
+
+    _logger.warning("Failed to send response: invalid status code (call_id=%d, method=%d, status_code=%d)",
+                    _call_id, method, status_code);
+    return false;
+}
+
+//-------------------------------------------
+
+bool SIP_Call::receive_response(SIP_Response *response)
+{
+    if (!response)
+    {
+        _logger.warning("Failed to receive response: invalid messages (call_id=%d)", _call_id);
+        return false;
+    }
+
+    unsigned short status_code = response->get_status_code();
+
+    SIP_Transaction *transaction = get_transaction(response);
+    if (!transaction)
+    {
+        _logger.warning("Failed to receive response: transaction not found (call_id=%d, status_code=%d)", _call_id, status_code);
+        return false;
+    }
+
+    SIP_Request *request = transaction->get_saved_request();
+    if (!request)
+    {
+        _logger.warning("Failed to receive response: invalid request (call_id=%d, status_code=%d)", _call_id, status_code);
+        return false;
+    }
+
+    SIP_Method_Type method = request->get_message_type();
+
+    if (transaction->get_transaction_type() == SIP_Transaction::SIP_TRANSACTION_CLIENT_INVITE)
+    {
+        SIP_Transaction_Client_Invite *transaction_client_invite = dynamic_cast<SIP_Transaction_Client_Invite *>(transaction);
+        if (!transaction_client_invite)
+        {
+            _logger.warning("Failed to receive response: invalid invite client transaction (call_id=%d, method=%d, status_code=%d)",
+                            _call_id, method, status_code);
+            return false;
+        }
+
+        if ((status_code >= 100) && (status_code <= 199))
+            return transaction_client_invite->receive_1xx(response);
+
+        else if ((status_code >= 200) && (status_code <= 299))
+            return transaction_client_invite->receive_2xx(response);
+
+        else if ((status_code >= 300) && (status_code <= 699))
+            return transaction_client_invite->receive_3xx_6xx(response);
+
+        else
+        {
+            _logger.warning("Failed to receive response: invalid status code (call_id=%d, method=%d, status_code=%d, transaction=%d)",
+                            _call_id, method, status_code, transaction->get_transaction_type());
+            return false;
+        }
+    }else if (transaction->get_transaction_type() == SIP_Transaction::SIP_TRANSACTION_CLIENT_NON_INVITE)
+    {
+        SIP_Transaction_Client_Non_Invite *transaction_client_non_invite = dynamic_cast<SIP_Transaction_Client_Non_Invite *>(transaction);
+        if (!transaction_client_non_invite)
+        {
+            _logger.warning("Failed to receive response: invalid non-invite client transaction (call_id=%d, method=%d, status_code=%d)",
+                            _call_id, method, status_code);
+            return false;
+        }
+
+        if ((status_code >= 100) && (status_code <= 199))
+            return transaction_client_non_invite->receive_1xx(response);
+
+        else if ((status_code >= 200) && (status_code <= 699))
+            return transaction_client_non_invite->receive_2xx_6xx(response);
+
+        else
+        {
+            _logger.warning("Failed to receive response: invalid status code (call_id=%d, method=%d, status_code=%d, transaction=%d)",
+                            _call_id, method, status_code, transaction->get_transaction_type());
+            return false;
+        }
+    }else
+    {
+        _logger.warning("Failed to receive response: invalid transaction type (call_id=%d, method=%d, status_code=%d, transaction=%d)",
+                        _call_id, method, status_code, transaction->get_transaction_type());
+        return false;
+    }
+}
+
+//-------------------------------------------
+
 bool SIP_Call::process_send_request(SIP_Request *request)
 {
     if (!request)
     {
-        _logger.warning("Failed to process send request: invalid request");
+        _logger.warning("Failed to process send request: invalid request (call_id=%d)", _call_id);
         return false;
     }
 
@@ -236,7 +516,8 @@ bool SIP_Call::process_send_request(SIP_Request *request)
             return process_send_request_active(request);
 
         default:
-            _logger.warning("Failed to process send request: invalid state (state=%d, method=%d)", _state, request->get_message_type());
+            _logger.warning("Failed to process send request: invalid state (call_id=%d, state=%d, method=%d)",
+                            _call_id, _state, request->get_message_type());
             return false;
     }
 }
@@ -247,7 +528,7 @@ bool SIP_Call::process_receive_request(SIP_Request *request)
 {
     if (!request)
     {
-        _logger.warning("Failed to process receive request: invalid request");
+        _logger.warning("Failed to process receive request: invalid request (call_id=%d)", _call_id);
         return false;
     }
 
@@ -269,7 +550,8 @@ bool SIP_Call::process_receive_request(SIP_Request *request)
             return process_receive_request_active(request);
 
         default:
-            _logger.warning("Failed to process receive request: invalid state (state=%d, method=%d)", _state, request->get_message_type());
+            _logger.warning("Failed to process receive request: invalid state (call_id=%d, state=%d, method=%d)",
+                            _call_id, _state, request->get_message_type());
             return false;
     }
 }
@@ -280,7 +562,7 @@ bool SIP_Call::process_send_response(SIP_Request *request, SIP_Response *respons
 {
     if ((!request) || (!response))
     {
-        _logger.warning("Failed to process send response: invalid messages");
+        _logger.warning("Failed to process send response: invalid params (call_id=%d)", _call_id);
         return false;
     }
 
@@ -308,10 +590,10 @@ bool SIP_Call::process_send_response(SIP_Request *request, SIP_Response *respons
             return process_send_response_closing_in(request, response);
 
         default:
-            _logger.warning("Failed to process receive request: invalid state (state=%d, method=%d, status_code=%d)",
-                            _state, request->get_message_type(), response->get_status_code());
+            _logger.warning("Failed to process receive request: invalid state (call_id=%d, state=%d, method=%d, status_code=%d)",
+                            _call_id, _state, request->get_message_type(), response->get_status_code());
             return false;
-    };
+    }
 }
 
 //-------------------------------------------
@@ -320,7 +602,7 @@ bool SIP_Call::process_receive_response(SIP_Request *request, SIP_Response *resp
 {
     if ((!request) || (!response))
     {
-        _logger.warning("Failed to process receive response: invalid messages");
+        _logger.warning("Failed to process receive response: invalid params (call_id=%d)", _call_id);
         return false;
     }
 
@@ -348,10 +630,10 @@ bool SIP_Call::process_receive_response(SIP_Request *request, SIP_Response *resp
             return process_receive_response_closing_out(request, response);
 
         default:
-            _logger.warning("Failed to process receive request: invalid state (state=%d, method=%d, status_code=%d)",
-                            _state, request->get_message_type(), response->get_status_code());
+            _logger.warning("Failed to process receive request: invalid state (call_id=%d, state=%d, method=%d, status_code=%d)",
+                            _call_id, _state, request->get_message_type(), response->get_status_code());
             return false;
-    };
+    }
 }
 
 //-------------------------------------------
@@ -390,15 +672,7 @@ bool SIP_Call::process_receive_request_idle(SIP_Request *request)
     if (dialog)
     {
         _logger.warning("Failed to process receive request idle: invalid dialog (method=%d)", method);
-
-        SIP_Response *response = call_create_response_callback(request, 481);
-        if (response)
-        {
-            call_send_response_callback(request, response);
-            delete response;
-        }
-
-        return false;
+        return send_response(request, 481);
     }
 
     switch (method)
@@ -415,19 +689,14 @@ bool SIP_Call::process_receive_request_idle(SIP_Request *request)
             if (!header_to->get_tag().empty())
             {
                 _logger.warning("Failed to process receive request idle: invalid TO header tag (method=%d)", method);
-
-                SIP_Response *response = call_create_response_callback(request, 481);
-                if (response)
-                {
-                    call_send_response_callback(request, response);
-                    delete response;
-                }
-
-                return false;
+                return send_response(request, 481);
             }
 
             _state = STATE_CALLING_IN;
             _logger.trace("Changed state in process receive request idle (state=%d, method=%d)", _state, method);
+
+            if (_receive_request_callback)
+                return _receive_request_callback(_receive_request_callback_data, this, request);
             return true;
         }
 
@@ -563,6 +832,9 @@ bool SIP_Call::process_receive_response_calling_out(SIP_Request *request, SIP_Re
                 _state = STATE_RINGING_OUT;
                 _logger.trace("Changed state in process receive response calling out (state=%d, method=%d, status_code=%d)",
                               _state, method, status_code);
+
+                if (_receive_response_callback)
+                    return _receive_response_callback(_receive_response_callback_data, this, request, response);
                 return true;
 
             }else if ((status_code >= 200) && (status_code <= 299))
@@ -581,6 +853,9 @@ bool SIP_Call::process_receive_response_calling_out(SIP_Request *request, SIP_Re
                 _state = STATE_WAITING_ACK_OUT;
                 _logger.trace("Changed state in process receive response calling out (state=%d, method=%d, status_code=%d)",
                               _state, method, status_code);
+
+                if (_receive_response_callback)
+                    return _receive_response_callback(_receive_response_callback_data, this, request, response);
                 return true;
 
             }else if ((status_code >= 300) && (status_code <= 699))
@@ -588,6 +863,9 @@ bool SIP_Call::process_receive_response_calling_out(SIP_Request *request, SIP_Re
                 _state = STATE_CLOSED;
                 _logger.trace("Changed state in process receive response calling out (state=%d, method=%d, status_code=%d)",
                               _state, method, status_code);
+
+                if (_receive_response_callback)
+                    return _receive_response_callback(_receive_response_callback_data, this, request, response);
                 return true;
             }
 
@@ -648,6 +926,9 @@ bool SIP_Call::process_receive_request_ringing_in(SIP_Request *request)
 
             _state = STATE_CANCELING_IN;
             _logger.trace("Changed state in process receive request ringing in (state=%d, method=%d)", _state, method);
+
+            if (_receive_request_callback)
+                return _receive_request_callback(_receive_request_callback_data, this, request);
             return true;
         }
 
@@ -666,6 +947,9 @@ bool SIP_Call::process_receive_request_ringing_in(SIP_Request *request)
 
             //_state = STATE_RINGING_IN;
             _logger.trace("Changed state in process receive request ringing in (state=%d, method=%d)", _state, method);
+
+            if (_receive_request_callback)
+                return _receive_request_callback(_receive_request_callback_data, this, request);
             return true;
         }
 
@@ -680,6 +964,9 @@ bool SIP_Call::process_receive_request_ringing_in(SIP_Request *request)
 
             //_state = STATE_RINGING_IN;
             _logger.trace("Changed state in process receive request ringing in (state=%d, method=%d)", _state, method);
+
+            if (_receive_request_callback)
+                return _receive_request_callback(_receive_request_callback_data, this, request);
             return true;
         }
 
@@ -820,6 +1107,9 @@ bool SIP_Call::process_receive_response_ringing_in(SIP_Request *request, SIP_Res
             //_state = STATE_RINGING_IN;
             _logger.trace("Changed state in process receive response ringing in (state=%d, method=%d, status_code=%d)",
                           _state, method, status_code);
+
+            if (_receive_response_callback)
+                return _receive_response_callback(_receive_response_callback_data, this, request, response);
             return true;
         }
 
@@ -896,6 +1186,9 @@ bool SIP_Call::process_receive_request_ringing_out(SIP_Request *request)
 
             //_state = STATE_RINGING_OUT;
             _logger.trace("Changed state in process receive request ringing out (state=%d, method=%d)", _state, method);
+
+            if (_receive_request_callback)
+                return _receive_request_callback(_receive_request_callback_data, this, request);
             return true;
         }
 
@@ -983,6 +1276,9 @@ bool SIP_Call::process_receive_response_ringing_out(SIP_Request *request, SIP_Re
                 //_state = STATE_RINGING_OUT;
                 _logger.trace("Changed state in process receive response ringing out (state=%d, method=%d, status_code=%d)",
                               _state, method, status_code);
+
+                if (_receive_response_callback)
+                    return _receive_response_callback(_receive_response_callback_data, this, request, response);
                 return true;
 
             }else if ((status_code >= 200) && (status_code <= 299))
@@ -1010,6 +1306,9 @@ bool SIP_Call::process_receive_response_ringing_out(SIP_Request *request, SIP_Re
                 _state = STATE_WAITING_ACK_OUT;
                 _logger.trace("Changed state in process receive response ringing out (state=%d, method=%d, status_code=%d)",
                               _state, method, status_code);
+
+                if (_receive_response_callback)
+                    return _receive_response_callback(_receive_response_callback_data, this, request, response);
                 return true;
 
             }else if ((status_code >= 300) && (status_code <= 699))
@@ -1021,6 +1320,9 @@ bool SIP_Call::process_receive_response_ringing_out(SIP_Request *request, SIP_Re
                 _state = STATE_CLOSED;
                 _logger.trace("Changed state in process receive response ringing out (state=%d, method=%d, status_code=%d)",
                               _state, method, status_code);
+
+                if (_receive_response_callback)
+                    return _receive_response_callback(_receive_response_callback_data, this, request, response);
                 return true;
             }
 
@@ -1045,6 +1347,9 @@ bool SIP_Call::process_receive_response_ringing_out(SIP_Request *request, SIP_Re
             //_state = STATE_RINGING_OUT;
             _logger.trace("Changed state in process receive response ringing out (state=%d, method=%d, status_code=%d)",
                           _state, method, status_code);
+
+            if (_receive_response_callback)
+                return _receive_response_callback(_receive_response_callback_data, this, request, response);
             return true;
         }
 
@@ -1061,6 +1366,9 @@ bool SIP_Call::process_receive_response_ringing_out(SIP_Request *request, SIP_Re
             //_state = STATE_RINGING_OUT;
             _logger.trace("Changed state in process receive response ringing out (state=%d, method=%d, status_code=%d)",
                           _state, method, status_code);
+
+            if (_receive_response_callback)
+                return _receive_response_callback(_receive_response_callback_data, this, request, response);
             return true;
         }
 
@@ -1125,6 +1433,9 @@ bool SIP_Call::process_receive_response_canceling_out(SIP_Request *request, SIP_
             _state = STATE_CANCELED_OUT;
             _logger.trace("Changed state in process receive response canceling out (state=%d, method=%d, status_code=%d)",
                           _state, method, status_code);
+
+            if (_receive_response_callback)
+                return _receive_response_callback(_receive_response_callback_data, this, request, response);
             return true;
         }
 
@@ -1202,6 +1513,9 @@ bool SIP_Call::process_receive_response_canceled_out(SIP_Request *request, SIP_R
                 _state = STATE_CLOSED;
                 _logger.trace("Changed state in process receive response canceled out (state=%d, method=%d, status_code=%d)",
                               _state, method, status_code);
+
+                if (_receive_response_callback)
+                    return _receive_response_callback(_receive_response_callback_data, this, request, response);
                 return true;
             }
 
@@ -1252,6 +1566,9 @@ bool SIP_Call::process_receive_request_waiting_ack_in(SIP_Request *request)
         case SIP_REQUEST_ACK:
             _state = STATE_ACTIVE;
             _logger.trace("Changed state in process receive request waiting ack in (state=%d, method=%d)", _state, method);
+
+            if (_receive_request_callback)
+                return _receive_request_callback(_receive_request_callback_data, this, request);
             return true;
 
         default:
@@ -1357,15 +1674,7 @@ bool SIP_Call::process_receive_request_active(SIP_Request *request)
     {
         _logger.warning("Failed to process receive request active: CSeq sequence is lower than the last one (method=%d, seq=%d, last=%d)",
                         method, cseq_sequence, dialog_sequence);
-
-        SIP_Response *response = call_create_response_callback(request, 500);
-        if (response)
-        {
-            call_send_response_callback(request, response);
-            delete response;
-        }
-
-        return false;
+        return send_response(request, 500);
     }
 
     switch (method)
@@ -1373,6 +1682,9 @@ bool SIP_Call::process_receive_request_active(SIP_Request *request)
         case SIP_REQUEST_BYE:
             _state = STATE_CLOSING_IN;
             _logger.trace("Changed state in process receive request active (state=%d, method=%d)", _state, method);
+
+            if (_receive_request_callback)
+                return _receive_request_callback(_receive_request_callback_data, this, request);
             return true;
 
         case SIP_REQUEST_ACK:
@@ -1387,6 +1699,9 @@ bool SIP_Call::process_receive_request_active(SIP_Request *request)
         case SIP_REQUEST_UPDATE:
             //_state = STATE_ACTIVE;
             _logger.trace("Changed state in process receive request active (state=%d, method=%d)", _state, method);
+
+            if (_receive_request_callback)
+                return _receive_request_callback(_receive_request_callback_data, this, request);
             return true;
 
         default:
@@ -1475,12 +1790,18 @@ bool SIP_Call::process_receive_response_active(SIP_Request *request, SIP_Respons
                 _state = STATE_CLOSED;
                 _logger.trace("Changed state in process receive response active (state=%d, method=%d, status_code=%d)",
                               _state, method, status_code);
+
+                if (_receive_response_callback)
+                    return _receive_response_callback(_receive_response_callback_data, this, request, response);
                 return true;
             }
 
             //_state = STATE_ACTIVE;
             _logger.trace("Changed state in process receive response active (state=%d, method=%d, status_code=%d)",
                           _state, method, status_code);
+
+            if (_receive_response_callback)
+                return _receive_response_callback(_receive_response_callback_data, this, request, response);
             return true;
 
         default:
@@ -1543,6 +1864,9 @@ bool SIP_Call::process_receive_response_closing_out(SIP_Request *request, SIP_Re
             _state = STATE_CLOSED;
             _logger.trace("Changed state in process receive response closing out (state=%d, method=%d, status_code=%d)",
                           _state, method, status_code);
+
+            if (_receive_response_callback)
+                return _receive_response_callback(_receive_response_callback_data, this, request, response);
             return true;
 
         default:
@@ -1550,6 +1874,99 @@ bool SIP_Call::process_receive_response_closing_out(SIP_Request *request, SIP_Re
                             method, status_code);
             return false;
     }
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+bool SIP_Call::send_response(SIP_Request *request, unsigned short status_code)
+{
+    if (!_create_response_callback)
+    {
+        _logger.warning("Failed to send response: invalid callback (call_id=%d)", _call_id);
+        return false;
+    }
+
+    if (!request)
+    {
+        _logger.warning("Failed to send response: invalid request (call_id=%d)", _call_id);
+        return false;
+    }
+
+    SIP_Method_Type method = request->get_message_type();
+
+    SIP_Response *response = _create_response_callback(_create_response_callback_data, this, request, status_code);
+    if (!response)
+    {
+        _logger.warning("Failed to send response: invalid response (call_id=%d, method=%d, status_code=%d)", _call_id, method, status_code);
+        return false;
+    }
+
+    if (!send_response(response))
+    {
+        _logger.warning("Failed to send response: send message returned false (call_id=%d, method=%d, status_code=%d)",
+                        _call_id, method, status_code);
+        delete response;
+        return false;
+    }
+
+    delete response;
+    return true;
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+bool SIP_Call::transaction_send_message_callback(void *data, SIP_Transaction *transaction, SIP_Message *msg)
+{
+    SIP_Call *call = reinterpret_cast<SIP_Call *>(data);
+    if ((!call) || (!transaction) || (!msg))
+    {
+        _logger.warning("Invalid transaction send message callback parameters");
+        return false;
+    }
+
+    if (!call->_send_message_callback)
+    {
+        _logger.warning("Invalid transaction send message callback (call_id=%d)", call->_call_id);
+        return false;
+    }
+
+    if (!call->_send_message_callback(call->_send_message_callback_data, call, msg))
+    {
+        _logger.warning("Failed to send message: send message callback returned false (call_id=%d)", call->_call_id);
+        return false;
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Call::transaction_receive_request_callback(void *data, SIP_Transaction *transaction, SIP_Request *request)
+{
+    SIP_Call *call = reinterpret_cast<SIP_Call *>(data);
+    if ((!call) || (!transaction) || (!request))
+    {
+        _logger.warning("Invalid transaction receive request callback parameters (call_id=%d)", call->_call_id);
+        return false;
+    }
+
+    return call->process_receive_request(request);
+}
+
+//-------------------------------------------
+
+bool SIP_Call::transaction_receive_response_callback(void *data, SIP_Transaction *transaction, SIP_Request *request, SIP_Response *response)
+{
+    SIP_Call *call = reinterpret_cast<SIP_Call *>(data);
+    if ((!call) || (!transaction) || (!request) || (!response))
+    {
+        _logger.warning("Invalid transaction receive response callback parameters (call_id=%d)", call->_call_id);
+        return false;
+    }
+
+    return call->process_receive_response(request, response);
 }
 
 //-------------------------------------------

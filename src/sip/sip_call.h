@@ -16,13 +16,18 @@
 #include "sip_header.h"
 #include "sip_message.h"
 #include "sip_dialog.h"
+#include "sip_transaction.h"
 #include <list>
 
 class SIP_Call
 {
 public:
+    typedef bool (send_message_callback)(void *data, SIP_Call *call, SIP_Message *msg);
+    typedef bool (receive_request_callback)(void *data, SIP_Call *call, SIP_Request *request);
+    typedef bool (receive_response_callback)(void *data, SIP_Call *call, SIP_Request *request, SIP_Response *response);
     typedef SIP_Response *(create_response_callback)(void *data, SIP_Call *call, SIP_Request *request, unsigned short status_code);
-    typedef bool (send_response_callback)(void *data, SIP_Call *call, SIP_Request *request, SIP_Response *response);
+
+    static const unsigned int INVALID_CALL_ID = INVALID_UNSIGNED_INT;
 
     enum State
     {
@@ -45,21 +50,25 @@ public:
     };
 
 public:
-    SIP_Call() : _state(STATE_IDLE) {}
+    SIP_Call(unsigned int call_id) : _call_id(call_id), _state(STATE_IDLE) {}
     ~SIP_Call();
+
+    unsigned int get_call_id() { return _call_id; }
 
     void set_state(State state) { _state = state; }
     State get_state() { return _state; }
     std::string get_state_str();
 
-    void set_call_id(std::string call_id) { _call_id = call_id; }
-    std::string get_call_id() { return _call_id; }
+    void set_header_call_id(std::string header_call_id) { _header_call_id = header_call_id; }
+    std::string get_header_call_id() { return _header_call_id; }
 
+    void set_local_tag(std::string local_tag) { _local_tag = local_tag; }
+    std::string get_local_tag() { return _local_tag; }
+
+    void set_send_message_callback(send_message_callback *callback, void *data);
+    void set_receive_request_callback(receive_request_callback *callback, void *data);
+    void set_receive_response_callback(receive_response_callback *callback, void *data);
     void set_create_response_callback(create_response_callback *callback, void *data);
-    SIP_Response *call_create_response_callback(SIP_Request *request, unsigned short status_code);
-
-    void set_send_response_callback(send_response_callback *callback, void *data);
-    bool call_send_response_callback(SIP_Request *request, SIP_Response *response);
 
     SIP_Dialog *get_client_dialog(SIP_Message *msg);
     SIP_Dialog *get_server_dialog(SIP_Message *msg);
@@ -69,12 +78,22 @@ public:
     void remove_dialog(SIP_Dialog *dialog);
     void clear_dialogs();
 
+    SIP_Transaction *get_transaction(SIP_Message *msg);
+    void add_transaction(SIP_Transaction *transaction);
+    void remove_transaction(SIP_Transaction *transaction);
+    void clear_transactions();
+
+    bool send_request(SIP_Request *request);
+    bool receive_request(SIP_Request *request);
+    bool send_response(SIP_Response *response);
+    bool receive_response(SIP_Response *response);
+
+private:
     bool process_send_request(SIP_Request *request);
     bool process_receive_request(SIP_Request *request);
     bool process_send_response(SIP_Request *request, SIP_Response *response);
     bool process_receive_response(SIP_Request *request, SIP_Response *response);
 
-private:
     bool process_send_request_idle(SIP_Request *request);
     bool process_receive_request_idle(SIP_Request *request);
 
@@ -107,17 +126,34 @@ private:
     bool process_send_response_closing_in(SIP_Request *request, SIP_Response *response);
     bool process_receive_response_closing_out(SIP_Request *request, SIP_Response *response);
 
+    bool send_response(SIP_Request *request, unsigned short status_code);
+
+public:
+    static bool transaction_send_message_callback(void *data, SIP_Transaction *transaction, SIP_Message *msg);
+    static bool transaction_receive_request_callback(void *data, SIP_Transaction *transaction, SIP_Request *request);
+    static bool transaction_receive_response_callback(void *data, SIP_Transaction *transaction, SIP_Request *request, SIP_Response *response);
+
 private:
+    unsigned int _call_id;
     State _state;
-    std::string _call_id;
+
+    std::string _header_call_id;
+    std::string _local_tag;
+
+    send_message_callback *_send_message_callback;
+    void *_send_message_callback_data;
+
+    receive_request_callback *_receive_request_callback;
+    void *_receive_request_callback_data;
+
+    receive_response_callback *_receive_response_callback;
+    void *_receive_response_callback_data;
 
     create_response_callback *_create_response_callback;
-    void *_create_response_data;
-
-    send_response_callback *_send_response_callback;
-    void *_send_response_data;
+    void *_create_response_callback_data;
 
     std::list<SIP_Dialog *> _dialogs;
+    std::list<SIP_Transaction *> _transactions;
 
     static Logger _logger;
 };
