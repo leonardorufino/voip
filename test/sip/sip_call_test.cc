@@ -14,36 +14,9 @@
 
 //-------------------------------------------
 
-SIP_Call_Test::SIP_Call_Test() : use_prack(false), _client_sequence(314158), _server_sequence(230), _invite_sequence(0),
-    _prack_rseq(988788), _invite(NULL), _bye(NULL), _update(NULL), _cancel(NULL), _prack(NULL), _info(NULL), _request(NULL),
-    _response(NULL), _status_code(0)
+SIP_Call_Test::SIP_Call_Test() : _client_call(0), _server_call(1), _use_prack(false), _client_sequence(314158), _server_sequence(230),
+    _invite_sequence(0), _prack_rseq(988788), _message(NULL), _request(NULL), _response(NULL), _status_code(0)
 {
-}
-
-//-------------------------------------------
-
-SIP_Call_Test::~SIP_Call_Test()
-{
-    if (_invite)
-        delete _invite;
-
-    if (_bye)
-        delete _bye;
-
-    if (_update)
-        delete _update;
-
-    if (_cancel)
-        delete _cancel;
-
-    if (_info)
-        delete _info;
-
-    if (_request)
-        delete _request;
-
-    if (_response)
-        delete _response;
 }
 
 //-------------------------------------------
@@ -82,21 +55,18 @@ bool SIP_Call_Test::init()
 
 //-------------------------------------------
 
-bool SIP_Call_Test::init_call()
-{
-    _server_call.set_call_id(_call_id);
-    _client_call.set_call_id(_call_id);
-    return true;
-}
-
-//-------------------------------------------
-
 bool SIP_Call_Test::set_callbacks()
 {
+    _server_call.set_send_message_callback(send_message_callback, this);
+    _server_call.set_receive_request_callback(receive_request_callback, this);
+    _server_call.set_receive_response_callback(receive_response_callback, this);
     _server_call.set_create_response_callback(create_response_callback, this);
-    _server_call.set_send_response_callback(send_response_callback, this);
+
+    _client_call.set_send_message_callback(send_message_callback, this);
+    _client_call.set_receive_request_callback(receive_request_callback, this);
+    _client_call.set_receive_response_callback(receive_response_callback, this);
     _client_call.set_create_response_callback(create_response_callback, this);
-    _client_call.set_send_response_callback(send_response_callback, this);
+
     return true;
 }
 
@@ -105,18 +75,20 @@ bool SIP_Call_Test::set_callbacks()
 
 SIP_Request *SIP_Call_Test::create_invite()
 {
+    _invite_branch = "z9hG4bK" + String_Functions::random(10);
+
     std::string str;
     str  = "INVITE sip:bob@biloxi.com SIP/2.0\r\n";
-    str += "Via: SIP/2.0/UDP pc33.atlanta.com;branch=z9hG4bK776asdhds\r\n";
+    str += "Via: SIP/2.0/UDP pc33.atlanta.com;branch=" + _invite_branch + "\r\n";
     str += "Max-Forwards: 70\r\n";
     str += "To: Bob <sip:bob@biloxi.com>\r\n";
     str += "From: Alice <sip:alice@atlanta.com>;tag=1928301774\r\n";
-    str += "Call-ID: " + _call_id + "\r\n";
+    str += "Call-ID: a84b4c76e66710@pc33.atlanta.com\r\n";
     str += "CSeq: " + std::to_string(++_client_sequence) + " INVITE\r\n";
     str += "Contact: <sip:alice@pc33.atlanta.com>\r\n";
     str += "Content-Length: 0\r\n";
 
-    if (use_prack)
+    if (_use_prack)
         str += "Supported: 100rel\r\n";
 
     _invite_sequence = _client_sequence;
@@ -138,10 +110,10 @@ SIP_Response *SIP_Call_Test::create_invite_response_100()
 {
     std::string str;
     str  = "SIP/2.0 100 Trying\r\n";
-    str += "Via: SIP/2.0/UDP pc33.atlanta.com;branch=z9hG4bK776asdhds;received=192.0.2.1\r\n";
+    str += "Via: SIP/2.0/UDP pc33.atlanta.com;branch=" + _invite_branch + ";received=192.0.2.1\r\n";
     str += "To: Bob <sip:bob@biloxi.com>\r\n";
     str += "From: Alice <sip:alice@atlanta.com>;tag=1928301774\r\n";
-    str += "Call-ID: " + _call_id + "\r\n";
+    str += "Call-ID: a84b4c76e66710@pc33.atlanta.com\r\n";
     str += "CSeq: " + std::to_string(_client_sequence) + " INVITE\r\n";
     str += "Content-Length: 0\r\n";
 
@@ -162,15 +134,15 @@ SIP_Response *SIP_Call_Test::create_invite_response_180()
 {
     std::string str;
     str  = "SIP/2.0 180 Ringing\r\n";
-    str += "Via: SIP/2.0/UDP pc33.atlanta.com;branch=z9hG4bK776asdhds;received=192.0.2.1\r\n";
+    str += "Via: SIP/2.0/UDP pc33.atlanta.com;branch=" + _invite_branch + ";received=192.0.2.1\r\n";
     str += "To: Bob <sip:bob@biloxi.com>;tag=a6c85cf\r\n";
     str += "From: Alice <sip:alice@atlanta.com>;tag=1928301774\r\n";
-    str += "Call-ID: " + _call_id + "\r\n";
+    str += "Call-ID: a84b4c76e66710@pc33.atlanta.com\r\n";
     str += "CSeq: " + std::to_string(_client_sequence) + " INVITE\r\n";
     str += "Contact: <sip:bob@192.0.2.4>\r\n";
     str += "Content-Length: 0\r\n";
 
-    if (use_prack)
+    if (_use_prack)
     {
         str += "Require: 100rel\r\n";
         str += "RSeq: " + std::to_string(++_prack_rseq) + "\r\n";
@@ -193,15 +165,15 @@ SIP_Response *SIP_Call_Test::create_invite_response_183()
 {
     std::string str;
     str  = "SIP/2.0 183 Session Progress\r\n";
-    str += "Via: SIP/2.0/UDP pc33.atlanta.com;branch=z9hG4bK776asdhds;received=192.0.2.1\r\n";
+    str += "Via: SIP/2.0/UDP pc33.atlanta.com;branch=" + _invite_branch + ";received=192.0.2.1\r\n";
     str += "To: Bob <sip:bob@biloxi.com>;tag=a6c85cf\r\n";
     str += "From: Alice <sip:alice@atlanta.com>;tag=1928301774\r\n";
-    str += "Call-ID: " + _call_id + "\r\n";
+    str += "Call-ID: a84b4c76e66710@pc33.atlanta.com\r\n";
     str += "CSeq: " + std::to_string(_client_sequence) + " INVITE\r\n";
     str += "Contact: <sip:bob@192.0.2.4>\r\n";
     str += "Content-Length: 0\r\n";
 
-    if (use_prack)
+    if (_use_prack)
     {
         str += "Require: 100rel\r\n";
         str += "RSeq: " + std::to_string(++_prack_rseq) + "\r\n";
@@ -224,10 +196,10 @@ SIP_Response *SIP_Call_Test::create_invite_response_200()
 {
     std::string str;
     str  = "SIP/2.0 200 OK\r\n";
-    str += "Via: SIP/2.0/UDP pc33.atlanta.com;branch=z9hG4bK776asdhds;received=192.0.2.1\r\n";
+    str += "Via: SIP/2.0/UDP pc33.atlanta.com;branch=" + _invite_branch + ";received=192.0.2.1\r\n";
     str += "To: Bob <sip:bob@biloxi.com>;tag=a6c85cf\r\n";
     str += "From: Alice <sip:alice@atlanta.com>;tag=1928301774\r\n";
-    str += "Call-ID: " + _call_id + "\r\n";
+    str += "Call-ID: a84b4c76e66710@pc33.atlanta.com\r\n";
     str += "CSeq: " + std::to_string(_client_sequence) + " INVITE\r\n";
     str += "Contact: <sip:bob@192.0.2.4>\r\n";
     str += "Content-Length: 0\r\n";
@@ -249,10 +221,10 @@ SIP_Response *SIP_Call_Test::create_invite_response_480()
 {
     std::string str;
     str  = "SIP/2.0 480 Temporarily Unavailable\r\n";
-    str += "Via: SIP/2.0/UDP pc33.atlanta.com;branch=z9hG4bK776asdhds;received=192.0.2.1\r\n";
+    str += "Via: SIP/2.0/UDP pc33.atlanta.com;branch=" + _invite_branch + ";received=192.0.2.1\r\n";
     str += "To: Bob <sip:bob@biloxi.com>;tag=a6c85cf\r\n";
     str += "From: Alice <sip:alice@atlanta.com>;tag=1928301774\r\n";
-    str += "Call-ID: " + _call_id + "\r\n";
+    str += "Call-ID: a84b4c76e66710@pc33.atlanta.com\r\n";
     str += "CSeq: " + std::to_string(_client_sequence) + " INVITE\r\n";
     str += "Content-Length: 0\r\n";
 
@@ -273,10 +245,10 @@ SIP_Response *SIP_Call_Test::create_invite_response_487()
 {
     std::string str;
     str  = "SIP/2.0 487 Request Terminated\r\n";
-    str += "Via: SIP/2.0/UDP pc33.atlanta.com;branch=z9hG4bK776asdhds;received=192.0.2.1\r\n";
+    str += "Via: SIP/2.0/UDP pc33.atlanta.com;branch=" + _invite_branch + ";received=192.0.2.1\r\n";
     str += "To: Bob <sip:bob@biloxi.com>;tag=a6c85cf\r\n";
     str += "From: Alice <sip:alice@atlanta.com>;tag=1928301774\r\n";
-    str += "Call-ID: " + _call_id + "\r\n";
+    str += "Call-ID: a84b4c76e66710@pc33.atlanta.com\r\n";
     str += "CSeq: " + std::to_string(_client_sequence) + " INVITE\r\n";
     str += "Content-Length: 0\r\n";
 
@@ -295,13 +267,15 @@ SIP_Response *SIP_Call_Test::create_invite_response_487()
 
 SIP_Request *SIP_Call_Test::create_ack()
 {
+    std::string ack_branch = "z9hG4bK" + String_Functions::random(10);
+
     std::string str;
     str  = "ACK sip:bob@192.0.2.4 SIP/2.0\r\n";
-    str += "Via: SIP/2.0/UDP pc33.atlanta.com;branch=z9hG4bK798711\r\n";
+    str += "Via: SIP/2.0/UDP pc33.atlanta.com;branch=" + ack_branch + "\r\n";
     str += "Max-Forwards: 70\r\n";
     str += "To: Bob <sip:bob@biloxi.com>;tag=a6c85cf\r\n";
     str += "From: Alice <sip:alice@atlanta.com>;tag=1928301774\r\n";
-    str += "Call-ID: " + _call_id + "\r\n";
+    str += "Call-ID: a84b4c76e66710@pc33.atlanta.com\r\n";
     str += "CSeq: " + std::to_string(_invite_sequence) + " ACK\r\n";
     str += "Contact: <sip:alice@pc33.atlanta.com>\r\n";
     str += "Content-Length: 0\r\n";
@@ -321,13 +295,15 @@ SIP_Request *SIP_Call_Test::create_ack()
 
 SIP_Request *SIP_Call_Test::create_client_bye()
 {
+    _bye_branch = "z9hG4bK" + String_Functions::random(10);
+
     std::string str;
     str  = "BYE sip:bob@192.0.2.4 SIP/2.0\r\n";
-    str += "Via: SIP/2.0/UDP pc33.atlanta.com;branch=z9hG4bKjhfuosd\r\n";
+    str += "Via: SIP/2.0/UDP pc33.atlanta.com;branch=" + _bye_branch + "\r\n";
     str += "Max-Forwards: 70\r\n";
     str += "To: Bob <sip:bob@biloxi.com>;tag=a6c85cf\r\n";
     str += "From: Alice <sip:alice@atlanta.com>;tag=1928301774\r\n";
-    str += "Call-ID: " + _call_id + "\r\n";
+    str += "Call-ID: a84b4c76e66710@pc33.atlanta.com\r\n";
     str += "CSeq: " + std::to_string(++_client_sequence) + " BYE\r\n";
     str += "Content-Length: 0\r\n";
 
@@ -348,10 +324,10 @@ SIP_Response *SIP_Call_Test::create_server_bye_response_200()
 {
     std::string str;
     str  = "SIP/2.0 200 OK\r\n";
-    str += "Via: SIP/2.0/UDP pc33.atlanta.com;branch=z9hG4bKjhfuosd\r\n";
+    str += "Via: SIP/2.0/UDP pc33.atlanta.com;branch=" + _bye_branch + "\r\n";
     str += "To: Bob <sip:bob@biloxi.com>;tag=a6c85cf\r\n";
     str += "From: Alice <sip:alice@atlanta.com>;tag=1928301774\r\n";
-    str += "Call-ID: " + _call_id + "\r\n";
+    str += "Call-ID: a84b4c76e66710@pc33.atlanta.com\r\n";
     str += "CSeq: " + std::to_string(_client_sequence) + " BYE\r\n";
     str += "Content-Length: 0\r\n";
 
@@ -370,13 +346,15 @@ SIP_Response *SIP_Call_Test::create_server_bye_response_200()
 
 SIP_Request *SIP_Call_Test::create_server_bye()
 {
+    _bye_branch = "z9hG4bK" + String_Functions::random(10);
+
     std::string str;
     str  = "BYE sip:alice@pc33.atlanta.com SIP/2.0\r\n";
-    str += "Via: SIP/2.0/UDP 192.0.2.4;branch=z9hG4bKiefjddf\r\n";
+    str += "Via: SIP/2.0/UDP 192.0.2.4;branch=" + _bye_branch + "\r\n";
     str += "Max-Forwards: 70\r\n";
     str += "From: Bob <sip:bob@biloxi.com>;tag=a6c85cf\r\n";
     str += "To: Alice <sip:alice@atlanta.com>;tag=1928301774\r\n";
-    str += "Call-ID: " + _call_id + "\r\n";
+    str += "Call-ID: a84b4c76e66710@pc33.atlanta.com\r\n";
     str += "CSeq: " + std::to_string(++_server_sequence) + " BYE\r\n";
     str += "Content-Length: 0\r\n";
 
@@ -397,10 +375,10 @@ SIP_Response *SIP_Call_Test::create_client_bye_response_200()
 {
     std::string str;
     str  = "SIP/2.0 200 OK\r\n";
-    str += "Via: SIP/2.0/UDP 192.0.2.4;branch=z9hG4bKiefjddf\r\n";
+    str += "Via: SIP/2.0/UDP 192.0.2.4;branch=" + _bye_branch + "\r\n";
     str += "From: Bob <sip:bob@biloxi.com>;tag=a6c85cf\r\n";
     str += "To: Alice <sip:alice@atlanta.com>;tag=1928301774\r\n";
-    str += "Call-ID: " + _call_id + "\r\n";
+    str += "Call-ID: a84b4c76e66710@pc33.atlanta.com\r\n";
     str += "CSeq: " + std::to_string(_server_sequence) + " BYE\r\n";
     str += "Content-Length: 0\r\n";
 
@@ -419,13 +397,15 @@ SIP_Response *SIP_Call_Test::create_client_bye_response_200()
 
 SIP_Request *SIP_Call_Test::create_client_update()
 {
+    _update_branch = "z9hG4bK" + String_Functions::random(10);
+
     std::string str;
     str  = "UPDATE sip:bob@192.0.2.4 SIP/2.0\r\n";
-    str += "Via: SIP/2.0/UDP pc33.atlanta.com;branch=z9hG4bKoi900ks\r\n";
+    str += "Via: SIP/2.0/UDP pc33.atlanta.com;branch=" + _update_branch + "\r\n";
     str += "Max-Forwards: 70\r\n";
     str += "To: Bob <sip:bob@biloxi.com>;tag=a6c85cf\r\n";
     str += "From: Alice <sip:alice@atlanta.com>;tag=1928301774\r\n";
-    str += "Call-ID: " + _call_id + "\r\n";
+    str += "Call-ID: a84b4c76e66710@pc33.atlanta.com\r\n";
     str += "CSeq: " + std::to_string(++_client_sequence) + " UPDATE\r\n";
     str += "Content-Length: 0\r\n";
 
@@ -446,10 +426,10 @@ SIP_Response *SIP_Call_Test::create_server_update_response_200()
 {
     std::string str;
     str  = "SIP/2.0 200 OK\r\n";
-    str += "Via: SIP/2.0/UDP pc33.atlanta.com;branch=z9hG4bKoi900ks\r\n";
+    str += "Via: SIP/2.0/UDP pc33.atlanta.com;branch=" + _update_branch + "\r\n";
     str += "To: Bob <sip:bob@biloxi.com>;tag=a6c85cf\r\n";
     str += "From: Alice <sip:alice@atlanta.com>;tag=1928301774\r\n";
-    str += "Call-ID: " + _call_id + "\r\n";
+    str += "Call-ID: a84b4c76e66710@pc33.atlanta.com\r\n";
     str += "CSeq: " + std::to_string(_client_sequence) + " UPDATE\r\n";
     str += "Content-Length: 0\r\n";
 
@@ -468,13 +448,15 @@ SIP_Response *SIP_Call_Test::create_server_update_response_200()
 
 SIP_Request *SIP_Call_Test::create_server_update()
 {
+    _update_branch = "z9hG4bK" + String_Functions::random(10);
+
     std::string str;
     str  = "UPDATE sip:alice@pc33.atlanta.com SIP/2.0\r\n";
-    str += "Via: SIP/2.0/UDP 192.0.2.4;branch=z9hG4bKppi56f\r\n";
+    str += "Via: SIP/2.0/UDP 192.0.2.4;branch=" + _update_branch + "\r\n";
     str += "Max-Forwards: 70\r\n";
     str += "From: Bob <sip:bob@biloxi.com>;tag=a6c85cf\r\n";
     str += "To: Alice <sip:alice@atlanta.com>;tag=1928301774\r\n";
-    str += "Call-ID: " + _call_id + "\r\n";
+    str += "Call-ID: a84b4c76e66710@pc33.atlanta.com\r\n";
     str += "CSeq: " + std::to_string(++_server_sequence) + " UPDATE\r\n";
     str += "Content-Length: 0\r\n";
 
@@ -495,10 +477,10 @@ SIP_Response *SIP_Call_Test::create_client_update_response_200()
 {
     std::string str;
     str  = "SIP/2.0 200 OK\r\n";
-    str += "Via: SIP/2.0/UDP 192.0.2.4;branch=z9hG4bKppi56f\r\n";
+    str += "Via: SIP/2.0/UDP 192.0.2.4;branch=" + _update_branch + "\r\n";
     str += "From: Bob <sip:bob@biloxi.com>;tag=a6c85cf\r\n";
     str += "To: Alice <sip:alice@atlanta.com>;tag=1928301774\r\n";
-    str += "Call-ID: " + _call_id + "\r\n";
+    str += "Call-ID: a84b4c76e66710@pc33.atlanta.com\r\n";
     str += "CSeq: " + std::to_string(_server_sequence) + " UPDATE\r\n";
     str += "Content-Length: 0\r\n";
 
@@ -519,11 +501,11 @@ SIP_Request *SIP_Call_Test::create_cancel()
 {
     std::string str;
     str  = "CANCEL sip:bob@192.0.2.4 SIP/2.0\r\n";
-    str += "Via: SIP/2.0/UDP pc33.atlanta.com;branch=z9hG4bKp02s2\r\n";
+    str += "Via: SIP/2.0/UDP pc33.atlanta.com;branch=" + _invite_branch + "\r\n";
     str += "Max-Forwards: 70\r\n";
     str += "To: Bob <sip:bob@biloxi.com>\r\n";
     str += "From: Alice <sip:alice@atlanta.com>;tag=1928301774\r\n";
-    str += "Call-ID: " + _call_id + "\r\n";
+    str += "Call-ID: a84b4c76e66710@pc33.atlanta.com\r\n";
     str += "CSeq: " + std::to_string(_invite_sequence) + " CANCEL\r\n";
     str += "Content-Length: 0\r\n";
 
@@ -544,10 +526,10 @@ SIP_Response *SIP_Call_Test::create_cancel_response_200()
 {
     std::string str;
     str  = "SIP/2.0 200 OK\r\n";
-    str += "Via: SIP/2.0/UDP pc33.atlanta.com;branch=z9hG4bKp02s2\r\n";
+    str += "Via: SIP/2.0/UDP pc33.atlanta.com;branch=" + _invite_branch + "\r\n";
     str += "To: Bob <sip:bob@biloxi.com>;tag=a6c85cf\r\n";
     str += "From: Alice <sip:alice@atlanta.com>;tag=1928301774\r\n";
-    str += "Call-ID: " + _call_id + "\r\n";
+    str += "Call-ID: a84b4c76e66710@pc33.atlanta.com\r\n";
     str += "CSeq: " + std::to_string(_invite_sequence) + " CANCEL\r\n";
     str += "Content-Length: 0\r\n";
 
@@ -566,13 +548,15 @@ SIP_Response *SIP_Call_Test::create_cancel_response_200()
 
 SIP_Request *SIP_Call_Test::create_prack()
 {
+    _prack_branch = "z9hG4bK" + String_Functions::random(10);
+
     std::string str;
     str  = "PRACK sip:bob@192.0.2.4 SIP/2.0\r\n";
-    str += "Via: SIP/2.0/UDP pc33.atlanta.com;branch=z9hG4bK99231\r\n";
+    str += "Via: SIP/2.0/UDP pc33.atlanta.com;branch=" + _prack_branch + "\r\n";
     str += "Max-Forwards: 70\r\n";
     str += "To: Bob <sip:bob@biloxi.com>;tag=a6c85cf\r\n";
     str += "From: Alice <sip:alice@atlanta.com>;tag=1928301774\r\n";
-    str += "Call-ID: " + _call_id + "\r\n";
+    str += "Call-ID: a84b4c76e66710@pc33.atlanta.com\r\n";
     str += "CSeq: " + std::to_string(++_client_sequence) + " PRACK\r\n";
     str += "RAck: " + std::to_string(_prack_rseq) + " " + std::to_string(_invite_sequence) + " INVITE\r\n";
     str += "Content-Length: 0\r\n";
@@ -594,10 +578,10 @@ SIP_Response *SIP_Call_Test::create_prack_response_200()
 {
     std::string str;
     str  = "SIP/2.0 200 OK\r\n";
-    str += "Via: SIP/2.0/UDP pc33.atlanta.com;branch=z9hG4bK99231\r\n";
+    str += "Via: SIP/2.0/UDP pc33.atlanta.com;branch=" + _prack_branch + "\r\n";
     str += "To: Bob <sip:bob@biloxi.com>;tag=a6c85cf\r\n";
     str += "From: Alice <sip:alice@atlanta.com>;tag=1928301774\r\n";
-    str += "Call-ID: " + _call_id + "\r\n";
+    str += "Call-ID: a84b4c76e66710@pc33.atlanta.com\r\n";
     str += "CSeq: " + std::to_string(_client_sequence) + " PRACK\r\n";
     str += "Content-Length: 0\r\n";
 
@@ -616,13 +600,15 @@ SIP_Response *SIP_Call_Test::create_prack_response_200()
 
 SIP_Request *SIP_Call_Test::create_info()
 {
+    _info_branch = "z9hG4bK" + String_Functions::random(10);
+
     std::string str;
     str  = "INFO sip:bob@192.0.2.4 SIP/2.0\r\n";
-    str += "Via: SIP/2.0/UDP pc33.atlanta.com;branch=z9hG4bKqqr712\r\n";
+    str += "Via: SIP/2.0/UDP pc33.atlanta.com;branch=" + _info_branch + "\r\n";
     str += "Max-Forwards: 70\r\n";
     str += "To: Bob <sip:bob@biloxi.com>;tag=a6c85cf\r\n";
     str += "From: Alice <sip:alice@atlanta.com>;tag=1928301774\r\n";
-    str += "Call-ID: " + _call_id + "\r\n";
+    str += "Call-ID: a84b4c76e66710@pc33.atlanta.com\r\n";
     str += "CSeq: " + std::to_string(++_client_sequence) + " INFO\r\n";
     str += "Content-Length: 0\r\n";
 
@@ -643,10 +629,10 @@ SIP_Response *SIP_Call_Test::create_info_response_200()
 {
     std::string str;
     str  = "SIP/2.0 200 OK\r\n";
-    str += "Via: SIP/2.0/UDP pc33.atlanta.com;branch=z9hG4bKqqr712\r\n";
+    str += "Via: SIP/2.0/UDP pc33.atlanta.com;branch=" + _info_branch + "\r\n";
     str += "To: Bob <sip:bob@biloxi.com>;tag=a6c85cf\r\n";
     str += "From: Alice <sip:alice@atlanta.com>;tag=1928301774\r\n";
-    str += "Call-ID: " + _call_id + "\r\n";
+    str += "Call-ID: a84b4c76e66710@pc33.atlanta.com\r\n";
     str += "CSeq: " + std::to_string(_client_sequence) + " INFO\r\n";
     str += "Content-Length: 0\r\n";
 
@@ -673,7 +659,7 @@ bool SIP_Call_Test::process_invite()
         return false;
     }
 
-    if (!_client_call.process_send_request(invite))
+    if (!_client_call.send_request(invite))
     {
         std::cout << "SIP_Call_Test::process_invite -> Failed to process send request\n";
         delete invite;
@@ -696,7 +682,7 @@ bool SIP_Call_Test::process_invite()
         return false;
     }
 
-    if (!_server_call.process_receive_request(invite))
+    if (!_server_call.receive_request(invite))
     {
         std::cout << "SIP_Call_Test::process_invite -> Failed to process receive request\n";
         delete invite;
@@ -719,10 +705,7 @@ bool SIP_Call_Test::process_invite()
         return false;
     }
 
-    if (_invite)
-        delete _invite;
-
-    _invite = invite;
+    delete invite;
     return true;
 }
 
@@ -730,12 +713,6 @@ bool SIP_Call_Test::process_invite()
 
 bool SIP_Call_Test::process_invite_response_100()
 {
-    if (!_invite)
-    {
-        std::cout << "SIP_Call_Test::process_invite_response_100 -> Invalid request\n";
-        return false;
-    }
-
     SIP_Response *invite_response_100 = create_invite_response_100();
     if (!invite_response_100)
     {
@@ -743,7 +720,7 @@ bool SIP_Call_Test::process_invite_response_100()
         return false;
     }
 
-    if (!_server_call.process_send_response(_invite, invite_response_100))
+    if (!_server_call.send_response(invite_response_100))
     {
         std::cout << "SIP_Call_Test::process_invite_response_100 -> Failed to process send response\n";
         delete invite_response_100;
@@ -766,7 +743,7 @@ bool SIP_Call_Test::process_invite_response_100()
         return false;
     }
 
-    if (!_client_call.process_receive_response(_invite, invite_response_100))
+    if (!_client_call.receive_response(invite_response_100))
     {
         std::cout << "SIP_Call_Test::process_invite_response_100 -> Failed to process receive response\n";
         delete invite_response_100;
@@ -797,12 +774,6 @@ bool SIP_Call_Test::process_invite_response_100()
 
 bool SIP_Call_Test::process_invite_response_180()
 {
-    if (!_invite)
-    {
-        std::cout << "SIP_Call_Test::process_invite_response_180 -> Invalid request\n";
-        return false;
-    }
-
     SIP_Response *invite_response_180 = create_invite_response_180();
     if (!invite_response_180)
     {
@@ -810,7 +781,7 @@ bool SIP_Call_Test::process_invite_response_180()
         return false;
     }
 
-    if (!_server_call.process_send_response(_invite, invite_response_180))
+    if (!_server_call.send_response(invite_response_180))
     {
         std::cout << "SIP_Call_Test::process_invite_response_180 -> Failed to process send response\n";
         delete invite_response_180;
@@ -833,7 +804,7 @@ bool SIP_Call_Test::process_invite_response_180()
         return false;
     }
 
-    if (!_client_call.process_receive_response(_invite, invite_response_180))
+    if (!_client_call.receive_response(invite_response_180))
     {
         std::cout << "SIP_Call_Test::process_invite_response_180 -> Failed to process receive response\n";
         delete invite_response_180;
@@ -864,12 +835,6 @@ bool SIP_Call_Test::process_invite_response_180()
 
 bool SIP_Call_Test::process_invite_response_183()
 {
-    if (!_invite)
-    {
-        std::cout << "SIP_Call_Test::process_invite_response_183 -> Invalid request\n";
-        return false;
-    }
-
     SIP_Response *invite_response_183 = create_invite_response_183();
     if (!invite_response_183)
     {
@@ -877,7 +842,7 @@ bool SIP_Call_Test::process_invite_response_183()
         return false;
     }
 
-    if (!_server_call.process_send_response(_invite, invite_response_183))
+    if (!_server_call.send_response(invite_response_183))
     {
         std::cout << "SIP_Call_Test::process_invite_response_183 -> Failed to process send response\n";
         delete invite_response_183;
@@ -900,7 +865,7 @@ bool SIP_Call_Test::process_invite_response_183()
         return false;
     }
 
-    if (!_client_call.process_receive_response(_invite, invite_response_183))
+    if (!_client_call.receive_response(invite_response_183))
     {
         std::cout << "SIP_Call_Test::process_invite_response_183 -> Failed to process receive response\n";
         delete invite_response_183;
@@ -931,12 +896,6 @@ bool SIP_Call_Test::process_invite_response_183()
 
 bool SIP_Call_Test::process_invite_response_200()
 {
-    if (!_invite)
-    {
-        std::cout << "SIP_Call_Test::process_invite_response_200 -> Invalid request\n";
-        return false;
-    }
-
     SIP_Response *invite_response_200 = create_invite_response_200();
     if (!invite_response_200)
     {
@@ -944,7 +903,7 @@ bool SIP_Call_Test::process_invite_response_200()
         return false;
     }
 
-    if (!_server_call.process_send_response(_invite, invite_response_200))
+    if (!_server_call.send_response(invite_response_200))
     {
         std::cout << "SIP_Call_Test::process_invite_response_200 -> Failed to process send response\n";
         delete invite_response_200;
@@ -967,7 +926,7 @@ bool SIP_Call_Test::process_invite_response_200()
         return false;
     }
 
-    if (!_client_call.process_receive_response(_invite, invite_response_200))
+    if (!_client_call.receive_response(invite_response_200))
     {
         std::cout << "SIP_Call_Test::process_invite_response_200 -> Failed to process receive response\n";
         delete invite_response_200;
@@ -998,12 +957,6 @@ bool SIP_Call_Test::process_invite_response_200()
 
 bool SIP_Call_Test::process_invite_response_480()
 {
-    if (!_invite)
-    {
-        std::cout << "SIP_Call_Test::process_invite_response_480 -> Invalid request\n";
-        return false;
-    }
-
     SIP_Response *invite_response_480 = create_invite_response_480();
     if (!invite_response_480)
     {
@@ -1011,7 +964,7 @@ bool SIP_Call_Test::process_invite_response_480()
         return false;
     }
 
-    if (!_server_call.process_send_response(_invite, invite_response_480))
+    if (!_server_call.send_response(invite_response_480))
     {
         std::cout << "SIP_Call_Test::process_invite_response_480 -> Failed to process send response\n";
         delete invite_response_480;
@@ -1034,7 +987,7 @@ bool SIP_Call_Test::process_invite_response_480()
         return false;
     }
 
-    if (!_client_call.process_receive_response(_invite, invite_response_480))
+    if (!_client_call.receive_response(invite_response_480))
     {
         std::cout << "SIP_Call_Test::process_invite_response_480 -> Failed to process receive response\n";
         delete invite_response_480;
@@ -1065,12 +1018,6 @@ bool SIP_Call_Test::process_invite_response_480()
 
 bool SIP_Call_Test::process_invite_response_487()
 {
-    if (!_invite)
-    {
-        std::cout << "SIP_Call_Test::process_invite_response_487 -> Invalid request\n";
-        return false;
-    }
-
     SIP_Response *invite_response_487 = create_invite_response_487();
     if (!invite_response_487)
     {
@@ -1078,7 +1025,7 @@ bool SIP_Call_Test::process_invite_response_487()
         return false;
     }
 
-    if (!_server_call.process_send_response(_invite, invite_response_487))
+    if (!_server_call.send_response(invite_response_487))
     {
         std::cout << "SIP_Call_Test::process_invite_response_487 -> Failed to process send response\n";
         delete invite_response_487;
@@ -1101,7 +1048,7 @@ bool SIP_Call_Test::process_invite_response_487()
         return false;
     }
 
-    if (!_client_call.process_receive_response(_invite, invite_response_487))
+    if (!_client_call.receive_response(invite_response_487))
     {
         std::cout << "SIP_Call_Test::process_invite_response_487 -> Failed to process receive response\n";
         delete invite_response_487;
@@ -1132,12 +1079,6 @@ bool SIP_Call_Test::process_invite_response_487()
 
 bool SIP_Call_Test::process_ack()
 {
-    if (!_invite)
-    {
-        std::cout << "SIP_Call_Test::process_ack -> Invalid request\n";
-        return false;
-    }
-
     SIP_Request *ack = create_ack();
     if (!ack)
     {
@@ -1145,7 +1086,7 @@ bool SIP_Call_Test::process_ack()
         return false;
     }
 
-    if (!_client_call.process_send_request(ack))
+    if (!_client_call.send_request(ack))
     {
         std::cout << "SIP_Call_Test::process_ack -> Failed to process send request\n";
         delete ack;
@@ -1168,7 +1109,7 @@ bool SIP_Call_Test::process_ack()
         return false;
     }
 
-    if (!_server_call.process_receive_request(ack))
+    if (!_server_call.receive_request(ack))
     {
         std::cout << "SIP_Call_Test::process_ack -> Failed to process receive request\n";
         delete ack;
@@ -1206,7 +1147,7 @@ bool SIP_Call_Test::process_client_bye()
         return false;
     }
 
-    if (!_client_call.process_send_request(bye))
+    if (!_client_call.send_request(bye))
     {
         std::cout << "SIP_Call_Test::process_client_bye -> Failed to process send request\n";
         delete bye;
@@ -1229,7 +1170,7 @@ bool SIP_Call_Test::process_client_bye()
         return false;
     }
 
-    if (!_server_call.process_receive_request(bye))
+    if (!_server_call.receive_request(bye))
     {
         std::cout << "SIP_Call_Test::process_client_bye -> Failed to process receive request\n";
         delete bye;
@@ -1252,10 +1193,7 @@ bool SIP_Call_Test::process_client_bye()
         return false;
     }
 
-    if (_bye)
-        delete _bye;
-
-    _bye = bye;
+    delete bye;
     return true;
 }
 
@@ -1263,12 +1201,6 @@ bool SIP_Call_Test::process_client_bye()
 
 bool SIP_Call_Test::process_server_bye_response_200()
 {
-    if (!_bye)
-    {
-        std::cout << "SIP_Call_Test::process_server_bye_response_200 -> Invalid request\n";
-        return false;
-    }
-
     SIP_Response *bye_response_200 = create_server_bye_response_200();
     if (!bye_response_200)
     {
@@ -1276,7 +1208,7 @@ bool SIP_Call_Test::process_server_bye_response_200()
         return false;
     }
 
-    if (!_server_call.process_send_response(_bye, bye_response_200))
+    if (!_server_call.send_response(bye_response_200))
     {
         std::cout << "SIP_Call_Test::process_server_bye_response_200 -> Failed to process send response\n";
         delete bye_response_200;
@@ -1299,7 +1231,7 @@ bool SIP_Call_Test::process_server_bye_response_200()
         return false;
     }
 
-    if (!_client_call.process_receive_response(_bye, bye_response_200))
+    if (!_client_call.receive_response(bye_response_200))
     {
         std::cout << "SIP_Call_Test::process_server_bye_response_200 -> Failed to process receive response\n";
         delete bye_response_200;
@@ -1337,7 +1269,7 @@ bool SIP_Call_Test::process_server_bye()
         return false;
     }
 
-    if (!_server_call.process_send_request(bye))
+    if (!_server_call.send_request(bye))
     {
         std::cout << "SIP_Call_Test::process_server_bye -> Failed to process send request\n";
         delete bye;
@@ -1360,7 +1292,7 @@ bool SIP_Call_Test::process_server_bye()
         return false;
     }
 
-    if (!_client_call.process_receive_request(bye))
+    if (!_client_call.receive_request(bye))
     {
         std::cout << "SIP_Call_Test::process_server_bye -> Failed to process receive request\n";
         delete bye;
@@ -1383,10 +1315,7 @@ bool SIP_Call_Test::process_server_bye()
         return false;
     }
 
-    if (_bye)
-        delete _bye;
-
-    _bye = bye;
+    delete bye;
     return true;
 }
 
@@ -1394,12 +1323,6 @@ bool SIP_Call_Test::process_server_bye()
 
 bool SIP_Call_Test::process_client_bye_response_200()
 {
-    if (!_bye)
-    {
-        std::cout << "SIP_Call_Test::process_client_bye_response_200 -> Invalid request\n";
-        return false;
-    }
-
     SIP_Response *bye_response_200 = create_client_bye_response_200();
     if (!bye_response_200)
     {
@@ -1407,7 +1330,7 @@ bool SIP_Call_Test::process_client_bye_response_200()
         return false;
     }
 
-    if (!_client_call.process_send_response(_bye, bye_response_200))
+    if (!_client_call.send_response(bye_response_200))
     {
         std::cout << "SIP_Call_Test::process_client_bye_response_200 -> Failed to process send response\n";
         delete bye_response_200;
@@ -1430,7 +1353,7 @@ bool SIP_Call_Test::process_client_bye_response_200()
         return false;
     }
 
-    if (!_server_call.process_receive_response(_bye, bye_response_200))
+    if (!_server_call.receive_response(bye_response_200))
     {
         std::cout << "SIP_Call_Test::process_client_bye_response_200 -> Failed to process receive response\n";
         delete bye_response_200;
@@ -1468,7 +1391,7 @@ bool SIP_Call_Test::process_client_update()
         return false;
     }
 
-    if (!_client_call.process_send_request(update))
+    if (!_client_call.send_request(update))
     {
         std::cout << "SIP_Call_Test::process_client_update -> Failed to process send request\n";
         delete update;
@@ -1491,7 +1414,7 @@ bool SIP_Call_Test::process_client_update()
         return false;
     }
 
-    if (!_server_call.process_receive_request(update))
+    if (!_server_call.receive_request(update))
     {
         std::cout << "SIP_Call_Test::process_client_update -> Failed to process receive request\n";
         delete update;
@@ -1514,10 +1437,7 @@ bool SIP_Call_Test::process_client_update()
         return false;
     }
 
-    if (_update)
-        delete _update;
-
-    _update = update;
+    delete update;
     return true;
 }
 
@@ -1525,12 +1445,6 @@ bool SIP_Call_Test::process_client_update()
 
 bool SIP_Call_Test::process_server_update_response_200()
 {
-    if (!_update)
-    {
-        std::cout << "SIP_Call_Test::process_server_update_response_200 -> Invalid request\n";
-        return false;
-    }
-
     SIP_Response *update_response_200 = create_server_update_response_200();
     if (!update_response_200)
     {
@@ -1538,7 +1452,7 @@ bool SIP_Call_Test::process_server_update_response_200()
         return false;
     }
 
-    if (!_server_call.process_send_response(_update, update_response_200))
+    if (!_server_call.send_response(update_response_200))
     {
         std::cout << "SIP_Call_Test::process_server_update_response_200 -> Failed to process send response\n";
         delete update_response_200;
@@ -1561,7 +1475,7 @@ bool SIP_Call_Test::process_server_update_response_200()
         return false;
     }
 
-    if (!_client_call.process_receive_response(_update, update_response_200))
+    if (!_client_call.receive_response(update_response_200))
     {
         std::cout << "SIP_Call_Test::process_server_update_response_200 -> Failed to process receive response\n";
         delete update_response_200;
@@ -1599,7 +1513,7 @@ bool SIP_Call_Test::process_server_update()
         return false;
     }
 
-    if (!_server_call.process_send_request(update))
+    if (!_server_call.send_request(update))
     {
         std::cout << "SIP_Call_Test::process_server_update -> Failed to process send request\n";
         delete update;
@@ -1622,7 +1536,7 @@ bool SIP_Call_Test::process_server_update()
         return false;
     }
 
-    if (!_client_call.process_receive_request(update))
+    if (!_client_call.receive_request(update))
     {
         std::cout << "SIP_Call_Test::process_server_update -> Failed to process receive request\n";
         delete update;
@@ -1645,10 +1559,7 @@ bool SIP_Call_Test::process_server_update()
         return false;
     }
 
-    if (_update)
-        delete _update;
-
-    _update = update;
+    delete update;
     return true;
 }
 
@@ -1656,12 +1567,6 @@ bool SIP_Call_Test::process_server_update()
 
 bool SIP_Call_Test::process_client_update_response_200()
 {
-    if (!_update)
-    {
-        std::cout << "SIP_Call_Test::process_client_update_response_200 -> Invalid request\n";
-        return false;
-    }
-
     SIP_Response *update_response_200 = create_client_update_response_200();
     if (!update_response_200)
     {
@@ -1669,7 +1574,7 @@ bool SIP_Call_Test::process_client_update_response_200()
         return false;
     }
 
-    if (!_client_call.process_send_response(_update, update_response_200))
+    if (!_client_call.send_response(update_response_200))
     {
         std::cout << "SIP_Call_Test::process_client_update_response_200 -> Failed to process send response\n";
         delete update_response_200;
@@ -1692,7 +1597,7 @@ bool SIP_Call_Test::process_client_update_response_200()
         return false;
     }
 
-    if (!_server_call.process_receive_response(_update, update_response_200))
+    if (!_server_call.receive_response(update_response_200))
     {
         std::cout << "SIP_Call_Test::process_client_update_response_200 -> Failed to process receive response\n";
         delete update_response_200;
@@ -1730,7 +1635,7 @@ bool SIP_Call_Test::process_cancel()
         return false;
     }
 
-    if (!_client_call.process_send_request(cancel))
+    if (!_client_call.send_request(cancel))
     {
         std::cout << "SIP_Call_Test::process_cancel -> Failed to process send request\n";
         delete cancel;
@@ -1753,7 +1658,7 @@ bool SIP_Call_Test::process_cancel()
         return false;
     }
 
-    if (!_server_call.process_receive_request(cancel))
+    if (!_server_call.receive_request(cancel))
     {
         std::cout << "SIP_Call_Test::process_cancel -> Failed to process receive request\n";
         delete cancel;
@@ -1776,10 +1681,7 @@ bool SIP_Call_Test::process_cancel()
         return false;
     }
 
-    if (_cancel)
-        delete _cancel;
-
-    _cancel = cancel;
+    delete cancel;
     return true;
 }
 
@@ -1787,12 +1689,6 @@ bool SIP_Call_Test::process_cancel()
 
 bool SIP_Call_Test::process_cancel_response_200()
 {
-    if (!_cancel)
-    {
-        std::cout << "SIP_Call_Test::process_cancel_response_200 -> Invalid request\n";
-        return false;
-    }
-
     SIP_Response *cancel_response_200 = create_cancel_response_200();
     if (!cancel_response_200)
     {
@@ -1800,7 +1696,7 @@ bool SIP_Call_Test::process_cancel_response_200()
         return false;
     }
 
-    if (!_server_call.process_send_response(_cancel, cancel_response_200))
+    if (!_server_call.send_response(cancel_response_200))
     {
         std::cout << "SIP_Call_Test::process_cancel_response_200 -> Failed to process send response\n";
         delete cancel_response_200;
@@ -1823,7 +1719,7 @@ bool SIP_Call_Test::process_cancel_response_200()
         return false;
     }
 
-    if (!_client_call.process_receive_response(_cancel, cancel_response_200))
+    if (!_client_call.receive_response(cancel_response_200))
     {
         std::cout << "SIP_Call_Test::process_cancel_response_200 -> Failed to process receive response\n";
         delete cancel_response_200;
@@ -1861,7 +1757,7 @@ bool SIP_Call_Test::process_prack()
         return false;
     }
 
-    if (!_client_call.process_send_request(prack))
+    if (!_client_call.send_request(prack))
     {
         std::cout << "SIP_Call_Test::process_prack -> Failed to process send request\n";
         delete prack;
@@ -1884,7 +1780,7 @@ bool SIP_Call_Test::process_prack()
         return false;
     }
 
-    if (!_server_call.process_receive_request(prack))
+    if (!_server_call.receive_request(prack))
     {
         std::cout << "SIP_Call_Test::process_prack -> Failed to process receive request\n";
         delete prack;
@@ -1907,10 +1803,7 @@ bool SIP_Call_Test::process_prack()
         return false;
     }
 
-    if (_prack)
-        delete _prack;
-
-    _prack = prack;
+    delete prack;
     return true;
 }
 
@@ -1918,12 +1811,6 @@ bool SIP_Call_Test::process_prack()
 
 bool SIP_Call_Test::process_prack_response_200()
 {
-    if (!_prack)
-    {
-        std::cout << "SIP_Call_Test::process_prack_response_200 -> Invalid request\n";
-        return false;
-    }
-
     SIP_Response *prack_response_200 = create_prack_response_200();
     if (!prack_response_200)
     {
@@ -1931,7 +1818,7 @@ bool SIP_Call_Test::process_prack_response_200()
         return false;
     }
 
-    if (!_server_call.process_send_response(_prack, prack_response_200))
+    if (!_server_call.send_response(prack_response_200))
     {
         std::cout << "SIP_Call_Test::process_prack_response_200 -> Failed to process send response\n";
         delete prack_response_200;
@@ -1954,7 +1841,7 @@ bool SIP_Call_Test::process_prack_response_200()
         return false;
     }
 
-    if (!_client_call.process_receive_response(_prack, prack_response_200))
+    if (!_client_call.receive_response(prack_response_200))
     {
         std::cout << "SIP_Call_Test::process_prack_response_200 -> Failed to process receive response\n";
         delete prack_response_200;
@@ -1992,7 +1879,7 @@ bool SIP_Call_Test::process_info()
         return false;
     }
 
-    if (!_client_call.process_send_request(info))
+    if (!_client_call.send_request(info))
     {
         std::cout << "SIP_Call_Test::process_info -> Failed to process send request\n";
         delete info;
@@ -2015,7 +1902,7 @@ bool SIP_Call_Test::process_info()
         return false;
     }
 
-    if (!_server_call.process_receive_request(info))
+    if (!_server_call.receive_request(info))
     {
         std::cout << "SIP_Call_Test::process_info -> Failed to process receive request\n";
         delete info;
@@ -2038,10 +1925,7 @@ bool SIP_Call_Test::process_info()
         return false;
     }
 
-    if (_info)
-        delete _info;
-
-    _info = info;
+    delete info;
     return true;
 }
 
@@ -2049,12 +1933,6 @@ bool SIP_Call_Test::process_info()
 
 bool SIP_Call_Test::process_info_response_200()
 {
-    if (!_info)
-    {
-        std::cout << "SIP_Call_Test::process_info_response_200 -> Invalid request\n";
-        return false;
-    }
-
     SIP_Response *info_response_200 = create_info_response_200();
     if (!info_response_200)
     {
@@ -2062,7 +1940,7 @@ bool SIP_Call_Test::process_info_response_200()
         return false;
     }
 
-    if (!_server_call.process_send_response(_info, info_response_200))
+    if (!_server_call.send_response(info_response_200))
     {
         std::cout << "SIP_Call_Test::process_info_response_200 -> Failed to process send response\n";
         delete info_response_200;
@@ -2085,7 +1963,7 @@ bool SIP_Call_Test::process_info_response_200()
         return false;
     }
 
-    if (!_client_call.process_receive_response(_info, info_response_200))
+    if (!_client_call.receive_response(info_response_200))
     {
         std::cout << "SIP_Call_Test::process_info_response_200 -> Failed to process receive response\n";
         delete info_response_200;
@@ -2115,6 +1993,52 @@ bool SIP_Call_Test::process_info_response_200()
 //-------------------------------------------
 //-------------------------------------------
 
+bool SIP_Call_Test::send_message_callback(void *data, SIP_Call *call, SIP_Message *msg)
+{
+    SIP_Call_Test *test = reinterpret_cast<SIP_Call_Test *>(data);
+    if ((!test) || (!call) || (!msg))
+    {
+        std::cout << "SIP_Call_Test::send_message_callback -> Invalid parameters\n";
+        return false;
+    }
+
+    test->_message = msg;
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Call_Test::receive_request_callback(void *data, SIP_Call *call, SIP_Request *request)
+{
+    SIP_Call_Test *test = reinterpret_cast<SIP_Call_Test *>(data);
+    if ((!test) || (!call) || (!request))
+    {
+        std::cout << "SIP_Call_Test::receive_request_callback -> Invalid parameters\n";
+        return false;
+    }
+
+    test->_request = request;
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Call_Test::receive_response_callback(void *data, SIP_Call *call, SIP_Request *request, SIP_Response *response)
+{
+    SIP_Call_Test *test = reinterpret_cast<SIP_Call_Test *>(data);
+    if ((!test) || (!call) || (!request) || (!response))
+    {
+        std::cout << "SIP_Call_Test::receive_response_callback -> Invalid parameters\n";
+        return false;
+    }
+
+    test->_request = request;
+    test->_response = response;
+    return true;
+}
+
+//-------------------------------------------
+
 SIP_Response *SIP_Call_Test::create_response_callback(void *data, SIP_Call *call, SIP_Request *request, unsigned short status_code)
 {
     SIP_Call_Test *test = reinterpret_cast<SIP_Call_Test *>(data);
@@ -2130,30 +2054,11 @@ SIP_Response *SIP_Call_Test::create_response_callback(void *data, SIP_Call *call
 }
 
 //-------------------------------------------
-
-bool SIP_Call_Test::send_response_callback(void *data, SIP_Call *call, SIP_Request *request, SIP_Response *response)
-{
-    SIP_Call_Test *test = reinterpret_cast<SIP_Call_Test *>(data);
-    if ((!test) || (!call) || (!request) || (!response))
-    {
-        std::cout << "SIP_Call_Test::send_response_callback -> Invalid parameters\n";
-        return false;
-    }
-
-    test->_request = request;
-    test->_response = response;
-    return true;
-}
-
-//-------------------------------------------
 //-------------------------------------------
 
 bool SIP_Call_Success_Test::run()
 {
     set_callbacks();
-    set_call_id("a84b4c76e66710@pc33.atlanta.com");
-
-    init_call();
 
     if (!process_invite())
         return false;
@@ -2194,9 +2099,6 @@ bool SIP_Call_Success_Test::run()
 bool SIP_Call_Success_No_100_Test::run()
 {
     set_callbacks();
-    set_call_id("a84b4c76e66710@pc33.atlanta.com");
-
-    init_call();
 
     if (!process_invite())
         return false;
@@ -2225,9 +2127,6 @@ bool SIP_Call_Success_No_100_Test::run()
 bool SIP_Call_Success_No_1xx_Test::run()
 {
     set_callbacks();
-    set_call_id("a84b4c76e66710@pc33.atlanta.com");
-
-    init_call();
 
     if (!process_invite())
         return false;
@@ -2253,9 +2152,6 @@ bool SIP_Call_Success_No_1xx_Test::run()
 bool SIP_Call_Reject_Test::run()
 {
     set_callbacks();
-    set_call_id("a84b4c76e66710@pc33.atlanta.com");
-
-    init_call();
 
     if (!process_invite())
         return false;
@@ -2281,9 +2177,6 @@ bool SIP_Call_Reject_Test::run()
 bool SIP_Call_Reject_No_100_Test::run()
 {
     set_callbacks();
-    set_call_id("a84b4c76e66710@pc33.atlanta.com");
-
-    init_call();
 
     if (!process_invite())
         return false;
@@ -2303,9 +2196,6 @@ bool SIP_Call_Reject_No_100_Test::run()
 bool SIP_Call_Reject_No_1xx_Test::run()
 {
     set_callbacks();
-    set_call_id("a84b4c76e66710@pc33.atlanta.com");
-
-    init_call();
 
     if (!process_invite())
         return false;

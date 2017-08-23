@@ -12,24 +12,22 @@
 #pragma once
 
 #include "sip/sip_call.h"
+#include "util/string_functions.h"
 #include <iomanip>
 
 class SIP_Call_Test
 {
 public:
     SIP_Call_Test();
-    virtual ~SIP_Call_Test();
+    virtual ~SIP_Call_Test() {}
 
     static bool init();
 
 protected:
     virtual bool run() = 0;
 
-    virtual void set_call_id(std::string call_id) { _call_id = call_id; }
-
-    virtual bool init_call();
     virtual bool set_callbacks();
-    virtual void set_use_prack(bool prack) { use_prack = prack; }
+    virtual void set_use_prack(bool prack) { _use_prack = prack; }
 
     SIP_Request *create_invite();
     SIP_Response *create_invite_response_100();
@@ -87,28 +85,29 @@ protected:
     bool process_info();
     bool process_info_response_200();
 
+    static bool send_message_callback(void *data, SIP_Call *call, SIP_Message *msg);
+    static bool receive_request_callback(void *data, SIP_Call *call, SIP_Request *request);
+    static bool receive_response_callback(void *data, SIP_Call *call, SIP_Request *request, SIP_Response *response);
     static SIP_Response *create_response_callback(void *data, SIP_Call *call, SIP_Request *request, unsigned short status_code);
-    static bool send_response_callback(void *data, SIP_Call *call, SIP_Request *request, SIP_Response *response);
 
 protected:
     SIP_Call _client_call;
     SIP_Call _server_call;
 
-    std::string _call_id;
-    bool use_prack;
+    bool _use_prack;
 
     unsigned long _client_sequence;
     unsigned long _server_sequence;
     unsigned long _invite_sequence;
     unsigned long _prack_rseq;
 
-    SIP_Request *_invite;
-    SIP_Request *_bye;
-    SIP_Request *_update;
-    SIP_Request *_cancel;
-    SIP_Request *_prack;
-    SIP_Request *_info;
+    std::string _invite_branch;
+    std::string _bye_branch;
+    std::string _update_branch;
+    std::string _prack_branch;
+    std::string _info_branch;
 
+    SIP_Message *_message;
     SIP_Request *_request;
     SIP_Response *_response;
     unsigned short _status_code;
