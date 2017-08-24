@@ -107,10 +107,9 @@ protected:
     std::string _prack_branch;
     std::string _info_branch;
 
-    SIP_Message *_message;
-    SIP_Request *_request;
-    SIP_Response *_response;
-    unsigned short _status_code;
+    bool _sent_message;
+    bool _received_request;
+    bool _received_response;
 };
 
 //-------------------------------------------

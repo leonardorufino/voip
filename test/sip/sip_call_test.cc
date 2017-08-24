@@ -15,7 +15,7 @@
 //-------------------------------------------
 
 SIP_Call_Test::SIP_Call_Test() : _client_call(0), _server_call(1), _use_prack(false), _client_sequence(314158), _server_sequence(230),
-    _invite_sequence(0), _prack_rseq(988788), _message(NULL), _request(NULL), _response(NULL), _status_code(0)
+    _invite_sequence(0), _prack_rseq(988788), _sent_message(false), _received_request(false), _received_response(false)
 {
 }
 
@@ -659,9 +659,18 @@ bool SIP_Call_Test::process_invite()
         return false;
     }
 
+    _sent_message = false;
+
     if (!_client_call.send_request(invite))
     {
-        std::cout << "SIP_Call_Test::process_invite -> Failed to process send request\n";
+        std::cout << "SIP_Call_Test::process_invite -> Failed to send request\n";
+        delete invite;
+        return false;
+    }
+
+    if (!_sent_message)
+    {
+        std::cout << "SIP_Call_Test::process_invite -> INVITE not sent\n";
         delete invite;
         return false;
     }
@@ -682,9 +691,18 @@ bool SIP_Call_Test::process_invite()
         return false;
     }
 
+    _received_request = false;
+
     if (!_server_call.receive_request(invite))
     {
-        std::cout << "SIP_Call_Test::process_invite -> Failed to process receive request\n";
+        std::cout << "SIP_Call_Test::process_invite -> Failed to receive request\n";
+        delete invite;
+        return false;
+    }
+
+    if (!_received_request)
+    {
+        std::cout << "SIP_Call_Test::process_invite -> INVITE not received\n";
         delete invite;
         return false;
     }
@@ -720,9 +738,18 @@ bool SIP_Call_Test::process_invite_response_100()
         return false;
     }
 
+    _sent_message = false;
+
     if (!_server_call.send_response(invite_response_100))
     {
-        std::cout << "SIP_Call_Test::process_invite_response_100 -> Failed to process send response\n";
+        std::cout << "SIP_Call_Test::process_invite_response_100 -> Failed to send response\n";
+        delete invite_response_100;
+        return false;
+    }
+
+    if (!_sent_message)
+    {
+        std::cout << "SIP_Call_Test::process_invite_response_100 -> Response not sent\n";
         delete invite_response_100;
         return false;
     }
@@ -743,9 +770,18 @@ bool SIP_Call_Test::process_invite_response_100()
         return false;
     }
 
+    _received_response = false;
+
     if (!_client_call.receive_response(invite_response_100))
     {
-        std::cout << "SIP_Call_Test::process_invite_response_100 -> Failed to process receive response\n";
+        std::cout << "SIP_Call_Test::process_invite_response_100 -> Failed to receive response\n";
+        delete invite_response_100;
+        return false;
+    }
+
+    if (!_received_response)
+    {
+        std::cout << "SIP_Call_Test::process_invite_response_100 -> Response not received\n";
         delete invite_response_100;
         return false;
     }
@@ -781,9 +817,18 @@ bool SIP_Call_Test::process_invite_response_180()
         return false;
     }
 
+    _sent_message = false;
+
     if (!_server_call.send_response(invite_response_180))
     {
-        std::cout << "SIP_Call_Test::process_invite_response_180 -> Failed to process send response\n";
+        std::cout << "SIP_Call_Test::process_invite_response_180 -> Failed to send response\n";
+        delete invite_response_180;
+        return false;
+    }
+
+    if (!_sent_message)
+    {
+        std::cout << "SIP_Call_Test::process_invite_response_180 -> Response not sent\n";
         delete invite_response_180;
         return false;
     }
@@ -804,9 +849,18 @@ bool SIP_Call_Test::process_invite_response_180()
         return false;
     }
 
+    _received_response = false;
+
     if (!_client_call.receive_response(invite_response_180))
     {
-        std::cout << "SIP_Call_Test::process_invite_response_180 -> Failed to process receive response\n";
+        std::cout << "SIP_Call_Test::process_invite_response_180 -> Failed to receive response\n";
+        delete invite_response_180;
+        return false;
+    }
+
+    if (!_received_response)
+    {
+        std::cout << "SIP_Call_Test::process_invite_response_180 -> Response not received\n";
         delete invite_response_180;
         return false;
     }
@@ -842,9 +896,18 @@ bool SIP_Call_Test::process_invite_response_183()
         return false;
     }
 
+    _sent_message = false;
+
     if (!_server_call.send_response(invite_response_183))
     {
-        std::cout << "SIP_Call_Test::process_invite_response_183 -> Failed to process send response\n";
+        std::cout << "SIP_Call_Test::process_invite_response_183 -> Failed to send response\n";
+        delete invite_response_183;
+        return false;
+    }
+
+    if (!_sent_message)
+    {
+        std::cout << "SIP_Call_Test::process_invite_response_183 -> Response not sent\n";
         delete invite_response_183;
         return false;
     }
@@ -865,9 +928,18 @@ bool SIP_Call_Test::process_invite_response_183()
         return false;
     }
 
+    _received_response = false;
+
     if (!_client_call.receive_response(invite_response_183))
     {
-        std::cout << "SIP_Call_Test::process_invite_response_183 -> Failed to process receive response\n";
+        std::cout << "SIP_Call_Test::process_invite_response_183 -> Failed to receive response\n";
+        delete invite_response_183;
+        return false;
+    }
+
+    if (!_received_response)
+    {
+        std::cout << "SIP_Call_Test::process_invite_response_183 -> Response not received\n";
         delete invite_response_183;
         return false;
     }
@@ -903,9 +975,18 @@ bool SIP_Call_Test::process_invite_response_200()
         return false;
     }
 
+    _sent_message = false;
+
     if (!_server_call.send_response(invite_response_200))
     {
-        std::cout << "SIP_Call_Test::process_invite_response_200 -> Failed to process send response\n";
+        std::cout << "SIP_Call_Test::process_invite_response_200 -> Failed to send response\n";
+        delete invite_response_200;
+        return false;
+    }
+
+    if (!_sent_message)
+    {
+        std::cout << "SIP_Call_Test::process_invite_response_200 -> Response not sent\n";
         delete invite_response_200;
         return false;
     }
@@ -926,9 +1007,18 @@ bool SIP_Call_Test::process_invite_response_200()
         return false;
     }
 
+    _received_response = false;
+
     if (!_client_call.receive_response(invite_response_200))
     {
-        std::cout << "SIP_Call_Test::process_invite_response_200 -> Failed to process receive response\n";
+        std::cout << "SIP_Call_Test::process_invite_response_200 -> Failed to receive response\n";
+        delete invite_response_200;
+        return false;
+    }
+
+    if (!_received_response)
+    {
+        std::cout << "SIP_Call_Test::process_invite_response_200 -> Response not received\n";
         delete invite_response_200;
         return false;
     }
@@ -964,9 +1054,18 @@ bool SIP_Call_Test::process_invite_response_480()
         return false;
     }
 
+    _sent_message = false;
+
     if (!_server_call.send_response(invite_response_480))
     {
-        std::cout << "SIP_Call_Test::process_invite_response_480 -> Failed to process send response\n";
+        std::cout << "SIP_Call_Test::process_invite_response_480 -> Failed to send response\n";
+        delete invite_response_480;
+        return false;
+    }
+
+    if (!_sent_message)
+    {
+        std::cout << "SIP_Call_Test::process_invite_response_480 -> Response not sent\n";
         delete invite_response_480;
         return false;
     }
@@ -987,9 +1086,18 @@ bool SIP_Call_Test::process_invite_response_480()
         return false;
     }
 
+    _received_response = false;
+
     if (!_client_call.receive_response(invite_response_480))
     {
-        std::cout << "SIP_Call_Test::process_invite_response_480 -> Failed to process receive response\n";
+        std::cout << "SIP_Call_Test::process_invite_response_480 -> Failed to receive response\n";
+        delete invite_response_480;
+        return false;
+    }
+
+    if (!_received_response)
+    {
+        std::cout << "SIP_Call_Test::process_invite_response_480 -> Response not received\n";
         delete invite_response_480;
         return false;
     }
@@ -1025,9 +1133,18 @@ bool SIP_Call_Test::process_invite_response_487()
         return false;
     }
 
+    _sent_message = false;
+
     if (!_server_call.send_response(invite_response_487))
     {
-        std::cout << "SIP_Call_Test::process_invite_response_487 -> Failed to process send response\n";
+        std::cout << "SIP_Call_Test::process_invite_response_487 -> Failed to send response\n";
+        delete invite_response_487;
+        return false;
+    }
+
+    if (!_sent_message)
+    {
+        std::cout << "SIP_Call_Test::process_invite_response_487 -> Response not sent\n";
         delete invite_response_487;
         return false;
     }
@@ -1048,9 +1165,18 @@ bool SIP_Call_Test::process_invite_response_487()
         return false;
     }
 
+    _received_response = false;
+
     if (!_client_call.receive_response(invite_response_487))
     {
-        std::cout << "SIP_Call_Test::process_invite_response_487 -> Failed to process receive response\n";
+        std::cout << "SIP_Call_Test::process_invite_response_487 -> Failed to receive response\n";
+        delete invite_response_487;
+        return false;
+    }
+
+    if (!_received_response)
+    {
+        std::cout << "SIP_Call_Test::process_invite_response_487 -> Response not received\n";
         delete invite_response_487;
         return false;
     }
@@ -1086,9 +1212,18 @@ bool SIP_Call_Test::process_ack()
         return false;
     }
 
+    _sent_message = false;
+
     if (!_client_call.send_request(ack))
     {
-        std::cout << "SIP_Call_Test::process_ack -> Failed to process send request\n";
+        std::cout << "SIP_Call_Test::process_ack -> Failed to send request\n";
+        delete ack;
+        return false;
+    }
+
+    if (!_sent_message)
+    {
+        std::cout << "SIP_Call_Test::process_ack -> ACK not sent\n";
         delete ack;
         return false;
     }
@@ -1109,9 +1244,18 @@ bool SIP_Call_Test::process_ack()
         return false;
     }
 
+    _received_request = false;
+
     if (!_server_call.receive_request(ack))
     {
-        std::cout << "SIP_Call_Test::process_ack -> Failed to process receive request\n";
+        std::cout << "SIP_Call_Test::process_ack -> Failed to receive request\n";
+        delete ack;
+        return false;
+    }
+
+    if (!_received_request)
+    {
+        std::cout << "SIP_Call_Test::process_ack -> Failed to receive ACK\n";
         delete ack;
         return false;
     }
@@ -1147,9 +1291,18 @@ bool SIP_Call_Test::process_client_bye()
         return false;
     }
 
+    _sent_message = false;
+
     if (!_client_call.send_request(bye))
     {
-        std::cout << "SIP_Call_Test::process_client_bye -> Failed to process send request\n";
+        std::cout << "SIP_Call_Test::process_client_bye -> Failed to send request\n";
+        delete bye;
+        return false;
+    }
+
+    if (!_sent_message)
+    {
+        std::cout << "SIP_Call_Test::process_client_bye -> BYE not sent\n";
         delete bye;
         return false;
     }
@@ -1170,9 +1323,18 @@ bool SIP_Call_Test::process_client_bye()
         return false;
     }
 
+    _received_request = false;
+
     if (!_server_call.receive_request(bye))
     {
-        std::cout << "SIP_Call_Test::process_client_bye -> Failed to process receive request\n";
+        std::cout << "SIP_Call_Test::process_client_bye -> Failed to receive request\n";
+        delete bye;
+        return false;
+    }
+
+    if (!_received_request)
+    {
+        std::cout << "SIP_Call_Test::process_client_bye -> Failed to receive BYE\n";
         delete bye;
         return false;
     }
@@ -1208,9 +1370,18 @@ bool SIP_Call_Test::process_server_bye_response_200()
         return false;
     }
 
+    _sent_message = false;
+
     if (!_server_call.send_response(bye_response_200))
     {
-        std::cout << "SIP_Call_Test::process_server_bye_response_200 -> Failed to process send response\n";
+        std::cout << "SIP_Call_Test::process_server_bye_response_200 -> Failed to send response\n";
+        delete bye_response_200;
+        return false;
+    }
+
+    if (!_sent_message)
+    {
+        std::cout << "SIP_Call_Test::process_server_bye_response_200 -> Response not sent\n";
         delete bye_response_200;
         return false;
     }
@@ -1231,9 +1402,18 @@ bool SIP_Call_Test::process_server_bye_response_200()
         return false;
     }
 
+    _received_response = false;
+
     if (!_client_call.receive_response(bye_response_200))
     {
-        std::cout << "SIP_Call_Test::process_server_bye_response_200 -> Failed to process receive response\n";
+        std::cout << "SIP_Call_Test::process_server_bye_response_200 -> Failed to receive response\n";
+        delete bye_response_200;
+        return false;
+    }
+
+    if (!_received_response)
+    {
+        std::cout << "SIP_Call_Test::process_server_bye_response_200 -> Response not received\n";
         delete bye_response_200;
         return false;
     }
@@ -1269,9 +1449,18 @@ bool SIP_Call_Test::process_server_bye()
         return false;
     }
 
+    _sent_message = false;
+
     if (!_server_call.send_request(bye))
     {
-        std::cout << "SIP_Call_Test::process_server_bye -> Failed to process send request\n";
+        std::cout << "SIP_Call_Test::process_server_bye -> Failed to send request\n";
+        delete bye;
+        return false;
+    }
+
+    if (!_sent_message)
+    {
+        std::cout << "SIP_Call_Test::process_server_bye -> BYE not sent\n";
         delete bye;
         return false;
     }
@@ -1292,9 +1481,18 @@ bool SIP_Call_Test::process_server_bye()
         return false;
     }
 
+    _received_request = false;
+
     if (!_client_call.receive_request(bye))
     {
-        std::cout << "SIP_Call_Test::process_server_bye -> Failed to process receive request\n";
+        std::cout << "SIP_Call_Test::process_server_bye -> Failed to receive request\n";
+        delete bye;
+        return false;
+    }
+
+    if (!_received_request)
+    {
+        std::cout << "SIP_Call_Test::process_server_bye -> Failed to receive BYE\n";
         delete bye;
         return false;
     }
@@ -1330,9 +1528,18 @@ bool SIP_Call_Test::process_client_bye_response_200()
         return false;
     }
 
+    _sent_message = false;
+
     if (!_client_call.send_response(bye_response_200))
     {
-        std::cout << "SIP_Call_Test::process_client_bye_response_200 -> Failed to process send response\n";
+        std::cout << "SIP_Call_Test::process_client_bye_response_200 -> Failed to send response\n";
+        delete bye_response_200;
+        return false;
+    }
+
+    if (!_sent_message)
+    {
+        std::cout << "SIP_Call_Test::process_client_bye_response_200 -> Response not sent\n";
         delete bye_response_200;
         return false;
     }
@@ -1353,9 +1560,18 @@ bool SIP_Call_Test::process_client_bye_response_200()
         return false;
     }
 
+    _received_response = false;
+
     if (!_server_call.receive_response(bye_response_200))
     {
-        std::cout << "SIP_Call_Test::process_client_bye_response_200 -> Failed to process receive response\n";
+        std::cout << "SIP_Call_Test::process_client_bye_response_200 -> Failed to receive response\n";
+        delete bye_response_200;
+        return false;
+    }
+
+    if (!_received_response)
+    {
+        std::cout << "SIP_Call_Test::process_client_bye_response_200 -> Response not received\n";
         delete bye_response_200;
         return false;
     }
@@ -1391,9 +1607,18 @@ bool SIP_Call_Test::process_client_update()
         return false;
     }
 
+    _sent_message = false;
+
     if (!_client_call.send_request(update))
     {
-        std::cout << "SIP_Call_Test::process_client_update -> Failed to process send request\n";
+        std::cout << "SIP_Call_Test::process_client_update -> Failed to send request\n";
+        delete update;
+        return false;
+    }
+
+    if (!_sent_message)
+    {
+        std::cout << "SIP_Call_Test::process_client_update -> UPDATE not sent\n";
         delete update;
         return false;
     }
@@ -1414,9 +1639,18 @@ bool SIP_Call_Test::process_client_update()
         return false;
     }
 
+    _received_request = false;
+
     if (!_server_call.receive_request(update))
     {
-        std::cout << "SIP_Call_Test::process_client_update -> Failed to process receive request\n";
+        std::cout << "SIP_Call_Test::process_client_update -> Failed to receive request\n";
+        delete update;
+        return false;
+    }
+
+    if (!_received_request)
+    {
+        std::cout << "SIP_Call_Test::process_client_update -> UPDATE not received\n";
         delete update;
         return false;
     }
@@ -1452,9 +1686,18 @@ bool SIP_Call_Test::process_server_update_response_200()
         return false;
     }
 
+    _sent_message = false;
+
     if (!_server_call.send_response(update_response_200))
     {
-        std::cout << "SIP_Call_Test::process_server_update_response_200 -> Failed to process send response\n";
+        std::cout << "SIP_Call_Test::process_server_update_response_200 -> Failed to send response\n";
+        delete update_response_200;
+        return false;
+    }
+
+    if (!_sent_message)
+    {
+        std::cout << "SIP_Call_Test::process_server_update_response_200 -> Response not sent\n";
         delete update_response_200;
         return false;
     }
@@ -1475,9 +1718,18 @@ bool SIP_Call_Test::process_server_update_response_200()
         return false;
     }
 
+    _received_response = false;
+
     if (!_client_call.receive_response(update_response_200))
     {
-        std::cout << "SIP_Call_Test::process_server_update_response_200 -> Failed to process receive response\n";
+        std::cout << "SIP_Call_Test::process_server_update_response_200 -> Failed to receive response\n";
+        delete update_response_200;
+        return false;
+    }
+
+    if (!_received_response)
+    {
+        std::cout << "SIP_Call_Test::process_server_update_response_200 -> Response not sent\n";
         delete update_response_200;
         return false;
     }
@@ -1513,9 +1765,18 @@ bool SIP_Call_Test::process_server_update()
         return false;
     }
 
+    _sent_message = false;
+
     if (!_server_call.send_request(update))
     {
-        std::cout << "SIP_Call_Test::process_server_update -> Failed to process send request\n";
+        std::cout << "SIP_Call_Test::process_server_update -> Failed to send request\n";
+        delete update;
+        return false;
+    }
+
+    if (!_sent_message)
+    {
+        std::cout << "SIP_Call_Test::process_server_update -> UPDATE not sent\n";
         delete update;
         return false;
     }
@@ -1536,9 +1797,18 @@ bool SIP_Call_Test::process_server_update()
         return false;
     }
 
+    _received_request = false;
+
     if (!_client_call.receive_request(update))
     {
-        std::cout << "SIP_Call_Test::process_server_update -> Failed to process receive request\n";
+        std::cout << "SIP_Call_Test::process_server_update -> Failed to receive request\n";
+        delete update;
+        return false;
+    }
+
+    if (!_received_request)
+    {
+        std::cout << "SIP_Call_Test::process_server_update -> UPDATE not received\n";
         delete update;
         return false;
     }
@@ -1574,9 +1844,18 @@ bool SIP_Call_Test::process_client_update_response_200()
         return false;
     }
 
+    _sent_message = false;
+
     if (!_client_call.send_response(update_response_200))
     {
-        std::cout << "SIP_Call_Test::process_client_update_response_200 -> Failed to process send response\n";
+        std::cout << "SIP_Call_Test::process_client_update_response_200 -> Failed to send response\n";
+        delete update_response_200;
+        return false;
+    }
+
+    if (!_sent_message)
+    {
+        std::cout << "SIP_Call_Test::process_client_update_response_200 -> Response not sent\n";
         delete update_response_200;
         return false;
     }
@@ -1597,9 +1876,18 @@ bool SIP_Call_Test::process_client_update_response_200()
         return false;
     }
 
+    _received_response = false;
+
     if (!_server_call.receive_response(update_response_200))
     {
-        std::cout << "SIP_Call_Test::process_client_update_response_200 -> Failed to process receive response\n";
+        std::cout << "SIP_Call_Test::process_client_update_response_200 -> Failed to receive response\n";
+        delete update_response_200;
+        return false;
+    }
+
+    if (!_received_response)
+    {
+        std::cout << "SIP_Call_Test::process_client_update_response_200 -> Response not received\n";
         delete update_response_200;
         return false;
     }
@@ -1635,9 +1923,18 @@ bool SIP_Call_Test::process_cancel()
         return false;
     }
 
+    _sent_message = false;
+
     if (!_client_call.send_request(cancel))
     {
-        std::cout << "SIP_Call_Test::process_cancel -> Failed to process send request\n";
+        std::cout << "SIP_Call_Test::process_cancel -> Failed to send request\n";
+        delete cancel;
+        return false;
+    }
+
+    if (!_sent_message)
+    {
+        std::cout << "SIP_Call_Test::process_cancel -> CANCEL not sent\n";
         delete cancel;
         return false;
     }
@@ -1658,9 +1955,18 @@ bool SIP_Call_Test::process_cancel()
         return false;
     }
 
+    _received_request = false;
+
     if (!_server_call.receive_request(cancel))
     {
-        std::cout << "SIP_Call_Test::process_cancel -> Failed to process receive request\n";
+        std::cout << "SIP_Call_Test::process_cancel -> Failed to receive request\n";
+        delete cancel;
+        return false;
+    }
+
+    if (!_received_request)
+    {
+        std::cout << "SIP_Call_Test::process_cancel -> Failed to receive CANCEL\n";
         delete cancel;
         return false;
     }
@@ -1696,9 +2002,18 @@ bool SIP_Call_Test::process_cancel_response_200()
         return false;
     }
 
+    _sent_message = false;
+
     if (!_server_call.send_response(cancel_response_200))
     {
-        std::cout << "SIP_Call_Test::process_cancel_response_200 -> Failed to process send response\n";
+        std::cout << "SIP_Call_Test::process_cancel_response_200 -> Failed to send response\n";
+        delete cancel_response_200;
+        return false;
+    }
+
+    if (!_sent_message)
+    {
+        std::cout << "SIP_Call_Test::process_cancel_response_200 -> Response not sent\n";
         delete cancel_response_200;
         return false;
     }
@@ -1719,9 +2034,18 @@ bool SIP_Call_Test::process_cancel_response_200()
         return false;
     }
 
+    _received_response = false;
+
     if (!_client_call.receive_response(cancel_response_200))
     {
-        std::cout << "SIP_Call_Test::process_cancel_response_200 -> Failed to process receive response\n";
+        std::cout << "SIP_Call_Test::process_cancel_response_200 -> Failed to receive response\n";
+        delete cancel_response_200;
+        return false;
+    }
+
+    if (!_received_response)
+    {
+        std::cout << "SIP_Call_Test::process_cancel_response_200 -> Response not received\n";
         delete cancel_response_200;
         return false;
     }
@@ -1757,9 +2081,18 @@ bool SIP_Call_Test::process_prack()
         return false;
     }
 
+    _sent_message = false;
+
     if (!_client_call.send_request(prack))
     {
-        std::cout << "SIP_Call_Test::process_prack -> Failed to process send request\n";
+        std::cout << "SIP_Call_Test::process_prack -> Failed to send request\n";
+        delete prack;
+        return false;
+    }
+
+    if (!_sent_message)
+    {
+        std::cout << "SIP_Call_Test::process_prack -> PRACK not sent\n";
         delete prack;
         return false;
     }
@@ -1780,9 +2113,18 @@ bool SIP_Call_Test::process_prack()
         return false;
     }
 
+    _received_request = false;
+
     if (!_server_call.receive_request(prack))
     {
-        std::cout << "SIP_Call_Test::process_prack -> Failed to process receive request\n";
+        std::cout << "SIP_Call_Test::process_prack -> Failed to receive request\n";
+        delete prack;
+        return false;
+    }
+
+    if (!_received_request)
+    {
+        std::cout << "SIP_Call_Test::process_prack -> Failed to receive PRACK\n";
         delete prack;
         return false;
     }
@@ -1818,9 +2160,18 @@ bool SIP_Call_Test::process_prack_response_200()
         return false;
     }
 
+    _sent_message = false;
+
     if (!_server_call.send_response(prack_response_200))
     {
-        std::cout << "SIP_Call_Test::process_prack_response_200 -> Failed to process send response\n";
+        std::cout << "SIP_Call_Test::process_prack_response_200 -> Failed to send response\n";
+        delete prack_response_200;
+        return false;
+    }
+
+    if (!_sent_message)
+    {
+        std::cout << "SIP_Call_Test::process_prack_response_200 -> Response not sent\n";
         delete prack_response_200;
         return false;
     }
@@ -1841,9 +2192,18 @@ bool SIP_Call_Test::process_prack_response_200()
         return false;
     }
 
+    _received_response = false;
+
     if (!_client_call.receive_response(prack_response_200))
     {
-        std::cout << "SIP_Call_Test::process_prack_response_200 -> Failed to process receive response\n";
+        std::cout << "SIP_Call_Test::process_prack_response_200 -> Failed to receive response\n";
+        delete prack_response_200;
+        return false;
+    }
+
+    if (!_received_response)
+    {
+        std::cout << "SIP_Call_Test::process_prack_response_200 -> Response not received\n";
         delete prack_response_200;
         return false;
     }
@@ -1879,9 +2239,18 @@ bool SIP_Call_Test::process_info()
         return false;
     }
 
+    _sent_message = false;
+
     if (!_client_call.send_request(info))
     {
-        std::cout << "SIP_Call_Test::process_info -> Failed to process send request\n";
+        std::cout << "SIP_Call_Test::process_info -> Failed to send request\n";
+        delete info;
+        return false;
+    }
+
+    if (!_sent_message)
+    {
+        std::cout << "SIP_Call_Test::process_info -> INFO not sent\n";
         delete info;
         return false;
     }
@@ -1902,9 +2271,18 @@ bool SIP_Call_Test::process_info()
         return false;
     }
 
+    _received_request = false;
+
     if (!_server_call.receive_request(info))
     {
-        std::cout << "SIP_Call_Test::process_info -> Failed to process receive request\n";
+        std::cout << "SIP_Call_Test::process_info -> Failed to receive request\n";
+        delete info;
+        return false;
+    }
+
+    if (!_received_request)
+    {
+        std::cout << "SIP_Call_Test::process_info -> INFO not received\n";
         delete info;
         return false;
     }
@@ -1940,9 +2318,18 @@ bool SIP_Call_Test::process_info_response_200()
         return false;
     }
 
+    _sent_message = false;
+
     if (!_server_call.send_response(info_response_200))
     {
-        std::cout << "SIP_Call_Test::process_info_response_200 -> Failed to process send response\n";
+        std::cout << "SIP_Call_Test::process_info_response_200 -> Failed to send response\n";
+        delete info_response_200;
+        return false;
+    }
+
+    if (!_sent_message)
+    {
+        std::cout << "SIP_Call_Test::process_info_response_200 -> Response not sent\n";
         delete info_response_200;
         return false;
     }
@@ -1963,9 +2350,18 @@ bool SIP_Call_Test::process_info_response_200()
         return false;
     }
 
+    _received_response = false;
+
     if (!_client_call.receive_response(info_response_200))
     {
-        std::cout << "SIP_Call_Test::process_info_response_200 -> Failed to process receive response\n";
+        std::cout << "SIP_Call_Test::process_info_response_200 -> Failed to receive response\n";
+        delete info_response_200;
+        return false;
+    }
+
+    if (!_received_response)
+    {
+        std::cout << "SIP_Call_Test::process_info_response_200 -> Response not received\n";
         delete info_response_200;
         return false;
     }
@@ -2002,7 +2398,7 @@ bool SIP_Call_Test::send_message_callback(void *data, SIP_Call *call, SIP_Messag
         return false;
     }
 
-    test->_message = msg;
+    test->_sent_message = true;
     return true;
 }
 
@@ -2017,7 +2413,7 @@ bool SIP_Call_Test::receive_request_callback(void *data, SIP_Call *call, SIP_Req
         return false;
     }
 
-    test->_request = request;
+    test->_received_request = true;
     return true;
 }
 
@@ -2032,8 +2428,7 @@ bool SIP_Call_Test::receive_response_callback(void *data, SIP_Call *call, SIP_Re
         return false;
     }
 
-    test->_request = request;
-    test->_response = response;
+    test->_received_response = true;
     return true;
 }
 
@@ -2048,8 +2443,6 @@ SIP_Response *SIP_Call_Test::create_response_callback(void *data, SIP_Call *call
         return NULL;
     }
 
-    test->_request = request;
-    test->_status_code = status_code;
     return NULL;
 }
 
