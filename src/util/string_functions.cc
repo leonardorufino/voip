@@ -76,6 +76,8 @@ bool String_Functions::match(std::string &str, const std::string &match, std::st
     unsigned short counter_greater_than = 0;
     unsigned short counter_left_parenthesis = 0;
     unsigned short counter_right_parenthesis = 0;
+    unsigned short counter_left_square_bracket = 0;
+    unsigned short counter_right_square_bracket = 0;
 
     std::string aux = str.substr(0, pos);
     std::string::size_type found;
@@ -122,8 +124,24 @@ bool String_Functions::match(std::string &str, const std::string &match, std::st
                 counter_right_parenthesis++;
         }while (found != std::string::npos);
 
+        found = -1;
+        do
+        {
+            found = aux.find('[', found + 1);
+            if (found != std::string::npos)
+                counter_left_square_bracket++;
+        }while (found != std::string::npos);
+
+        found = -1;
+        do
+        {
+            found = aux.find(']', found + 1);
+            if (found != std::string::npos)
+                counter_right_square_bracket++;
+        }while (found != std::string::npos);
+
         if ((counter_double_quotation % 2 == 0) && (counter_less_than == counter_greater_than) &&
-            (counter_left_parenthesis == counter_right_parenthesis))
+            (counter_left_parenthesis == counter_right_parenthesis) && (counter_left_square_bracket == counter_right_square_bracket))
         {
             result = str.substr(0, pos);
             str.erase(0, pos + 1);

@@ -15,6 +15,41 @@
 
 //-------------------------------------------
 
+bool SIP_Host::decode(std::string &sip_msg)
+{
+    std::string result;
+
+    String_Functions::trim(sip_msg);
+
+    if ((sip_msg.size() > 2) && (sip_msg.front() == '[') && (sip_msg.back() == ']'))
+        _address = sip_msg.substr(1, sip_msg.size() - 2);
+    else
+        _address = sip_msg;
+
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Host::encode(std::string &sip_msg)
+{
+    if (_address.empty())
+        return false;
+
+    if (Socket::address_to_address_family(_address) == Socket::ADDRESS_FAMILY_IPv6)
+    {
+        sip_msg += "[";
+        sip_msg += _address;
+        sip_msg += "]";
+    }else
+        sip_msg += _address;
+
+    return true;
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
 bool SIP_URI::decode(std::string &sip_msg)
 {
     String_Functions::trim(sip_msg);
@@ -55,7 +90,7 @@ bool SIP_URI::decode(std::string &sip_msg)
         if (host.empty())
             return false;
 
-        _host = host;
+        _host.decode(host);
 
         String_Functions::trim(user_host);
         _port = String_Functions::str_to_us(user_host);
@@ -67,7 +102,7 @@ bool SIP_URI::decode(std::string &sip_msg)
         if (user_host.empty())
             return false;
 
-        _host = user_host;
+        _host.decode(user_host);
         _port = INVALID_PORT;
     }
 
@@ -137,9 +172,6 @@ bool SIP_URI::decode(std::string &sip_msg)
 
 bool SIP_URI::encode(std::string &sip_msg)
 {
-    if (_host.empty())
-        return false;
-
     if (!_user.empty())
     {
         sip_msg += _user;
@@ -153,7 +185,8 @@ bool SIP_URI::encode(std::string &sip_msg)
         sip_msg += "@";
     }
 
-    sip_msg += _host;
+    if (!_host.encode(sip_msg))
+        return false;
 
     if (_port != INVALID_PORT)
     {

@@ -13,8 +13,28 @@
 
 #include "sip_defs.h"
 #include "util/util_defs.h"
+#include "util/socket.h"
 #include <string>
 #include <list>
+
+class SIP_Host
+{
+public:
+    SIP_Host() {}
+    SIP_Host(const SIP_Host &value) { *this = value; }
+    ~SIP_Host() {}
+
+    bool decode(std::string &sip_msg);
+    bool encode(std::string &sip_msg);
+
+    void set_address(std::string address) { _address = address; }
+    std::string get_address() { return _address; }
+
+private:
+    std::string _address;
+};
+
+//-------------------------------------------
 
 class SIP_URI
 {
@@ -43,8 +63,8 @@ public:
     void set_password(std::string password) { _password = password; }
     std::string get_password() { return _password; }
 
-    void set_host(std::string host) { _host = host; }
-    std::string get_host() { return _host; }
+    void set_host(SIP_Host &host) { _host = host; }
+    SIP_Host get_host() { return _host; }
 
     void set_port(unsigned short port) { _port = port; }
     unsigned short get_port() { return _port; }
@@ -80,7 +100,7 @@ public:
 private:
     std::string _user;
     std::string _password;
-    std::string _host;
+    SIP_Host _host;
     unsigned short _port;
 
     std::string _transport;
