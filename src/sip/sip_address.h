@@ -63,8 +63,8 @@ public:
     void set_password(std::string password) { _password = password; }
     std::string get_password() { return _password; }
 
-    void set_host(SIP_Host &host) { _host = host; }
-    SIP_Host get_host() { return _host; }
+    void set_host(const SIP_Host &host) { _host = host; }
+    SIP_Host &get_host() { return _host; }
 
     void set_port(unsigned short port) { _port = port; }
     unsigned short get_port() { return _port; }
@@ -87,8 +87,8 @@ public:
     void set_ttl(unsigned short ttl) { _ttl = ttl; }
     unsigned short get_ttl() { return _ttl; }
 
-    void set_maddr(std::string maddr) { _maddr = maddr; }
-    std::string get_maddr() { return _maddr; }
+    void set_maddr(const SIP_Host &maddr) { _maddr = maddr; }
+    SIP_Host &get_maddr() { return _maddr; }
 
     void set_lr(bool lr) { _lr = lr; }
     bool is_lr() { return _lr; }
@@ -107,7 +107,7 @@ private:
     std::string _user_param;
     std::string _method;
     unsigned short _ttl;
-    std::string _maddr;
+    SIP_Host _maddr;
     bool _lr;
     std::list<std::string> _parameters;
     std::list<std::string> _headers;

@@ -169,7 +169,7 @@ bool SIP_Transaction::match_transaction_request(SIP_Message *msg)
 
     SIP_Method_Type saved_request_method = _saved_request->get_message_type();
     std::string saved_request_via_branch = saved_request_via->get_branch();
-    std::string saved_request_via_host = saved_request_via->get_host();
+    std::string saved_request_via_host = saved_request_via->get_host().get_address();
     unsigned short saved_request_via_port = saved_request_via->get_port();
 
     if ((saved_request_method == SIP_METHOD_INVALID) || (saved_request_via_branch.empty()) || (saved_request_via_host.empty()))
@@ -194,7 +194,7 @@ bool SIP_Transaction::match_transaction_request(SIP_Message *msg)
 
     SIP_Method_Type request_method = request->get_message_type();
     std::string request_via_branch = request_via->get_branch();
-    std::string request_via_host = request_via->get_host();
+    std::string request_via_host = request_via->get_host().get_address();
     unsigned short request_via_port = request_via->get_port();
 
     if ((request_method == SIP_METHOD_INVALID) || (request_via_host.empty()))

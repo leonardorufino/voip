@@ -20,6 +20,8 @@ bool SIP_Host::decode(std::string &sip_msg)
     std::string result;
 
     String_Functions::trim(sip_msg);
+    if (sip_msg.empty())
+        return false;
 
     if ((sip_msg.size() > 2) && (sip_msg.front() == '[') && (sip_msg.back() == ']'))
         _address = sip_msg.substr(1, sip_msg.size() - 2);
@@ -90,7 +92,8 @@ bool SIP_URI::decode(std::string &sip_msg)
         if (host.empty())
             return false;
 
-        _host.decode(host);
+        if (!_host.decode(host))
+            return false;
 
         String_Functions::trim(user_host);
         _port = String_Functions::str_to_us(user_host);
@@ -102,7 +105,9 @@ bool SIP_URI::decode(std::string &sip_msg)
         if (user_host.empty())
             return false;
 
-        _host.decode(user_host);
+        if (!_host.decode(user_host))
+            return false;
+
         _port = INVALID_PORT;
     }
 
@@ -146,9 +151,12 @@ bool SIP_URI::decode(std::string &sip_msg)
 
         }else if (String_Functions::start_with(param, "maddr="))
         {
-            _maddr = param.substr(6);
-            String_Functions::trim(_maddr);
-            if (_maddr.empty())
+            std::string maddr = param.substr(6);
+            String_Functions::trim(maddr);
+            if (maddr.empty())
+                return false;
+
+            if (!_maddr.decode(maddr))
                 return false;
 
         }else if (param == "lr")
@@ -218,10 +226,11 @@ bool SIP_URI::encode(std::string &sip_msg)
         sip_msg += std::to_string(_ttl);
     }
 
-    if (!_maddr.empty())
+    if (!_maddr.get_address().empty())
     {
         sip_msg += ";maddr=";
-        sip_msg += _maddr;
+        if (!_maddr.encode(sip_msg))
+            return false;
     }
 
     if (_lr)

@@ -1738,8 +1738,8 @@ public:
     SIP_Transport_Type get_transport();
     std::string get_transport_str() { return _transport; }
 
-    void set_host(std::string host) { _host = host; }
-    std::string get_host() { return _host; }
+    void set_host(const SIP_Host &host) { _host = host; }
+    SIP_Host &get_host() { return _host; }
 
     void set_port(unsigned short port) { _port = port; }
     unsigned short get_port() { return _port; }
@@ -1754,8 +1754,8 @@ public:
     void set_ttl(unsigned short ttl) { _ttl = ttl; }
     unsigned short get_ttl() { return _ttl; }
 
-    void set_maddr(std::string maddr) { _maddr = maddr; }
-    std::string get_maddr() { return _maddr; }
+    void set_maddr(const SIP_Host &maddr) { _maddr = maddr; }
+    SIP_Host &get_maddr() { return _maddr; }
 
     void set_parameters(std::list<std::string> &parameters) { _parameters = parameters; }
     std::list<std::string> &get_parameters() { return _parameters; }
@@ -1764,12 +1764,12 @@ private:
     std::string _protocol_name;
     std::string _protocol_version;
     std::string _transport;
-    std::string _host;
+    SIP_Host _host;
     unsigned short _port;
     std::string _branch;
     std::string _received;
     unsigned short _ttl;
-    std::string _maddr;
+    SIP_Host _maddr;
     std::list<std::string> _parameters;
 };
 

@@ -3191,8 +3191,10 @@ bool SIP_Header_Via::decode(std::string &sip_msg)
     if (matched)
     {
         String_Functions::trim(result);
-        _host = result;
-        if (_host.empty())
+        if (result.empty())
+            return false;
+
+        if (!_host.decode(result))
             return false;
 
         matched = String_Functions::match(sip_msg, ";", result);
@@ -3204,9 +3206,12 @@ bool SIP_Header_Via::decode(std::string &sip_msg)
     }else
     {
         matched = String_Functions::match(sip_msg, ";", result);
+
         String_Functions::trim(result);
-        _host = result;
-        if (_host.empty())
+        if (result.empty())
+            return false;
+
+        if (!_host.decode(result))
             return false;
 
         _port = INVALID_PORT;
@@ -3244,9 +3249,12 @@ bool SIP_Header_Via::decode(std::string &sip_msg)
 
         }else if (String_Functions::start_with(result, "maddr="))
         {
-            _maddr = result.substr(6);
-            String_Functions::trim(_maddr);
-            if (_maddr.empty())
+            std::string maddr = result.substr(6);
+            String_Functions::trim(maddr);
+            if (maddr.empty())
+                return false;
+
+            if (!_maddr.decode(maddr))
                 return false;
         }else
             _parameters.push_back(result);
@@ -3259,7 +3267,7 @@ bool SIP_Header_Via::decode(std::string &sip_msg)
 
 bool SIP_Header_Via::encode(std::string &sip_msg)
 {
-    if ((_protocol_name.empty()) || (_protocol_version.empty()) || (_transport.empty()) || (_host.empty()))
+    if ((_protocol_name.empty()) || (_protocol_version.empty()) || (_transport.empty()))
         return false;
 
     sip_msg += _protocol_name;
@@ -3268,7 +3276,9 @@ bool SIP_Header_Via::encode(std::string &sip_msg)
     sip_msg += "/";
     sip_msg += _transport;
     sip_msg += " ";
-    sip_msg += _host;
+
+    if (!_host.encode(sip_msg))
+        return false;
 
     if (_port != INVALID_PORT)
     {
@@ -3294,10 +3304,11 @@ bool SIP_Header_Via::encode(std::string &sip_msg)
         sip_msg += std::to_string(_ttl);
     }
 
-    if (!_maddr.empty())
+    if (!_maddr.get_address().empty())
     {
         sip_msg += ";maddr=";
-        sip_msg += _maddr;
+        if (!_maddr.encode(sip_msg))
+            return false;
     }
 
     std::list<std::string>::const_iterator it = _parameters.begin();
