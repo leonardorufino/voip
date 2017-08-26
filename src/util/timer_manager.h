@@ -47,11 +47,7 @@ public:
     void set_timer_id(timer_id_t timer_id) { _timer_id = timer_id; }
     timer_id_t get_timer_id() { return _timer_id; }
 
-    void set_callback(timer_callback *callback) { _callback = callback; }
-    timer_callback *get_callback() { return _callback; }
-
-    void set_data(void *data) { _data = data; }
-    void *get_data() { return _data; }
+    void set_callback(timer_callback *callback, void *data);
 
     bool operator==(const Timer &other);
 
@@ -62,7 +58,7 @@ public:
 private:
     timer_id_t _timer_id;
     timer_callback *_callback;
-    void *_data;
+    void *_callback_data;
 
 #ifdef WIN32
     HANDLE _timer;

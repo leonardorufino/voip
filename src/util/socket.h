@@ -148,13 +148,13 @@ protected:
     socket_t _socket;
 
     connect_callback *_connect_callback;
-    void *_connect_data;
+    void *_connect_callback_data;
 
     accept_callback *_accept_callback;
-    void *_accept_data;
+    void *_accept_callback_data;
 
     receive_callback *_receive_callback;
-    void *_receive_data;
+    void *_receive_callback_data;
 
     static Logger _logger;
 };

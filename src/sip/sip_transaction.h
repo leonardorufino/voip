@@ -81,13 +81,13 @@ protected:
     SIP_Request *_saved_request;
 
     send_message_callback *_send_message_callback;
-    void *_send_message_data;
+    void *_send_message_callback_data;
 
     receive_request_callback *_receive_request_callback;
-    void *_receive_request_data;
+    void *_receive_request_callback_data;
 
     receive_response_callback *_receive_response_callback;
-    void *_receive_response_data;
+    void *_receive_response_callback_data;
 
     unsigned long _timer_values[SIP_TIMER_COUNT];
     timer_id_t _timer_ids[SIP_TIMER_COUNT];

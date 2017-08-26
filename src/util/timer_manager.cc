@@ -20,7 +20,7 @@ Timer::Timer()
 {
     _timer_id = INVALID_TIMER_ID;
     _callback = NULL;
-    _data = NULL;
+    _callback_data = NULL;
 
 #ifdef WIN32
     _timer = NULL;
@@ -142,7 +142,7 @@ bool Timer::expired()
 #endif
 
         _logger.trace("Timer::expired -> Timer expired (timer=%d)", _timer_id);
-        return _callback(_data);
+        return _callback(_callback_data);
 
     }catch (std::exception &e)
     {
@@ -174,6 +174,14 @@ timer_id_t Timer::next_timer_id()
 
 //-------------------------------------------
 
+void Timer::set_callback(timer_callback *callback, void *data)
+{
+    _callback = callback;
+    _callback_data = data;
+}
+
+//-------------------------------------------
+
 bool Timer::operator==(const Timer &other)
 {
     return _timer_id == other._timer_id;
@@ -198,8 +206,7 @@ timer_id_t Timer_Manager::start_timer(unsigned long time, void *data, Timer::tim
 
     Timer *timer = new Timer();
     timer->set_timer_id(id);
-    timer->set_callback(callback);
-    timer->set_data(data);
+    timer->set_callback(callback, data);
 
     timer->start(time);
 

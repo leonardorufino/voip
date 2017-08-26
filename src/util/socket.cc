@@ -16,8 +16,8 @@ Logger Socket::_logger(Log_Manager::LOG_SOCKET);
 
 //-------------------------------------------
 
-Socket::Socket() : _state(STATE_IDLE), _socket(INVALID_SOCKET), _connect_callback(NULL), _connect_data(NULL),
-    _accept_callback(NULL), _accept_data(NULL), _receive_callback(NULL), _receive_data(NULL)
+Socket::Socket() : _state(STATE_IDLE), _socket(INVALID_SOCKET), _connect_callback(NULL), _connect_callback_data(NULL),
+    _accept_callback(NULL), _accept_callback_data(NULL), _receive_callback(NULL), _receive_callback_data(NULL)
 {
 #ifdef WIN32
     Startup();
@@ -37,7 +37,7 @@ Socket::~Socket()
 void Socket::set_connect_callback(connect_callback *callback, void *data)
 {
     _connect_callback = callback;
-    _connect_data = data;
+    _connect_callback_data = data;
 }
 
 //-------------------------------------------
@@ -49,7 +49,7 @@ bool Socket::call_connect_callback(bool success)
         if (_connect_callback)
         {
             _logger.trace("Calling connect callback (state=%d, socket=%d, success=%d)", _state, _socket, success);
-            return _connect_callback(_connect_data, success);
+            return _connect_callback(_connect_callback_data, success);
         }
 
         _logger.trace("Connect callback not configured (state=%d, socket=%d, success=%d)", _state, _socket, success);
@@ -71,7 +71,7 @@ bool Socket::call_connect_callback(bool success)
 void Socket::set_accept_callback(accept_callback *callback, void *data)
 {
     _accept_callback = callback;
-    _accept_data = data;
+    _accept_callback_data = data;
 }
 
 //-------------------------------------------
@@ -85,7 +85,7 @@ bool Socket::call_accept_callback(Socket_TCP_Client *accepted, std::string addre
             _logger.trace("Calling accept callback (state=%d, socket=%d, accepted=%d, address=%s, port=%d)",
                           _state, _socket, accepted->_socket, address.c_str(), port);
 
-            return _accept_callback(_accept_data, accepted, address, port);
+            return _accept_callback(_accept_callback_data, accepted, address, port);
         }
 
         _logger.trace("Accept callback not configured (state=%d, socket=%d, accepted=%d, address=%s, port=%d)",
@@ -109,7 +109,7 @@ bool Socket::call_accept_callback(Socket_TCP_Client *accepted, std::string addre
 void Socket::set_receive_callback(receive_callback *callback, void *data)
 {
     _receive_callback = callback;
-    _receive_data = data;
+    _receive_callback_data = data;
 }
 
 //-------------------------------------------
@@ -122,7 +122,7 @@ bool Socket::call_receive_callback(const char *buffer, int size, std::string add
         {
             _logger.trace("Calling receive callback (state=%d, socket=%d, address=%s, port=%d, size=%d)",
                           _state, _socket, address.c_str(), port, size);
-            return _receive_callback(_receive_data, buffer, size, address, port);
+            return _receive_callback(_receive_callback_data, buffer, size, address, port);
         }
 
         _logger.trace("Receive callback not configured (state=%d, socket=%d, address=%s, port=%d, size=%d)",

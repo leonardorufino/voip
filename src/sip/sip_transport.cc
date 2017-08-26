@@ -15,8 +15,8 @@ Logger SIP_Transport::_logger(Log_Manager::LOG_SIP_TRANSPORT);
 
 //-------------------------------------------
 
-SIP_Transport::SIP_Transport() : _port(INVALID_PORT), _socket(NULL), _connect_callback(NULL), _connect_data(NULL),
-    _accept_callback(NULL), _accept_data(NULL), _receive_callback(NULL), _receive_data(NULL)
+SIP_Transport::SIP_Transport() : _port(INVALID_PORT), _socket(NULL), _connect_callback(NULL), _connect_callback_data(NULL),
+    _accept_callback(NULL), _accept_callback_data(NULL), _receive_callback(NULL), _receive_callback_data(NULL)
 {
 }
 
@@ -61,7 +61,7 @@ bool SIP_Transport::stop()
 void SIP_Transport::set_connect_callback(connect_callback *callback, void *data)
 {
     _connect_callback = callback;
-    _connect_data = data;
+    _connect_callback_data = data;
 }
 
 //-------------------------------------------
@@ -70,7 +70,7 @@ void SIP_Transport::set_connect_callback(connect_callback *callback, void *data)
 void SIP_Transport::set_accept_callback(accept_callback *callback, void *data)
 {
     _accept_callback = callback;
-    _accept_data = data;
+    _accept_callback_data = data;
 }
 
 //-------------------------------------------
@@ -78,7 +78,7 @@ void SIP_Transport::set_accept_callback(accept_callback *callback, void *data)
 void SIP_Transport::set_receive_callback(receive_callback *callback, void *data)
 {
     _receive_callback = callback;
-    _receive_data = data;
+    _receive_callback_data = data;
 }
 
 //-------------------------------------------
@@ -218,7 +218,7 @@ bool SIP_Transport::socket_connect_callback(void *data, bool success)
         if (transport->_connect_callback)
         {
             _logger.trace("Socket connected (success=%d)", success);
-            return transport->_connect_callback(transport->_connect_data, transport, success);
+            return transport->_connect_callback(transport->_connect_callback_data, transport, success);
         }
 
         _logger.trace("Connect callback not configured (success=%d)", success);
@@ -281,7 +281,7 @@ bool SIP_Transport::socket_accept_callback(void *data, Socket_TCP_Client *accept
 
             _logger.trace("TCP transport accepted (socket=%d, address=%s, port=%d)", accepted->get_socket(), address.c_str(), port);
 
-            if (!transport->_accept_callback(transport->_accept_data, transport, accepted_transport, address, port))
+            if (!transport->_accept_callback(transport->_accept_callback_data, transport, accepted_transport, address, port))
             {
                 _logger.warning("Accept callback returned false (socket=%d, address=%s, port=%d)", accepted->get_socket(),
                                 address.c_str(), port);
@@ -330,7 +330,7 @@ bool SIP_Transport::socket_receive_callback(void *data, const char *buffer, int 
         if (transport->_receive_callback)
         {
             _logger.trace("Message received (address=%s, port=%d, size=%d):\n%s", address.c_str(), port, size, buffer);
-            return transport->_receive_callback(transport->_receive_data, transport, buffer, size, address, port);
+            return transport->_receive_callback(transport->_receive_callback_data, transport, buffer, size, address, port);
         }
 
         _logger.trace("Receive callback not configured (address=%s, port=%d, size=%d)", address.c_str(), port, size);
