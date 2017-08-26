@@ -18,19 +18,26 @@ bool SIP_Message_Test::init()
 {
     std::cout << "SIP message test initialized\n";
 
-    SIP_Request_Test request;
-    if (!request.run())
+    if (!run<SIP_Request_Test>())
         return false;
 
-    SIP_Response_Test response;
-    if (!response.run())
+    if (!run<SIP_Response_Test>())
         return false;
 
-    SIP_Response_Answer_Test response_answer;
-    if (!response_answer.run())
+    if (!run<SIP_Response_Answer_Test>())
         return false;
 
     std::cout << "SIP message test completed successfully\n";
+    return true;
+}
+
+//-------------------------------------------
+
+template<class T> bool SIP_Message_Test::run()
+{
+    T test;
+    if (!test.run())
+        return false;
     return true;
 }
 

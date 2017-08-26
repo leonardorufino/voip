@@ -48,12 +48,10 @@ bool SIP_Transport_Test::init()
     {
         std::cout << "IPv4 SIP transport test initialized\n";
 
-        SIP_Transport_UDP_Test udp_test;
-        if (!udp_test.run(family_ipv4, address_ipv4, port_ipv4))
+        if (!run<SIP_Transport_UDP_Test>(family_ipv4, address_ipv4, port_ipv4))
             return false;
 
-        SIP_Transport_TCP_Test tcp_test;
-        if (!tcp_test.run(family_ipv4, address_ipv4, port_ipv4))
+        if (!run<SIP_Transport_TCP_Test>(family_ipv4, address_ipv4, port_ipv4))
             return false;
     }else
         std::cout << "IPv4 SIP transport test disabled\n";
@@ -67,17 +65,25 @@ bool SIP_Transport_Test::init()
     {
         std::cout << "IPv6 SIP transport test initialized\n";
 
-        SIP_Transport_UDP_Test udp_test;
-        if (!udp_test.run(family_ipv6, address_ipv6, port_ipv6))
+        if (!run<SIP_Transport_UDP_Test>(family_ipv6, address_ipv6, port_ipv6))
             return false;
 
-        SIP_Transport_TCP_Test tcp_test;
-        if (!tcp_test.run(family_ipv6, address_ipv6, port_ipv6))
+        if (!run<SIP_Transport_TCP_Test>(family_ipv6, address_ipv6, port_ipv6))
             return false;
     }else
         std::cout << "IPv6 SIP transport test disabled\n";
 
     std::cout << "SIP transport test completed successfully\n";
+    return true;
+}
+
+//-------------------------------------------
+
+template<class T> bool SIP_Transport_Test::run(Socket::Address_Family family, std::string address, unsigned short port)
+{
+    T test;
+    if (!test.run(family, address, port))
+        return false;
     return true;
 }
 

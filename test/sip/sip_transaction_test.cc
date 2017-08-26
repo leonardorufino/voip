@@ -18,47 +18,47 @@ bool SIP_Transaction_Test::init()
 {
     std::cout << "SIP transaction test initialized\n";
 
-    SIP_Transaction_Client_Invite_Accepted_Test client_invite_accepted_test;
-    if (!client_invite_accepted_test.run())
+    if (!run<SIP_Transaction_Client_Invite_Accepted_Test>())
         return false;
 
-    SIP_Transaction_Client_Invite_Rejected_Test client_invite_rejected_test;
-    if (!client_invite_rejected_test.run())
+    if (!run<SIP_Transaction_Client_Invite_Rejected_Test>())
         return false;
 
-    SIP_Transaction_Client_Invite_Retransmission_Test client_invite_retransmission_test;
-    if (!client_invite_retransmission_test.run())
+    if (!run<SIP_Transaction_Client_Invite_Retransmission_Test>())
         return false;
 
-    SIP_Transaction_Client_Non_Invite_Accepted_Test client_non_invite_accepted_test;
-    if (!client_non_invite_accepted_test.run())
+    if (!run<SIP_Transaction_Client_Non_Invite_Accepted_Test>())
         return false;
 
-    SIP_Transaction_Client_Non_Invite_Retransmission_Test client_non_invite_retransmission_test;
-    if (!client_non_invite_retransmission_test.run())
+    if (!run<SIP_Transaction_Client_Non_Invite_Retransmission_Test>())
         return false;
 
-    SIP_Transaction_Server_Invite_Accepted_Test server_invite_accepted_test;
-    if (!server_invite_accepted_test.run())
+    if (!run<SIP_Transaction_Server_Invite_Accepted_Test>())
         return false;
 
-    SIP_Transaction_Server_Invite_Rejected_Test server_invite_rejected_test;
-    if (!server_invite_rejected_test.run())
+    if (!run<SIP_Transaction_Server_Invite_Rejected_Test>())
         return false;
 
-    SIP_Transaction_Server_Invite_Retransmission_Test server_invite_retransmission_test;
-    if (!server_invite_retransmission_test.run())
+    if (!run<SIP_Transaction_Server_Invite_Retransmission_Test>())
         return false;
 
-    SIP_Transaction_Server_Non_Invite_Accepted_Test server_non_invite_accepted_test;
-    if (!server_non_invite_accepted_test.run())
+    if (!run<SIP_Transaction_Server_Non_Invite_Accepted_Test>())
         return false;
 
-    SIP_Transaction_Server_Non_Invite_Retransmission_Test server_non_invite_retransmission_test;
-    if (!server_non_invite_retransmission_test.run())
+    if (!run<SIP_Transaction_Server_Non_Invite_Retransmission_Test>())
         return false;
 
     std::cout << "SIP transaction test completed successfully\n";
+    return true;
+}
+
+//-------------------------------------------
+
+template<class T> bool SIP_Transaction_Test::run()
+{
+    T test;
+    if (!test.run())
+        return false;
     return true;
 }
 

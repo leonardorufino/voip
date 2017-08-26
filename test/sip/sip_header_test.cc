@@ -17,211 +17,170 @@ bool SIP_Header_Test::init()
 {
     std::cout << "SIP header test initialized\n";
 
-    SIP_Header_Accept_Test header_accept;
-    if (!header_accept.run())
+    if (!run<SIP_Header_Accept_Test>())
         return false;
 
-    SIP_Header_Accept_Encoding_Test header_accept_encoding;
-    if (!header_accept_encoding.run())
+    if (!run<SIP_Header_Accept_Encoding_Test>())
         return false;
 
-    SIP_Header_Accept_Language_Test header_accept_language;
-    if (!header_accept_language.run())
+    if (!run<SIP_Header_Accept_Language_Test>())
         return false;
 
-    SIP_Header_Alert_Info_Test header_alert_info;
-    if (!header_alert_info.run())
+    if (!run<SIP_Header_Alert_Info_Test>())
         return false;
 
-    SIP_Header_Allow_Test header_allow;
-    if (!header_allow.run())
+    if (!run<SIP_Header_Allow_Test>())
         return false;
 
-    SIP_Header_Allow_Events_Test header_allow_events;
-    if (!header_allow_events.run())
+    if (!run<SIP_Header_Allow_Events_Test>())
         return false;
 
-    SIP_Header_Authentication_Info_Test header_authentication_info;
-    if (!header_authentication_info.run())
+    if (!run<SIP_Header_Authentication_Info_Test>())
         return false;
 
-    SIP_Header_Authorization_Test header_authorization;
-    if (!header_authorization.run())
+    if (!run<SIP_Header_Authorization_Test>())
         return false;
 
-    SIP_Header_Call_ID_Test header_call_id;
-    if (!header_call_id.run())
+    if (!run<SIP_Header_Call_ID_Test>())
         return false;
 
-    SIP_Header_Call_Info_Test header_call_info;
-    if (!header_call_info.run())
+    if (!run<SIP_Header_Call_Info_Test>())
         return false;
 
-    SIP_Header_Contact_Test header_contact;
-    if (!header_contact.run())
+    if (!run<SIP_Header_Contact_Test>())
         return false;
 
-    SIP_Header_Content_Disposition_Test header_content_disposition;
-    if (!header_content_disposition.run())
+    if (!run<SIP_Header_Content_Disposition_Test>())
         return false;
 
-    SIP_Header_Content_Encoding_Test header_content_encoding;
-    if (!header_content_encoding.run())
+    if (!run<SIP_Header_Content_Encoding_Test>())
         return false;
 
-    SIP_Header_Content_Language_Test header_content_language;
-    if (!header_content_language.run())
+    if (!run<SIP_Header_Content_Language_Test>())
         return false;
 
-    SIP_Header_Content_Length_Test header_content_length;
-    if (!header_content_length.run())
+    if (!run<SIP_Header_Content_Length_Test>())
         return false;
 
-    SIP_Header_Content_Type_Test header_content_type;
-    if (!header_content_type.run())
+    if (!run<SIP_Header_Content_Type_Test>())
         return false;
 
-    SIP_Header_CSeq_Test header_cseq;
-    if (!header_cseq.run())
+    if (!run<SIP_Header_CSeq_Test>())
         return false;
 
-    SIP_Header_Date_Test header_date;
-    if (!header_date.run())
+    if (!run<SIP_Header_Date_Test>())
         return false;
 
-    SIP_Header_Error_Info_Test header_error_info;
-    if (!header_error_info.run())
+    if (!run<SIP_Header_Error_Info_Test>())
         return false;
 
-    SIP_Header_Event_Test header_event;
-    if (!header_event.run())
+    if (!run<SIP_Header_Event_Test>())
         return false;
 
-    SIP_Header_Expires_Test header_expires;
-    if (!header_expires.run())
+    if (!run<SIP_Header_Expires_Test>())
         return false;
 
-    SIP_Header_From_Test header_from;
-    if (!header_from.run())
+    if (!run<SIP_Header_From_Test>())
         return false;
 
-    SIP_Header_In_Reply_To_Test header_in_reply_to;
-    if (!header_in_reply_to.run())
+    if (!run<SIP_Header_In_Reply_To_Test>())
         return false;
 
-    SIP_Header_Max_Forwards_Test header_max_forwards;
-    if (!header_max_forwards.run())
+    if (!run<SIP_Header_Max_Forwards_Test>())
         return false;
 
-    SIP_Header_Mime_Version_Test header_mime_version;
-    if (!header_mime_version.run())
+    if (!run<SIP_Header_Mime_Version_Test>())
         return false;
 
-    SIP_Header_Min_Expires_Test header_min_expires;
-    if (!header_min_expires.run())
+    if (!run<SIP_Header_Min_Expires_Test>())
         return false;
 
-    SIP_Header_Organization_Test header_organization;
-    if (!header_organization.run())
+    if (!run<SIP_Header_Organization_Test>())
         return false;
 
-    SIP_Header_Priority_Test header_priority;
-    if (!header_priority.run())
+    if (!run<SIP_Header_Priority_Test>())
         return false;
 
-    SIP_Header_Proxy_Authenticate_Test header_proxy_authenticate;
-    if (!header_proxy_authenticate.run())
+    if (!run<SIP_Header_Proxy_Authenticate_Test>())
         return false;
 
-    SIP_Header_Proxy_Authorization_Test header_proxy_authorization;
-    if (!header_proxy_authorization.run())
+    if (!run<SIP_Header_Proxy_Authorization_Test>())
         return false;
 
-    SIP_Header_Proxy_Require_Test header_proxy_require;
-    if (!header_proxy_require.run())
+    if (!run<SIP_Header_Proxy_Require_Test>())
         return false;
 
-    SIP_Header_RAck_Test header_rack;
-    if (!header_rack.run())
+    if (!run<SIP_Header_RAck_Test>())
         return false;
 
-    SIP_Header_Record_Route_Test header_record_route;
-    if (!header_record_route.run())
+    if (!run<SIP_Header_Record_Route_Test>())
         return false;
 
-    SIP_Header_Refer_To_Test header_refer_to;
-    if (!header_refer_to.run())
+    if (!run<SIP_Header_Refer_To_Test>())
         return false;
 
-    SIP_Header_Referred_By_Test header_referred_by;
-    if (!header_referred_by.run())
+    if (!run<SIP_Header_Referred_By_Test>())
         return false;
 
-    SIP_Header_Reply_To_Test header_reply_to;
-    if (!header_reply_to.run())
+    if (!run<SIP_Header_Reply_To_Test>())
         return false;
 
-    SIP_Header_Require_Test header_require;
-    if (!header_require.run())
+    if (!run<SIP_Header_Require_Test>())
         return false;
 
-    SIP_Header_Retry_After_Test header_retry_after;
-    if (!header_retry_after.run())
+    if (!run<SIP_Header_Retry_After_Test>())
         return false;
 
-    SIP_Header_Route_Test header_route;
-    if (!header_route.run())
+    if (!run<SIP_Header_Route_Test>())
         return false;
 
-    SIP_Header_RSeq_Test header_rseq;
-    if (!header_rseq.run())
+    if (!run<SIP_Header_RSeq_Test>())
         return false;
 
-    SIP_Header_Server_Test header_server;
-    if (!header_server.run())
+    if (!run<SIP_Header_Server_Test>())
         return false;
 
-    SIP_Header_Subject_Test header_subject;
-    if (!header_subject.run())
+    if (!run<SIP_Header_Subject_Test>())
         return false;
 
-    SIP_Header_Subscription_State_Test header_subscription_state;
-    if (!header_subscription_state.run())
+    if (!run<SIP_Header_Subscription_State_Test>())
         return false;
 
-    SIP_Header_Supported_Test header_supported;
-    if (!header_supported.run())
+    if (!run<SIP_Header_Supported_Test>())
         return false;
 
-    SIP_Header_Timestamp_Test header_timestamp;
-    if (!header_timestamp.run())
+    if (!run<SIP_Header_Timestamp_Test>())
         return false;
 
-    SIP_Header_To_Test header_to;
-    if (!header_to.run())
+    if (!run<SIP_Header_To_Test>())
         return false;
 
-    SIP_Header_Unsupported_Test header_unsupported;
-    if (!header_unsupported.run())
+    if (!run<SIP_Header_Unsupported_Test>())
         return false;
 
-    SIP_Header_User_Agent_Test header_user_agent;
-    if (!header_user_agent.run())
+    if (!run<SIP_Header_User_Agent_Test>())
         return false;
 
-    SIP_Header_Via_Test header_via;
-    if (!header_via.run())
+    if (!run<SIP_Header_Via_Test>())
         return false;
 
-    SIP_Header_Warning_Test header_warning;
-    if (!header_warning.run())
+    if (!run<SIP_Header_Warning_Test>())
         return false;
 
-    SIP_Header_WWW_Authenticate_Test header_www_authenticate;
-    if (!header_www_authenticate.run())
+    if (!run<SIP_Header_WWW_Authenticate_Test>())
         return false;
 
     std::cout << "SIP header test completed successfully\n";
+    return true;
+}
+
+//-------------------------------------------
+
+template<class T> bool SIP_Header_Test::run()
+{
+    T test;
+    if (!test.run())
+        return false;
     return true;
 }
 

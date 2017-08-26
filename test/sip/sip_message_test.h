@@ -23,6 +23,7 @@ public:
     virtual ~SIP_Message_Test() {}
 
     static bool init();
+    template<class T> static bool run();
 
 protected:
     bool run();

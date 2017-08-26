@@ -25,31 +25,35 @@ bool SIP_Call_Test::init()
 {
     std::cout << "SIP call test initialized\n";
 
-    SIP_Call_Success_Test success_test;
-    if (!success_test.run())
+    if (!run<SIP_Call_Success_Test>())
         return false;
 
-    SIP_Call_Success_No_100_Test success_no_100_test;
-    if (!success_no_100_test.run())
+    if (!run<SIP_Call_Success_No_100_Test>())
         return false;
 
-    SIP_Call_Success_No_1xx_Test success_no_1xx_test;
-    if (!success_no_1xx_test.run())
+    if (!run<SIP_Call_Success_No_1xx_Test>())
         return false;
 
-    SIP_Call_Reject_Test reject_test;
-    if (!reject_test.run())
+    if (!run<SIP_Call_Reject_Test>())
         return false;
 
-    SIP_Call_Reject_No_100_Test reject_no_100_test;
-    if (!reject_no_100_test.run())
+    if (!run<SIP_Call_Reject_No_100_Test>())
         return false;
 
-    SIP_Call_Reject_No_1xx_Test reject_no_1xx_test;
-    if (!reject_no_1xx_test.run())
+    if (!run<SIP_Call_Reject_No_1xx_Test>())
         return false;
 
     std::cout << "SIP call test completed successfully\n";
+    return true;
+}
+
+//-------------------------------------------
+
+template<class T> bool SIP_Call_Test::run()
+{
+    T test;
+    if (!test.run())
+        return false;
     return true;
 }
 

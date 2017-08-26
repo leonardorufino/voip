@@ -24,6 +24,7 @@ public:
     virtual ~SIP_Transaction_Test() {}
 
     static bool init();
+    template<class T> static bool run();
 
 protected:
     virtual bool run() = 0;

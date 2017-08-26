@@ -22,6 +22,7 @@ public:
     virtual ~SIP_Header_Test() {}
 
     static bool init();
+    template<class T> static bool run();
 
 protected:
     bool run();
