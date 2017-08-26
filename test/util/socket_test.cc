@@ -48,36 +48,28 @@ bool Socket_Test::init()
     {
         std::cout << "IPv4 socket test initialized\n";
 
-        Socket_UDP_Blocking_Test udp_blocking_test;
-        if (!udp_blocking_test.run(family_ipv4, address_ipv4, port_ipv4))
+        if (!run<Socket_UDP_Blocking_Test>(family_ipv4, address_ipv4, port_ipv4))
             return false;
 
-        Socket_UDP_Blocking_Connect_Test udp_blocking_connect_test;
-        if (!udp_blocking_connect_test.run(family_ipv4, address_ipv4, port_ipv4))
+        if (!run<Socket_UDP_Blocking_Connect_Test>(family_ipv4, address_ipv4, port_ipv4))
             return false;
 
-        Socket_UDP_Non_Blocking_Test udp_non_blocking_test;
-        if (!udp_non_blocking_test.run(family_ipv4, address_ipv4, port_ipv4))
+        if (!run<Socket_UDP_Non_Blocking_Test>(family_ipv4, address_ipv4, port_ipv4))
             return false;
 
-        Socket_UDP_Non_Blocking_Connect_Test udp_non_blocking_connect_test;
-        if (!udp_non_blocking_connect_test.run(family_ipv4, address_ipv4, port_ipv4))
+        if (!run<Socket_UDP_Non_Blocking_Connect_Test>(family_ipv4, address_ipv4, port_ipv4))
             return false;
 
-        Socket_UDP_Non_Blocking_Control_Test udp_non_blocking_control_test;
-        if (!udp_non_blocking_control_test.run(family_ipv4, address_ipv4, port_ipv4))
+        if (!run<Socket_UDP_Non_Blocking_Control_Test>(family_ipv4, address_ipv4, port_ipv4))
             return false;
 
-        Socket_TCP_Blocking_Test tcp_blocking_test;
-        if (!tcp_blocking_test.run(family_ipv4, address_ipv4, port_ipv4))
+        if (!run<Socket_TCP_Blocking_Test>(family_ipv4, address_ipv4, port_ipv4))
             return false;
 
-        Socket_TCP_Non_Blocking_Test tcp_non_blocking_test;
-        if (!tcp_non_blocking_test.run(family_ipv4, address_ipv4, port_ipv4))
+        if (!run<Socket_TCP_Non_Blocking_Test>(family_ipv4, address_ipv4, port_ipv4))
             return false;
 
-        Socket_TCP_Non_Blocking_Control_Test tcp_non_blocking_control_test;
-        if (!tcp_non_blocking_control_test.run(family_ipv4, address_ipv4, port_ipv4))
+        if (!run<Socket_TCP_Non_Blocking_Control_Test>(family_ipv4, address_ipv4, port_ipv4))
             return false;
     }else
         std::cout << "IPv4 socket test disabled\n";
@@ -91,41 +83,43 @@ bool Socket_Test::init()
     {
         std::cout << "IPv6 socket test initialized\n";
 
-        Socket_UDP_Blocking_Test udp_blocking_test;
-        if (!udp_blocking_test.run(family_ipv6, address_ipv6, port_ipv6))
+        if (!run<Socket_UDP_Blocking_Test>(family_ipv6, address_ipv6, port_ipv6))
             return false;
 
-        Socket_UDP_Blocking_Connect_Test udp_blocking_connect_test;
-        if (!udp_blocking_connect_test.run(family_ipv6, address_ipv6, port_ipv6))
+        if (!run<Socket_UDP_Blocking_Connect_Test>(family_ipv6, address_ipv6, port_ipv6))
             return false;
 
-        Socket_UDP_Non_Blocking_Test udp_non_blocking_test;
-        if (!udp_non_blocking_test.run(family_ipv6, address_ipv6, port_ipv6))
+        if (!run<Socket_UDP_Non_Blocking_Test>(family_ipv6, address_ipv6, port_ipv6))
             return false;
 
-        Socket_UDP_Non_Blocking_Connect_Test udp_non_blocking_connect_test;
-        if (!udp_non_blocking_connect_test.run(family_ipv6, address_ipv6, port_ipv6))
+        if (!run<Socket_UDP_Non_Blocking_Connect_Test>(family_ipv6, address_ipv6, port_ipv6))
             return false;
 
-        Socket_UDP_Non_Blocking_Control_Test udp_non_blocking_control_test;
-        if (!udp_non_blocking_control_test.run(family_ipv6, address_ipv6, port_ipv6))
+        if (!run<Socket_UDP_Non_Blocking_Control_Test>(family_ipv6, address_ipv6, port_ipv6))
             return false;
 
-        Socket_TCP_Blocking_Test tcp_blocking_test;
-        if (!tcp_blocking_test.run(family_ipv6, address_ipv6, port_ipv6))
+        if (!run<Socket_TCP_Blocking_Test>(family_ipv6, address_ipv6, port_ipv6))
             return false;
 
-        Socket_TCP_Non_Blocking_Test tcp_non_blocking_test;
-        if (!tcp_non_blocking_test.run(family_ipv6, address_ipv6, port_ipv6))
+        if (!run<Socket_TCP_Non_Blocking_Test>(family_ipv6, address_ipv6, port_ipv6))
             return false;
 
-        Socket_TCP_Non_Blocking_Control_Test tcp_non_blocking_control_test;
-        if (!tcp_non_blocking_control_test.run(family_ipv6, address_ipv6, port_ipv6))
+        if (!run<Socket_TCP_Non_Blocking_Control_Test>(family_ipv6, address_ipv6, port_ipv6))
             return false;
     }else
         std::cout << "IPv6 socket test disabled\n";
 
     std::cout << "Socket test completed successfully\n";
+    return true;
+}
+
+//-------------------------------------------
+
+template<class T> bool Socket_Test::run(Socket::Address_Family family, std::string address, unsigned short port)
+{
+    T test;
+    if (!test.run(family, address, port))
+        return false;
     return true;
 }
 

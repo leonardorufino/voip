@@ -18,19 +18,26 @@ bool Timer_Manager_Test::init()
 {
     std::cout << "Timer manager test initialized\n";
 
-    Timer_Manager_Stop_Test stop_test;
-    if (!stop_test.run())
+    if (!run<Timer_Manager_Stop_Test>())
         return false;
 
-    Timer_Manager_Callback_Test callback_test;
-    if (!callback_test.run())
+    if (!run<Timer_Manager_Callback_Test>())
         return false;
 
-    Timer_Manager_Multiple_Timers_Test multiple_timers_test;
-    if (!multiple_timers_test.run())
+    if (!run<Timer_Manager_Multiple_Timers_Test>())
         return false;
 
     std::cout << "Timer manager test completed successfully\n";
+    return true;
+}
+
+//-------------------------------------------
+
+template<class T> bool Timer_Manager_Test::run()
+{
+    T test;
+    if (!test.run())
+        return false;
     return true;
 }
 

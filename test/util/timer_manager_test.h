@@ -22,6 +22,7 @@ public:
     virtual ~Timer_Manager_Test() {}
 
     static bool init();
+    template<class T> static bool run();
 
 protected:
     virtual bool run() = 0;

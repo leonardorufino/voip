@@ -24,6 +24,7 @@ public:
     virtual ~Socket_Test();
 
     static bool init();
+    template<class T> static bool run(Socket::Address_Family family, std::string address, unsigned short port);
 
 protected:
     virtual bool run(Socket::Address_Family family, std::string address, unsigned short port) = 0;
