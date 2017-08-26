@@ -27,7 +27,7 @@ public:
 protected:
     bool run();
 
-    SIP_Message *copy_message(SIP_Message &message);
+    SIP_Message *copy_message(SIP_Message &message, bool response_answer);
 
 protected:
     class SIP_Message_Input_Output
@@ -35,6 +35,7 @@ protected:
     public:
         std::string _input;
         std::string _output;
+        bool _response_answer;
     };
 
     std::list<SIP_Message_Input_Output> _message_input_output;
@@ -55,6 +56,14 @@ class SIP_Response_Test : public SIP_Message_Test
 {
 public:
     SIP_Response_Test();
+};
+
+//-------------------------------------------
+
+class SIP_Response_Answer_Test : public SIP_Message_Test
+{
+public:
+    SIP_Response_Answer_Test();
 };
 
 //-------------------------------------------
