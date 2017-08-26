@@ -1395,6 +1395,15 @@ SIP_Header_From_Test::SIP_Header_From_Test()
     hdr8._decode_success = true;
     hdr8._encode_success = true;
     _header_input_output.push_back(hdr8);
+
+    SIP_Header_Input_Output hdr9;
+    hdr9._header_type    = SIP_HEADER_FROM;
+    hdr9._input          = "f: \"Test 1\" <sip:[2001:2003:2004::] ; maddr= [1111:2:3333:44:5:6666:777:8] >;tag=123abc";
+    hdr9._output         = "From: \"Test 1\" <sip:[2001:2003:2004::];maddr=[1111:2:3333:44:5:6666:777:8]>;tag=123abc\r\n";
+    hdr9._header_nb      = 1;
+    hdr9._decode_success = true;
+    hdr9._encode_success = true;
+    _header_input_output.push_back(hdr9);
 }
 
 //-------------------------------------------
@@ -1917,8 +1926,8 @@ SIP_Header_Record_Route_Test::SIP_Header_Record_Route_Test()
 
     SIP_Header_Input_Output hdr4;
     hdr4._header_type    = SIP_HEADER_RECORD_ROUTE;
-    hdr4._input          = "Record-Route: <sip:[1111:2222::3333];lr>, <sip:[9999::]:5060;lr>";
-    hdr4._output         = "Record-Route: <sip:[1111:2222::3333];lr>\r\nRecord-Route: <sip:[9999::]:5060;lr>\r\n";
+    hdr4._input          = "Record-Route: <sip:[1111:2222::3333];lr ; maddr= [fe80::1]>, <sip:[9999::]:5060;lr>";
+    hdr4._output         = "Record-Route: <sip:[1111:2222::3333];maddr=[fe80::1];lr>\r\nRecord-Route: <sip:[9999::]:5060;lr>\r\n";
     hdr4._header_nb      = 2;
     hdr4._decode_success = true;
     hdr4._encode_success = true;
@@ -2604,8 +2613,8 @@ SIP_Header_To_Test::SIP_Header_To_Test()
 
     SIP_Header_Input_Output hdr7;
     hdr7._header_type    = SIP_HEADER_TO;
-    hdr7._input          = "To: G. Marconi <sip:Marconi@[1111:2222:3333:4444:5555:6666:7777:8888]>";
-    hdr7._output         = "To: G. Marconi <sip:Marconi@[1111:2222:3333:4444:5555:6666:7777:8888]>\r\n";
+    hdr7._input          = "To: G. Marconi <sip:Marconi@[1111:2222:3333:4444:5555:6666:7777:8888];maddr=[fe80::10fe:234f]>";
+    hdr7._output         = "To: G. Marconi <sip:Marconi@[1111:2222:3333:4444:5555:6666:7777:8888];maddr=[fe80::10fe:234f]>\r\n";
     hdr7._header_nb      = 1;
     hdr7._decode_success = true;
     hdr7._encode_success = true;
@@ -2749,6 +2758,24 @@ SIP_Header_Via_Test::SIP_Header_Via_Test()
     hdr6._decode_success = true;
     hdr6._encode_success = true;
     _header_input_output.push_back(hdr6);
+
+    SIP_Header_Input_Output hdr7;
+    hdr7._header_type    = SIP_HEADER_VIA;
+    hdr7._input          = "Via: SIP / 2.0 / UDP [fe80::2345:6789]: 4002;ttl=16 ;maddr=[::1] ;branch=z9hG4bKa7c6a8dlze.1";
+    hdr7._output         = "Via: SIP/2.0/UDP [fe80::2345:6789]:4002;branch=z9hG4bKa7c6a8dlze.1;ttl=16;maddr=[::1]\r\n";
+    hdr7._header_nb      = 1;
+    hdr7._decode_success = true;
+    hdr7._encode_success = true;
+    _header_input_output.push_back(hdr7);
+
+    SIP_Header_Input_Output hdr8;
+    hdr8._header_type    = SIP_HEADER_VIA;
+    hdr8._input          = "Via: SIP/2.0/UDP [2001:1111:2222::5555] ;branch=z9hG4bKa767890fds";
+    hdr8._output         = "Via: SIP/2.0/UDP [2001:1111:2222::5555];branch=z9hG4bKa767890fds\r\n";
+    hdr8._header_nb      = 1;
+    hdr8._decode_success = true;
+    hdr8._encode_success = true;
+    _header_input_output.push_back(hdr8);
 }
 
 //-------------------------------------------
