@@ -25,7 +25,6 @@ public:
     typedef bool (send_message_callback)(void *data, SIP_Call *call, SIP_Message *msg);
     typedef bool (receive_request_callback)(void *data, SIP_Call *call, SIP_Request *request);
     typedef bool (receive_response_callback)(void *data, SIP_Call *call, SIP_Request *request, SIP_Response *response);
-    typedef SIP_Response *(create_response_callback)(void *data, SIP_Call *call, SIP_Request *request, unsigned short status_code);
 
     static const unsigned int INVALID_CALL_ID = INVALID_UNSIGNED_INT;
 
@@ -68,7 +67,6 @@ public:
     void set_send_message_callback(send_message_callback *callback, void *data);
     void set_receive_request_callback(receive_request_callback *callback, void *data);
     void set_receive_response_callback(receive_response_callback *callback, void *data);
-    void set_create_response_callback(create_response_callback *callback, void *data);
 
     SIP_Dialog *get_client_dialog(SIP_Message *msg);
     SIP_Dialog *get_server_dialog(SIP_Message *msg);
@@ -148,9 +146,6 @@ private:
 
     receive_response_callback *_receive_response_callback;
     void *_receive_response_callback_data;
-
-    create_response_callback *_create_response_callback;
-    void *_create_response_callback_data;
 
     std::list<SIP_Dialog *> _dialogs;
     std::list<SIP_Transaction *> _transactions;

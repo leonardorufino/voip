@@ -88,7 +88,6 @@ protected:
     static bool send_message_callback(void *data, SIP_Call *call, SIP_Message *msg);
     static bool receive_request_callback(void *data, SIP_Call *call, SIP_Request *request);
     static bool receive_response_callback(void *data, SIP_Call *call, SIP_Request *request, SIP_Response *response);
-    static SIP_Response *create_response_callback(void *data, SIP_Call *call, SIP_Request *request, unsigned short status_code);
 
 protected:
     SIP_Call _client_call;

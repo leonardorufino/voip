@@ -72,14 +72,6 @@ void SIP_Call::set_receive_response_callback(receive_response_callback *callback
 
 //-------------------------------------------
 
-void SIP_Call::set_create_response_callback(create_response_callback *callback, void *data)
-{
-    _create_response_callback = callback;
-    _create_response_callback_data = data;
-}
-
-//-------------------------------------------
-
 SIP_Dialog *SIP_Call::get_client_dialog(SIP_Message *msg)
 {
     SIP_Header_Call_ID *header_call_id = dynamic_cast<SIP_Header_Call_ID *>(msg->get_header(SIP_HEADER_CALL_ID));
@@ -1881,12 +1873,6 @@ bool SIP_Call::process_receive_response_closing_out(SIP_Request *request, SIP_Re
 
 bool SIP_Call::send_response(SIP_Request *request, unsigned short status_code)
 {
-    if (!_create_response_callback)
-    {
-        _logger.warning("Failed to send response: invalid callback (call_id=%d)", _call_id);
-        return false;
-    }
-
     if (!request)
     {
         _logger.warning("Failed to send response: invalid request (call_id=%d)", _call_id);
@@ -1895,22 +1881,14 @@ bool SIP_Call::send_response(SIP_Request *request, unsigned short status_code)
 
     SIP_Method_Type method = request->get_message_type();
 
-    SIP_Response *response = _create_response_callback(_create_response_callback_data, this, request, status_code);
-    if (!response)
+    SIP_Response response(status_code, *request);
+    if (!send_response(&response))
     {
-        _logger.warning("Failed to send response: invalid response (call_id=%d, method=%d, status_code=%d)", _call_id, method, status_code);
-        return false;
-    }
-
-    if (!send_response(response))
-    {
-        _logger.warning("Failed to send response: send message returned false (call_id=%d, method=%d, status_code=%d)",
+        _logger.warning("Failed to send response: send response returned false (call_id=%d, method=%d, status_code=%d)",
                         _call_id, method, status_code);
-        delete response;
         return false;
     }
 
-    delete response;
     return true;
 }
 

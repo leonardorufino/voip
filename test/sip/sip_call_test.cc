@@ -60,12 +60,10 @@ bool SIP_Call_Test::set_callbacks()
     _server_call.set_send_message_callback(send_message_callback, this);
     _server_call.set_receive_request_callback(receive_request_callback, this);
     _server_call.set_receive_response_callback(receive_response_callback, this);
-    _server_call.set_create_response_callback(create_response_callback, this);
 
     _client_call.set_send_message_callback(send_message_callback, this);
     _client_call.set_receive_request_callback(receive_request_callback, this);
     _client_call.set_receive_response_callback(receive_response_callback, this);
-    _client_call.set_create_response_callback(create_response_callback, this);
 
     return true;
 }
@@ -2430,20 +2428,6 @@ bool SIP_Call_Test::receive_response_callback(void *data, SIP_Call *call, SIP_Re
 
     test->_received_response = true;
     return true;
-}
-
-//-------------------------------------------
-
-SIP_Response *SIP_Call_Test::create_response_callback(void *data, SIP_Call *call, SIP_Request *request, unsigned short status_code)
-{
-    SIP_Call_Test *test = reinterpret_cast<SIP_Call_Test *>(data);
-    if ((!test) || (!call) || (!request))
-    {
-        std::cout << "SIP_Call_Test::create_response_callback -> Invalid parameters\n";
-        return NULL;
-    }
-
-    return NULL;
 }
 
 //-------------------------------------------
