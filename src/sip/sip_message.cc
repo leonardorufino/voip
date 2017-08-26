@@ -327,6 +327,15 @@ void SIP_Request::set_request_line(SIP_Method_Type msg_type, const SIP_Address &
 //-------------------------------------------
 //-------------------------------------------
 
+SIP_Response::SIP_Response(const SIP_Response &response) : SIP_Message(response)
+{
+    _sip_version = response._sip_version;
+    _status_code = response._status_code;
+    _reason_phrase = response._reason_phrase;
+}
+
+//-------------------------------------------
+
 SIP_Response::SIP_Response(unsigned short status_code) : _status_code(INVALID_STATUS_CODE)
 {
     unsigned short i = 0;
@@ -343,11 +352,31 @@ SIP_Response::SIP_Response(unsigned short status_code) : _status_code(INVALID_ST
 
 //-------------------------------------------
 
-SIP_Response::SIP_Response(const SIP_Response &response) : SIP_Message(response)
+SIP_Response::SIP_Response(unsigned short status_code, SIP_Request &request) : SIP_Response(status_code)
 {
-    _sip_version = response._sip_version;
-    _status_code = response._status_code;
-    _reason_phrase = response._reason_phrase;
+    SIP_Header_Call_ID *header_call_id = dynamic_cast<SIP_Header_Call_ID *>(request.get_header(SIP_HEADER_CALL_ID));
+    if (header_call_id)
+        add_header(new SIP_Header_Call_ID(*header_call_id));
+
+    SIP_Header_CSeq *header_cseq = dynamic_cast<SIP_Header_CSeq *>(request.get_header(SIP_HEADER_CSEQ));
+    if (header_cseq)
+        add_header(new SIP_Header_CSeq(*header_cseq));
+
+    SIP_Header_From *header_from = dynamic_cast<SIP_Header_From *>(request.get_header(SIP_HEADER_FROM));
+    if (header_from)
+        add_header(new SIP_Header_From(*header_from));
+
+    SIP_Header_To *header_to = dynamic_cast<SIP_Header_To *>(request.get_header(SIP_HEADER_TO));
+    if (header_to)
+        add_header(new SIP_Header_To(*header_to));
+
+    unsigned short via_size = request.get_header_size(SIP_HEADER_VIA);
+    for (unsigned short i = 0; i < via_size; i++)
+    {
+        SIP_Header_Via *header_via = dynamic_cast<SIP_Header_Via *>(request.get_header(SIP_HEADER_VIA, i));
+        if (header_via)
+            add_header(new SIP_Header_Via(*header_via));
+    }
 }
 
 //-------------------------------------------

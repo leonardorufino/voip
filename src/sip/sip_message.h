@@ -93,8 +93,9 @@ public:
 
 public:
     SIP_Response() : _status_code(INVALID_STATUS_CODE) {}
-    SIP_Response(unsigned short status_code);
     SIP_Response(const SIP_Response &response);
+    SIP_Response(unsigned short status_code);
+    SIP_Response(unsigned short status_code, SIP_Request &request);
     ~SIP_Response() {}
 
     // Virtual pure functions
