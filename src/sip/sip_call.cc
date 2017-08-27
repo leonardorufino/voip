@@ -1662,7 +1662,8 @@ bool SIP_Call::process_receive_request_active(SIP_Request *request)
     {
         dialog->set_remote_sequence(cseq_sequence);
 
-    }else if (cseq_sequence < dialog_sequence)
+    }else if (((cseq_sequence <= dialog_sequence) && (method != SIP_REQUEST_ACK) && (method != SIP_REQUEST_CANCEL)) ||
+              ((cseq_sequence < dialog_sequence) && ((method == SIP_REQUEST_ACK) || (method == SIP_REQUEST_CANCEL))))
     {
         _logger.warning("Failed to process receive request active: CSeq sequence is lower than the last one (method=%d, seq=%d, last=%d)",
                         method, cseq_sequence, dialog_sequence);
