@@ -227,6 +227,15 @@ bool SIP_Dialog::check_remote_sequence(SIP_Request *request)
 
 //-------------------------------------------
 
+void SIP_Dialog::set_remote_target(SIP_Message *message)
+{
+    SIP_Header_Contact *header_contact = dynamic_cast<SIP_Header_Contact *>(message->get_header(SIP_HEADER_CONTACT));
+    if (header_contact)
+        _remote_target = header_contact->get_address();
+}
+
+//-------------------------------------------
+
 void SIP_Dialog::add_route_back(SIP_Header_Route *route)
 {
     _routes.push_back(route);

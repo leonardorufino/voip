@@ -62,6 +62,7 @@ public:
     SIP_Address &get_remote_uri() { return _remote_uri; }
 
     void set_remote_target(const SIP_Address &target) { _remote_target = target; }
+    void set_remote_target(SIP_Message *message);
     SIP_Address &get_remote_target() { return _remote_target; }
 
     void add_route_back(SIP_Header_Route *route);
