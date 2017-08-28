@@ -660,13 +660,6 @@ bool SIP_Call::process_receive_request_idle(SIP_Request *request)
 {
     SIP_Method_Type method = request->get_message_type();
 
-    SIP_Dialog *dialog = get_server_dialog(request);
-    if (dialog)
-    {
-        _logger.warning("Failed to process receive request idle: invalid dialog (method=%d)", method);
-        return send_response(request, 481);
-    }
-
     switch (method)
     {
         case SIP_REQUEST_INVITE:
@@ -681,6 +674,7 @@ bool SIP_Call::process_receive_request_idle(SIP_Request *request)
             if (!header_to->get_tag().empty())
             {
                 _logger.warning("Failed to process receive request idle: invalid TO header tag (method=%d)", method);
+                _state = STATE_CALLING_IN;
                 return send_response(request, 481);
             }
 
