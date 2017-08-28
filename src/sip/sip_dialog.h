@@ -49,9 +49,11 @@ public:
 
     void set_local_sequence(unsigned long sequence) { _local_sequence = sequence; }
     unsigned long get_local_sequence() { return _local_sequence; }
+    unsigned long get_local_sequence(SIP_Request *request);
 
     void set_remote_sequence(unsigned long sequence) { _remote_sequence = sequence; }
     unsigned long get_remote_sequence() { return _remote_sequence; }
+    bool check_remote_sequence(SIP_Request *request);
 
     void set_local_uri(const SIP_Address &uri) { _local_uri = uri; }
     SIP_Address &get_local_uri() { return _local_uri; }
@@ -75,6 +77,8 @@ private:
     std::string _remote_tag;
     unsigned long _local_sequence;
     unsigned long _remote_sequence;
+    unsigned long _invite_local_sequence;
+    unsigned long _invite_remote_sequence;
     SIP_Address _local_uri;
     SIP_Address _remote_uri;
     SIP_Address _remote_target;

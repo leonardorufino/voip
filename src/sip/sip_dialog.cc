@@ -16,7 +16,8 @@ Logger SIP_Dialog::_logger(Log_Manager::LOG_SIP_DIALOG);
 //-------------------------------------------
 
 SIP_Dialog::SIP_Dialog() : _state(STATE_IDLE), _local_sequence(SIP_Header_CSeq::INVALID_SEQUENCE),
-    _remote_sequence(SIP_Header_CSeq::INVALID_SEQUENCE)
+    _remote_sequence(SIP_Header_CSeq::INVALID_SEQUENCE), _invite_local_sequence(SIP_Header_CSeq::INVALID_SEQUENCE),
+    _invite_remote_sequence(SIP_Header_CSeq::INVALID_SEQUENCE)
 {
 }
 
@@ -62,6 +63,12 @@ bool SIP_Dialog::set_client_dialog(SIP_Request *request, SIP_Response *response)
 
     _local_sequence = header_cseq->get_sequence();
     _remote_sequence = SIP_Header_CSeq::INVALID_SEQUENCE;
+
+    if (request->get_message_type() == SIP_REQUEST_INVITE)
+    {
+        _invite_local_sequence = header_cseq->get_sequence();
+        _invite_remote_sequence = SIP_Header_CSeq::INVALID_SEQUENCE;
+    }
 
     if ((_call_id.empty()) || (_local_uri.get_scheme_str().empty()) || (_local_tag.empty()) || (_remote_uri.get_scheme_str().empty()) ||
         (_remote_target.get_scheme_str().empty()) || (_local_sequence == SIP_Header_CSeq::INVALID_SEQUENCE))
@@ -126,6 +133,12 @@ bool SIP_Dialog::set_server_dialog(SIP_Request *request, SIP_Response *response)
     _local_sequence = SIP_Header_CSeq::INVALID_SEQUENCE;
     _remote_sequence = header_cseq->get_sequence();
 
+    if (request->get_message_type() == SIP_REQUEST_INVITE)
+    {
+        _invite_local_sequence = SIP_Header_CSeq::INVALID_SEQUENCE;
+        _invite_remote_sequence = header_cseq->get_sequence();
+    }
+
     if ((_call_id.empty()) || (_local_uri.get_scheme_str().empty()) || (_local_tag.empty()) || (_remote_uri.get_scheme_str().empty()) ||
         (_remote_target.get_scheme_str().empty()) || (_remote_sequence == SIP_Header_CSeq::INVALID_SEQUENCE))
     {
@@ -150,6 +163,65 @@ bool SIP_Dialog::set_server_dialog(SIP_Request *request, SIP_Response *response)
     }
 
     _logger.trace("Server dialog set");
+    return true;
+}
+
+//-------------------------------------------
+
+unsigned long SIP_Dialog::get_local_sequence(SIP_Request *request)
+{
+    if (_local_sequence == SIP_Header_CSeq::INVALID_SEQUENCE)
+    {
+        _local_sequence = 1;
+        return _local_sequence;
+    }else
+    {
+        SIP_Method_Type method = request->get_message_type();
+
+        if ((method != SIP_REQUEST_ACK) && (method != SIP_REQUEST_CANCEL))
+            return ++_local_sequence;
+        else
+            return _invite_local_sequence;
+    }
+}
+
+//-------------------------------------------
+
+bool SIP_Dialog::check_remote_sequence(SIP_Request *request)
+{
+    SIP_Method_Type method = request->get_message_type();
+
+    SIP_Header_CSeq *header_cseq = dynamic_cast<SIP_Header_CSeq *>(request->get_header(SIP_HEADER_CSEQ));
+    if (!header_cseq)
+    {
+        _logger.warning("Failed to check remote sequence: invalid CSeq header (method=%d)", method);
+        return false;
+    }
+
+    unsigned long cseq_sequence = header_cseq->get_sequence();
+
+    if ((_remote_sequence == SIP_Header_CSeq::INVALID_SEQUENCE) || (cseq_sequence > _remote_sequence))
+    {
+        _remote_sequence = cseq_sequence;
+
+    }else if ((method != SIP_REQUEST_ACK) && (method != SIP_REQUEST_CANCEL))
+    {
+        if (cseq_sequence <= _remote_sequence)
+        {
+            _logger.warning("Failed to check remote sequence: incorrect CSeq sequence (method=%d, seq=%d, last=%d)",
+                            method, cseq_sequence, _remote_sequence);
+            return false;
+        }
+    }else
+    {
+        if (cseq_sequence != _invite_remote_sequence)
+        {
+            _logger.warning("Failed to check remote sequence: incorrect CSeq sequence (method=%d, seq=%d, invite_cseq=%d)",
+                            method, cseq_sequence, _invite_remote_sequence);
+            return false;
+        }
+    }
+
     return true;
 }
 
