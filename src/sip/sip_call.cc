@@ -41,6 +41,8 @@ std::string SIP_Call::get_state_str()
         case STATE_ACTIVE:          return "Active";
         case STATE_CLOSING_IN:      return "Closing In";
         case STATE_CLOSING_OUT:     return "Closing Out";
+        case STATE_OPTIONS_IN:      return "Options In";
+        case STATE_OPTIONS_OUT:     return "Options Out";
         case STATE_CLOSED:          return "Closed";
         default:                    return "Invalid";
     }
@@ -581,6 +583,9 @@ bool SIP_Call::process_send_response(SIP_Request *request, SIP_Response *respons
         case STATE_CLOSING_IN:
             return process_send_response_closing_in(request, response);
 
+        case STATE_OPTIONS_IN:
+            return process_send_response_options_in(request, response);
+
         default:
             _logger.warning("Failed to process receive request: invalid state (call_id=%d, state=%d, method=%d, status_code=%d)",
                             _call_id, _state, request->get_message_type(), response->get_status_code());
@@ -621,6 +626,9 @@ bool SIP_Call::process_receive_response(SIP_Request *request, SIP_Response *resp
         case STATE_CLOSING_OUT:
             return process_receive_response_closing_out(request, response);
 
+        case STATE_OPTIONS_OUT:
+            return process_receive_response_options_out(request, response);
+
         default:
             _logger.warning("Failed to process receive request: invalid state (call_id=%d, state=%d, method=%d, status_code=%d)",
                             _call_id, _state, request->get_message_type(), response->get_status_code());
@@ -645,6 +653,11 @@ bool SIP_Call::process_send_request_idle(SIP_Request *request)
     {
         case SIP_REQUEST_INVITE:
             _state = STATE_CALLING_OUT;
+            _logger.trace("Changed state in process send request idle (state=%d, method=%d)", _state, method);
+            return true;
+
+        case SIP_REQUEST_OPTIONS:
+            _state = STATE_OPTIONS_OUT;
             _logger.trace("Changed state in process send request idle (state=%d, method=%d)", _state, method);
             return true;
 
@@ -686,6 +699,14 @@ bool SIP_Call::process_receive_request_idle(SIP_Request *request)
                 return _receive_request_callback(_receive_request_callback_data, this, request);
             return true;
         }
+
+        case SIP_REQUEST_OPTIONS:
+            _state = STATE_OPTIONS_IN;
+            _logger.trace("Changed state in process receive request idle (state=%d, method=%d)", _state, method);
+
+            if (_receive_request_callback)
+                return _receive_request_callback(_receive_request_callback_data, this, request);
+            return true;
 
         default:
             _logger.warning("Failed to process receive request idle: invalid method (method=%d)", method);
@@ -1835,6 +1856,99 @@ bool SIP_Call::process_receive_response_closing_out(SIP_Request *request, SIP_Re
 
         default:
             _logger.warning("Failed to process receive response closing out: invalid method (method=%d, status_code=%d)",
+                            method, status_code);
+            return false;
+    }
+}
+
+//-------------------------------------------
+
+bool SIP_Call::process_send_response_options_in(SIP_Request *request, SIP_Response *response)
+{
+    SIP_Method_Type method = request->get_message_type();
+    unsigned short status_code = response->get_status_code();
+
+    SIP_Dialog *dialog = get_server_dialog(response);
+    if (dialog)
+    {
+        _logger.warning("Failed to process send response options in: invalid dialog (method=%d, status_code=%d)",
+                        method, status_code);
+        return false;
+    }
+
+    switch (method)
+    {
+        case SIP_REQUEST_OPTIONS:
+            if ((status_code >= 100) && (status_code <= 199))
+            {
+                //_state = STATE_OPTIONS_IN;
+                _logger.trace("Changed state in process send response options in (state=%d, method=%d, status_code=%d)",
+                              _state, method, status_code);
+                return true;
+
+            }else if ((status_code >= 200) && (status_code <= 699))
+            {
+                _state = STATE_CLOSED;
+                _logger.trace("Changed state in process send response options in (state=%d, method=%d, status_code=%d)",
+                              _state, method, status_code);
+                return true;
+            }
+
+            _logger.warning("Failed to process send response options in: invalid status code (method=%d, status_code=%d)",
+                            method, status_code);
+            return false;
+
+        default:
+            _logger.warning("Failed to process send response options in: invalid method (method=%d, status_code=%d)",
+                            method, status_code);
+            return false;
+    }
+}
+
+//-------------------------------------------
+
+bool SIP_Call::process_receive_response_options_out(SIP_Request *request, SIP_Response *response)
+{
+    SIP_Method_Type method = request->get_message_type();
+    unsigned short status_code = response->get_status_code();
+
+    SIP_Dialog *dialog = get_client_dialog(response);
+    if (dialog)
+    {
+        _logger.warning("Failed to process receive response options out: invalid dialog (method=%d, status_code=%d)", method, status_code);
+        return false;
+    }
+
+    switch (method)
+    {
+        case SIP_REQUEST_OPTIONS:
+            if ((status_code >= 100) && (status_code <= 199))
+            {
+                //_state = STATE_OPTIONS_OUT;
+                _logger.trace("Changed state in process receive response options out (state=%d, method=%d, status_code=%d)",
+                              _state, method, status_code);
+
+                if (_receive_response_callback)
+                    return _receive_response_callback(_receive_response_callback_data, this, request, response);
+                return true;
+
+            }else if ((status_code >= 200) && (status_code <= 699))
+            {
+                _state = STATE_CLOSED;
+                _logger.trace("Changed state in process receive response options out (state=%d, method=%d, status_code=%d)",
+                              _state, method, status_code);
+
+                if (_receive_response_callback)
+                    return _receive_response_callback(_receive_response_callback_data, this, request, response);
+                return true;
+            }
+
+            _logger.warning("Failed to process receive response options out: invalid status code (method=%d, status_code=%d)",
+                            method, status_code);
+            return false;
+
+        default:
+            _logger.warning("Failed to process receive response options out: invalid method (method=%d, status_code=%d)",
                             method, status_code);
             return false;
     }

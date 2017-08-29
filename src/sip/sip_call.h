@@ -45,6 +45,8 @@ public:
         STATE_CLOSING_IN,
         STATE_CLOSING_OUT,
         STATE_CLOSED,
+        STATE_OPTIONS_IN,
+        STATE_OPTIONS_OUT,
         STATE_INVALID
     };
 
@@ -123,6 +125,9 @@ private:
 
     bool process_send_response_closing_in(SIP_Request *request, SIP_Response *response);
     bool process_receive_response_closing_out(SIP_Request *request, SIP_Response *response);
+
+    bool process_send_response_options_in(SIP_Request *request, SIP_Response *response);
+    bool process_receive_response_options_out(SIP_Request *request, SIP_Response *response);
 
     bool send_response(SIP_Request *request, unsigned short status_code);
 
