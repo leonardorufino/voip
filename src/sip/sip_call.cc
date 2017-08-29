@@ -675,7 +675,8 @@ bool SIP_Call::process_receive_request_idle(SIP_Request *request)
             {
                 _logger.warning("Failed to process receive request idle: invalid TO header tag (method=%d)", method);
                 _state = STATE_CALLING_IN;
-                return send_response(request, 481);
+                send_response(request, 481);
+                return false;
             }
 
             _state = STATE_CALLING_IN;
@@ -927,9 +928,13 @@ bool SIP_Call::process_receive_request_ringing_in(SIP_Request *request)
                 return false;
             }
 
-            SIP_Header_Contact *header_contact = dynamic_cast<SIP_Header_Contact *>(request->get_header(SIP_HEADER_CONTACT));
-            if (header_contact)
-                dialog->set_remote_target(header_contact->get_address());
+            if (!dialog->check_remote_sequence(request))
+            {
+                _logger.warning("Failed to process receive request ringing in: dialog check remote sequence failed (method=%d)", method);
+                return false;
+            }
+
+            dialog->set_remote_target(request);
 
             //_state = STATE_RINGING_IN;
             _logger.trace("Changed state in process receive request ringing in (state=%d, method=%d)", _state, method);
@@ -945,6 +950,12 @@ bool SIP_Call::process_receive_request_ringing_in(SIP_Request *request)
             if (!dialog)
             {
                 _logger.warning("Failed to process receive request ringing in: invalid dialog (method=%d)", method);
+                return false;
+            }
+
+            if (!dialog->check_remote_sequence(request))
+            {
+                _logger.warning("Failed to process receive request ringing in: dialog check remote sequence failed (method=%d)", method);
                 return false;
             }
 
@@ -1086,9 +1097,7 @@ bool SIP_Call::process_receive_response_ringing_in(SIP_Request *request, SIP_Res
                 return false;
             }
 
-            SIP_Header_Contact *header_contact = dynamic_cast<SIP_Header_Contact *>(response->get_header(SIP_HEADER_CONTACT));
-            if (header_contact)
-                dialog->set_remote_target(header_contact->get_address());
+            dialog->set_remote_target(response);
 
             //_state = STATE_RINGING_IN;
             _logger.trace("Changed state in process receive response ringing in (state=%d, method=%d, status_code=%d)",
@@ -1166,9 +1175,13 @@ bool SIP_Call::process_receive_request_ringing_out(SIP_Request *request)
                 return false;
             }
 
-            SIP_Header_Contact *header_contact = dynamic_cast<SIP_Header_Contact *>(request->get_header(SIP_HEADER_CONTACT));
-            if (header_contact)
-                dialog->set_remote_target(header_contact->get_address());
+            if (!dialog->check_remote_sequence(request))
+            {
+                _logger.warning("Failed to process receive request ringing out: dialog check remote sequence failed (method=%d)", method);
+                return false;
+            }
+
+            dialog->set_remote_target(request);
 
             //_state = STATE_RINGING_OUT;
             _logger.trace("Changed state in process receive request ringing out (state=%d, method=%d)", _state, method);
@@ -1252,11 +1265,7 @@ bool SIP_Call::process_receive_response_ringing_out(SIP_Request *request, SIP_Re
 
                         add_dialog(new_dialog);
                     }else
-                    {
-                        SIP_Header_Contact *header_contact = dynamic_cast<SIP_Header_Contact *>(response->get_header(SIP_HEADER_CONTACT));
-                        if (header_contact)
-                            dialog->set_remote_target(header_contact->get_address());
-                    }
+                        dialog->set_remote_target(response);
                 }
 
                 //_state = STATE_RINGING_OUT;
@@ -1283,11 +1292,7 @@ bool SIP_Call::process_receive_response_ringing_out(SIP_Request *request, SIP_Re
 
                     add_dialog(new_dialog);
                 }else
-                {
-                    SIP_Header_Contact *header_contact = dynamic_cast<SIP_Header_Contact *>(response->get_header(SIP_HEADER_CONTACT));
-                    if (header_contact)
-                        dialog->set_remote_target(header_contact->get_address());
-                }
+                    dialog->set_remote_target(response);
 
                 _state = STATE_WAITING_ACK_OUT;
                 _logger.trace("Changed state in process receive response ringing out (state=%d, method=%d, status_code=%d)",
@@ -1326,9 +1331,7 @@ bool SIP_Call::process_receive_response_ringing_out(SIP_Request *request, SIP_Re
                 return false;
             }
 
-            SIP_Header_Contact *header_contact = dynamic_cast<SIP_Header_Contact *>(response->get_header(SIP_HEADER_CONTACT));
-            if (header_contact)
-                dialog->set_remote_target(header_contact->get_address());
+            dialog->set_remote_target(response);
 
             //_state = STATE_RINGING_OUT;
             _logger.trace("Changed state in process receive response ringing out (state=%d, method=%d, status_code=%d)",
@@ -1530,20 +1533,9 @@ bool SIP_Call::process_receive_request_waiting_ack_in(SIP_Request *request)
         return false;
     }
 
-    SIP_Header_CSeq *header_cseq = dynamic_cast<SIP_Header_CSeq *>(request->get_header(SIP_HEADER_CSEQ));
-    if (!header_cseq)
+    if (!dialog->check_remote_sequence(request))
     {
-        _logger.warning("Failed to process receive request waiting ack in: invalid CSeq header (method=%d)", method);
-        return false;
-    }
-
-    unsigned long cseq_sequence = header_cseq->get_sequence();
-    unsigned long dialog_sequence = dialog->get_remote_sequence();
-
-    if ((dialog_sequence == SIP_Header_CSeq::INVALID_SEQUENCE) || (cseq_sequence != dialog_sequence))
-    {
-        _logger.warning("Failed to process receive request waiting ack in: incorrect CSeq sequence (method=%d, seq=%d, expected=%d)",
-                        method, cseq_sequence, dialog_sequence);
+        _logger.warning("Failed to process receive request waiting ack in: dialog check remote sequence failed (method=%d)", method);
         return false;
     }
 
@@ -1642,26 +1634,11 @@ bool SIP_Call::process_receive_request_active(SIP_Request *request)
         return false;
     }
 
-    SIP_Header_CSeq *header_cseq = dynamic_cast<SIP_Header_CSeq *>(request->get_header(SIP_HEADER_CSEQ));
-    if (!header_cseq)
+    if (!dialog->check_remote_sequence(request))
     {
-        _logger.warning("Failed to process receive request active: invalid CSeq header (method=%d)", method);
+        _logger.warning("Failed to process receive request active: dialog check remote sequence failed (method=%d)", method);
+        send_response(request, 500);
         return false;
-    }
-
-    unsigned long cseq_sequence = header_cseq->get_sequence();
-    unsigned long dialog_sequence = dialog->get_remote_sequence();
-
-    if ((dialog_sequence == SIP_Header_CSeq::INVALID_SEQUENCE) || (cseq_sequence > dialog_sequence))
-    {
-        dialog->set_remote_sequence(cseq_sequence);
-
-    }else if (((cseq_sequence <= dialog_sequence) && (method != SIP_REQUEST_ACK) && (method != SIP_REQUEST_CANCEL)) ||
-              ((cseq_sequence < dialog_sequence) && ((method == SIP_REQUEST_ACK) || (method == SIP_REQUEST_CANCEL))))
-    {
-        _logger.warning("Failed to process receive request active: CSeq sequence is lower than the last one (method=%d, seq=%d, last=%d)",
-                        method, cseq_sequence, dialog_sequence);
-        return send_response(request, 500);
     }
 
     switch (method)
