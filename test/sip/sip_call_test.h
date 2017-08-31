@@ -90,6 +90,10 @@ protected:
     bool process_info();
     bool process_info_response_200();
 
+    bool process_options();
+    bool process_options_response_100();
+    bool process_options_response_200();
+
     static bool send_message_callback(void *data, SIP_Call *call, SIP_Message *msg);
     static bool receive_request_callback(void *data, SIP_Call *call, SIP_Request *request);
     static bool receive_response_callback(void *data, SIP_Call *call, SIP_Request *request, SIP_Response *response);
