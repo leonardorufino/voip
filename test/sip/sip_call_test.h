@@ -95,6 +95,11 @@ protected:
     bool process_info();
     bool process_info_response_200();
 
+    bool process_register();
+    bool process_register_response_100();
+    bool process_register_response_401();
+    bool process_register_response_200();
+
     bool process_options();
     bool process_options_response_100();
     bool process_options_response_200();
