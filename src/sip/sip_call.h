@@ -45,6 +45,8 @@ public:
         STATE_CLOSING_IN,
         STATE_CLOSING_OUT,
         STATE_CLOSED,
+        STATE_REGISTER_IN,
+        STATE_REGISTER_OUT,
         STATE_OPTIONS_IN,
         STATE_OPTIONS_OUT,
         STATE_INVALID
@@ -125,6 +127,9 @@ private:
 
     bool process_send_response_closing_in(SIP_Request *request, SIP_Response *response);
     bool process_receive_response_closing_out(SIP_Request *request, SIP_Response *response);
+
+    bool process_send_response_register_in(SIP_Request *request, SIP_Response *response);
+    bool process_receive_response_register_out(SIP_Request *request, SIP_Response *response);
 
     bool process_send_response_options_in(SIP_Request *request, SIP_Response *response);
     bool process_receive_response_options_out(SIP_Request *request, SIP_Response *response);
