@@ -651,6 +651,109 @@ SIP_Response *SIP_Call_Test::create_info_response_200()
 
 //-------------------------------------------
 
+SIP_Request *SIP_Call_Test::create_register()
+{
+    _register_branch = "z9hG4bK" + String_Functions::random(10);
+
+    std::string str;
+    str  = "REGISTER sip:bob@192.0.2.4 SIP/2.0\r\n";
+    str += "Via: SIP/2.0/UDP pc33.atlanta.com;branch=" + _register_branch + "\r\n";
+    str += "Max-Forwards: 70\r\n";
+    str += "To: Bob <sip:bob@biloxi.com>\r\n";
+    str += "From: Alice <sip:alice@atlanta.com>;tag=1928301774\r\n";
+    str += "Expires: 3600\r\n";
+    str += "Call-ID: a84b4c76e66710@pc33.atlanta.com\r\n";
+    str += "CSeq: " + std::to_string(++_client_sequence) + " REGISTER\r\n";
+    str += "Contact: <sip:alice@pc33.atlanta.com>\r\n";
+    str += "Content-Length: 0\r\n";
+
+    SIP_Message *msg = SIP_Message::decode_msg(str);
+    SIP_Request *request = dynamic_cast<SIP_Request *>(msg);
+    if (!request)
+    {
+        std::cout << "SIP_Call_Test::create_register -> Failed to decode message\n";
+        return NULL;
+    }
+
+    return request;
+}
+
+//-------------------------------------------
+
+SIP_Response *SIP_Call_Test::create_register_response_100()
+{
+    std::string str;
+    str  = "SIP/2.0 100 Trying\r\n";
+    str += "Via: SIP/2.0/UDP pc33.atlanta.com;branch=" + _register_branch + "\r\n";
+    str += "To: Bob <sip:bob@biloxi.com>\r\n";
+    str += "From: Alice <sip:alice@atlanta.com>;tag=1928301774\r\n";
+    str += "Call-ID: a84b4c76e66710@pc33.atlanta.com\r\n";
+    str += "CSeq: " + std::to_string(_client_sequence) + " REGISTER\r\n";
+    str += "Content-Length: 0\r\n";
+
+    SIP_Message *msg = SIP_Message::decode_msg(str);
+    SIP_Response *response = dynamic_cast<SIP_Response *>(msg);
+    if (!response)
+    {
+        std::cout << "SIP_Call_Test::create_register_response_100 -> Failed to decode message\n";
+        return NULL;
+    }
+
+    return response;
+}
+
+//-------------------------------------------
+
+SIP_Response *SIP_Call_Test::create_register_response_200()
+{
+    std::string str;
+    str  = "SIP/2.0 200 OK\r\n";
+    str += "Via: SIP/2.0/UDP pc33.atlanta.com;branch=" + _register_branch + "\r\n";
+    str += "To: Bob <sip:bob@biloxi.com>;tag=a6c85cf\r\n";
+    str += "From: Alice <sip:alice@atlanta.com>;tag=1928301774\r\n";
+    str += "Expires: 3600\r\n";
+    str += "Call-ID: a84b4c76e66710@pc33.atlanta.com\r\n";
+    str += "CSeq: " + std::to_string(_client_sequence) + " REGISTER\r\n";
+    str += "Contact: <sip:alice@pc33.atlanta.com>\r\n";
+    str += "Content-Length: 0\r\n";
+
+    SIP_Message *msg = SIP_Message::decode_msg(str);
+    SIP_Response *response = dynamic_cast<SIP_Response *>(msg);
+    if (!response)
+    {
+        std::cout << "SIP_Call_Test::create_register_response_200 -> Failed to decode message\n";
+        return NULL;
+    }
+
+    return response;
+}
+
+//-------------------------------------------
+
+SIP_Response *SIP_Call_Test::create_register_response_401()
+{
+    std::string str;
+    str  = "SIP/2.0 401 Unauthorized\r\n";
+    str += "Via: SIP/2.0/UDP pc33.atlanta.com;branch=" + _register_branch + "\r\n";
+    str += "To: Bob <sip:bob@biloxi.com>\r\n";
+    str += "From: Alice <sip:alice@atlanta.com>;tag=1928301774\r\n";
+    str += "Call-ID: a84b4c76e66710@pc33.atlanta.com\r\n";
+    str += "CSeq: " + std::to_string(_client_sequence) + " REGISTER\r\n";
+    str += "Content-Length: 0\r\n";
+
+    SIP_Message *msg = SIP_Message::decode_msg(str);
+    SIP_Response *response = dynamic_cast<SIP_Response *>(msg);
+    if (!response)
+    {
+        std::cout << "SIP_Call_Test::create_register_response_401 -> Failed to decode message\n";
+        return NULL;
+    }
+
+    return response;
+}
+
+//-------------------------------------------
+
 SIP_Request *SIP_Call_Test::create_options()
 {
     _options_branch = "z9hG4bK" + String_Functions::random(10);
@@ -681,7 +784,7 @@ SIP_Request *SIP_Call_Test::create_options()
 SIP_Response *SIP_Call_Test::create_options_response_100()
 {
     std::string str;
-    str  = "SIP/2.0 100 OK\r\n";
+    str  = "SIP/2.0 100 Trying\r\n";
     str += "Via: SIP/2.0/UDP pc33.atlanta.com;branch=" + _options_branch + "\r\n";
     str += "To: Bob <sip:bob@biloxi.com>\r\n";
     str += "From: Alice <sip:alice@atlanta.com>;tag=1928301774\r\n";

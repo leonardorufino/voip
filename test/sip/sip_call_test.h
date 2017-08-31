@@ -58,6 +58,11 @@ protected:
     SIP_Request *create_info();
     SIP_Response *create_info_response_200();
 
+    SIP_Request *create_register();
+    SIP_Response *create_register_response_100();
+    SIP_Response *create_register_response_401();
+    SIP_Response *create_register_response_200();
+
     SIP_Request *create_options();
     SIP_Response *create_options_response_100();
     SIP_Response *create_options_response_200();
@@ -114,6 +119,7 @@ protected:
     std::string _update_branch;
     std::string _prack_branch;
     std::string _info_branch;
+    std::string _register_branch;
     std::string _options_branch;
 
     bool _sent_message;
