@@ -205,3 +205,15 @@ public:
 };
 
 //-------------------------------------------
+//-------------------------------------------
+
+class SIP_Call_Update_Test : public SIP_Call_Test
+{
+public:
+    SIP_Call_Update_Test() {}
+    virtual ~SIP_Call_Update_Test() {}
+
+    bool run();
+};
+
+//-------------------------------------------
