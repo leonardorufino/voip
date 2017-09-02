@@ -217,3 +217,15 @@ public:
 };
 
 //-------------------------------------------
+//-------------------------------------------
+
+class SIP_Call_Cancel_Test : public SIP_Call_Test
+{
+public:
+    SIP_Call_Cancel_Test() {}
+    virtual ~SIP_Call_Cancel_Test() {}
+
+    bool run();
+};
+
+//-------------------------------------------
