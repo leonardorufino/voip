@@ -49,6 +49,9 @@ bool SIP_Call_Test::init()
     if (!run<SIP_Call_Cancel_Test>())
         return false;
 
+    if (!run<SIP_Call_Prack_Test>())
+        return false;
+
     std::cout << "SIP call test completed successfully\n";
     return true;
 }
@@ -3396,6 +3399,53 @@ bool SIP_Call_Cancel_Test::run()
         return false;
 
     if (!process_invite_response_487())
+        return false;
+
+    return true;
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+bool SIP_Call_Prack_Test::run()
+{
+    set_callbacks();
+    set_use_prack(true);
+
+    if (!process_invite())
+        return false;
+
+    if (!process_invite_response_100())
+        return false;
+
+    if (!process_invite_response_180())
+        return false;
+
+    if (!process_prack())
+        return false;
+
+    if (!process_prack_response_200())
+        return false;
+
+    if (!process_invite_response_183())
+        return false;
+
+    if (!process_prack())
+        return false;
+
+    if (!process_prack_response_200())
+        return false;
+
+    if (!process_invite_response_200())
+        return false;
+
+    if (!process_ack())
+        return false;
+
+    if (!process_client_bye())
+        return false;
+
+    if (!process_server_bye_response_200())
         return false;
 
     return true;

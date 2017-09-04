@@ -229,3 +229,15 @@ public:
 };
 
 //-------------------------------------------
+//-------------------------------------------
+
+class SIP_Call_Prack_Test : public SIP_Call_Test
+{
+public:
+    SIP_Call_Prack_Test() {}
+    virtual ~SIP_Call_Prack_Test() {}
+
+    bool run();
+};
+
+//-------------------------------------------
