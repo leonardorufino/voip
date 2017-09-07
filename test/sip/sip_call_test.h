@@ -253,3 +253,15 @@ public:
 };
 
 //-------------------------------------------
+//-------------------------------------------
+
+class SIP_Call_Options_Test : public SIP_Call_Test
+{
+public:
+    SIP_Call_Options_Test() {}
+    virtual ~SIP_Call_Options_Test() {}
+
+    bool run();
+};
+
+//-------------------------------------------
