@@ -255,6 +255,18 @@ public:
 //-------------------------------------------
 //-------------------------------------------
 
+class SIP_Call_Register_Test : public SIP_Call_Test
+{
+public:
+    SIP_Call_Register_Test() {}
+    virtual ~SIP_Call_Register_Test() {}
+
+    bool run();
+};
+
+//-------------------------------------------
+//-------------------------------------------
+
 class SIP_Call_Options_Test : public SIP_Call_Test
 {
 public:

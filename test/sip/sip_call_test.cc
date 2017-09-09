@@ -55,6 +55,9 @@ bool SIP_Call_Test::init()
     if (!run<SIP_Call_Prack_No_100_Test>())
         return false;
 
+    if (!run<SIP_Call_Register_Test>())
+        return false;
+
     if (!run<SIP_Call_Options_Test>())
         return false;
 
@@ -3499,6 +3502,22 @@ bool SIP_Call_Prack_No_100_Test::run()
         return false;
 
     if (!process_client_bye_response_200())
+        return false;
+
+    return true;
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+bool SIP_Call_Register_Test::run()
+{
+    set_callbacks();
+
+    if (!process_register())
+        return false;
+
+    if (!process_register_response_200())
         return false;
 
     return true;
