@@ -279,6 +279,18 @@ public:
 //-------------------------------------------
 //-------------------------------------------
 
+class SIP_Call_Register_Reject_Test : public SIP_Call_Test
+{
+public:
+    SIP_Call_Register_Reject_Test() {}
+    virtual ~SIP_Call_Register_Reject_Test() {}
+
+    bool run();
+};
+
+//-------------------------------------------
+//-------------------------------------------
+
 class SIP_Call_Options_Test : public SIP_Call_Test
 {
 public:
