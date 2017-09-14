@@ -344,12 +344,12 @@ std::string SIP_Transaction_Client_Invite::get_state_str()
 {
     switch (_state)
     {
-        case sttIdle:       return "Idle";
-        case sttCalling:    return "Calling";
-        case sttProceeding: return "Proceeding";
-        case sttCompleted:  return "Completed";
-        case sttTerminated: return "Terminated";
-        default:            return "Invalid";
+        case STATE_IDLE:        return "Idle";
+        case STATE_CALLING:     return "Calling";
+        case STATE_PROCEEDING:  return "Proceeding";
+        case STATE_COMPLETED:   return "Completed";
+        case STATE_TERMINATED:  return "Terminated";
+        default:                return "Invalid";
     }
 }
 
@@ -359,8 +359,8 @@ bool SIP_Transaction_Client_Invite::send_invite(SIP_Request *msg)
 {
     switch (_state)
     {
-        case sttIdle:
-            _state = sttCalling;
+        case STATE_IDLE:
+            _state = STATE_CALLING;
             _saved_request = new SIP_Request(*msg);
 
             if (_send_message_callback)
@@ -438,8 +438,8 @@ bool SIP_Transaction_Client_Invite::receive_1xx(SIP_Response *msg)
 {
     switch (_state)
     {
-        case sttCalling:
-            _state = sttProceeding;
+        case STATE_CALLING:
+            _state = STATE_PROCEEDING;
             stop_timer(SIP_TIMER_A);
             stop_timer(SIP_TIMER_B);
 
@@ -447,8 +447,8 @@ bool SIP_Transaction_Client_Invite::receive_1xx(SIP_Response *msg)
                 return _receive_response_callback(_receive_response_callback_data, this, _saved_request, msg);
             return true;
 
-        case sttProceeding:
-            //_state = sttProceeding;
+        case STATE_PROCEEDING:
+            //_state = STATE_PROCEEDING;
             if (_receive_response_callback)
                 return _receive_response_callback(_receive_response_callback_data, this, _saved_request, msg);
             return true;
@@ -464,8 +464,8 @@ bool SIP_Transaction_Client_Invite::receive_2xx(SIP_Response *msg)
 {
     switch (_state)
     {
-        case sttCalling:
-            _state = sttTerminated;
+        case STATE_CALLING:
+            _state = STATE_TERMINATED;
             stop_timer(SIP_TIMER_A);
             stop_timer(SIP_TIMER_B);
 
@@ -473,8 +473,8 @@ bool SIP_Transaction_Client_Invite::receive_2xx(SIP_Response *msg)
                 return _receive_response_callback(_receive_response_callback_data, this, _saved_request, msg);
             return true;
 
-        case sttProceeding:
-            _state = sttTerminated;
+        case STATE_PROCEEDING:
+            _state = STATE_TERMINATED;
             if (_receive_response_callback)
                 return _receive_response_callback(_receive_response_callback_data, this, _saved_request, msg);
             return true;
@@ -490,8 +490,8 @@ bool SIP_Transaction_Client_Invite::receive_3xx_6xx(SIP_Response *msg)
 {
     switch (_state)
     {
-        case sttCalling:
-            _state = sttCompleted;
+        case STATE_CALLING:
+            _state = STATE_COMPLETED;
             send_ack(msg);
             set_timer_value(SIP_TIMER_D, SIP_TIMER_32s);
             start_timer(SIP_TIMER_D, this);
@@ -502,8 +502,8 @@ bool SIP_Transaction_Client_Invite::receive_3xx_6xx(SIP_Response *msg)
                 return _receive_response_callback(_receive_response_callback_data, this, _saved_request, msg);
             return true;
 
-        case sttProceeding:
-            _state = sttCompleted;
+        case STATE_PROCEEDING:
+            _state = STATE_COMPLETED;
             send_ack(msg);
             set_timer_value(SIP_TIMER_D, SIP_TIMER_32s);
             start_timer(SIP_TIMER_D, this);
@@ -512,8 +512,8 @@ bool SIP_Transaction_Client_Invite::receive_3xx_6xx(SIP_Response *msg)
                 return _receive_response_callback(_receive_response_callback_data, this, _saved_request, msg);
             return true;
 
-        case sttCompleted:
-            //_state = sttCompleted;
+        case STATE_COMPLETED:
+            //_state = STATE_COMPLETED;
             return send_ack(msg);
 
         default:
@@ -536,8 +536,8 @@ bool SIP_Transaction_Client_Invite::timer_A_callback(void *p)
 
     switch (transaction->_state)
     {
-        case sttCalling:
-            //transaction->_state = sttCalling;
+        case STATE_CALLING:
+            //transaction->_state = STATE_CALLING;
             transaction->set_timer_value(SIP_TIMER_A, transaction->get_timer_value(SIP_TIMER_A) * 2);
             transaction->start_timer(SIP_TIMER_A, transaction);
 
@@ -566,9 +566,9 @@ bool SIP_Transaction_Client_Invite::timer_B_callback(void *p)
 
     switch (transaction->_state)
     {
-        case sttCalling:
+        case STATE_CALLING:
         {
-            transaction->_state = sttTerminated;
+            transaction->_state = STATE_TERMINATED;
             transaction->stop_timer(SIP_TIMER_A);
 
             SIP_Response response(408);
@@ -599,8 +599,8 @@ bool SIP_Transaction_Client_Invite::timer_D_callback(void *p)
 
     switch (transaction->_state)
     {
-        case sttCompleted:
-            transaction->_state = sttTerminated;
+        case STATE_COMPLETED:
+            transaction->_state = STATE_TERMINATED;
             return true;
 
         default:
@@ -615,12 +615,12 @@ std::string SIP_Transaction_Client_Non_Invite::get_state_str()
 {
     switch (_state)
     {
-        case sttIdle:       return "Idle";
-        case sttTrying:     return "Trying";
-        case sttProceeding: return "Proceeding";
-        case sttCompleted:  return "Completed";
-        case sttTerminated: return "Terminated";
-        default:            return "Invalid";
+        case STATE_IDLE:        return "Idle";
+        case STATE_TRYING:      return "Trying";
+        case STATE_PROCEEDING:  return "Proceeding";
+        case STATE_COMPLETED:   return "Completed";
+        case STATE_TERMINATED:  return "Terminated";
+        default:                return "Invalid";
     }
 }
 
@@ -630,8 +630,8 @@ bool SIP_Transaction_Client_Non_Invite::send_request(SIP_Request *msg)
 {
     switch (_state)
     {
-        case sttIdle:
-            _state = sttTrying;
+        case STATE_IDLE:
+            _state = STATE_TRYING;
             _saved_request = new SIP_Request(*msg);
 
             if (_send_message_callback)
@@ -657,9 +657,9 @@ bool SIP_Transaction_Client_Non_Invite::receive_1xx(SIP_Response *msg)
 {
     switch (_state)
     {
-        case sttTrying:
-        case sttProceeding:
-            _state = sttProceeding;
+        case STATE_TRYING:
+        case STATE_PROCEEDING:
+            _state = STATE_PROCEEDING;
             if (_receive_response_callback)
                 return _receive_response_callback(_receive_response_callback_data, this, _saved_request, msg);
             return true;
@@ -675,9 +675,9 @@ bool SIP_Transaction_Client_Non_Invite::receive_2xx_6xx(SIP_Response *msg)
 {
     switch (_state)
     {
-        case sttTrying:
-        case sttProceeding:
-            _state = sttCompleted;
+        case STATE_TRYING:
+        case STATE_PROCEEDING:
+            _state = STATE_COMPLETED;
             set_timer_value(SIP_TIMER_K, SIP_TIMER_4);
             start_timer(SIP_TIMER_K, this);
             stop_timer(SIP_TIMER_E);
@@ -707,9 +707,9 @@ bool SIP_Transaction_Client_Non_Invite::timer_E_callback(void *p)
 
     switch (transaction->_state)
     {
-        case sttTrying:
+        case STATE_TRYING:
         {
-            //_state = sttTrying;
+            //_state = STATE_TRYING;
             unsigned long value = ((transaction->get_timer_value(SIP_TIMER_E) * 2) < SIP_TIMER_2)
                                 ? transaction->get_timer_value(SIP_TIMER_E) * 2 : SIP_TIMER_2;
             transaction->set_timer_value(SIP_TIMER_E, value);
@@ -721,8 +721,8 @@ bool SIP_Transaction_Client_Non_Invite::timer_E_callback(void *p)
             return true;
         }
 
-        case sttProceeding:
-            //_state = sttProceeding;
+        case STATE_PROCEEDING:
+            //_state = STATE_PROCEEDING;
             transaction->set_timer_value(SIP_TIMER_E, SIP_TIMER_2);
             transaction->start_timer(SIP_TIMER_E, transaction);
 
@@ -751,10 +751,10 @@ bool SIP_Transaction_Client_Non_Invite::timer_F_callback(void *p)
 
     switch (transaction->_state)
     {
-        case sttTrying:
-        case sttProceeding:
+        case STATE_TRYING:
+        case STATE_PROCEEDING:
         {
-            transaction->_state = sttTerminated;
+            transaction->_state = STATE_TERMINATED;
             transaction->stop_timer(SIP_TIMER_E);
 
             SIP_Response response(408);
@@ -785,8 +785,8 @@ bool SIP_Transaction_Client_Non_Invite::timer_K_callback(void *p)
 
     switch (transaction->_state)
     {
-        case sttCompleted:
-            transaction->_state = sttTerminated;
+        case STATE_COMPLETED:
+            transaction->_state = STATE_TERMINATED;
             return true;
 
         default:
@@ -809,12 +809,12 @@ std::string SIP_Transaction_Server_Invite::get_state_str()
 {
     switch (_state)
     {
-        case sttIdle:       return "Idle";
-        case sttProceeding: return "Proceeding";
-        case sttCompleted:  return "Completed";
-        case sttConfirmed:  return "Confirmed";
-        case sttTerminated: return "Terminated";
-        default:            return "Invalid";
+        case STATE_IDLE:        return "Idle";
+        case STATE_PROCEEDING:  return "Proceeding";
+        case STATE_COMPLETED:   return "Completed";
+        case STATE_CONFIRMED:   return "Confirmed";
+        case STATE_TERMINATED:  return "Terminated";
+        default:                return "Invalid";
     }
 }
 
@@ -824,22 +824,22 @@ bool SIP_Transaction_Server_Invite::receive_invite(SIP_Request *msg)
 {
     switch (_state)
     {
-        case sttIdle:
-            _state = sttProceeding;
+        case STATE_IDLE:
+            _state = STATE_PROCEEDING;
             _saved_request = new SIP_Request(*msg);
 
             if (_receive_request_callback)
                 return _receive_request_callback(_receive_request_callback_data, this, _saved_request);
             return true;
 
-        case sttProceeding:
-            //_state = sttProceeding;
+        case STATE_PROCEEDING:
+            //_state = STATE_PROCEEDING;
             if ((_last_response) && (_send_message_callback))
                 return _send_message_callback(_send_message_callback_data, this, _last_response);
             return true;
 
-        case sttCompleted:
-            //_state = sttCompleted;
+        case STATE_COMPLETED:
+            //_state = STATE_COMPLETED;
             if ((_last_response) && (_send_message_callback))
                 return _send_message_callback(_send_message_callback_data, this, _last_response);
             return true;
@@ -855,8 +855,8 @@ bool SIP_Transaction_Server_Invite::receive_ack(SIP_Request *msg)
 {
     switch (_state)
     {
-        case sttCompleted:
-            _state = sttConfirmed;
+        case STATE_COMPLETED:
+            _state = STATE_CONFIRMED;
             set_timer_value(SIP_TIMER_I, SIP_TIMER_4);
             start_timer(SIP_TIMER_I, this);
             stop_timer(SIP_TIMER_G);
@@ -874,8 +874,8 @@ bool SIP_Transaction_Server_Invite::send_1xx(SIP_Response *msg)
 {
     switch (_state)
     {
-        case sttProceeding:
-            //_state = sttProceeding;
+        case STATE_PROCEEDING:
+            //_state = STATE_PROCEEDING;
             if (_last_response)
                 delete _last_response;
             _last_response = new SIP_Response(*msg);
@@ -895,8 +895,8 @@ bool SIP_Transaction_Server_Invite::send_2xx(SIP_Response *msg)
 {
     switch (_state)
     {
-        case sttProceeding:
-            _state = sttTerminated;
+        case STATE_PROCEEDING:
+            _state = STATE_TERMINATED;
             if (_send_message_callback)
                 return _send_message_callback(_send_message_callback_data, this, msg);
             return true;
@@ -912,8 +912,8 @@ bool SIP_Transaction_Server_Invite::send_3xx_6xx(SIP_Response *msg)
 {
     switch (_state)
     {
-        case sttProceeding:
-            _state = sttCompleted;
+        case STATE_PROCEEDING:
+            _state = STATE_COMPLETED;
             if (_last_response)
                 delete _last_response;
             _last_response = new SIP_Response(*msg);
@@ -950,9 +950,9 @@ bool SIP_Transaction_Server_Invite::timer_G_callback(void *p)
 
     switch (transaction->_state)
     {
-        case sttCompleted:
+        case STATE_COMPLETED:
         {
-            //transaction->_state = sttCompleted;
+            //transaction->_state = STATE_COMPLETED;
             unsigned long value = ((transaction->get_timer_value(SIP_TIMER_G) * 2) < SIP_TIMER_2)
                                 ? transaction->get_timer_value(SIP_TIMER_G) * 2 : SIP_TIMER_2;
             transaction->set_timer_value(SIP_TIMER_G, value);
@@ -983,8 +983,8 @@ bool SIP_Transaction_Server_Invite::timer_H_callback(void *p)
 
     switch (transaction->_state)
     {
-        case sttCompleted:
-            transaction->_state = sttTerminated;
+        case STATE_COMPLETED:
+            transaction->_state = STATE_TERMINATED;
             transaction->stop_timer(SIP_TIMER_G);
             return true;
 
@@ -1008,8 +1008,8 @@ bool SIP_Transaction_Server_Invite::timer_I_callback(void *p)
 
     switch (transaction->_state)
     {
-        case sttConfirmed:
-            transaction->_state = sttTerminated;
+        case STATE_CONFIRMED:
+            transaction->_state = STATE_TERMINATED;
             return true;
 
         default:
@@ -1032,12 +1032,12 @@ std::string SIP_Transaction_Server_Non_Invite::get_state_str()
 {
     switch (_state)
     {
-        case sttIdle:       return "Idle";
-        case sttTrying:     return "Trying";
-        case sttProceeding: return "Proceeding";
-        case sttCompleted:  return "Completed";
-        case sttTerminated: return "Terminated";
-        default:            return "Invalid";
+        case STATE_IDLE:        return "Idle";
+        case STATE_TRYING:      return "Trying";
+        case STATE_PROCEEDING:  return "Proceeding";
+        case STATE_COMPLETED:   return "Completed";
+        case STATE_TERMINATED:  return "Terminated";
+        default:                return "Invalid";
     }
 }
 
@@ -1047,22 +1047,22 @@ bool SIP_Transaction_Server_Non_Invite::receive_request(SIP_Request *msg)
 {
     switch (_state)
     {
-        case sttIdle:
-            _state = sttTrying;
+        case STATE_IDLE:
+            _state = STATE_TRYING;
             _saved_request = new SIP_Request(*msg);
 
             if (_receive_request_callback)
                 return _receive_request_callback(_receive_request_callback_data, this, _saved_request);
             return true;
 
-        case sttProceeding:
-            //_state = sttProceeding;
+        case STATE_PROCEEDING:
+            //_state = STATE_PROCEEDING;
             if ((_last_response) && (_send_message_callback))
                 return _send_message_callback(_send_message_callback_data, this, _last_response);
             return true;
 
-        case sttCompleted:
-            //_state = sttCompleted;
+        case STATE_COMPLETED:
+            //_state = STATE_COMPLETED;
             if ((_last_response) && (_send_message_callback))
                 return _send_message_callback(_send_message_callback_data, this, _last_response);
             return true;
@@ -1078,9 +1078,9 @@ bool SIP_Transaction_Server_Non_Invite::send_1xx(SIP_Response *msg)
 {
     switch (_state)
     {
-        case sttTrying:
-        case sttProceeding:
-            _state = sttProceeding;
+        case STATE_TRYING:
+        case STATE_PROCEEDING:
+            _state = STATE_PROCEEDING;
             if (_last_response)
                 delete _last_response;
             _last_response = new SIP_Response(*msg);
@@ -1100,9 +1100,9 @@ bool SIP_Transaction_Server_Non_Invite::send_2xx_6xx(SIP_Response *msg)
 {
     switch (_state)
     {
-        case sttTrying:
-        case sttProceeding:
-            _state = sttCompleted;
+        case STATE_TRYING:
+        case STATE_PROCEEDING:
+            _state = STATE_COMPLETED;
             if (_last_response)
                 delete _last_response;
             _last_response = new SIP_Response(*msg);
@@ -1137,8 +1137,8 @@ bool SIP_Transaction_Server_Non_Invite::timer_J_callback(void *p)
 
     switch (transaction->_state)
     {
-        case sttCompleted:
-            transaction->_state = sttTerminated;
+        case STATE_COMPLETED:
+            transaction->_state = STATE_TERMINATED;
             return true;
 
         default:

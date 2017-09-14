@@ -103,15 +103,15 @@ class SIP_Transaction_Client_Invite : public SIP_Transaction
 public:
     enum State
     {
-        sttIdle,
-        sttCalling,
-        sttProceeding,
-        sttCompleted,
-        sttTerminated
+        STATE_IDLE,
+        STATE_CALLING,
+        STATE_PROCEEDING,
+        STATE_COMPLETED,
+        STATE_TERMINATED
     };
 
 public:
-    SIP_Transaction_Client_Invite() : _state(sttIdle) {}
+    SIP_Transaction_Client_Invite() : _state(STATE_IDLE) {}
     ~SIP_Transaction_Client_Invite() {}
 
     SIP_Transaction_Type get_transaction_type() { return SIP_TRANSACTION_CLIENT_INVITE; }
@@ -140,15 +140,15 @@ class SIP_Transaction_Client_Non_Invite : public SIP_Transaction
 public:
     enum State
     {
-        sttIdle,
-        sttTrying,
-        sttProceeding,
-        sttCompleted,
-        sttTerminated
+        STATE_IDLE,
+        STATE_TRYING,
+        STATE_PROCEEDING,
+        STATE_COMPLETED,
+        STATE_TERMINATED
     };
 
 public:
-    SIP_Transaction_Client_Non_Invite() : _state(sttIdle) {}
+    SIP_Transaction_Client_Non_Invite() : _state(STATE_IDLE) {}
     ~SIP_Transaction_Client_Non_Invite() {}
 
     SIP_Transaction_Type get_transaction_type() { return SIP_TRANSACTION_CLIENT_NON_INVITE; }
@@ -175,15 +175,15 @@ class SIP_Transaction_Server_Invite : public SIP_Transaction
 public:
     enum State
     {
-        sttIdle,
-        sttProceeding,
-        sttCompleted,
-        sttConfirmed,
-        sttTerminated
+        STATE_IDLE,
+        STATE_PROCEEDING,
+        STATE_COMPLETED,
+        STATE_CONFIRMED,
+        STATE_TERMINATED
     };
 
 public:
-    SIP_Transaction_Server_Invite() : _state(sttIdle), _last_response(NULL) {}
+    SIP_Transaction_Server_Invite() : _state(STATE_IDLE), _last_response(NULL) {}
     ~SIP_Transaction_Server_Invite();
 
     SIP_Transaction_Type get_transaction_type() { return SIP_TRANSACTION_SERVER_INVITE; }
@@ -213,15 +213,15 @@ class SIP_Transaction_Server_Non_Invite : public SIP_Transaction
 public:
     enum State
     {
-        sttIdle,
-        sttTrying,
-        sttProceeding,
-        sttCompleted,
-        sttTerminated
+        STATE_IDLE,
+        STATE_TRYING,
+        STATE_PROCEEDING,
+        STATE_COMPLETED,
+        STATE_TERMINATED
     };
 
 public:
-    SIP_Transaction_Server_Non_Invite() : _state(sttIdle), _last_response(NULL) {}
+    SIP_Transaction_Server_Non_Invite() : _state(STATE_IDLE), _last_response(NULL) {}
     ~SIP_Transaction_Server_Non_Invite();
 
     SIP_Transaction_Type get_transaction_type() { return SIP_TRANSACTION_SERVER_NON_INVITE; }
