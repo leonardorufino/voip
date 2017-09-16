@@ -88,6 +88,8 @@ public:
 
     bool init(std::string address, unsigned short port);
     bool connect(std::string address, unsigned short port);
+
+    bool is_connected() { return _socket->get_state() == Socket::STATE_CONNECTED; }
 };
 
 //-------------------------------------------
@@ -101,6 +103,8 @@ public:
     bool init(std::string address, unsigned short port);
     bool listen(int backlog);
     bool accept(socket_t &accept_socket, std::string &address, unsigned short &port);
+
+    bool is_listening() { return _socket->get_state() == Socket::STATE_LISTENING; }
 };
 
 //-------------------------------------------
