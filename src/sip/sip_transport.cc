@@ -253,6 +253,8 @@ bool SIP_Transport::socket_accept_callback(void *data, Socket_TCP_Client *accept
             accepted_transport->_socket = accepted;
             accepted_transport->_address = transport->_address;
             accepted_transport->_port = transport->_port;
+            accepted_transport->set_remote_address(address);
+            accepted_transport->set_remote_port(port);
 
             accepted->set_connect_callback(socket_connect_callback, accepted_transport);
             accepted->set_accept_callback(socket_accept_callback, accepted_transport);
@@ -386,6 +388,9 @@ bool SIP_Transport_TCP_Client::connect(std::string address, unsigned short port)
         _logger.warning("Failed to connect TCP client socket: invalid socket");
         return false;
     }
+
+    _remote_address = address;
+    _remote_port = port;
 
     return _socket->connect(address, port);
 }

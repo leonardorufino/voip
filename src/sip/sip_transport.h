@@ -83,13 +83,23 @@ public:
 class SIP_Transport_TCP_Client : public SIP_Transport
 {
 public:
-    SIP_Transport_TCP_Client() {}
+    SIP_Transport_TCP_Client() : _remote_port(INVALID_PORT) {}
     ~SIP_Transport_TCP_Client() {}
 
     bool init(std::string address, unsigned short port);
     bool connect(std::string address, unsigned short port);
 
+    void set_remote_address(std::string address) { _remote_address = address; }
+    std::string get_remote_address() { return _remote_address; }
+
+    void set_remote_port(unsigned short port) { _remote_port = port; }
+    unsigned short get_remote_port() { return _remote_port; }
+
     bool is_connected() { return _socket->get_state() == Socket::STATE_CONNECTED; }
+
+private:
+    std::string _remote_address;
+    unsigned short _remote_port;
 };
 
 //-------------------------------------------
