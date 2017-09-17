@@ -20,6 +20,10 @@
 class Socket_Test
 {
 public:
+    static const unsigned long MAX_WAIT_TIME = 5000;
+    static const unsigned long DELAY = 500;
+
+public:
     Socket_Test();
     virtual ~Socket_Test();
 

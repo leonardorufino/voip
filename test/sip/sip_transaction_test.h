@@ -20,6 +20,10 @@
 class SIP_Transaction_Test
 {
 public:
+    static const unsigned long MAX_WAIT_TIME = 5000;
+    static const unsigned long DELAY = 500;
+
+public:
     SIP_Transaction_Test() : _sent_message(false), _received_request(false), _received_response(false) {}
     virtual ~SIP_Transaction_Test() {}
 

@@ -506,10 +506,9 @@ bool Socket_UDP_Blocking_Test::run(Socket::Address_Family family, std::string ad
     if (!send(send_buffer, sizeof(send_buffer), address, port))
         return false;
 
-    unsigned long timeout = 5000;
     int read;
 
-    if (!select(timeout, &read, NULL, NULL))
+    if (!select(MAX_WAIT_TIME, &read, NULL, NULL))
         return false;
 
     if (read != 1)
@@ -575,10 +574,9 @@ bool Socket_UDP_Blocking_Connect_Test::run(Socket::Address_Family family, std::s
     if (!send(send_buffer, sizeof(send_buffer)))
         return false;
 
-    unsigned long timeout = 5000;
     int read;
 
-    if (!select(timeout, &read, NULL, NULL))
+    if (!select(MAX_WAIT_TIME, &read, NULL, NULL))
         return false;
 
     if (read != 1)
@@ -621,10 +619,9 @@ bool Socket_UDP_Non_Blocking_Test::run(Socket::Address_Family family, std::strin
     if (!send(send_buffer, sizeof(send_buffer), address, port))
         return false;
 
-    unsigned long timeout = 5000;
     int read;
 
-    if (!select(timeout, &read, NULL, NULL))
+    if (!select(MAX_WAIT_TIME, &read, NULL, NULL))
         return false;
 
     if (read != 1)
@@ -671,18 +668,17 @@ bool Socket_UDP_Non_Blocking_Connect_Test::run(Socket::Address_Family family, st
         return false;
 
     unsigned long start = Util_Functions::get_tick();
-    unsigned long max_wait_time = 5000;
     _connected = false;
 
     if (!connect(address, port))
         return false;
 
-    while ((Util_Functions::get_tick() - start) < max_wait_time)
+    while ((Util_Functions::get_tick() - start) < MAX_WAIT_TIME)
     {
         if (_connected)
             break;
 
-        Util_Functions::delay(500);
+        Util_Functions::delay(DELAY);
     }
 
     if (!_connected)
@@ -700,10 +696,9 @@ bool Socket_UDP_Non_Blocking_Connect_Test::run(Socket::Address_Family family, st
     if (!send(send_buffer, sizeof(send_buffer)))
         return false;
 
-    unsigned long timeout = 5000;
     int read;
 
-    if (!select(timeout, &read, NULL, NULL))
+    if (!select(MAX_WAIT_TIME, &read, NULL, NULL))
         return false;
 
     if (read != 1)
@@ -752,18 +747,17 @@ bool Socket_UDP_Non_Blocking_Control_Test::run(Socket::Address_Family family, st
     }
 
     unsigned long start = Util_Functions::get_tick();
-    unsigned long max_wait_time = 5000;
     _connected = false;
 
     if (!connect(address, port))
         return false;
 
-    while ((Util_Functions::get_tick() - start) < max_wait_time)
+    while ((Util_Functions::get_tick() - start) < MAX_WAIT_TIME)
     {
         if (_connected)
             break;
 
-        Util_Functions::delay(500);
+        Util_Functions::delay(DELAY);
     }
 
     if (!_connected)
@@ -787,12 +781,12 @@ bool Socket_UDP_Non_Blocking_Control_Test::run(Socket::Address_Family family, st
     if (!send(send_buffer, sizeof(send_buffer)))
         return false;
 
-    while ((Util_Functions::get_tick() - start) < max_wait_time)
+    while ((Util_Functions::get_tick() - start) < MAX_WAIT_TIME)
     {
         if (_received_size == MSG_SIZE)
             break;
 
-        Util_Functions::delay(500);
+        Util_Functions::delay(DELAY);
     }
 
     if (_received_size != MSG_SIZE)
@@ -869,10 +863,9 @@ bool Socket_TCP_Blocking_Test::run(Socket::Address_Family family, std::string ad
     }
 
     _current_socket = &_socket_tcp_server;
-    unsigned long timeout = 5000;
     int read;
 
-    if (!select(timeout, &read, NULL, NULL))
+    if (!select(MAX_WAIT_TIME, &read, NULL, NULL))
         return false;
 
     if (read != 1)
@@ -911,7 +904,7 @@ bool Socket_TCP_Blocking_Test::run(Socket::Address_Family family, std::string ad
         return false;
 
     _current_socket = _accepted_socket;
-    if (!select(timeout, &read, NULL, NULL))
+    if (!select(MAX_WAIT_TIME, &read, NULL, NULL))
         return false;
 
     if (read != 1)
@@ -970,10 +963,9 @@ bool Socket_TCP_Non_Blocking_Test::run(Socket::Address_Family family, std::strin
     if (!connect(address, port))
         return false;
 
-    unsigned long timeout = 5000;
     int write;
 
-    if (!select(timeout, NULL, &write, NULL))
+    if (!select(MAX_WAIT_TIME, NULL, &write, NULL))
         return false;
 
     if (write != 1)
@@ -985,7 +977,7 @@ bool Socket_TCP_Non_Blocking_Test::run(Socket::Address_Family family, std::strin
     _current_socket = &_socket_tcp_server;
     int read;
 
-    if (!select(timeout, &read, NULL, NULL))
+    if (!select(MAX_WAIT_TIME, &read, NULL, NULL))
         return false;
 
     if (read != 1)
@@ -1024,7 +1016,7 @@ bool Socket_TCP_Non_Blocking_Test::run(Socket::Address_Family family, std::strin
         return false;
 
     _current_socket = _accepted_socket;
-    if (!select(timeout, &read, NULL, NULL))
+    if (!select(MAX_WAIT_TIME, &read, NULL, NULL))
         return false;
 
     if (read != 1)
@@ -1096,7 +1088,6 @@ bool Socket_TCP_Non_Blocking_Control_Test::run(Socket::Address_Family family, st
         return false;
 
     unsigned long start = Util_Functions::get_tick();
-    unsigned long max_wait_time = 5000;
     _current_socket = &_socket_tcp_client;
     _connected = false;
     _accepted_socket = NULL;
@@ -1106,12 +1097,12 @@ bool Socket_TCP_Non_Blocking_Control_Test::run(Socket::Address_Family family, st
     if (!connect(address, port))
         return false;
 
-    while ((Util_Functions::get_tick() - start) < max_wait_time)
+    while ((Util_Functions::get_tick() - start) < MAX_WAIT_TIME)
     {
         if (_connected)
             break;
 
-        Util_Functions::delay(500);
+        Util_Functions::delay(DELAY);
     }
 
     if (!_connected)
@@ -1121,14 +1112,13 @@ bool Socket_TCP_Non_Blocking_Control_Test::run(Socket::Address_Family family, st
     }
 
     start = Util_Functions::get_tick();
-    max_wait_time = 5000;
 
-    while ((Util_Functions::get_tick() - start) < max_wait_time)
+    while ((Util_Functions::get_tick() - start) < MAX_WAIT_TIME)
     {
         if (_accepted_socket)
             break;
 
-        Util_Functions::delay(500);
+        Util_Functions::delay(DELAY);
     }
 
     if (!_accepted_socket)
@@ -1186,12 +1176,12 @@ bool Socket_TCP_Non_Blocking_Control_Test::run(Socket::Address_Family family, st
     _current_socket = _accepted_socket;
     start = Util_Functions::get_tick();
 
-    while ((Util_Functions::get_tick() - start) < max_wait_time)
+    while ((Util_Functions::get_tick() - start) < MAX_WAIT_TIME)
     {
         if (_received_size == MSG_SIZE)
             break;
 
-        Util_Functions::delay(500);
+        Util_Functions::delay(DELAY);
     }
 
     if (_received_size != MSG_SIZE)

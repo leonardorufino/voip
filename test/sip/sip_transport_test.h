@@ -19,6 +19,10 @@
 class SIP_Transport_Test
 {
 public:
+    static const unsigned long MAX_WAIT_TIME = 5000;
+    static const unsigned long DELAY = 500;
+
+public:
     SIP_Transport_Test();
     virtual ~SIP_Transport_Test();
 

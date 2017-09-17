@@ -232,14 +232,13 @@ bool SIP_Transport_UDP_Test::run(Socket::Address_Family family, std::string addr
     }
 
     unsigned long start = Util_Functions::get_tick();
-    unsigned long max_wait_time = 5000;
 
-    while ((Util_Functions::get_tick() - start) < max_wait_time)
+    while ((Util_Functions::get_tick() - start) < MAX_WAIT_TIME)
     {
         if (_received_size == (int) request.size())
             break;
 
-        Util_Functions::delay(500);
+        Util_Functions::delay(DELAY);
     }
 
     if (_received_size != (int) request.size())
@@ -317,7 +316,6 @@ bool SIP_Transport_TCP_Test::run(Socket::Address_Family family, std::string addr
     }
 
     unsigned long start = Util_Functions::get_tick();
-    unsigned long max_wait_time = 5000;
     _connected = false;
     _accepted_transport = NULL;
     _accepted_address = "";
@@ -329,12 +327,12 @@ bool SIP_Transport_TCP_Test::run(Socket::Address_Family family, std::string addr
         return false;
     }
 
-    while ((Util_Functions::get_tick() - start) < max_wait_time)
+    while ((Util_Functions::get_tick() - start) < MAX_WAIT_TIME)
     {
         if (_connected)
             break;
 
-        Util_Functions::delay(500);
+        Util_Functions::delay(DELAY);
     }
 
     if (!_connected)
@@ -344,14 +342,13 @@ bool SIP_Transport_TCP_Test::run(Socket::Address_Family family, std::string addr
     }
 
     start = Util_Functions::get_tick();
-    max_wait_time = 5000;
 
-    while ((Util_Functions::get_tick() - start) < max_wait_time)
+    while ((Util_Functions::get_tick() - start) < MAX_WAIT_TIME)
     {
         if (_accepted_transport)
             break;
 
-        Util_Functions::delay(500);
+        Util_Functions::delay(DELAY);
     }
 
     if (!_accepted_transport)
@@ -386,14 +383,13 @@ bool SIP_Transport_TCP_Test::run(Socket::Address_Family family, std::string addr
     }
 
     start = Util_Functions::get_tick();
-    max_wait_time = 5000;
 
-    while ((Util_Functions::get_tick() - start) < max_wait_time)
+    while ((Util_Functions::get_tick() - start) < MAX_WAIT_TIME)
     {
         if (_received_size == (int) request.size())
             break;
 
-        Util_Functions::delay(500);
+        Util_Functions::delay(DELAY);
     }
 
     if (_received_size != (int) request.size())
