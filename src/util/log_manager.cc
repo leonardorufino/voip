@@ -18,7 +18,7 @@ Log_Manager::Log_Manager()
 {
     _level = LOG_ERROR | LOG_WARNING | LOG_INFO;
     _source = LOG_TIMER | LOG_SOCKET | LOG_SIP_HEADER | LOG_SIP_MESSAGE | LOG_SIP_TRANSACTION | LOG_SIP_TRANSPORT |
-              LOG_SIP_DIALOG | LOG_SIP_CALL;
+              LOG_SIP_DIALOG | LOG_SIP_CALL | LOG_SIP_USER_AGENT;
     _callback = log_cout_callback;
 }
 
@@ -116,6 +116,7 @@ std::string Log_Manager::get_source(Log_Source source)
         case LOG_SIP_TRANSPORT:     return "SIP TPT";
         case LOG_SIP_DIALOG:        return "SIP DLG";
         case LOG_SIP_CALL:          return "SIP CAL";
+        case LOG_SIP_USER_AGENT:    return "SIP UA ";
         default:                    return "       ";
     }
 }
