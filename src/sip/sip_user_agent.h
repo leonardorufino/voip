@@ -20,6 +20,35 @@
 #include <list>
 #include <map>
 
+class SIP_User_Agent;
+
+class SIP_User_Agent_Client
+{
+public:
+    typedef bool (receive_response_callback)(void *data, SIP_User_Agent *user_agent, unsigned int call_id, SIP_Request *request,
+                                             SIP_Response *response);
+
+public:
+    SIP_User_Agent_Client(SIP_User_Agent *ua) : _user_agent(ua), _receive_response_callback(NULL), _receive_response_callback_data(NULL) {}
+    ~SIP_User_Agent_Client() {}
+
+    void set_receive_response_callback(receive_response_callback *callback, void *data);
+
+    SIP_Request *create_request(unsigned int call_id, SIP_Method_Type method);
+    bool send_request(unsigned int call_id, SIP_Request *request);
+
+    bool receive_response(SIP_Response *response);
+    bool receive_response(SIP_Call *call, SIP_Request *request, SIP_Response *response);
+
+private:
+    SIP_User_Agent *_user_agent;
+
+    receive_response_callback *_receive_response_callback;
+    void *_receive_response_callback_data;
+};
+
+//-------------------------------------------
+
 class SIP_User_Agent
 {
 public:

@@ -15,6 +15,259 @@ Logger SIP_User_Agent::_logger(Log_Manager::LOG_SIP_USER_AGENT);
 
 //-------------------------------------------
 
+void SIP_User_Agent_Client::set_receive_response_callback(receive_response_callback *callback, void *data)
+{
+    _receive_response_callback = callback;
+    _receive_response_callback_data = data;
+}
+
+//-------------------------------------------
+
+SIP_Request *SIP_User_Agent_Client::create_request(unsigned int call_id, SIP_Method_Type method)
+{
+    Logger &logger = SIP_User_Agent::get_logger();
+
+    if (method >= SIP_RESPONSE)
+    {
+        logger.warning("Failed to send request: invalid request (call_id=%d)", call_id);
+        return false;
+    }
+
+    SIP_Request *request = new SIP_Request(method);
+
+    SIP_Header_Via *header_via = new SIP_Header_Via();
+    header_via->set_protocol_name(SIP_Header_Via::PROTOCOL_NAME_SIP);
+    header_via->set_protocol_version(SIP_Header_Via::PROTOCOL_VERSION_2_0);
+    header_via->set_transport(SIP_TRANSPORT_UDP);
+    header_via->get_host().set_address(_user_agent->get_address());
+    header_via->set_port(_user_agent->get_port());
+    header_via->set_random_branch();
+    request->add_header(header_via);
+
+    SIP_Header_Call_ID *header_call_id = new SIP_Header_Call_ID();
+    request->add_header(header_call_id);
+
+    SIP_Header_CSeq *header_cseq = new SIP_Header_CSeq();
+    request->add_header(header_cseq);
+
+    SIP_Header_From *header_from = new SIP_Header_From();
+    request->add_header(header_from);
+
+    SIP_Header_To *header_to = new SIP_Header_To();
+    request->add_header(header_to);
+
+    SIP_Header_Max_Forwards *header_max_forwards = new SIP_Header_Max_Forwards();
+    header_max_forwards->set_max_forwards(70);
+    request->add_header(header_max_forwards);
+
+    SIP_Header_Contact *header_contact = new SIP_Header_Contact();
+    request->add_header(header_contact);
+
+    SIP_Call *call = _user_agent->get_call(call_id);
+    if (!call)
+    {
+        header_call_id->set_random_call_id(_user_agent->get_address());
+
+        header_cseq->set_sequence(1);
+        header_cseq->set_method(method);
+
+        header_from->get_address().set_scheme(SIP_Address::SCHEME_SIP);
+        header_from->get_address().get_sip_uri().get_host().set_address(_user_agent->get_address());
+        header_from->get_address().get_sip_uri().set_port(_user_agent->get_port());
+        header_from->set_random_tag();
+
+        header_contact->get_address().set_scheme(SIP_Address::SCHEME_SIP);
+        header_contact->get_address().get_sip_uri().get_host().set_address(_user_agent->get_address());
+        header_contact->get_address().get_sip_uri().set_port(_user_agent->get_port());
+    }else
+    {
+        SIP_Dialog *dialog = call->get_dialog();
+        if (!dialog)
+        {
+            logger.warning("Failed to create request: invalid dialog (call_id=%d, method=%d)", call_id, method);
+            delete request;
+            return NULL;
+        }
+
+        header_call_id->set_call_id(dialog->get_call_id());
+
+        header_cseq->set_sequence(dialog->get_local_sequence(request));
+        header_cseq->set_method(method);
+
+        header_from->set_address(dialog->get_local_uri());
+        header_from->set_tag(dialog->get_local_tag());
+
+        header_to->set_address(dialog->get_remote_uri());
+        header_to->set_tag(dialog->get_remote_tag());
+
+        header_contact->set_address(dialog->get_local_uri());
+
+        SIP_Address request_uri;
+        unsigned short route_size = dialog->get_route_size();
+        if (route_size > 0)
+        {
+            SIP_Header_Route *first_header_route = dialog->get_route(0);
+            if (!first_header_route)
+            {
+                logger.warning("Failed to create request: invalid route header from dialog (call_id=%d, method=%d)", call_id, method);
+                delete request;
+                return NULL;
+            }
+
+            if (first_header_route->get_address().get_sip_uri().is_lr())
+            {
+                request_uri = dialog->get_remote_target();
+
+                for (unsigned short i = 0; i < route_size; i++)
+                {
+                    SIP_Header_Route *header_route = dialog->get_route(i);
+                    if (header_route)
+                        request->add_header(new SIP_Header_Route(*header_route));
+                }
+            }else
+            {
+                request_uri = first_header_route->get_address();
+
+                for (unsigned short i = 1; i < route_size; i++)
+                {
+                    SIP_Header_Route *header_route = dialog->get_route(i);
+                    if (header_route)
+                        request->add_header(new SIP_Header_Route(*header_route));
+                }
+
+                SIP_Header_Route *last_header_route = new SIP_Header_Route();
+                last_header_route->set_address(dialog->get_remote_target());
+                last_header_route->get_address().get_sip_uri().set_lr(true);
+                request->add_header(last_header_route);
+            }
+        }else
+            request_uri = dialog->get_remote_target();
+
+        request->set_request_line(method, request_uri, SIP_VERSION);
+    }
+
+    return request;
+}
+
+//-------------------------------------------
+
+bool SIP_User_Agent_Client::send_request(unsigned int call_id, SIP_Request *request)
+{
+    Logger &logger = SIP_User_Agent::get_logger();
+
+    if (!request)
+    {
+        logger.warning("Failed to send request: invalid request (call_id=%d)", call_id);
+        return false;
+    }
+
+    SIP_Method_Type method = request->get_message_type();
+    bool call_created = false;
+
+    SIP_Call *call = _user_agent->get_call(call_id);
+    if (!call)
+    {
+        if ((method == SIP_REQUEST_INVITE) || (method == SIP_REQUEST_MESSAGE) || (method == SIP_REQUEST_OPTIONS) ||
+            (method == SIP_REQUEST_PUBLISH) || (method == SIP_REQUEST_REGISTER) || (method == SIP_REQUEST_SUBSCRIBE))
+        {
+            SIP_Header_Call_ID *header_call_id = dynamic_cast<SIP_Header_Call_ID *>(request->get_header(SIP_HEADER_CALL_ID));
+            SIP_Header_From *header_from = dynamic_cast<SIP_Header_From *>(request->get_header(SIP_HEADER_FROM));
+            if ((!header_call_id) || (!header_from))
+            {
+                logger.warning("Failed to send request: invalid headers (call_id=%d, method=%d)", call_id, method);
+                return false;
+            }
+
+            if (call_id >= SIP_User_Agent::MAX_CALLS)
+            {
+                logger.warning("Failed to send request: invalid call-id (call_id=%d, method=%d)", call_id, method);
+                return false;
+            }
+
+            call = new SIP_Call(call_id);
+            call->set_header_call_id(header_call_id->get_call_id());
+            call->set_local_tag(header_from->get_tag());
+            _user_agent->add_call(call);
+            call_created = true;
+        }else
+        {
+            logger.warning("Failed to send request: invalid call (call_id=%d, method=%d)", call_id, method);
+            return false;
+        }
+    }
+
+    if (!call->send_request(request))
+    {
+        logger.warning("Failed to send request: process send request returned false (call_id=%d, method=%d)", call_id, method);
+        if (call_created)
+            _user_agent->remove_call(call);
+        return false;
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_User_Agent_Client::receive_response(SIP_Response *response)
+{
+    Logger &logger = SIP_User_Agent::get_logger();
+
+    unsigned short status_code = response->get_status_code();
+
+    unsigned short via_size = response->get_header_size(SIP_HEADER_VIA);
+    if (via_size != 1)
+    {
+        logger.warning("Failed to receive response: invalid Via header size (size=%d, status_code=%d)", via_size, status_code);
+        return false;
+    }
+
+    SIP_Call *call = _user_agent->get_call(response);
+    if (!call)
+    {
+        logger.warning("Failed to receive response: invalid call (status_code=%d)", status_code);
+        return false;
+    }
+
+    if (!call->receive_response(response))
+    {
+        logger.warning("Failed to receive response: process receive response returned false (status_code=%d)", status_code);
+        return false;
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_User_Agent_Client::receive_response(SIP_Call *call, SIP_Request *request, SIP_Response *response)
+{
+    Logger &logger = SIP_User_Agent::get_logger();
+
+    try
+    {
+        if (_receive_response_callback)
+        {
+            logger.trace("Calling receive response callback");
+            return _receive_response_callback(_receive_response_callback_data, _user_agent, call->get_call_id(), request, response);
+        }
+
+        logger.trace("Receive response callback not configured");
+        return false;
+    }catch (std::exception &e)
+    {
+        logger.warning("Exception when calling receive response callback (msg=%s)", e.what());
+        return false;
+    }catch (...)
+    {
+        logger.warning("Exception when calling receive response callback");
+        return false;
+    }
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
 SIP_User_Agent::SIP_User_Agent() : _user_agent_client(this), _user_agent_server(this)
 {
 }
