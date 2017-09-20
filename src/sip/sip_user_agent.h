@@ -49,6 +49,32 @@ private:
 
 //-------------------------------------------
 
+class SIP_User_Agent_Server
+{
+public:
+    typedef bool (receive_request_callback)(void *data, SIP_User_Agent *user_agent, unsigned int call_id, SIP_Request *request);
+
+public:
+    SIP_User_Agent_Server(SIP_User_Agent *ua) : _user_agent(ua), _receive_request_callback(NULL), _receive_request_callback_data(NULL) {}
+    ~SIP_User_Agent_Server() {}
+
+    void set_receive_request_callback(receive_request_callback *callback, void *data);
+
+    SIP_Response *create_response(unsigned int call_id, SIP_Request *request, unsigned short status_code);
+    bool send_response(unsigned int call_id, SIP_Response *response);
+
+    bool receive_request(SIP_Request *request);
+    bool receive_request(SIP_Call *call, SIP_Request *request);
+
+private:
+    SIP_User_Agent *_user_agent;
+
+    receive_request_callback *_receive_request_callback;
+    void *_receive_request_callback_data;
+};
+
+//-------------------------------------------
+
 class SIP_User_Agent
 {
 public:

@@ -268,6 +268,185 @@ bool SIP_User_Agent_Client::receive_response(SIP_Call *call, SIP_Request *reques
 //-------------------------------------------
 //-------------------------------------------
 
+void SIP_User_Agent_Server::set_receive_request_callback(receive_request_callback *callback, void *data)
+{
+    _receive_request_callback = callback;
+    _receive_request_callback_data = data;
+}
+
+//-------------------------------------------
+
+SIP_Response *SIP_User_Agent_Server::create_response(unsigned int call_id, SIP_Request *request, unsigned short status_code)
+{
+    Logger &logger = SIP_User_Agent::get_logger();
+
+    if ((!request) || (status_code < 100) || (status_code > 699))
+    {
+        logger.warning("Failed to create response: invalid parameters (call_id=%d, status_code=%d)", call_id, status_code);
+        return NULL;
+    }
+
+    SIP_Method_Type method = request->get_message_type();
+
+    SIP_Call *call = _user_agent->get_call(call_id);
+    if (!call)
+    {
+        logger.warning("Failed to create response: invalid call (call_id=%d, method=%d, status_code=%d)", call_id, method, status_code);
+        return NULL;
+    }
+
+    SIP_Response *response = new SIP_Response(status_code, *request);
+
+    SIP_Header_To *header_to = dynamic_cast<SIP_Header_To *>(response->get_header(SIP_HEADER_TO));
+    if (!header_to)
+    {
+        logger.warning("Failed to create response: invalid To header (call_id=%d, method=%d, status_code=%d)", call_id, method, status_code);
+        return NULL;
+    }
+
+    if (status_code != 100)
+    {
+        if (!call->get_local_tag().empty())
+            header_to->set_tag(call->get_local_tag());
+        else
+            header_to->set_random_tag();
+    }
+
+    if (((method == SIP_REQUEST_INVITE) || (method == SIP_REQUEST_SUBSCRIBE)) && (status_code > 100) && (status_code <= 299))
+    {
+        SIP_Header_Contact *header_contact = new SIP_Header_Contact();
+        response->add_header(header_contact);
+
+        header_contact->get_address().set_scheme(SIP_Address::SCHEME_SIP);
+        header_contact->get_address().get_sip_uri().get_host().set_address(_user_agent->get_address());
+        header_contact->get_address().get_sip_uri().set_port(_user_agent->get_port());
+
+        //header_contact->set_address(dialog->get_local_uri());
+    }
+
+    return response;
+}
+
+//-------------------------------------------
+
+bool SIP_User_Agent_Server::send_response(unsigned int call_id, SIP_Response *response)
+{
+    Logger &logger = SIP_User_Agent::get_logger();
+
+    if (!response)
+    {
+        logger.warning("Failed to send response: invalid response (call_id=%d)", call_id);
+        return false;
+    }
+
+    unsigned short status_code = response->get_status_code();
+
+    SIP_Call *call = _user_agent->get_call(call_id);
+    if (!call)
+    {
+        logger.warning("Failed to send response: invalid call (call_id=%d, status_code=%d)", call_id, status_code);
+        return false;
+    }
+
+    SIP_Header_To *header_to = dynamic_cast<SIP_Header_To *>(response->get_header(SIP_HEADER_TO));
+    if (!header_to)
+    {
+        logger.warning("Failed to send response: invalid To header (call_id=%d, status_code=%d)", call_id, status_code);
+        return false;
+    }
+
+    call->set_local_tag(header_to->get_tag());
+
+    if (!call->send_response(response))
+    {
+        logger.warning("Failed to send response: process send response returned false (call_id=%d, status_code=%d)", call_id, status_code);
+        return false;
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_User_Agent_Server::receive_request(SIP_Request *request)
+{
+    Logger &logger = SIP_User_Agent::get_logger();
+
+    SIP_Method_Type method = request->get_message_type();
+    bool call_created = false;
+
+    SIP_Call *call = _user_agent->get_call(request);
+    if (!call)
+    {
+        if ((method == SIP_REQUEST_INVITE) || (method == SIP_REQUEST_MESSAGE) || (method == SIP_REQUEST_OPTIONS) ||
+            (method == SIP_REQUEST_PUBLISH) || (method == SIP_REQUEST_REGISTER) || (method == SIP_REQUEST_SUBSCRIBE))
+        {
+            SIP_Header_Call_ID *header_call_id = dynamic_cast<SIP_Header_Call_ID *>(request->get_header(SIP_HEADER_CALL_ID));
+            if (!header_call_id)
+            {
+                logger.warning("Failed to receive request: invalid Call-ID header (method=%d)", method);
+                return false;
+            }
+
+            unsigned int call_id = _user_agent->get_free_call_id();
+            if (call_id == SIP_Call::INVALID_CALL_ID)
+            {
+                logger.warning("Failed to receive request: no free call-id (method=%d)", method);
+                return false;
+            }
+
+            call = new SIP_Call(call_id);
+            call->set_header_call_id(header_call_id->get_call_id());
+            _user_agent->add_call(call);
+            call_created = true;
+        }else
+        {
+            logger.warning("Failed to receive request: invalid call (method=%d)", method);
+            return false;
+        }
+    }
+
+    if (!call->receive_request(request))
+    {
+        logger.warning("Failed to receive request: process receive request returned false (method=%d)", method);
+        if (call_created)
+            _user_agent->remove_call(call);
+        return false;
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_User_Agent_Server::receive_request(SIP_Call *call, SIP_Request *request)
+{
+    Logger &logger = SIP_User_Agent::get_logger();
+
+    try
+    {
+        if (_receive_request_callback)
+        {
+            logger.trace("Calling receive request callback");
+            return _receive_request_callback(_receive_request_callback_data, _user_agent, call->get_call_id(), request);
+        }
+
+        logger.trace("Receive request callback not configured");
+        return false;
+    }catch (std::exception &e)
+    {
+        logger.warning("Exception when calling receive request callback (msg=%s)", e.what());
+        return false;
+    }catch (...)
+    {
+        logger.warning("Exception when calling receive request callback");
+        return false;
+    }
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
 SIP_User_Agent::SIP_User_Agent() : _user_agent_client(this), _user_agent_server(this)
 {
 }
