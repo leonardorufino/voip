@@ -35,6 +35,12 @@ protected:
 
     virtual bool init_user_agent(std::string address, unsigned short port);
     virtual bool close_user_agent();
+    virtual bool set_callbacks();
+    virtual void clear_callback_params();
+
+    static bool receive_request_callback(void *data, SIP_User_Agent *user_agent, unsigned int call_id, SIP_Request *request);
+    static bool receive_response_callback(void *data, SIP_User_Agent *user_agent, unsigned int call_id, SIP_Request *request,
+                                          SIP_Response *response);
 
     static bool get_network_addresses(std::list<Socket::Network_Address> &addresses);
     static bool check_network_address(Socket::Address_Family family, std::string address);

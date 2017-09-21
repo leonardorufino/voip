@@ -88,6 +88,8 @@ bool SIP_User_Agent_Test::init_user_agent(std::string address, unsigned short po
         return false;
     }
 
+    set_callbacks();
+
     if (!_user_agent.init(address, port))
     {
         std::cout << "SIP_User_Agent_Test::init_user_agent -> Failed to init user agent\n";
@@ -113,6 +115,79 @@ bool SIP_User_Agent_Test::close_user_agent()
         return false;
     }
 
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_User_Agent_Test::set_callbacks()
+{
+    _user_agent.get_user_agent_server().set_receive_request_callback(receive_request_callback, this);
+    _user_agent.get_user_agent_client().set_receive_response_callback(receive_response_callback, this);
+    return true;
+}
+
+//-------------------------------------------
+
+void SIP_User_Agent_Test::clear_callback_params()
+{
+    _call_id_callback = SIP_Call::INVALID_CALL_ID;
+
+    if (_request_callback)
+    {
+        delete _request_callback;
+        _request_callback = NULL;
+    }
+
+    if (_response_callback)
+    {
+        delete _response_callback;
+        _response_callback = NULL;
+    }
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+bool SIP_User_Agent_Test::receive_request_callback(void *data, SIP_User_Agent *user_agent, unsigned int call_id, SIP_Request *request)
+{
+    SIP_User_Agent_Test *test = reinterpret_cast<SIP_User_Agent_Test *>(data);
+    if ((!test) || (!user_agent) || (call_id == SIP_Call::INVALID_CALL_ID) || (!request))
+    {
+        std::cout << "SIP_User_Agent_Test::receive_request_callback -> Invalid parameters\n";
+        return false;
+    }
+
+    if (!test->_request_callback)
+        delete test->_request_callback;
+
+    test->_call_id_callback = call_id;
+    test->_request_callback = new SIP_Request(*request);
+    test->_received_requests.push_back(new SIP_Request(*request));
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_User_Agent_Test::receive_response_callback(void *data, SIP_User_Agent *user_agent, unsigned int call_id,
+                                                    SIP_Request *request, SIP_Response *response)
+{
+    SIP_User_Agent_Test *test = reinterpret_cast<SIP_User_Agent_Test *>(data);
+    if ((!test) || (!user_agent) || (call_id == SIP_Call::INVALID_CALL_ID) || (!request) || (!response))
+    {
+        std::cout << "SIP_User_Agent_Test::receive_response_callback -> Invalid parameters\n";
+        return false;
+    }
+
+    if (!test->_request_callback)
+        delete test->_request_callback;
+
+    if (!test->_response_callback)
+        delete test->_response_callback;
+
+    test->_call_id_callback = call_id;
+    test->_request_callback = new SIP_Request(*request);
+    test->_response_callback = new SIP_Response(*response);
     return true;
 }
 
