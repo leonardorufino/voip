@@ -57,3 +57,17 @@ protected:
     SIP_Request *_request_callback;
     SIP_Response *_response_callback;
 };
+
+//-------------------------------------------
+//-------------------------------------------
+
+class SIP_User_Agent_Call_Success_Test : public SIP_User_Agent_Test
+{
+public:
+    SIP_User_Agent_Call_Success_Test() {}
+    virtual ~SIP_User_Agent_Call_Success_Test() {}
+
+    bool run(Socket::Address_Family family, std::string address, unsigned short port, SIP_Transport_Type transport);
+};
+
+//-------------------------------------------
