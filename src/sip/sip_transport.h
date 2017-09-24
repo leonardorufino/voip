@@ -11,6 +11,7 @@
 
 #pragma once
 
+#include "sip_defs.h"
 #include "util/util_defs.h"
 #include "util/socket.h"
 #include <string>
@@ -27,7 +28,7 @@ public:
     typedef bool (receive_callback)(void *data, SIP_Transport *transport, const char *buffer, int size, std::string address, unsigned short port);
 
 public:
-    SIP_Transport();
+    SIP_Transport(SIP_Object_ID id);
     virtual ~SIP_Transport();
 
     static bool start();
@@ -40,6 +41,8 @@ public:
     virtual bool init(std::string address, unsigned short port);
     virtual bool close();
 
+    void set_id(SIP_Object_ID id) { _id = id; }
+
     std::string get_address() { return _address; }
     unsigned short get_port() { return _port; }
 
@@ -50,6 +53,8 @@ public:
     static bool socket_receive_callback(void *data, const char *buffer, int size, std::string address, unsigned short port);
 
 protected:
+    SIP_Object_ID _id;
+
     std::string _address;
     unsigned short _port;
 
@@ -72,7 +77,7 @@ protected:
 class SIP_Transport_UDP : public SIP_Transport
 {
 public:
-    SIP_Transport_UDP() {}
+    SIP_Transport_UDP(SIP_Object_ID id) : SIP_Transport(id) {}
     ~SIP_Transport_UDP() {}
 
     bool init(std::string address, unsigned short port);
@@ -83,7 +88,7 @@ public:
 class SIP_Transport_TCP_Client : public SIP_Transport
 {
 public:
-    SIP_Transport_TCP_Client() : _remote_port(INVALID_PORT) {}
+    SIP_Transport_TCP_Client(SIP_Object_ID id) : SIP_Transport(id), _remote_port(INVALID_PORT) {}
     ~SIP_Transport_TCP_Client() {}
 
     bool init(std::string address, unsigned short port);
@@ -107,7 +112,7 @@ private:
 class SIP_Transport_TCP_Server : public SIP_Transport
 {
 public:
-    SIP_Transport_TCP_Server() {}
+    SIP_Transport_TCP_Server(SIP_Object_ID id) : SIP_Transport(id) {}
     ~SIP_Transport_TCP_Server() {}
 
     bool init(std::string address, unsigned short port);
