@@ -63,15 +63,36 @@ template<class T> bool SIP_Transaction_Test::run()
 }
 
 //-------------------------------------------
+//-------------------------------------------
+
+SIP_Transaction_Test::~SIP_Transaction_Test()
+{
+    if (_transaction)
+        delete _transaction;
+}
+
+//-------------------------------------------
 
 bool SIP_Transaction_Test::set_callbacks()
 {
-    SIP_Transaction &transaction = get_transaction();
+    if (!_transaction)
+    {
+        std::cout << "SIP_Transaction_Test::set_callbacks -> Invalid transaction\n";
+        return false;
+    }
 
-    transaction.set_send_message_callback(send_message_callback, this);
-    transaction.set_receive_request_callback(receive_request_callback, this);
-    transaction.set_receive_response_callback(receive_response_callback, this);
+    _transaction->set_send_message_callback(send_message_callback, this);
+    _transaction->set_receive_request_callback(receive_request_callback, this);
+    _transaction->set_receive_response_callback(receive_response_callback, this);
     return true;
+}
+
+//-------------------------------------------
+
+unsigned int SIP_Transaction_Test::get_next_transaction_id()
+{
+    static unsigned int NEXT_TRANSACTION_ID = 0;
+    return NEXT_TRANSACTION_ID++;
 }
 
 //-------------------------------------------
@@ -348,13 +369,30 @@ bool SIP_Transaction_Test::receive_response_callback(void *data, SIP_Transaction
 //-------------------------------------------
 //-------------------------------------------
 
+SIP_Transaction_Client_Invite_Test::SIP_Transaction_Client_Invite_Test()
+{
+    SIP_Object_ID id;
+    id._transaction = get_next_transaction_id();
+
+    _transaction = new SIP_Transaction_Client_Invite(id);
+}
+
+//-------------------------------------------
+
 bool SIP_Transaction_Client_Invite_Test::send_invite()
 {
+    SIP_Transaction_Client_Invite *transaction_client_invite = dynamic_cast<SIP_Transaction_Client_Invite *>(_transaction);
+    if (!transaction_client_invite)
+    {
+        std::cout << "SIP_Transaction_Client_Invite_Test::send_invite -> Invalid transaction\n";
+        return false;
+    }
+
     SIP_Request *request = create_invite();
     if (!request)
         return false;
 
-    if (_transaction.match_transaction(request))
+    if (transaction_client_invite->match_transaction(request))
     {
         std::cout << "SIP_Transaction_Client_Invite_Test::send_invite -> Failed to match transaction\n";
         delete request;
@@ -363,7 +401,7 @@ bool SIP_Transaction_Client_Invite_Test::send_invite()
 
     _sent_message = false;
 
-    if (!_transaction.send_invite(request))
+    if (!transaction_client_invite->send_invite(request))
     {
         std::cout << "SIP_Transaction_Client_Invite_Test::send_invite -> Failed to send INVITE\n";
         delete request;
@@ -377,11 +415,11 @@ bool SIP_Transaction_Client_Invite_Test::send_invite()
         return false;
     }
 
-    if (_transaction.get_state() != SIP_Transaction_Client_Invite::STATE_CALLING)
+    if (transaction_client_invite->get_state() != SIP_Transaction_Client_Invite::STATE_CALLING)
     {
         std::cout << "SIP_Transaction_Client_Invite_Test::send_invite -> Invalid transaction state:\n";
         std::cout << std::setw(12) << "Expected: " << "Calling" << "\n";
-        std::cout << std::setw(12) << "State: " << _transaction.get_state_str().c_str() << "\n";
+        std::cout << std::setw(12) << "State: " << transaction_client_invite->get_state_str().c_str() << "\n";
         delete request;
         return false;
     }
@@ -394,11 +432,18 @@ bool SIP_Transaction_Client_Invite_Test::send_invite()
 
 bool SIP_Transaction_Client_Invite_Test::receive_response_100()
 {
+    SIP_Transaction_Client_Invite *transaction_client_invite = dynamic_cast<SIP_Transaction_Client_Invite *>(_transaction);
+    if (!transaction_client_invite)
+    {
+        std::cout << "SIP_Transaction_Client_Invite_Test::receive_response_100 -> Invalid transaction\n";
+        return false;
+    }
+
     SIP_Response *response = create_invite_response_100();
     if (!response)
         return false;
 
-    if (!_transaction.match_transaction(response))
+    if (!transaction_client_invite->match_transaction(response))
     {
         std::cout << "SIP_Transaction_Client_Invite_Test::receive_response_100 -> Failed to match transaction\n";
         delete response;
@@ -407,7 +452,7 @@ bool SIP_Transaction_Client_Invite_Test::receive_response_100()
 
     _received_response = false;
 
-    if (!_transaction.receive_1xx(response))
+    if (!transaction_client_invite->receive_1xx(response))
     {
         std::cout << "SIP_Transaction_Client_Invite_Test::receive_response_100 -> Failed to receive response\n";
         delete response;
@@ -421,11 +466,11 @@ bool SIP_Transaction_Client_Invite_Test::receive_response_100()
         return false;
     }
 
-    if (_transaction.get_state() != SIP_Transaction_Client_Invite::STATE_PROCEEDING)
+    if (transaction_client_invite->get_state() != SIP_Transaction_Client_Invite::STATE_PROCEEDING)
     {
         std::cout << "SIP_Transaction_Client_Invite_Test::receive_response_100 -> Invalid transaction state:\n";
         std::cout << std::setw(12) << "Expected: " << "Proceeding " << "\n";
-        std::cout << std::setw(12) << "State: " << _transaction.get_state_str().c_str() << "\n";
+        std::cout << std::setw(12) << "State: " << transaction_client_invite->get_state_str().c_str() << "\n";
         delete response;
         return false;
     }
@@ -438,11 +483,18 @@ bool SIP_Transaction_Client_Invite_Test::receive_response_100()
 
 bool SIP_Transaction_Client_Invite_Test::receive_response_180()
 {
+    SIP_Transaction_Client_Invite *transaction_client_invite = dynamic_cast<SIP_Transaction_Client_Invite *>(_transaction);
+    if (!transaction_client_invite)
+    {
+        std::cout << "SIP_Transaction_Client_Invite_Test::receive_response_180 -> Invalid transaction\n";
+        return false;
+    }
+
     SIP_Response *response = create_invite_response_180();
     if (!response)
         return false;
 
-    if (!_transaction.match_transaction(response))
+    if (!transaction_client_invite->match_transaction(response))
     {
         std::cout << "SIP_Transaction_Client_Invite_Test::receive_response_180 -> Failed to match transaction\n";
         delete response;
@@ -451,7 +503,7 @@ bool SIP_Transaction_Client_Invite_Test::receive_response_180()
 
     _received_response = false;
 
-    if (!_transaction.receive_1xx(response))
+    if (!transaction_client_invite->receive_1xx(response))
     {
         std::cout << "SIP_Transaction_Client_Invite_Test::receive_response_180 -> Failed to receive response\n";
         delete response;
@@ -465,11 +517,11 @@ bool SIP_Transaction_Client_Invite_Test::receive_response_180()
         return false;
     }
 
-    if (_transaction.get_state() != SIP_Transaction_Client_Invite::STATE_PROCEEDING)
+    if (transaction_client_invite->get_state() != SIP_Transaction_Client_Invite::STATE_PROCEEDING)
     {
         std::cout << "SIP_Transaction_Client_Invite_Test::receive_response_180 -> Invalid transaction state:\n";
         std::cout << std::setw(12) << "Expected: " << "Proceeding" << "\n";
-        std::cout << std::setw(12) << "State: " << _transaction.get_state_str().c_str() << "\n";
+        std::cout << std::setw(12) << "State: " << transaction_client_invite->get_state_str().c_str() << "\n";
         delete response;
         return false;
     }
@@ -482,11 +534,18 @@ bool SIP_Transaction_Client_Invite_Test::receive_response_180()
 
 bool SIP_Transaction_Client_Invite_Test::receive_response_200()
 {
+    SIP_Transaction_Client_Invite *transaction_client_invite = dynamic_cast<SIP_Transaction_Client_Invite *>(_transaction);
+    if (!transaction_client_invite)
+    {
+        std::cout << "SIP_Transaction_Client_Invite_Test::receive_response_200 -> Invalid transaction\n";
+        return false;
+    }
+
     SIP_Response *response = create_invite_response_200();
     if (!response)
         return false;
 
-    if (!_transaction.match_transaction(response))
+    if (!transaction_client_invite->match_transaction(response))
     {
         std::cout << "SIP_Transaction_Client_Invite_Test::receive_response_200 -> Failed to match transaction\n";
         delete response;
@@ -495,7 +554,7 @@ bool SIP_Transaction_Client_Invite_Test::receive_response_200()
 
     _received_response = false;
 
-    if (!_transaction.receive_2xx(response))
+    if (!transaction_client_invite->receive_2xx(response))
     {
         std::cout << "SIP_Transaction_Client_Invite_Test::receive_response_200 -> Failed to receive response\n";
         delete response;
@@ -509,11 +568,11 @@ bool SIP_Transaction_Client_Invite_Test::receive_response_200()
         return false;
     }
 
-    if (_transaction.get_state() != SIP_Transaction_Client_Invite::STATE_TERMINATED)
+    if (transaction_client_invite->get_state() != SIP_Transaction_Client_Invite::STATE_TERMINATED)
     {
         std::cout << "SIP_Transaction_Client_Invite_Test::receive_response_200 -> Invalid transaction state:\n";
         std::cout << std::setw(12) << "Expected: " << "Terminated" << "\n";
-        std::cout << std::setw(12) << "State: " << _transaction.get_state_str().c_str() << "\n";
+        std::cout << std::setw(12) << "State: " << transaction_client_invite->get_state_str().c_str() << "\n";
         delete response;
         return false;
     }
@@ -526,11 +585,18 @@ bool SIP_Transaction_Client_Invite_Test::receive_response_200()
 
 bool SIP_Transaction_Client_Invite_Test::receive_response_480()
 {
+    SIP_Transaction_Client_Invite *transaction_client_invite = dynamic_cast<SIP_Transaction_Client_Invite *>(_transaction);
+    if (!transaction_client_invite)
+    {
+        std::cout << "SIP_Transaction_Client_Invite_Test::receive_response_480 -> Invalid transaction\n";
+        return false;
+    }
+
     SIP_Response *response = create_invite_response_480();
     if (!response)
         return false;
 
-    if (!_transaction.match_transaction(response))
+    if (!transaction_client_invite->match_transaction(response))
     {
         std::cout << "SIP_Transaction_Client_Invite_Test::receive_response_480 -> Failed to match transaction\n";
         delete response;
@@ -540,7 +606,7 @@ bool SIP_Transaction_Client_Invite_Test::receive_response_480()
     _received_response = false;
     _sent_message = false; // ACK is sent by SIP transaction
 
-    if (!_transaction.receive_3xx_6xx(response))
+    if (!transaction_client_invite->receive_3xx_6xx(response))
     {
         std::cout << "SIP_Transaction_Client_Invite_Test::receive_response_480 -> Failed to receive response\n";
         delete response;
@@ -561,11 +627,11 @@ bool SIP_Transaction_Client_Invite_Test::receive_response_480()
         return false;
     }
 
-    if (_transaction.get_state() != SIP_Transaction_Client_Invite::STATE_COMPLETED)
+    if (transaction_client_invite->get_state() != SIP_Transaction_Client_Invite::STATE_COMPLETED)
     {
         std::cout << "SIP_Transaction_Client_Invite_Test::receive_response_480 -> Invalid transaction state:\n";
         std::cout << std::setw(12) << "Expected: " << "Completed" << "\n";
-        std::cout << std::setw(12) << "State: " << _transaction.get_state_str().c_str() << "\n";
+        std::cout << std::setw(12) << "State: " << transaction_client_invite->get_state_str().c_str() << "\n";
         delete response;
         return false;
     }
@@ -578,6 +644,13 @@ bool SIP_Transaction_Client_Invite_Test::receive_response_480()
 
 bool SIP_Transaction_Client_Invite_Test::wait_timer_B()
 {
+    SIP_Transaction_Client_Invite *transaction_client_invite = dynamic_cast<SIP_Transaction_Client_Invite *>(_transaction);
+    if (!transaction_client_invite)
+    {
+        std::cout << "SIP_Transaction_Client_Invite_Test::wait_timer_B -> Invalid transaction\n";
+        return false;
+    }
+
     unsigned long start = Util_Functions::get_tick();
     unsigned long max_wait_time = (SIP_Transaction::SIP_TIMER_1 * 64) + MAX_WAIT_TIME;
 
@@ -595,7 +668,7 @@ bool SIP_Transaction_Client_Invite_Test::wait_timer_B()
             _sent_message = false;
         }
 
-        if ((_transaction.get_state() == SIP_Transaction_Client_Invite::STATE_TERMINATED) && (_received_response))
+        if ((transaction_client_invite->get_state() == SIP_Transaction_Client_Invite::STATE_TERMINATED) && (_received_response))
             break;
 
         Util_Functions::delay(DELAY);
@@ -615,11 +688,11 @@ bool SIP_Transaction_Client_Invite_Test::wait_timer_B()
         return false;
     }
 
-    if (_transaction.get_state() != SIP_Transaction_Client_Invite::STATE_TERMINATED)
+    if (transaction_client_invite->get_state() != SIP_Transaction_Client_Invite::STATE_TERMINATED)
     {
         std::cout << "SIP_Transaction_Client_Invite_Test::wait_timer_B -> Invalid transaction state:\n";
         std::cout << std::setw(12) << "Expected: " << "Terminated" << "\n";
-        std::cout << std::setw(12) << "State: " << _transaction.get_state_str().c_str() << "\n";
+        std::cout << std::setw(12) << "State: " << transaction_client_invite->get_state_str().c_str() << "\n";
         return false;
     }
 
@@ -630,22 +703,29 @@ bool SIP_Transaction_Client_Invite_Test::wait_timer_B()
 
 bool SIP_Transaction_Client_Invite_Test::wait_timer_D()
 {
+    SIP_Transaction_Client_Invite *transaction_client_invite = dynamic_cast<SIP_Transaction_Client_Invite *>(_transaction);
+    if (!transaction_client_invite)
+    {
+        std::cout << "SIP_Transaction_Client_Invite_Test::wait_timer_D -> Invalid transaction\n";
+        return false;
+    }
+
     unsigned long start = Util_Functions::get_tick();
     unsigned long max_wait_time = SIP_Transaction::SIP_TIMER_32s + MAX_WAIT_TIME;
 
     while ((Util_Functions::get_tick() - start) < max_wait_time)
     {
-        if (_transaction.get_state() == SIP_Transaction_Client_Invite::STATE_TERMINATED)
+        if (transaction_client_invite->get_state() == SIP_Transaction_Client_Invite::STATE_TERMINATED)
             break;
 
         Util_Functions::delay(DELAY);
     }
 
-    if (_transaction.get_state() != SIP_Transaction_Client_Invite::STATE_TERMINATED)
+    if (transaction_client_invite->get_state() != SIP_Transaction_Client_Invite::STATE_TERMINATED)
     {
         std::cout << "SIP_Transaction_Client_Invite_Test::wait_timer_D -> Invalid transaction state:\n";
         std::cout << std::setw(12) << "Expected: " << "Terminated" << "\n";
-        std::cout << std::setw(12) << "State: " << _transaction.get_state_str().c_str() << "\n";
+        std::cout << std::setw(12) << "State: " << transaction_client_invite->get_state_str().c_str() << "\n";
         return false;
     }
 
@@ -657,7 +737,8 @@ bool SIP_Transaction_Client_Invite_Test::wait_timer_D()
 
 bool SIP_Transaction_Client_Invite_Accepted_Test::run()
 {
-    set_callbacks();
+    if (!set_callbacks())
+        return false;
 
     if (!send_invite())
         return false;
@@ -679,7 +760,8 @@ bool SIP_Transaction_Client_Invite_Accepted_Test::run()
 
 bool SIP_Transaction_Client_Invite_Rejected_Test::run()
 {
-    set_callbacks();
+    if (!set_callbacks())
+        return false;
 
     if (!send_invite())
         return false;
@@ -704,7 +786,8 @@ bool SIP_Transaction_Client_Invite_Rejected_Test::run()
 
 bool SIP_Transaction_Client_Invite_Retransmission_Test::run()
 {
-    set_callbacks();
+    if (!set_callbacks())
+        return false;
 
     if (!send_invite())
         return false;
@@ -718,13 +801,30 @@ bool SIP_Transaction_Client_Invite_Retransmission_Test::run()
 //-------------------------------------------
 //-------------------------------------------
 
+SIP_Transaction_Client_Non_Invite_Test::SIP_Transaction_Client_Non_Invite_Test()
+{
+    SIP_Object_ID id;
+    id._transaction = get_next_transaction_id();
+
+    _transaction = new SIP_Transaction_Client_Non_Invite(id);
+}
+
+//-------------------------------------------
+
 bool SIP_Transaction_Client_Non_Invite_Test::send_bye()
 {
+    SIP_Transaction_Client_Non_Invite *transaction_client_non_invite = dynamic_cast<SIP_Transaction_Client_Non_Invite *>(_transaction);
+    if (!transaction_client_non_invite)
+    {
+        std::cout << "SIP_Transaction_Client_Non_Invite_Test::send_bye -> Invalid transaction\n";
+        return false;
+    }
+
     SIP_Request *request = create_bye();
     if (!request)
         return false;
 
-    if (_transaction.match_transaction(request))
+    if (transaction_client_non_invite->match_transaction(request))
     {
         std::cout << "SIP_Transaction_Client_Non_Invite_Test::send_bye -> Failed to match transaction\n";
         delete request;
@@ -733,7 +833,7 @@ bool SIP_Transaction_Client_Non_Invite_Test::send_bye()
 
     _sent_message = false;
 
-    if (!_transaction.send_request(request))
+    if (!transaction_client_non_invite->send_request(request))
     {
         std::cout << "SIP_Transaction_Client_Non_Invite_Test::send_bye -> Failed to send BYE\n";
         delete request;
@@ -747,11 +847,11 @@ bool SIP_Transaction_Client_Non_Invite_Test::send_bye()
         return false;
     }
 
-    if (_transaction.get_state() != SIP_Transaction_Client_Non_Invite::STATE_TRYING)
+    if (transaction_client_non_invite->get_state() != SIP_Transaction_Client_Non_Invite::STATE_TRYING)
     {
         std::cout << "SIP_Transaction_Client_Non_Invite_Test::send_bye -> Invalid transaction state:\n";
         std::cout << std::setw(12) << "Expected: " << "Trying" << "\n";
-        std::cout << std::setw(12) << "State: " << _transaction.get_state_str().c_str() << "\n";
+        std::cout << std::setw(12) << "State: " << transaction_client_non_invite->get_state_str().c_str() << "\n";
         delete request;
         return false;
     }
@@ -764,11 +864,18 @@ bool SIP_Transaction_Client_Non_Invite_Test::send_bye()
 
 bool SIP_Transaction_Client_Non_Invite_Test::receive_response_100()
 {
+    SIP_Transaction_Client_Non_Invite *transaction_client_non_invite = dynamic_cast<SIP_Transaction_Client_Non_Invite *>(_transaction);
+    if (!transaction_client_non_invite)
+    {
+        std::cout << "SIP_Transaction_Client_Non_Invite_Test::receive_response_100 -> Invalid transaction\n";
+        return false;
+    }
+
     SIP_Response *response = create_bye_response_100();
     if (!response)
         return false;
 
-    if (!_transaction.match_transaction(response))
+    if (!transaction_client_non_invite->match_transaction(response))
     {
         std::cout << "SIP_Transaction_Client_Non_Invite_Test::receive_response_100 -> Failed to match transaction\n";
         delete response;
@@ -777,7 +884,7 @@ bool SIP_Transaction_Client_Non_Invite_Test::receive_response_100()
 
     _received_response = false;
 
-    if (!_transaction.receive_1xx(response))
+    if (!transaction_client_non_invite->receive_1xx(response))
     {
         std::cout << "SIP_Transaction_Client_Non_Invite_Test::receive_response_100 -> Failed to receive response\n";
         delete response;
@@ -791,11 +898,11 @@ bool SIP_Transaction_Client_Non_Invite_Test::receive_response_100()
         return false;
     }
 
-    if (_transaction.get_state() != SIP_Transaction_Client_Non_Invite::STATE_PROCEEDING)
+    if (transaction_client_non_invite->get_state() != SIP_Transaction_Client_Non_Invite::STATE_PROCEEDING)
     {
         std::cout << "SIP_Transaction_Client_Non_Invite_Test::receive_response_100 -> Invalid transaction state:\n";
         std::cout << std::setw(12) << "Expected: " << "Proceeding " << "\n";
-        std::cout << std::setw(12) << "State: " << _transaction.get_state_str().c_str() << "\n";
+        std::cout << std::setw(12) << "State: " << transaction_client_non_invite->get_state_str().c_str() << "\n";
         delete response;
         return false;
     }
@@ -808,11 +915,18 @@ bool SIP_Transaction_Client_Non_Invite_Test::receive_response_100()
 
 bool SIP_Transaction_Client_Non_Invite_Test::receive_response_200()
 {
+    SIP_Transaction_Client_Non_Invite *transaction_client_non_invite = dynamic_cast<SIP_Transaction_Client_Non_Invite *>(_transaction);
+    if (!transaction_client_non_invite)
+    {
+        std::cout << "SIP_Transaction_Client_Non_Invite_Test::receive_response_200 -> Invalid transaction\n";
+        return false;
+    }
+
     SIP_Response *response = create_bye_response_200();
     if (!response)
         return false;
 
-    if (!_transaction.match_transaction(response))
+    if (!transaction_client_non_invite->match_transaction(response))
     {
         std::cout << "SIP_Transaction_Client_Non_Invite_Test::receive_response_200 -> Failed to match transaction\n";
         delete response;
@@ -821,7 +935,7 @@ bool SIP_Transaction_Client_Non_Invite_Test::receive_response_200()
 
     _received_response = false;
 
-    if (!_transaction.receive_2xx_6xx(response))
+    if (!transaction_client_non_invite->receive_2xx_6xx(response))
     {
         std::cout << "SIP_Transaction_Client_Non_Invite_Test::receive_response_200 -> Failed to receive response\n";
         delete response;
@@ -835,11 +949,11 @@ bool SIP_Transaction_Client_Non_Invite_Test::receive_response_200()
         return false;
     }
 
-    if (_transaction.get_state() != SIP_Transaction_Client_Non_Invite::STATE_COMPLETED)
+    if (transaction_client_non_invite->get_state() != SIP_Transaction_Client_Non_Invite::STATE_COMPLETED)
     {
         std::cout << "SIP_Transaction_Client_Non_Invite_Test::receive_response_200 -> Invalid transaction state:\n";
         std::cout << std::setw(12) << "Expected: " << "Completed" << "\n";
-        std::cout << std::setw(12) << "State: " << _transaction.get_state_str().c_str() << "\n";
+        std::cout << std::setw(12) << "State: " << transaction_client_non_invite->get_state_str().c_str() << "\n";
         delete response;
         return false;
     }
@@ -852,6 +966,13 @@ bool SIP_Transaction_Client_Non_Invite_Test::receive_response_200()
 
 bool SIP_Transaction_Client_Non_Invite_Test::wait_timer_F()
 {
+    SIP_Transaction_Client_Non_Invite *transaction_client_non_invite = dynamic_cast<SIP_Transaction_Client_Non_Invite *>(_transaction);
+    if (!transaction_client_non_invite)
+    {
+        std::cout << "SIP_Transaction_Client_Non_Invite_Test::wait_timer_F -> Invalid transaction\n";
+        return false;
+    }
+
     unsigned long start = Util_Functions::get_tick();
     unsigned long max_wait_time = (SIP_Transaction::SIP_TIMER_1 * 64) + MAX_WAIT_TIME;
 
@@ -869,7 +990,7 @@ bool SIP_Transaction_Client_Non_Invite_Test::wait_timer_F()
             _sent_message = false;
         }
 
-        if ((_transaction.get_state() == SIP_Transaction_Client_Non_Invite::STATE_TERMINATED) && (_received_response))
+        if ((transaction_client_non_invite->get_state() == SIP_Transaction_Client_Non_Invite::STATE_TERMINATED) && (_received_response))
             break;
 
         Util_Functions::delay(DELAY);
@@ -889,11 +1010,11 @@ bool SIP_Transaction_Client_Non_Invite_Test::wait_timer_F()
         return false;
     }
 
-    if (_transaction.get_state() != SIP_Transaction_Client_Non_Invite::STATE_TERMINATED)
+    if (transaction_client_non_invite->get_state() != SIP_Transaction_Client_Non_Invite::STATE_TERMINATED)
     {
         std::cout << "SIP_Transaction_Client_Non_Invite_Test::wait_timer_F -> Invalid transaction state:\n";
         std::cout << std::setw(12) << "Expected: " << "Terminated" << "\n";
-        std::cout << std::setw(12) << "State: " << _transaction.get_state_str().c_str() << "\n";
+        std::cout << std::setw(12) << "State: " << transaction_client_non_invite->get_state_str().c_str() << "\n";
         return false;
     }
 
@@ -904,22 +1025,29 @@ bool SIP_Transaction_Client_Non_Invite_Test::wait_timer_F()
 
 bool SIP_Transaction_Client_Non_Invite_Test::wait_timer_K()
 {
+    SIP_Transaction_Client_Non_Invite *transaction_client_non_invite = dynamic_cast<SIP_Transaction_Client_Non_Invite *>(_transaction);
+    if (!transaction_client_non_invite)
+    {
+        std::cout << "SIP_Transaction_Client_Non_Invite_Test::wait_timer_K -> Invalid transaction\n";
+        return false;
+    }
+
     unsigned long start = Util_Functions::get_tick();
     unsigned long max_wait_time = SIP_Transaction::SIP_TIMER_4 + MAX_WAIT_TIME;
 
     while ((Util_Functions::get_tick() - start) < max_wait_time)
     {
-        if (_transaction.get_state() == SIP_Transaction_Client_Non_Invite::STATE_TERMINATED)
+        if (transaction_client_non_invite->get_state() == SIP_Transaction_Client_Non_Invite::STATE_TERMINATED)
             break;
 
         Util_Functions::delay(DELAY);
     }
 
-    if (_transaction.get_state() != SIP_Transaction_Client_Non_Invite::STATE_TERMINATED)
+    if (transaction_client_non_invite->get_state() != SIP_Transaction_Client_Non_Invite::STATE_TERMINATED)
     {
         std::cout << "SIP_Transaction_Client_Non_Invite_Test::wait_timer_K -> Invalid transaction state:\n";
         std::cout << std::setw(12) << "Expected: " << "Terminated" << "\n";
-        std::cout << std::setw(12) << "State: " << _transaction.get_state_str().c_str() << "\n";
+        std::cout << std::setw(12) << "State: " << transaction_client_non_invite->get_state_str().c_str() << "\n";
         return false;
     }
 
@@ -931,7 +1059,8 @@ bool SIP_Transaction_Client_Non_Invite_Test::wait_timer_K()
 
 bool SIP_Transaction_Client_Non_Invite_Accepted_Test::run()
 {
-    set_callbacks();
+    if (!set_callbacks())
+        return false;
 
     if (!send_bye())
         return false;
@@ -953,7 +1082,8 @@ bool SIP_Transaction_Client_Non_Invite_Accepted_Test::run()
 
 bool SIP_Transaction_Client_Non_Invite_Retransmission_Test::run()
 {
-    set_callbacks();
+    if (!set_callbacks())
+        return false;
 
     if (!send_bye())
         return false;
@@ -967,14 +1097,31 @@ bool SIP_Transaction_Client_Non_Invite_Retransmission_Test::run()
 //-------------------------------------------
 //-------------------------------------------
 
+SIP_Transaction_Server_Invite_Test::SIP_Transaction_Server_Invite_Test()
+{
+    SIP_Object_ID id;
+    id._transaction = get_next_transaction_id();
+
+    _transaction = new SIP_Transaction_Server_Invite(id);
+}
+
+//-------------------------------------------
+
 bool SIP_Transaction_Server_Invite_Test::receive_invite(bool retransmission)
 {
+    SIP_Transaction_Server_Invite *transaction_server_invite = dynamic_cast<SIP_Transaction_Server_Invite *>(_transaction);
+    if (!transaction_server_invite)
+    {
+        std::cout << "SIP_Transaction_Server_Invite_Test::receive_invite -> Invalid transaction\n";
+        return false;
+    }
+
     SIP_Request *request = create_invite();
     if (!request)
         return false;
 
-    if (((!retransmission) && (_transaction.match_transaction(request))) ||
-        ((retransmission) && (!_transaction.match_transaction(request))))
+    if (((!retransmission) && (transaction_server_invite->match_transaction(request))) ||
+        ((retransmission) && (!transaction_server_invite->match_transaction(request))))
     {
         std::cout << "SIP_Transaction_Server_Invite_Test::receive_invite -> Failed to match transaction\n";
         delete request;
@@ -983,7 +1130,7 @@ bool SIP_Transaction_Server_Invite_Test::receive_invite(bool retransmission)
 
     _received_request = false;
 
-    if (!_transaction.receive_invite(request))
+    if (!transaction_server_invite->receive_invite(request))
     {
         std::cout << "SIP_Transaction_Server_Invite_Test::receive_invite -> Failed to receive INVITE\n";
         delete request;
@@ -997,11 +1144,11 @@ bool SIP_Transaction_Server_Invite_Test::receive_invite(bool retransmission)
         return false;
     }
 
-    if ((_transaction.get_state() != SIP_Transaction_Server_Invite::STATE_PROCEEDING) && (!retransmission))
+    if ((transaction_server_invite->get_state() != SIP_Transaction_Server_Invite::STATE_PROCEEDING) && (!retransmission))
     {
         std::cout << "SIP_Transaction_Server_Invite_Test::receive_invite -> Invalid transaction state:\n";
         std::cout << std::setw(12) << "Expected: " << "Proceeding" << "\n";
-        std::cout << std::setw(12) << "State: " << _transaction.get_state_str().c_str() << "\n";
+        std::cout << std::setw(12) << "State: " << transaction_server_invite->get_state_str().c_str() << "\n";
         delete request;
         return false;
     }
@@ -1014,29 +1161,36 @@ bool SIP_Transaction_Server_Invite_Test::receive_invite(bool retransmission)
 
 bool SIP_Transaction_Server_Invite_Test::receive_ack()
 {
+    SIP_Transaction_Server_Invite *transaction_server_invite = dynamic_cast<SIP_Transaction_Server_Invite *>(_transaction);
+    if (!transaction_server_invite)
+    {
+        std::cout << "SIP_Transaction_Server_Invite_Test::receive_ack -> Invalid transaction\n";
+        return false;
+    }
+
     SIP_Request *request = create_ack();
     if (!request)
         return false;
 
-    if (!_transaction.match_transaction(request))
+    if (!transaction_server_invite->match_transaction(request))
     {
         std::cout << "SIP_Transaction_Server_Invite_Test::receive_ack -> Failed to match transaction\n";
         delete request;
         return false;
     }
 
-    if (!_transaction.receive_ack(request))
+    if (!transaction_server_invite->receive_ack(request))
     {
         std::cout << "SIP_Transaction_Server_Invite_Test::receive_ack -> Failed to receive ACK\n";
         delete request;
         return false;
     }
 
-    if (_transaction.get_state() != SIP_Transaction_Server_Invite::STATE_CONFIRMED)
+    if (transaction_server_invite->get_state() != SIP_Transaction_Server_Invite::STATE_CONFIRMED)
     {
         std::cout << "SIP_Transaction_Server_Invite_Test::receive_ack -> Invalid transaction state:\n";
         std::cout << std::setw(12) << "Expected: " << "Confirmed" << "\n";
-        std::cout << std::setw(12) << "State: " << _transaction.get_state_str().c_str() << "\n";
+        std::cout << std::setw(12) << "State: " << transaction_server_invite->get_state_str().c_str() << "\n";
         delete request;
         return false;
     }
@@ -1049,11 +1203,18 @@ bool SIP_Transaction_Server_Invite_Test::receive_ack()
 
 bool SIP_Transaction_Server_Invite_Test::send_response_100()
 {
+    SIP_Transaction_Server_Invite *transaction_server_invite = dynamic_cast<SIP_Transaction_Server_Invite *>(_transaction);
+    if (!transaction_server_invite)
+    {
+        std::cout << "SIP_Transaction_Server_Invite_Test::send_response_100 -> Invalid transaction\n";
+        return false;
+    }
+
     SIP_Response *response = create_invite_response_100();
     if (!response)
         return false;
 
-    if (!_transaction.match_transaction(response))
+    if (!transaction_server_invite->match_transaction(response))
     {
         std::cout << "SIP_Transaction_Server_Invite_Test::send_response_100 -> Failed to match transaction\n";
         delete response;
@@ -1062,7 +1223,7 @@ bool SIP_Transaction_Server_Invite_Test::send_response_100()
 
     _sent_message = false;
 
-    if (!_transaction.send_1xx(response))
+    if (!transaction_server_invite->send_1xx(response))
     {
         std::cout << "SIP_Transaction_Server_Invite_Test::send_response_100 -> Failed to send response\n";
         delete response;
@@ -1076,11 +1237,11 @@ bool SIP_Transaction_Server_Invite_Test::send_response_100()
         return false;
     }
 
-    if (_transaction.get_state() != SIP_Transaction_Server_Invite::STATE_PROCEEDING)
+    if (transaction_server_invite->get_state() != SIP_Transaction_Server_Invite::STATE_PROCEEDING)
     {
         std::cout << "SIP_Transaction_Server_Invite_Test::send_response_100 -> Invalid transaction state:\n";
         std::cout << std::setw(12) << "Expected: " << "Proceeding " << "\n";
-        std::cout << std::setw(12) << "State: " << _transaction.get_state_str().c_str() << "\n";
+        std::cout << std::setw(12) << "State: " << transaction_server_invite->get_state_str().c_str() << "\n";
         delete response;
         return false;
     }
@@ -1093,11 +1254,18 @@ bool SIP_Transaction_Server_Invite_Test::send_response_100()
 
 bool SIP_Transaction_Server_Invite_Test::send_response_180()
 {
+    SIP_Transaction_Server_Invite *transaction_server_invite = dynamic_cast<SIP_Transaction_Server_Invite *>(_transaction);
+    if (!transaction_server_invite)
+    {
+        std::cout << "SIP_Transaction_Server_Invite_Test::send_response_180 -> Invalid transaction\n";
+        return false;
+    }
+
     SIP_Response *response = create_invite_response_180();
     if (!response)
         return false;
 
-    if (!_transaction.match_transaction(response))
+    if (!transaction_server_invite->match_transaction(response))
     {
         std::cout << "SIP_Transaction_Server_Invite_Test::send_response_180 -> Failed to match transaction\n";
         delete response;
@@ -1106,7 +1274,7 @@ bool SIP_Transaction_Server_Invite_Test::send_response_180()
 
     _sent_message = false;
 
-    if (!_transaction.send_1xx(response))
+    if (!transaction_server_invite->send_1xx(response))
     {
         std::cout << "SIP_Transaction_Server_Invite_Test::send_response_180 -> Failed to send response\n";
         delete response;
@@ -1120,11 +1288,11 @@ bool SIP_Transaction_Server_Invite_Test::send_response_180()
         return false;
     }
 
-    if (_transaction.get_state() != SIP_Transaction_Server_Invite::STATE_PROCEEDING)
+    if (transaction_server_invite->get_state() != SIP_Transaction_Server_Invite::STATE_PROCEEDING)
     {
         std::cout << "SIP_Transaction_Server_Invite_Test::send_response_180 -> Invalid transaction state:\n";
         std::cout << std::setw(12) << "Expected: " << "Proceeding" << "\n";
-        std::cout << std::setw(12) << "State: " << _transaction.get_state_str().c_str() << "\n";
+        std::cout << std::setw(12) << "State: " << transaction_server_invite->get_state_str().c_str() << "\n";
         delete response;
         return false;
     }
@@ -1137,11 +1305,18 @@ bool SIP_Transaction_Server_Invite_Test::send_response_180()
 
 bool SIP_Transaction_Server_Invite_Test::send_response_200()
 {
+    SIP_Transaction_Server_Invite *transaction_server_invite = dynamic_cast<SIP_Transaction_Server_Invite *>(_transaction);
+    if (!transaction_server_invite)
+    {
+        std::cout << "SIP_Transaction_Server_Invite_Test::send_response_200 -> Invalid transaction\n";
+        return false;
+    }
+
     SIP_Response *response = create_invite_response_200();
     if (!response)
         return false;
 
-    if (!_transaction.match_transaction(response))
+    if (!transaction_server_invite->match_transaction(response))
     {
         std::cout << "SIP_Transaction_Server_Invite_Test::send_response_200 -> Failed to match transaction\n";
         delete response;
@@ -1150,7 +1325,7 @@ bool SIP_Transaction_Server_Invite_Test::send_response_200()
 
     _sent_message = false;
 
-    if (!_transaction.send_2xx(response))
+    if (!transaction_server_invite->send_2xx(response))
     {
         std::cout << "SIP_Transaction_Server_Invite_Test::send_response_200 -> Failed to send response\n";
         delete response;
@@ -1164,11 +1339,11 @@ bool SIP_Transaction_Server_Invite_Test::send_response_200()
         return false;
     }
 
-    if (_transaction.get_state() != SIP_Transaction_Server_Invite::STATE_TERMINATED)
+    if (transaction_server_invite->get_state() != SIP_Transaction_Server_Invite::STATE_TERMINATED)
     {
         std::cout << "SIP_Transaction_Server_Invite_Test::send_response_200 -> Invalid transaction state:\n";
         std::cout << std::setw(12) << "Expected: " << "Terminated" << "\n";
-        std::cout << std::setw(12) << "State: " << _transaction.get_state_str().c_str() << "\n";
+        std::cout << std::setw(12) << "State: " << transaction_server_invite->get_state_str().c_str() << "\n";
         delete response;
         return false;
     }
@@ -1181,11 +1356,18 @@ bool SIP_Transaction_Server_Invite_Test::send_response_200()
 
 bool SIP_Transaction_Server_Invite_Test::send_response_480()
 {
+    SIP_Transaction_Server_Invite *transaction_server_invite = dynamic_cast<SIP_Transaction_Server_Invite *>(_transaction);
+    if (!transaction_server_invite)
+    {
+        std::cout << "SIP_Transaction_Server_Invite_Test::send_response_480 -> Invalid transaction\n";
+        return false;
+    }
+
     SIP_Response *response = create_invite_response_480();
     if (!response)
         return false;
 
-    if (!_transaction.match_transaction(response))
+    if (!transaction_server_invite->match_transaction(response))
     {
         std::cout << "SIP_Transaction_Server_Invite_Test::send_response_480 -> Failed to match transaction\n";
         delete response;
@@ -1194,7 +1376,7 @@ bool SIP_Transaction_Server_Invite_Test::send_response_480()
 
     _sent_message = false;
 
-    if (!_transaction.send_3xx_6xx(response))
+    if (!transaction_server_invite->send_3xx_6xx(response))
     {
         std::cout << "SIP_Transaction_Server_Invite_Test::send_response_480 -> Failed to send response\n";
         delete response;
@@ -1208,11 +1390,11 @@ bool SIP_Transaction_Server_Invite_Test::send_response_480()
         return false;
     }
 
-    if (_transaction.get_state() != SIP_Transaction_Server_Invite::STATE_COMPLETED)
+    if (transaction_server_invite->get_state() != SIP_Transaction_Server_Invite::STATE_COMPLETED)
     {
         std::cout << "SIP_Transaction_Server_Invite_Test::send_response_480 -> Invalid transaction state:\n";
         std::cout << std::setw(12) << "Expected: " << "Completed" << "\n";
-        std::cout << std::setw(12) << "State: " << _transaction.get_state_str().c_str() << "\n";
+        std::cout << std::setw(12) << "State: " << transaction_server_invite->get_state_str().c_str() << "\n";
         delete response;
         return false;
     }
@@ -1225,6 +1407,13 @@ bool SIP_Transaction_Server_Invite_Test::send_response_480()
 
 bool SIP_Transaction_Server_Invite_Test::wait_timer_H()
 {
+    SIP_Transaction_Server_Invite *transaction_server_invite = dynamic_cast<SIP_Transaction_Server_Invite *>(_transaction);
+    if (!transaction_server_invite)
+    {
+        std::cout << "SIP_Transaction_Server_Invite_Test::wait_timer_H -> Invalid transaction\n";
+        return false;
+    }
+
     unsigned long start = Util_Functions::get_tick();
     unsigned long max_wait_time = (SIP_Transaction::SIP_TIMER_1 * 64) + MAX_WAIT_TIME;
 
@@ -1241,7 +1430,7 @@ bool SIP_Transaction_Server_Invite_Test::wait_timer_H()
             _sent_message = false;
         }
 
-        if (_transaction.get_state() == SIP_Transaction_Server_Invite::STATE_TERMINATED)
+        if (transaction_server_invite->get_state() == SIP_Transaction_Server_Invite::STATE_TERMINATED)
             break;
 
         Util_Functions::delay(DELAY);
@@ -1255,11 +1444,11 @@ bool SIP_Transaction_Server_Invite_Test::wait_timer_H()
         return false;
     }
 
-    if (_transaction.get_state() != SIP_Transaction_Server_Invite::STATE_TERMINATED)
+    if (transaction_server_invite->get_state() != SIP_Transaction_Server_Invite::STATE_TERMINATED)
     {
         std::cout << "SIP_Transaction_Server_Invite_Test::wait_timer_H -> Invalid transaction state:\n";
         std::cout << std::setw(12) << "Expected: " << "Terminated" << "\n";
-        std::cout << std::setw(12) << "State: " << _transaction.get_state_str().c_str() << "\n";
+        std::cout << std::setw(12) << "State: " << transaction_server_invite->get_state_str().c_str() << "\n";
         return false;
     }
 
@@ -1270,22 +1459,29 @@ bool SIP_Transaction_Server_Invite_Test::wait_timer_H()
 
 bool SIP_Transaction_Server_Invite_Test::wait_timer_I()
 {
+    SIP_Transaction_Server_Invite *transaction_server_invite = dynamic_cast<SIP_Transaction_Server_Invite *>(_transaction);
+    if (!transaction_server_invite)
+    {
+        std::cout << "SIP_Transaction_Server_Invite_Test::wait_timer_I -> Invalid transaction\n";
+        return false;
+    }
+
     unsigned long start = Util_Functions::get_tick();
     unsigned long max_wait_time = SIP_Transaction::SIP_TIMER_4 + MAX_WAIT_TIME;
 
     while ((Util_Functions::get_tick() - start) < max_wait_time)
     {
-        if (_transaction.get_state() == SIP_Transaction_Server_Invite::STATE_TERMINATED)
+        if (transaction_server_invite->get_state() == SIP_Transaction_Server_Invite::STATE_TERMINATED)
             break;
 
         Util_Functions::delay(DELAY);
     }
 
-    if (_transaction.get_state() != SIP_Transaction_Server_Invite::STATE_TERMINATED)
+    if (transaction_server_invite->get_state() != SIP_Transaction_Server_Invite::STATE_TERMINATED)
     {
         std::cout << "SIP_Transaction_Server_Invite_Test::wait_timer_I -> Invalid transaction state:\n";
         std::cout << std::setw(12) << "Expected: " << "Terminated" << "\n";
-        std::cout << std::setw(12) << "State: " << _transaction.get_state_str().c_str() << "\n";
+        std::cout << std::setw(12) << "State: " << transaction_server_invite->get_state_str().c_str() << "\n";
         return false;
     }
 
@@ -1297,7 +1493,8 @@ bool SIP_Transaction_Server_Invite_Test::wait_timer_I()
 
 bool SIP_Transaction_Server_Invite_Accepted_Test::run()
 {
-    set_callbacks();
+    if (!set_callbacks())
+        return false;
 
     if (!receive_invite())
         return false;
@@ -1319,7 +1516,8 @@ bool SIP_Transaction_Server_Invite_Accepted_Test::run()
 
 bool SIP_Transaction_Server_Invite_Rejected_Test::run()
 {
-    set_callbacks();
+    if (!set_callbacks())
+        return false;
 
     if (!receive_invite())
         return false;
@@ -1347,7 +1545,8 @@ bool SIP_Transaction_Server_Invite_Rejected_Test::run()
 
 bool SIP_Transaction_Server_Invite_Retransmission_Test::run()
 {
-    set_callbacks();
+    if (!set_callbacks())
+        return false;
 
     if (!receive_invite())
         return false;
@@ -1367,14 +1566,31 @@ bool SIP_Transaction_Server_Invite_Retransmission_Test::run()
 //-------------------------------------------
 //-------------------------------------------
 
+SIP_Transaction_Server_Non_Invite_Test::SIP_Transaction_Server_Non_Invite_Test()
+{
+    SIP_Object_ID id;
+    id._transaction = get_next_transaction_id();
+
+    _transaction = new SIP_Transaction_Server_Non_Invite(id);
+}
+
+//-------------------------------------------
+
 bool SIP_Transaction_Server_Non_Invite_Test::receive_bye(bool retransmission)
 {
+    SIP_Transaction_Server_Non_Invite *transaction_server_non_invite = dynamic_cast<SIP_Transaction_Server_Non_Invite *>(_transaction);
+    if (!transaction_server_non_invite)
+    {
+        std::cout << "SIP_Transaction_Server_Non_Invite_Test::receive_bye -> Invalid transaction\n";
+        return false;
+    }
+
     SIP_Request *request = create_bye();
     if (!request)
         return false;
 
-    if (((!retransmission) && (_transaction.match_transaction(request))) ||
-        ((retransmission) && (!_transaction.match_transaction(request))))
+    if (((!retransmission) && (transaction_server_non_invite->match_transaction(request))) ||
+        ((retransmission) && (!transaction_server_non_invite->match_transaction(request))))
     {
         std::cout << "SIP_Transaction_Server_Non_Invite_Test::receive_bye -> Failed to match transaction\n";
         delete request;
@@ -1383,7 +1599,7 @@ bool SIP_Transaction_Server_Non_Invite_Test::receive_bye(bool retransmission)
 
     _received_request = false;
 
-    if (!_transaction.receive_request(request))
+    if (!transaction_server_non_invite->receive_request(request))
     {
         std::cout << "SIP_Transaction_Server_Non_Invite_Test::receive_bye -> Failed to receive BYE\n";
         delete request;
@@ -1397,11 +1613,11 @@ bool SIP_Transaction_Server_Non_Invite_Test::receive_bye(bool retransmission)
         return false;
     }
 
-    if ((_transaction.get_state() != SIP_Transaction_Server_Non_Invite::STATE_TRYING) && (!retransmission))
+    if ((transaction_server_non_invite->get_state() != SIP_Transaction_Server_Non_Invite::STATE_TRYING) && (!retransmission))
     {
         std::cout << "SIP_Transaction_Server_Non_Invite_Test::receive_bye -> Invalid transaction state:\n";
         std::cout << std::setw(12) << "Expected: " << "Trying" << "\n";
-        std::cout << std::setw(12) << "State: " << _transaction.get_state_str().c_str() << "\n";
+        std::cout << std::setw(12) << "State: " << transaction_server_non_invite->get_state_str().c_str() << "\n";
         delete request;
         return false;
     }
@@ -1414,11 +1630,18 @@ bool SIP_Transaction_Server_Non_Invite_Test::receive_bye(bool retransmission)
 
 bool SIP_Transaction_Server_Non_Invite_Test::send_response_100()
 {
+    SIP_Transaction_Server_Non_Invite *transaction_server_non_invite = dynamic_cast<SIP_Transaction_Server_Non_Invite *>(_transaction);
+    if (!transaction_server_non_invite)
+    {
+        std::cout << "SIP_Transaction_Server_Non_Invite_Test::send_response_100 -> Invalid transaction\n";
+        return false;
+    }
+
     SIP_Response *response = create_bye_response_100();
     if (!response)
         return false;
 
-    if (!_transaction.match_transaction(response))
+    if (!transaction_server_non_invite->match_transaction(response))
     {
         std::cout << "SIP_Transaction_Server_Non_Invite_Test::send_response_100 -> Failed to match transaction\n";
         delete response;
@@ -1427,7 +1650,7 @@ bool SIP_Transaction_Server_Non_Invite_Test::send_response_100()
 
     _sent_message = false;
 
-    if (!_transaction.send_1xx(response))
+    if (!transaction_server_non_invite->send_1xx(response))
     {
         std::cout << "SIP_Transaction_Server_Non_Invite_Test::send_response_100 -> Failed to send response\n";
         delete response;
@@ -1441,11 +1664,11 @@ bool SIP_Transaction_Server_Non_Invite_Test::send_response_100()
         return false;
     }
 
-    if (_transaction.get_state() != SIP_Transaction_Server_Non_Invite::STATE_PROCEEDING)
+    if (transaction_server_non_invite->get_state() != SIP_Transaction_Server_Non_Invite::STATE_PROCEEDING)
     {
         std::cout << "SIP_Transaction_Server_Non_Invite_Test::send_response_100 -> Invalid transaction state:\n";
         std::cout << std::setw(12) << "Expected: " << "Proceeding " << "\n";
-        std::cout << std::setw(12) << "State: " << _transaction.get_state_str().c_str() << "\n";
+        std::cout << std::setw(12) << "State: " << transaction_server_non_invite->get_state_str().c_str() << "\n";
         delete response;
         return false;
     }
@@ -1458,11 +1681,18 @@ bool SIP_Transaction_Server_Non_Invite_Test::send_response_100()
 
 bool SIP_Transaction_Server_Non_Invite_Test::send_response_200()
 {
+    SIP_Transaction_Server_Non_Invite *transaction_server_non_invite = dynamic_cast<SIP_Transaction_Server_Non_Invite *>(_transaction);
+    if (!transaction_server_non_invite)
+    {
+        std::cout << "SIP_Transaction_Server_Non_Invite_Test::send_response_200 -> Invalid transaction\n";
+        return false;
+    }
+
     SIP_Response *response = create_bye_response_200();
     if (!response)
         return false;
 
-    if (!_transaction.match_transaction(response))
+    if (!transaction_server_non_invite->match_transaction(response))
     {
         std::cout << "SIP_Transaction_Server_Non_Invite_Test::send_response_200 -> Failed to match transaction\n";
         delete response;
@@ -1471,7 +1701,7 @@ bool SIP_Transaction_Server_Non_Invite_Test::send_response_200()
 
     _sent_message = false;
 
-    if (!_transaction.send_2xx_6xx(response))
+    if (!transaction_server_non_invite->send_2xx_6xx(response))
     {
         std::cout << "SIP_Transaction_Server_Non_Invite_Test::send_response_200 -> Failed to send response\n";
         delete response;
@@ -1485,11 +1715,11 @@ bool SIP_Transaction_Server_Non_Invite_Test::send_response_200()
         return false;
     }
 
-    if (_transaction.get_state() != SIP_Transaction_Server_Non_Invite::STATE_COMPLETED)
+    if (transaction_server_non_invite->get_state() != SIP_Transaction_Server_Non_Invite::STATE_COMPLETED)
     {
         std::cout << "SIP_Transaction_Server_Non_Invite_Test::send_response_200 -> Invalid transaction state:\n";
         std::cout << std::setw(12) << "Expected: " << "Completed" << "\n";
-        std::cout << std::setw(12) << "State: " << _transaction.get_state_str().c_str() << "\n";
+        std::cout << std::setw(12) << "State: " << transaction_server_non_invite->get_state_str().c_str() << "\n";
         delete response;
         return false;
     }
@@ -1502,22 +1732,29 @@ bool SIP_Transaction_Server_Non_Invite_Test::send_response_200()
 
 bool SIP_Transaction_Server_Non_Invite_Test::wait_timer_J()
 {
+    SIP_Transaction_Server_Non_Invite *transaction_server_non_invite = dynamic_cast<SIP_Transaction_Server_Non_Invite *>(_transaction);
+    if (!transaction_server_non_invite)
+    {
+        std::cout << "SIP_Transaction_Server_Non_Invite_Test::wait_timer_J -> Invalid transaction\n";
+        return false;
+    }
+
     unsigned long start = Util_Functions::get_tick();
     unsigned long max_wait_time = (SIP_Transaction::SIP_TIMER_1 * 64) + MAX_WAIT_TIME;
 
     while ((Util_Functions::get_tick() - start) < max_wait_time)
     {
-        if (_transaction.get_state() == SIP_Transaction_Server_Non_Invite::STATE_TERMINATED)
+        if (transaction_server_non_invite->get_state() == SIP_Transaction_Server_Non_Invite::STATE_TERMINATED)
             break;
 
         Util_Functions::delay(DELAY);
     }
 
-    if (_transaction.get_state() != SIP_Transaction_Server_Non_Invite::STATE_TERMINATED)
+    if (transaction_server_non_invite->get_state() != SIP_Transaction_Server_Non_Invite::STATE_TERMINATED)
     {
         std::cout << "SIP_Transaction_Server_Non_Invite_Test::wait_timer_J -> Invalid transaction state:\n";
         std::cout << std::setw(12) << "Expected: " << "Terminated" << "\n";
-        std::cout << std::setw(12) << "State: " << _transaction.get_state_str().c_str() << "\n";
+        std::cout << std::setw(12) << "State: " << transaction_server_non_invite->get_state_str().c_str() << "\n";
         return false;
     }
 
@@ -1529,7 +1766,8 @@ bool SIP_Transaction_Server_Non_Invite_Test::wait_timer_J()
 
 bool SIP_Transaction_Server_Non_Invite_Accepted_Test::run()
 {
-    set_callbacks();
+    if (!set_callbacks())
+        return false;
 
     if (!receive_bye())
         return false;
@@ -1551,7 +1789,8 @@ bool SIP_Transaction_Server_Non_Invite_Accepted_Test::run()
 
 bool SIP_Transaction_Server_Non_Invite_Retransmission_Test::run()
 {
-    set_callbacks();
+    if (!set_callbacks())
+        return false;
 
     if (!receive_bye())
         return false;

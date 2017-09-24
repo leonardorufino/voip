@@ -24,17 +24,17 @@ public:
     static const unsigned long DELAY = 500;
 
 public:
-    SIP_Transaction_Test() : _sent_message(false), _received_request(false), _received_response(false) {}
-    virtual ~SIP_Transaction_Test() {}
-
     static bool init();
     template<class T> static bool run();
 
 protected:
-    virtual bool run() = 0;
-    virtual SIP_Transaction &get_transaction() = 0;
+    SIP_Transaction_Test() : _transaction(NULL), _sent_message(false), _received_request(false), _received_response(false) {}
+    virtual ~SIP_Transaction_Test();
 
+    virtual bool run() = 0;
     virtual bool set_callbacks();
+
+    unsigned int get_next_transaction_id();
 
     SIP_Request *create_invite();
     SIP_Request *create_ack();
@@ -52,6 +52,8 @@ protected:
     static bool receive_response_callback(void *data, SIP_Transaction *transaction, SIP_Request *request, SIP_Response *response);
 
 protected:
+    SIP_Transaction *_transaction;
+
     bool _sent_message;
     bool _received_request;
     bool _received_response;
@@ -63,10 +65,8 @@ protected:
 class SIP_Transaction_Client_Invite_Test : public SIP_Transaction_Test
 {
 public:
-    SIP_Transaction_Client_Invite_Test() {}
+    SIP_Transaction_Client_Invite_Test();
     virtual ~SIP_Transaction_Client_Invite_Test() {}
-
-    SIP_Transaction &get_transaction() { return _transaction; }
 
 protected:
     bool send_invite();
@@ -76,9 +76,6 @@ protected:
     bool receive_response_480();
     bool wait_timer_B();
     bool wait_timer_D();
-
-protected:
-    SIP_Transaction_Client_Invite _transaction;
 };
 
 //-------------------------------------------
@@ -120,10 +117,8 @@ public:
 class SIP_Transaction_Client_Non_Invite_Test : public SIP_Transaction_Test
 {
 public:
-    SIP_Transaction_Client_Non_Invite_Test() {}
+    SIP_Transaction_Client_Non_Invite_Test();
     virtual ~SIP_Transaction_Client_Non_Invite_Test() {}
-
-    SIP_Transaction &get_transaction() { return _transaction; }
 
 protected:
     bool send_bye();
@@ -131,9 +126,6 @@ protected:
     bool receive_response_200();
     bool wait_timer_F();
     bool wait_timer_K();
-
-protected:
-    SIP_Transaction_Client_Non_Invite _transaction;
 };
 
 //-------------------------------------------
@@ -164,10 +156,8 @@ public:
 class SIP_Transaction_Server_Invite_Test : public SIP_Transaction_Test
 {
 public:
-    SIP_Transaction_Server_Invite_Test() {}
+    SIP_Transaction_Server_Invite_Test();
     virtual ~SIP_Transaction_Server_Invite_Test() {}
-
-    SIP_Transaction &get_transaction() { return _transaction; }
 
 protected:
     bool receive_invite(bool retransmission = false);
@@ -178,9 +168,6 @@ protected:
     bool send_response_480();
     bool wait_timer_H();
     bool wait_timer_I();
-
-protected:
-    SIP_Transaction_Server_Invite _transaction;
 };
 
 //-------------------------------------------
@@ -222,19 +209,14 @@ public:
 class SIP_Transaction_Server_Non_Invite_Test : public SIP_Transaction_Test
 {
 public:
-    SIP_Transaction_Server_Non_Invite_Test() {}
+    SIP_Transaction_Server_Non_Invite_Test();
     virtual ~SIP_Transaction_Server_Non_Invite_Test() {}
-
-    SIP_Transaction &get_transaction() { return _transaction; }
 
 protected:
     bool receive_bye(bool retransmission = false);
     bool send_response_100();
     bool send_response_200();
     bool wait_timer_J();
-
-protected:
-    SIP_Transaction_Server_Non_Invite _transaction;
 };
 
 //-------------------------------------------
