@@ -57,7 +57,7 @@ public:
     static const unsigned long SIP_TIMER_32s = 32000; // 32 seconds
 
 public:
-    SIP_Transaction();
+    SIP_Transaction(SIP_Object_ID id);
     virtual ~SIP_Transaction();
 
     virtual SIP_Transaction_Type get_transaction_type() = 0;
@@ -78,6 +78,8 @@ public:
     void stop_timer(SIP_Timer timer);
 
 protected:
+    SIP_Object_ID _id;
+
     SIP_Request *_saved_request;
 
     send_message_callback *_send_message_callback;
@@ -111,7 +113,7 @@ public:
     };
 
 public:
-    SIP_Transaction_Client_Invite() : _state(STATE_IDLE) {}
+    SIP_Transaction_Client_Invite(SIP_Object_ID id) : SIP_Transaction(id), _state(STATE_IDLE) {}
     ~SIP_Transaction_Client_Invite() {}
 
     SIP_Transaction_Type get_transaction_type() { return SIP_TRANSACTION_CLIENT_INVITE; }
@@ -148,7 +150,7 @@ public:
     };
 
 public:
-    SIP_Transaction_Client_Non_Invite() : _state(STATE_IDLE) {}
+    SIP_Transaction_Client_Non_Invite(SIP_Object_ID id) : SIP_Transaction(id), _state(STATE_IDLE) {}
     ~SIP_Transaction_Client_Non_Invite() {}
 
     SIP_Transaction_Type get_transaction_type() { return SIP_TRANSACTION_CLIENT_NON_INVITE; }
@@ -183,7 +185,7 @@ public:
     };
 
 public:
-    SIP_Transaction_Server_Invite() : _state(STATE_IDLE), _last_response(NULL) {}
+    SIP_Transaction_Server_Invite(SIP_Object_ID id) : SIP_Transaction(id), _state(STATE_IDLE), _last_response(NULL) {}
     ~SIP_Transaction_Server_Invite();
 
     SIP_Transaction_Type get_transaction_type() { return SIP_TRANSACTION_SERVER_INVITE; }
@@ -221,7 +223,7 @@ public:
     };
 
 public:
-    SIP_Transaction_Server_Non_Invite() : _state(STATE_IDLE), _last_response(NULL) {}
+    SIP_Transaction_Server_Non_Invite(SIP_Object_ID id) : SIP_Transaction(id), _state(STATE_IDLE), _last_response(NULL) {}
     ~SIP_Transaction_Server_Non_Invite();
 
     SIP_Transaction_Type get_transaction_type() { return SIP_TRANSACTION_SERVER_NON_INVITE; }

@@ -16,9 +16,9 @@ Logger SIP_Transaction::_logger(Log_Manager::LOG_SIP_TRANSACTION);
 
 //-------------------------------------------
 
-SIP_Transaction::SIP_Transaction() : _saved_request(NULL), _send_message_callback(NULL), _send_message_callback_data(NULL),
-    _receive_request_callback(NULL), _receive_request_callback_data(NULL), _receive_response_callback(NULL),
-    _receive_response_callback_data(NULL)
+SIP_Transaction::SIP_Transaction(SIP_Object_ID id) : _id(id), _saved_request(NULL), _send_message_callback(NULL),
+    _send_message_callback_data(NULL), _receive_request_callback(NULL), _receive_request_callback_data(NULL),
+    _receive_response_callback(NULL), _receive_response_callback_data(NULL)
 {
     for (unsigned short i = 0; i < SIP_TIMER_COUNT; i++)
     {
@@ -45,46 +45,50 @@ SIP_Transaction::~SIP_Transaction()
 
 bool SIP_Transaction::match_transaction(SIP_Message *msg)
 {
-    switch (get_transaction_type())
+    SIP_Transaction_Type transaction_type = get_transaction_type();
+    SIP_Method_Type message_type = msg->get_message_type();
+
+    switch (transaction_type)
     {
         case SIP_TRANSACTION_CLIENT_INVITE:
-            if (msg->get_message_type() == SIP_RESPONSE)
+            if (message_type == SIP_RESPONSE)
                 return match_transaction_response(msg);
 
-            else if ((msg->get_message_type() == SIP_REQUEST_INVITE) || (msg->get_message_type() == SIP_REQUEST_ACK))
+            else if ((message_type == SIP_REQUEST_INVITE) || (message_type == SIP_REQUEST_ACK))
                 return match_transaction_request(msg);
 
             return false;
 
         case SIP_TRANSACTION_CLIENT_NON_INVITE:
-            if (msg->get_message_type() == SIP_RESPONSE)
+            if (message_type == SIP_RESPONSE)
                 return match_transaction_response(msg);
 
-            else if ((msg->get_message_type() != SIP_REQUEST_INVITE) && (msg->get_message_type() != SIP_REQUEST_ACK))
+            else if ((message_type != SIP_REQUEST_INVITE) && (message_type != SIP_REQUEST_ACK))
                 return match_transaction_request(msg);
 
             return false;
 
         case SIP_TRANSACTION_SERVER_INVITE:
-            if (msg->get_message_type() == SIP_RESPONSE)
+            if (message_type == SIP_RESPONSE)
                 return match_transaction_response(msg);
 
-            else if ((msg->get_message_type() == SIP_REQUEST_INVITE) || (msg->get_message_type() == SIP_REQUEST_ACK))
+            else if ((message_type == SIP_REQUEST_INVITE) || (message_type == SIP_REQUEST_ACK))
                 return match_transaction_request(msg);
 
             return false;
 
         case SIP_TRANSACTION_SERVER_NON_INVITE:
-            if (msg->get_message_type() == SIP_RESPONSE)
+            if (message_type == SIP_RESPONSE)
                 return match_transaction_response(msg);
 
-            else if ((msg->get_message_type() != SIP_REQUEST_INVITE) && (msg->get_message_type() != SIP_REQUEST_ACK))
+            else if ((message_type != SIP_REQUEST_INVITE) && (message_type != SIP_REQUEST_ACK))
                 return match_transaction_request(msg);
 
             return false;
 
         default:
-            _logger.warning("SIP_Transaction::match_transaction -> Invalid message type (transaction=%d)", get_transaction_type());
+            _logger.warning("Failed to match transaction: invalid transaction type (type=%d) [%s]",
+                            transaction_type, _id.to_string().c_str());
             return false;
     }
 }
@@ -95,7 +99,7 @@ bool SIP_Transaction::match_transaction_response(SIP_Message *msg)
 {
     if (!_saved_request)
     {
-        //_logger.trace("SIP_Transaction::match_transaction_response -> Invalid saved request message");
+        //_logger.trace("Failed to match transaction response: invalid saved request message [%s]", _id.to_string().c_str());
         return false;
     }
 
@@ -104,7 +108,8 @@ bool SIP_Transaction::match_transaction_response(SIP_Message *msg)
 
     if ((!saved_request_via) || (!saved_request_cseq))
     {
-        _logger.warning("SIP_Transaction::match_transaction_response -> Failed to get Via or CSeq header from saved request");
+        _logger.warning("Failed to match transaction response: invalid Via or CSeq header from saved request [%s]",
+                        _id.to_string().c_str());
         return false;
     }
 
@@ -113,14 +118,15 @@ bool SIP_Transaction::match_transaction_response(SIP_Message *msg)
 
     if ((saved_request_via_branch.empty()) || (saved_request_cseq_method == SIP_METHOD_INVALID))
     {
-        _logger.warning("SIP_Transaction::match_transaction_response -> Invalid Via branch or CSeq method from saved request");
+        _logger.warning("Failed to match transaction response: invalid Via branch or CSeq method from saved request [%s]",
+                        _id.to_string().c_str());
         return false;
     }
 
     SIP_Response *response = dynamic_cast<SIP_Response *>(msg);
     if (!response)
     {
-        _logger.warning("SIP_Transaction::match_transaction_response -> Invalid response message");
+        _logger.warning("Failed to match transaction response: invalid response message [%s]", _id.to_string().c_str());
         return false;
     }
 
@@ -129,7 +135,7 @@ bool SIP_Transaction::match_transaction_response(SIP_Message *msg)
 
     if ((!response_via) || (!response_cseq))
     {
-        _logger.warning("SIP_Transaction::match_transaction_response -> Failed to get Via or CSeq header from response");
+        _logger.warning("Failed to match transaction response: invalid Via or CSeq header from response [%s]", _id.to_string().c_str());
         return false;
     }
 
@@ -138,16 +144,18 @@ bool SIP_Transaction::match_transaction_response(SIP_Message *msg)
 
     if ((response_via_branch.empty()) || (response_cseq_method == SIP_METHOD_INVALID))
     {
-        _logger.warning("SIP_Transaction::match_transaction_response -> Invalid Via branch or CSeq method from response");
+        _logger.warning("Failed to match transaction response: invalid Via branch or CSeq method from response [%s]",
+                        _id.to_string().c_str());
         return false;
     }
 
     if ((saved_request_via_branch != response_via_branch) || (saved_request_cseq_method != response_cseq_method))
     {
-        _logger.trace("SIP_Transaction::match_transaction_response -> Via branch or CSeq method do not match");
+        _logger.trace("Failed to match transaction response: Via branch or CSeq method do not match [%s]", _id.to_string().c_str());
         return false;
     }
 
+    _logger.trace("Transaction response matched [%s]", _id.to_string().c_str());
     return true;
 }
 
@@ -157,14 +165,14 @@ bool SIP_Transaction::match_transaction_request(SIP_Message *msg)
 {
     if (!_saved_request)
     {
-        //_logger.trace("SIP_Transaction::match_transaction_request -> Invalid saved request message");
+        //_logger.trace("Failed to match transaction request: invalid saved request message [%s]", _id.to_string().c_str());
         return false;
     }
 
     SIP_Header_Via *saved_request_via = dynamic_cast<SIP_Header_Via *>(_saved_request->get_header(SIP_HEADER_VIA));
     if (!saved_request_via)
     {
-        _logger.warning("SIP_Transaction::match_transaction_request -> Failed to get Via header from saved request");
+        _logger.warning("Failed to match transaction request: invalid Via header from saved request [%s]", _id.to_string().c_str());
         return false;
     }
 
@@ -175,21 +183,22 @@ bool SIP_Transaction::match_transaction_request(SIP_Message *msg)
 
     if ((saved_request_method == SIP_METHOD_INVALID) || (saved_request_via_branch.empty()) || (saved_request_via_host.empty()))
     {
-        _logger.warning("SIP_Transaction::match_transaction_request -> Invalid method, Via branch or Via host from saved request");
+        _logger.warning("Failed to match transaction request: invalid request method, Via branch or Via host from saved request [%s]",
+                        _id.to_string().c_str());
         return false;
     }
 
     SIP_Request *request = dynamic_cast<SIP_Request *>(msg);
     if (!request)
     {
-        _logger.warning("SIP_Transaction::match_transaction_request -> Invalid request message");
+        _logger.warning("Failed to match transaction request: invalid request message [%s]", _id.to_string().c_str());
         return false;
     }
 
     SIP_Header_Via *request_via = dynamic_cast<SIP_Header_Via *>(request->get_header(SIP_HEADER_VIA));
     if (!request_via)
     {
-        _logger.warning("SIP_Transaction::match_transaction_request -> Failed to get Via header from request");
+        _logger.warning("Failed to match transaction request: invalid Via header from request [%s]", _id.to_string().c_str());
         return false;
     }
 
@@ -200,7 +209,8 @@ bool SIP_Transaction::match_transaction_request(SIP_Message *msg)
 
     if ((request_method == SIP_METHOD_INVALID) || (request_via_host.empty()))
     {
-        _logger.warning("SIP_Transaction::match_transaction_request -> Invalid method or Via host from request");
+        _logger.warning("Failed to match transaction request: invalid request method or Via host from request [%s]",
+                        _id.to_string().c_str());
         return false;
     }
 
@@ -210,7 +220,8 @@ bool SIP_Transaction::match_transaction_request(SIP_Message *msg)
 
     if (!magic_cookie)
     {
-        _logger.warning("SIP_Transaction::match_transaction_request -> Invalid Via branch from request (magic cookie is not present)");
+        _logger.warning("Failed to match transaction request: invalid Via branch from request (magic cookie is not present) [%s]",
+                        _id.to_string().c_str());
         return false;
     }
 
@@ -218,10 +229,12 @@ bool SIP_Transaction::match_transaction_request(SIP_Message *msg)
         (request_via_port != saved_request_via_port) || ((request_method != saved_request_method) &&
         ((saved_request_method != SIP_REQUEST_INVITE) || (request_method != SIP_REQUEST_ACK))))
     {
-        _logger.trace("SIP_Transaction::match_transaction_request -> Method, Via branch, host or port do not match");
+        _logger.trace("Failed to match transaction request: request method, Via branch, host or port do not match [%s]",
+                      _id.to_string().c_str());
         return false;
     }
 
+    _logger.trace("Transaction request matched [%s]", _id.to_string().c_str());
     return true;
 }
 
@@ -255,7 +268,7 @@ unsigned long SIP_Transaction::get_timer_value(SIP_Timer timer)
 {
     if (timer >= SIP_TIMER_COUNT)
     {
-        _logger.warning("SIP_Transaction::get_timer_value -> Invalid timer (timer=%d)", timer);
+        _logger.warning("Failed to get timer value: invalid timer (timer=%d) [%s]", timer, _id.to_string().c_str());
         return 0;
     }
 
@@ -268,7 +281,7 @@ void SIP_Transaction::set_timer_value(SIP_Timer timer, unsigned long timer_value
 {
     if (timer >= SIP_TIMER_COUNT)
     {
-        _logger.warning("SIP_Transaction::set_timer_value -> Invalid timer (timer=%d)", timer);
+        _logger.warning("Failed to set timer value: invalid timer (timer=%d) [%s]", timer, _id.to_string().c_str());
         return;
     }
 
@@ -314,27 +327,34 @@ void SIP_Transaction::start_timer(SIP_Timer timer, SIP_Transaction *p)
             _timer_ids[SIP_TIMER_K] = tm.start_timer(_timer_values[timer], p, SIP_Transaction_Client_Non_Invite::timer_K_callback);
             break;
         default:
-            _logger.warning("SIP_Transaction::start_timer -> Invalid timer (timer=%d)", timer);
+            _logger.warning("Failed to start timer: invalid timer (timer=%d) [%s]", timer, _id.to_string().c_str());
             return;
     }
 
-    _logger.trace("SIP_Transaction::start_timer -> Timer started (timer=%d)", timer);
+    _logger.trace("Timer started (timer=%d) [%s]", timer, _id.to_string().c_str());
 }
 
 //-------------------------------------------
 
 void SIP_Transaction::stop_timer(SIP_Timer timer)
 {
-    if (_timer_ids[timer] != Timer::INVALID_TIMER_ID)
+    if (timer >= SIP_TIMER_COUNT)
     {
-        Timer_Manager &tm = Timer_Manager::instance();
-        tm.stop_timer(_timer_ids[timer]);
+        _logger.warning("Failed to stop timer: invalid timer (timer=%d) [%s]", timer, _id.to_string().c_str());
+        return;
+    }
 
-        _timer_ids[timer] = Timer::INVALID_TIMER_ID;
+    if (_timer_ids[timer] == Timer::INVALID_TIMER_ID)
+    {
+        _logger.warning("Failed to stop timer: timer not started (timer=%d) [%s]", timer, _id.to_string().c_str());
+        return;
+    }
 
-        _logger.trace("SIP_Transaction::stop_timer -> Timer stopped (timer=%d)", timer);
-    }else
-        _logger.trace("SIP_Transaction::stop_timer -> Timer not started (timer=%d)", timer);
+    Timer_Manager &tm = Timer_Manager::instance();
+    tm.stop_timer(_timer_ids[timer]);
+
+    _timer_ids[timer] = Timer::INVALID_TIMER_ID;
+    _logger.trace("Timer stopped (timer=%d) [%s]", timer, _id.to_string().c_str());
 }
 
 //-------------------------------------------
@@ -386,7 +406,7 @@ bool SIP_Transaction_Client_Invite::send_ack(SIP_Response *msg)
 {
     if (!_saved_request)
     {
-        _logger.warning("SIP_Transaction_Client_Invite::send_ack -> Invalid saved request message");
+        _logger.warning("Failed to send ack: invalid saved request message [%s]", _id.to_string().c_str());
         return false;
     }
 
@@ -399,7 +419,7 @@ bool SIP_Transaction_Client_Invite::send_ack(SIP_Response *msg)
 
     if ((!saved_request_call_id) || (!saved_request_cseq) || (!saved_request_from) || (!saved_request_to) || (!saved_request_via))
     {
-        _logger.warning("SIP_Transaction_Client_Invite::send_ack -> Invalid headers from saved request");
+        _logger.warning("Failed to send ack: invalid headers from saved request [%s]", _id.to_string().c_str());
         return false;
     }
 
@@ -528,7 +548,7 @@ bool SIP_Transaction_Client_Invite::timer_A_callback(void *p)
     SIP_Transaction_Client_Invite *transaction = reinterpret_cast<SIP_Transaction_Client_Invite *>(p);
     if (!transaction)
     {
-        _logger.warning("SIP_Transaction_Client_Invite::timer_A_callback -> Invalid parameter");
+        _logger.warning("Invalid timer A callback parameter");
         return false;
     }
 
@@ -558,7 +578,7 @@ bool SIP_Transaction_Client_Invite::timer_B_callback(void *p)
     SIP_Transaction_Client_Invite *transaction = reinterpret_cast<SIP_Transaction_Client_Invite *>(p);
     if (!transaction)
     {
-        _logger.warning("SIP_Transaction_Client_Invite::timer_B_callback -> Invalid parameter");
+        _logger.warning("Invalid timer B callback parameter");
         return false;
     }
 
@@ -591,7 +611,7 @@ bool SIP_Transaction_Client_Invite::timer_D_callback(void *p)
     SIP_Transaction_Client_Invite *transaction = reinterpret_cast<SIP_Transaction_Client_Invite *>(p);
     if (!transaction)
     {
-        _logger.warning("SIP_Transaction_Client_Invite::timer_D_callback -> Invalid parameter");
+        _logger.warning("Invalid timer D callback parameter");
         return false;
     }
 
@@ -699,7 +719,7 @@ bool SIP_Transaction_Client_Non_Invite::timer_E_callback(void *p)
     SIP_Transaction_Client_Non_Invite *transaction = reinterpret_cast<SIP_Transaction_Client_Non_Invite *>(p);
     if (!transaction)
     {
-        _logger.warning("SIP_Transaction_Client_Non_Invite::timer_E_callback -> Invalid parameter");
+        _logger.warning("Invalid timer E callback parameter");
         return false;
     }
 
@@ -743,7 +763,7 @@ bool SIP_Transaction_Client_Non_Invite::timer_F_callback(void *p)
     SIP_Transaction_Client_Non_Invite *transaction = reinterpret_cast<SIP_Transaction_Client_Non_Invite *>(p);
     if (!transaction)
     {
-        _logger.warning("SIP_Transaction_Client_Non_Invite::timer_F_callback -> Invalid parameter");
+        _logger.warning("Invalid timer F callback parameter");
         return false;
     }
 
@@ -777,7 +797,7 @@ bool SIP_Transaction_Client_Non_Invite::timer_K_callback(void *p)
     SIP_Transaction_Client_Non_Invite *transaction = reinterpret_cast<SIP_Transaction_Client_Non_Invite *>(p);
     if (!transaction)
     {
-        _logger.warning("SIP_Transaction_Client_Non_Invite::timer_K_callback -> Invalid parameter");
+        _logger.warning("Invalid timer K callback parameter");
         return false;
     }
 
@@ -942,7 +962,7 @@ bool SIP_Transaction_Server_Invite::timer_G_callback(void *p)
     SIP_Transaction_Server_Invite *transaction = reinterpret_cast<SIP_Transaction_Server_Invite *>(p);
     if (!transaction)
     {
-        _logger.warning("SIP_Transaction_Server_Invite::timer_G_callback -> Invalid parameter");
+        _logger.warning("Invalid timer G callback parameter");
         return false;
     }
 
@@ -975,7 +995,7 @@ bool SIP_Transaction_Server_Invite::timer_H_callback(void *p)
     SIP_Transaction_Server_Invite *transaction = reinterpret_cast<SIP_Transaction_Server_Invite *>(p);
     if (!transaction)
     {
-        _logger.warning("SIP_Transaction_Server_Invite::timer_H_callback -> Invalid parameter");
+        _logger.warning("Invalid timer H callback parameter");
         return false;
     }
 
@@ -1000,7 +1020,7 @@ bool SIP_Transaction_Server_Invite::timer_I_callback(void *p)
     SIP_Transaction_Server_Invite *transaction = reinterpret_cast<SIP_Transaction_Server_Invite *>(p);
     if (!transaction)
     {
-        _logger.warning("SIP_Transaction_Server_Invite::timer_I_callback -> Invalid parameter");
+        _logger.warning("Invalid timer I callback parameter");
         return false;
     }
 
@@ -1129,7 +1149,7 @@ bool SIP_Transaction_Server_Non_Invite::timer_J_callback(void *p)
     SIP_Transaction_Server_Non_Invite *transaction = reinterpret_cast<SIP_Transaction_Server_Non_Invite *>(p);
     if (!transaction)
     {
-        _logger.warning("SIP_Transaction_Server_Non_Invite::timer_J_callback -> Invalid parameter");
+        _logger.warning("Invalid timer J callback parameter");
         return false;
     }
 
