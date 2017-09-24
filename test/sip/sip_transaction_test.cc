@@ -373,7 +373,6 @@ SIP_Transaction_Client_Invite_Test::SIP_Transaction_Client_Invite_Test()
 {
     SIP_Object_ID id;
     id._transaction = get_next_transaction_id();
-
     _transaction = new SIP_Transaction_Client_Invite(id);
 }
 

@@ -14,28 +14,6 @@
 
 //-------------------------------------------
 
-SIP_Transport_Test::SIP_Transport_Test()
-{
-    _connected = false;
-
-    _accepted_transport = NULL;
-    _accepted_port = SIP_Transport::INVALID_PORT;
-
-    _received_buffer[0] = 0;
-    _received_size = 0;
-    _received_port = SIP_Transport::INVALID_PORT;
-}
-
-//-------------------------------------------
-
-SIP_Transport_Test::~SIP_Transport_Test()
-{
-    if (_accepted_transport)
-        delete _accepted_transport;
-}
-
-//-------------------------------------------
-
 bool SIP_Transport_Test::init()
 {
     std::cout << "SIP transport test initialized\n";
@@ -88,17 +66,48 @@ template<class T> bool SIP_Transport_Test::run(Socket::Address_Family family, st
 }
 
 //-------------------------------------------
+//-------------------------------------------
+
+SIP_Transport_Test::SIP_Transport_Test() : _connected(false), _accepted_transport(NULL), _accepted_port(SIP_Transport::INVALID_PORT),
+    _received_size(0), _received_port(SIP_Transport::INVALID_PORT)
+{
+    _received_buffer[0] = 0;
+}
+
+//-------------------------------------------
+
+SIP_Transport_Test::~SIP_Transport_Test()
+{
+    if (_accepted_transport)
+        delete _accepted_transport;
+}
+
+//-------------------------------------------
 
 bool SIP_Transport_Test::set_callbacks()
 {
-    SIP_Transport &transport = get_transport();
+    SIP_Transport *transport = get_transport();
+    if (!transport)
+    {
+        std::cout << "SIP_Transport_Test::set_callbacks -> Invalid transport\n";
+        return false;
+    }
 
-    transport.set_connect_callback(connect_callback, this);
-    transport.set_accept_callback(accept_callback, this);
-    transport.set_receive_callback(receive_callback, this);
+    transport->set_connect_callback(connect_callback, this);
+    transport->set_accept_callback(accept_callback, this);
+    transport->set_receive_callback(receive_callback, this);
     return true;
 }
 
+//-------------------------------------------
+
+unsigned int SIP_Transport_Test::get_next_transport_id()
+{
+    static unsigned int NEXT_TRANSPORT_ID = 0;
+    return NEXT_TRANSPORT_ID++;
+}
+
+//-------------------------------------------
 //-------------------------------------------
 
 std::string SIP_Transport_Test::create_request()
@@ -142,6 +151,10 @@ bool SIP_Transport_Test::accept_callback(void *data, SIP_Transport *transport, S
         std::cout << "SIP_Transport_Test::accept_callback -> Invalid parameters\n";
         return false;
     }
+
+    SIP_Object_ID id;
+    id._transport = test->get_next_transport_id();
+    accepted->set_id(id);
 
     test->_accepted_transport = accepted;
     test->_accepted_address = address;
@@ -202,17 +215,41 @@ bool SIP_Transport_Test::check_network_address(Socket::Address_Family family, st
 //-------------------------------------------
 //-------------------------------------------
 
+SIP_Transport_UDP_Test::SIP_Transport_UDP_Test()
+{
+    SIP_Object_ID id;
+    id._transport = get_next_transport_id();
+    _transport_udp = new SIP_Transport_UDP(id);
+}
+
+//-------------------------------------------
+
+SIP_Transport_UDP_Test::~SIP_Transport_UDP_Test()
+{
+    if (_transport_udp)
+        delete _transport_udp;
+}
+
+//-------------------------------------------
+
 bool SIP_Transport_UDP_Test::run(Socket::Address_Family family, std::string address, unsigned short port)
 {
+    if (!_transport_udp)
+    {
+        std::cout << "SIP_Transport_UDP_Test::run -> Invalid transport\n";
+        return false;
+    }
+
     if (!SIP_Transport::start())
     {
         std::cout << "SIP_Transport_UDP_Test::run -> Failed to start SIP transport\n";
         return false;
     }
 
-    set_callbacks();
+    if (!set_callbacks())
+        return false;
 
-    if (!_transport_udp.init(address, port))
+    if (!_transport_udp->init(address, port))
     {
         std::cout << "SIP_Transport_UDP_Test::run -> Failed to init transport\n";
         return false;
@@ -225,7 +262,7 @@ bool SIP_Transport_UDP_Test::run(Socket::Address_Family family, std::string addr
     _received_address.clear();
     _received_port = SIP_Transport::INVALID_PORT;
 
-    if (!_transport_udp.send_message(request.c_str(), (int) request.size(), address, port))
+    if (!_transport_udp->send_message(request.c_str(), (int) request.size(), address, port))
     {
         std::cout << "SIP_Transport_UDP_Test::run -> Failed to send message\n";
         return false;
@@ -265,7 +302,7 @@ bool SIP_Transport_UDP_Test::run(Socket::Address_Family family, std::string addr
         return false;
     }
 
-    if (!_transport_udp.close())
+    if (!_transport_udp->close())
     {
         std::cout << "SIP_Transport_UDP_Test::run -> Failed to close transport\n";
         return false;
@@ -283,33 +320,65 @@ bool SIP_Transport_UDP_Test::run(Socket::Address_Family family, std::string addr
 //-------------------------------------------
 //-------------------------------------------
 
+SIP_Transport_TCP_Test::SIP_Transport_TCP_Test() : _current_transport(NULL)
+{
+    SIP_Object_ID client_id;
+    client_id._transport = get_next_transport_id();
+    _transport_tcp_client = new SIP_Transport_TCP_Client(client_id);
+
+    SIP_Object_ID server_id;
+    server_id._transport = get_next_transport_id();
+    _transport_tcp_server = new SIP_Transport_TCP_Server(server_id);
+}
+
+//-------------------------------------------
+
+SIP_Transport_TCP_Test::~SIP_Transport_TCP_Test()
+{
+    if (_transport_tcp_client)
+        delete _transport_tcp_client;
+
+    if (_transport_tcp_server)
+        delete _transport_tcp_server;
+}
+
+//-------------------------------------------
+
 bool SIP_Transport_TCP_Test::run(Socket::Address_Family family, std::string address, unsigned short port)
 {
+    if ((!_transport_tcp_client) || (!_transport_tcp_server))
+    {
+        std::cout << "SIP_Transport_TCP_Test::run -> Invalid transports\n";
+        return false;
+    }
+
     if (!SIP_Transport::start())
     {
         std::cout << "SIP_Transport_TCP_Test::run -> Failed to start SIP transport\n";
         return false;
     }
 
-    _current_transport = &_transport_tcp_client;
-    set_callbacks();
+    _current_transport = _transport_tcp_client;
+    if (!set_callbacks())
+        return false;
 
-    if (!_transport_tcp_client.init(address, 0))
+    if (!_transport_tcp_client->init(address, 0))
     {
         std::cout << "SIP_Transport_TCP_Test::run -> Failed to init TCP client transport\n";
         return false;
     }
 
-    _current_transport = &_transport_tcp_server;
-    set_callbacks();
+    _current_transport = _transport_tcp_server;
+    if (!set_callbacks())
+        return false;
 
-    if (!_transport_tcp_server.init(address, port))
+    if (!_transport_tcp_server->init(address, port))
     {
         std::cout << "SIP_Transport_TCP_Test::run -> Failed to init TCP server transport\n";
         return false;
     }
 
-    if (!_transport_tcp_server.listen(10))
+    if (!_transport_tcp_server->listen(10))
     {
         std::cout << "SIP_Transport_TCP_Test::run -> Failed to listen TCP server transport\n";
         return false;
@@ -321,7 +390,7 @@ bool SIP_Transport_TCP_Test::run(Socket::Address_Family family, std::string addr
     _accepted_address = "";
     _accepted_port = SIP_Transport::INVALID_PORT;
 
-    if (!_transport_tcp_client.connect(address, port))
+    if (!_transport_tcp_client->connect(address, port))
     {
         std::cout << "SIP_Transport_TCP_Test::run -> Failed to connect TCP client transport\n";
         return false;
@@ -376,7 +445,7 @@ bool SIP_Transport_TCP_Test::run(Socket::Address_Family family, std::string addr
     _received_address.clear();
     _received_port = SIP_Transport::INVALID_PORT;
 
-    if (!_transport_tcp_client.send_message(request.c_str(), (int) request.size(), address, port))
+    if (!_transport_tcp_client->send_message(request.c_str(), (int) request.size(), address, port))
     {
         std::cout << "SIP_Transport_TCP_Test::run -> Failed to send client message\n";
         return false;
@@ -406,7 +475,7 @@ bool SIP_Transport_TCP_Test::run(Socket::Address_Family family, std::string addr
         return false;
     }
 
-    if (!_transport_tcp_client.close())
+    if (!_transport_tcp_client->close())
     {
         std::cout << "SIP_Transport_UDP_Test::run -> Failed to close TCP client transport\n";
         return false;
@@ -418,7 +487,7 @@ bool SIP_Transport_TCP_Test::run(Socket::Address_Family family, std::string addr
         return false;
     }
 
-    if (!_transport_tcp_server.close())
+    if (!_transport_tcp_server->close())
     {
         std::cout << "SIP_Transport_UDP_Test::run -> Failed to close TCP server transport\n";
         return false;

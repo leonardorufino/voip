@@ -23,17 +23,18 @@ public:
     static const unsigned long DELAY = 500;
 
 public:
-    SIP_Transport_Test();
-    virtual ~SIP_Transport_Test();
-
     static bool init();
     template<class T> static bool run(Socket::Address_Family family, std::string address, unsigned short port);
 
 protected:
-    virtual bool run(Socket::Address_Family family, std::string address, unsigned short port) = 0;
-    virtual SIP_Transport &get_transport() = 0;
+    SIP_Transport_Test();
+    virtual ~SIP_Transport_Test();
 
+    virtual bool run(Socket::Address_Family family, std::string address, unsigned short port) = 0;
+    virtual SIP_Transport *get_transport() = 0;
     virtual bool set_callbacks();
+
+    unsigned int get_next_transport_id();
 
     std::string create_request();
 
@@ -65,14 +66,14 @@ protected:
 class SIP_Transport_UDP_Test : public SIP_Transport_Test
 {
 public:
-    SIP_Transport_UDP_Test() {}
-    virtual ~SIP_Transport_UDP_Test() {}
+    SIP_Transport_UDP_Test();
+    virtual ~SIP_Transport_UDP_Test();
 
     bool run(Socket::Address_Family family, std::string address, unsigned short port);
-    SIP_Transport &get_transport() { return _transport_udp; }
+    SIP_Transport *get_transport() { return _transport_udp; }
 
 protected:
-    SIP_Transport_UDP _transport_udp;
+    SIP_Transport_UDP *_transport_udp;
 };
 
 //-------------------------------------------
@@ -81,15 +82,15 @@ protected:
 class SIP_Transport_TCP_Test : public SIP_Transport_Test
 {
 public:
-    SIP_Transport_TCP_Test() : _current_transport(NULL) {}
-    virtual ~SIP_Transport_TCP_Test() {}
+    SIP_Transport_TCP_Test();
+    virtual ~SIP_Transport_TCP_Test();
 
     bool run(Socket::Address_Family family, std::string address, unsigned short port);
-    SIP_Transport &get_transport() { return *_current_transport; }
+    SIP_Transport *get_transport() { return _current_transport; }
 
 protected:
-    SIP_Transport_TCP_Client _transport_tcp_client;
-    SIP_Transport_TCP_Server _transport_tcp_server;
+    SIP_Transport_TCP_Client *_transport_tcp_client;
+    SIP_Transport_TCP_Server *_transport_tcp_server;
 
     SIP_Transport *_current_transport;
 };
