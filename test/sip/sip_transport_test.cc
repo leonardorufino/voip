@@ -225,7 +225,7 @@ bool SIP_Transport_UDP_Test::run(Socket::Address_Family family, std::string addr
     _received_address.clear();
     _received_port = SIP_Transport::INVALID_PORT;
 
-    if (!_transport_udp.send_message(request.c_str(), request.size(), address, port))
+    if (!_transport_udp.send_message(request.c_str(), (int) request.size(), address, port))
     {
         std::cout << "SIP_Transport_UDP_Test::run -> Failed to send message\n";
         return false;
@@ -376,7 +376,7 @@ bool SIP_Transport_TCP_Test::run(Socket::Address_Family family, std::string addr
     _received_address.clear();
     _received_port = SIP_Transport::INVALID_PORT;
 
-    if (!_transport_tcp_client.send_message(request.c_str(), request.size(), address, port))
+    if (!_transport_tcp_client.send_message(request.c_str(), (int) request.size(), address, port))
     {
         std::cout << "SIP_Transport_TCP_Test::run -> Failed to send client message\n";
         return false;

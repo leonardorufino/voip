@@ -30,7 +30,7 @@ SIP_Request *SIP_User_Agent_Client::create_request(unsigned int call_id, SIP_Met
     if (method >= SIP_RESPONSE)
     {
         logger.warning("Failed to send request: invalid request (call_id=%d)", call_id);
-        return false;
+        return NULL;
     }
 
     SIP_Request *request = new SIP_Request(method);
