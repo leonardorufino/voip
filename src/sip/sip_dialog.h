@@ -29,7 +29,7 @@ public:
     };
 
 public:
-    SIP_Dialog();
+    SIP_Dialog(SIP_Object_ID id);
     ~SIP_Dialog();
 
     bool set_client_dialog(SIP_Request *request, SIP_Response *response);
@@ -72,6 +72,8 @@ public:
     SIP_Header_Route *get_route(int pos);
 
 private:
+    SIP_Object_ID _id;
+
     State _state;
     std::string _call_id;
     std::string _local_tag;
