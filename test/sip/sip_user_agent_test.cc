@@ -53,6 +53,12 @@ bool SIP_User_Agent_Test::init()
 
         if (!run<SIP_User_Agent_Call_Success_Test>(family_ipv4, address_ipv4, port_ipv4, SIP_TRANSPORT_TCP))
             return false;
+
+        if (!run<SIP_User_Agent_Call_Success_No_100_Test>(family_ipv4, address_ipv4, port_ipv4, SIP_TRANSPORT_UDP))
+            return false;
+
+        if (!run<SIP_User_Agent_Call_Success_No_100_Test>(family_ipv4, address_ipv4, port_ipv4, SIP_TRANSPORT_TCP))
+            return false;
     }else
         std::cout << "IPv4 SIP user agent test disabled\n";
 
@@ -69,6 +75,12 @@ bool SIP_User_Agent_Test::init()
             return false;
 
         if (!run<SIP_User_Agent_Call_Success_Test>(family_ipv6, address_ipv6, port_ipv6, SIP_TRANSPORT_TCP))
+            return false;
+
+        if (!run<SIP_User_Agent_Call_Success_No_100_Test>(family_ipv6, address_ipv6, port_ipv6, SIP_TRANSPORT_UDP))
+            return false;
+
+        if (!run<SIP_User_Agent_Call_Success_No_100_Test>(family_ipv6, address_ipv6, port_ipv6, SIP_TRANSPORT_TCP))
             return false;
     }else
         std::cout << "IPv6 SIP user agent test disabled\n";
@@ -416,6 +428,55 @@ bool SIP_User_Agent_Call_Success_Test::run(Socket::Address_Family family, std::s
         return false;
 
     if (!process_response(call_id_2, SIP_REQUEST_BYE, 200))
+        return false;
+
+    if (!close_user_agent())
+        return false;
+
+    return true;
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+bool SIP_User_Agent_Call_Success_No_100_Test::run(Socket::Address_Family family, std::string address, unsigned short port,
+                                                  SIP_Transport_Type transport)
+{
+    if (!init_user_agent(address, port))
+        return false;
+
+    unsigned int call_id_1 = 0;
+
+    if (!process_request(call_id_1, SIP_REQUEST_INVITE, address, port, transport))
+        return false;
+
+    unsigned int call_id_2 = _call_id_callback;
+
+    if (!process_response(call_id_2, SIP_REQUEST_INVITE, 183))
+        return false;
+
+    if (!process_response(call_id_2, SIP_REQUEST_INVITE, 200))
+        return false;
+
+    if (!process_request(call_id_1, SIP_REQUEST_ACK))
+        return false;
+
+    if (!process_request(call_id_2, SIP_REQUEST_INFO))
+        return false;
+
+    if (!process_response(call_id_1, SIP_REQUEST_INFO, 200))
+        return false;
+
+    if (!process_request(call_id_1, SIP_REQUEST_MESSAGE))
+        return false;
+
+    if (!process_response(call_id_2, SIP_REQUEST_MESSAGE, 200))
+        return false;
+
+    if (!process_request(call_id_2, SIP_REQUEST_BYE))
+        return false;
+
+    if (!process_response(call_id_1, SIP_REQUEST_BYE, 200))
         return false;
 
     if (!close_user_agent())
