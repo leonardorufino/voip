@@ -26,8 +26,6 @@ public:
     typedef bool (receive_request_callback)(void *data, SIP_Call *call, SIP_Request *request);
     typedef bool (receive_response_callback)(void *data, SIP_Call *call, SIP_Request *request, SIP_Response *response);
 
-    static const unsigned int INVALID_CALL_ID = INVALID_UNSIGNED_INT;
-
     enum State
     {
         STATE_IDLE,
@@ -53,10 +51,10 @@ public:
     };
 
 public:
-    SIP_Call(unsigned int call_id) : _call_id(call_id), _state(STATE_IDLE) {}
+    SIP_Call(SIP_Object_ID id) : _id(id), _state(STATE_IDLE), _next_dialog_id(0), _next_transaction_id(0) {}
     ~SIP_Call();
 
-    unsigned int get_call_id() { return _call_id; }
+    unsigned int get_call_id() { return _id._call; }
 
     void set_state(State state) { _state = state; }
     State get_state() { return _state; }
@@ -142,7 +140,8 @@ public:
     static bool transaction_receive_response_callback(void *data, SIP_Transaction *transaction, SIP_Request *request, SIP_Response *response);
 
 private:
-    unsigned int _call_id;
+    SIP_Object_ID _id;
+
     State _state;
 
     std::string _header_call_id;
@@ -157,7 +156,10 @@ private:
     receive_response_callback *_receive_response_callback;
     void *_receive_response_callback_data;
 
+    unsigned int _next_dialog_id;
     std::list<SIP_Dialog *> _dialogs;
+
+    unsigned int _next_transaction_id;
     std::list<SIP_Transaction *> _transactions;
 
     static Logger _logger;
