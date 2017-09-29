@@ -81,11 +81,13 @@ public:
     static const unsigned int MAX_CALLS = 5000;
 
 public:
-    SIP_User_Agent();
+    SIP_User_Agent(SIP_Object_ID id) : _id(id), _user_agent_client(this), _user_agent_server(this), _next_transport_id(0) {}
     ~SIP_User_Agent();
 
     bool init(std::string address, unsigned short port);
     bool close();
+
+    SIP_Object_ID get_id() { return _id; }
 
     std::string get_address() { return _address; }
     unsigned short get_port() { return _port; }
@@ -121,6 +123,8 @@ public:
     static Logger &get_logger() { return _logger; }
 
 private:
+    SIP_Object_ID _id;
+
     std::string _address;
     unsigned short _port;
 
@@ -128,6 +132,8 @@ private:
     SIP_User_Agent_Server _user_agent_server;
 
     std::list<SIP_Call *> _calls;
+
+    unsigned int _next_transport_id;
     std::list<SIP_Transport *> _transports;
     std::map<SIP_Transport *, std::list<std::string>> _pending_messages;
 

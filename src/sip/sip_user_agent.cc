@@ -29,7 +29,8 @@ SIP_Request *SIP_User_Agent_Client::create_request(unsigned int call_id, SIP_Met
 
     if (method >= SIP_RESPONSE)
     {
-        logger.warning("Failed to send request: invalid request (call_id=%d)", call_id);
+        logger.warning("Failed to create request: invalid request (call_id=%d) [%s]",
+                       call_id, _user_agent->get_id().to_string().c_str());
         return NULL;
     }
 
@@ -84,7 +85,8 @@ SIP_Request *SIP_User_Agent_Client::create_request(unsigned int call_id, SIP_Met
         SIP_Dialog *dialog = call->get_dialog();
         if (!dialog)
         {
-            logger.warning("Failed to create request: invalid dialog (call_id=%d, method=%d)", call_id, method);
+            logger.warning("Failed to create request: invalid dialog (call_id=%d, method=%d) [%s]",
+                           call_id, method, _user_agent->get_id().to_string().c_str());
             delete request;
             return NULL;
         }
@@ -109,7 +111,8 @@ SIP_Request *SIP_User_Agent_Client::create_request(unsigned int call_id, SIP_Met
             SIP_Header_Route *first_header_route = dialog->get_route(0);
             if (!first_header_route)
             {
-                logger.warning("Failed to create request: invalid route header from dialog (call_id=%d, method=%d)", call_id, method);
+                logger.warning("Failed to create request: invalid route header from dialog (call_id=%d, method=%d) [%s]",
+                               call_id, method, _user_agent->get_id().to_string().c_str());
                 delete request;
                 return NULL;
             }
@@ -157,7 +160,8 @@ bool SIP_User_Agent_Client::send_request(unsigned int call_id, SIP_Request *requ
 
     if (!request)
     {
-        logger.warning("Failed to send request: invalid request (call_id=%d)", call_id);
+        logger.warning("Failed to send request: invalid request (call_id=%d) [%s]",
+                       call_id, _user_agent->get_id().to_string().c_str());
         return false;
     }
 
@@ -174,31 +178,39 @@ bool SIP_User_Agent_Client::send_request(unsigned int call_id, SIP_Request *requ
             SIP_Header_From *header_from = dynamic_cast<SIP_Header_From *>(request->get_header(SIP_HEADER_FROM));
             if ((!header_call_id) || (!header_from))
             {
-                logger.warning("Failed to send request: invalid headers (call_id=%d, method=%d)", call_id, method);
+                logger.warning("Failed to send request: invalid headers (call_id=%d, method=%d) [%s]",
+                               call_id, method, _user_agent->get_id().to_string().c_str());
                 return false;
             }
 
             if (call_id >= SIP_User_Agent::MAX_CALLS)
             {
-                logger.warning("Failed to send request: invalid call-id (call_id=%d, method=%d)", call_id, method);
+                logger.warning("Failed to send request: invalid call-id (call_id=%d, method=%d) [%s]",
+                               call_id, method, _user_agent->get_id().to_string().c_str());
                 return false;
             }
 
-            call = new SIP_Call(call_id);
+            SIP_Object_ID id = _user_agent->get_id();
+            id._call = call_id;
+
+            call = new SIP_Call(id);
             call->set_header_call_id(header_call_id->get_call_id());
             call->set_local_tag(header_from->get_tag());
             _user_agent->add_call(call);
             call_created = true;
         }else
         {
-            logger.warning("Failed to send request: invalid call (call_id=%d, method=%d)", call_id, method);
+            logger.warning("Failed to send request: invalid call (call_id=%d, method=%d) [%s]",
+                           call_id, method, _user_agent->get_id().to_string().c_str());
             return false;
         }
     }
 
     if (!call->send_request(request))
     {
-        logger.warning("Failed to send request: process send request returned false (call_id=%d, method=%d)", call_id, method);
+        logger.warning("Failed to send request: send request failed (call_id=%d, method=%d) [%s]",
+                       call_id, method, _user_agent->get_id().to_string().c_str());
+
         if (call_created)
             _user_agent->remove_call(call);
         return false;
@@ -218,20 +230,23 @@ bool SIP_User_Agent_Client::receive_response(SIP_Response *response)
     unsigned short via_size = response->get_header_size(SIP_HEADER_VIA);
     if (via_size != 1)
     {
-        logger.warning("Failed to receive response: invalid Via header size (size=%d, status_code=%d)", via_size, status_code);
+        logger.warning("Failed to receive response: invalid Via header size (size=%d, status_code=%d) [%s]",
+                       via_size, status_code, _user_agent->get_id().to_string().c_str());
         return false;
     }
 
     SIP_Call *call = _user_agent->get_call(response);
     if (!call)
     {
-        logger.warning("Failed to receive response: invalid call (status_code=%d)", status_code);
+        logger.warning("Failed to receive response: invalid call (status_code=%d) [%s]",
+                       status_code, _user_agent->get_id().to_string().c_str());
         return false;
     }
 
     if (!call->receive_response(response))
     {
-        logger.warning("Failed to receive response: process receive response returned false (status_code=%d)", status_code);
+        logger.warning("Failed to receive response: receive response failed (status_code=%d) [%s]",
+                       status_code, _user_agent->get_id().to_string().c_str());
         return false;
     }
 
@@ -246,21 +261,22 @@ bool SIP_User_Agent_Client::receive_response(SIP_Call *call, SIP_Request *reques
 
     try
     {
-        if (_receive_response_callback)
+        if (!_receive_response_callback)
         {
-            logger.trace("Calling receive response callback");
-            return _receive_response_callback(_receive_response_callback_data, _user_agent, call->get_call_id(), request, response);
+            logger.warning("Receive response callback not configured [%s]", _user_agent->get_id().to_string().c_str());
+            return false;
         }
 
-        logger.trace("Receive response callback not configured");
-        return false;
+        logger.trace("Calling receive response callback [%s]", _user_agent->get_id().to_string().c_str());
+        return _receive_response_callback(_receive_response_callback_data, _user_agent, call->get_call_id(), request, response);
+
     }catch (std::exception &e)
     {
-        logger.warning("Exception when calling receive response callback (msg=%s)", e.what());
+        logger.warning("Exception in receive response (msg=%s) [%s]", e.what(), _user_agent->get_id().to_string().c_str());
         return false;
     }catch (...)
     {
-        logger.warning("Exception when calling receive response callback");
+        logger.warning("Exception in receive response [%s]", _user_agent->get_id().to_string().c_str());
         return false;
     }
 }
@@ -282,7 +298,8 @@ SIP_Response *SIP_User_Agent_Server::create_response(unsigned int call_id, SIP_R
 
     if ((!request) || (status_code < 100) || (status_code > 699))
     {
-        logger.warning("Failed to create response: invalid parameters (call_id=%d, status_code=%d)", call_id, status_code);
+        logger.warning("Failed to create response: invalid parameters (call_id=%d, status_code=%d) [%s]",
+                       call_id, status_code, _user_agent->get_id().to_string().c_str());
         return NULL;
     }
 
@@ -291,7 +308,8 @@ SIP_Response *SIP_User_Agent_Server::create_response(unsigned int call_id, SIP_R
     SIP_Call *call = _user_agent->get_call(call_id);
     if (!call)
     {
-        logger.warning("Failed to create response: invalid call (call_id=%d, method=%d, status_code=%d)", call_id, method, status_code);
+        logger.warning("Failed to create response: invalid call (call_id=%d, method=%d, status_code=%d) [%s]",
+                       call_id, method, status_code, _user_agent->get_id().to_string().c_str());
         return NULL;
     }
 
@@ -300,7 +318,8 @@ SIP_Response *SIP_User_Agent_Server::create_response(unsigned int call_id, SIP_R
     SIP_Header_To *header_to = dynamic_cast<SIP_Header_To *>(response->get_header(SIP_HEADER_TO));
     if (!header_to)
     {
-        logger.warning("Failed to create response: invalid To header (call_id=%d, method=%d, status_code=%d)", call_id, method, status_code);
+        logger.warning("Failed to create response: invalid To header (call_id=%d, method=%d, status_code=%d) [%s]",
+                       call_id, method, status_code, _user_agent->get_id().to_string().c_str());
         return NULL;
     }
 
@@ -335,7 +354,8 @@ bool SIP_User_Agent_Server::send_response(unsigned int call_id, SIP_Response *re
 
     if (!response)
     {
-        logger.warning("Failed to send response: invalid response (call_id=%d)", call_id);
+        logger.warning("Failed to send response: invalid response (call_id=%d) [%s]",
+                       call_id, _user_agent->get_id().to_string().c_str());
         return false;
     }
 
@@ -344,14 +364,16 @@ bool SIP_User_Agent_Server::send_response(unsigned int call_id, SIP_Response *re
     SIP_Call *call = _user_agent->get_call(call_id);
     if (!call)
     {
-        logger.warning("Failed to send response: invalid call (call_id=%d, status_code=%d)", call_id, status_code);
+        logger.warning("Failed to send response: invalid call (call_id=%d, status_code=%d) [%s]",
+                       call_id, status_code, _user_agent->get_id().to_string().c_str());
         return false;
     }
 
     SIP_Header_To *header_to = dynamic_cast<SIP_Header_To *>(response->get_header(SIP_HEADER_TO));
     if (!header_to)
     {
-        logger.warning("Failed to send response: invalid To header (call_id=%d, status_code=%d)", call_id, status_code);
+        logger.warning("Failed to send response: invalid To header (call_id=%d, status_code=%d) [%s]",
+                       call_id, status_code, _user_agent->get_id().to_string().c_str());
         return false;
     }
 
@@ -359,7 +381,8 @@ bool SIP_User_Agent_Server::send_response(unsigned int call_id, SIP_Response *re
 
     if (!call->send_response(response))
     {
-        logger.warning("Failed to send response: process send response returned false (call_id=%d, status_code=%d)", call_id, status_code);
+        logger.warning("Failed to send response: send response failed (call_id=%d, status_code=%d) [%s]",
+                       call_id, status_code, _user_agent->get_id().to_string().c_str());
         return false;
     }
 
@@ -384,16 +407,21 @@ bool SIP_User_Agent_Server::receive_request(SIP_Request *request)
             SIP_Header_Call_ID *header_call_id = dynamic_cast<SIP_Header_Call_ID *>(request->get_header(SIP_HEADER_CALL_ID));
             if (!header_call_id)
             {
-                logger.warning("Failed to receive request: invalid Call-ID header (method=%d)", method);
+                logger.warning("Failed to receive request: invalid Call-ID header (method=%d) [%s]",
+                               method, _user_agent->get_id().to_string().c_str());
                 return false;
             }
 
-            unsigned int call_id = _user_agent->get_free_call_id();
-            if (call_id == SIP_Call::INVALID_CALL_ID)
+            unsigned int new_call_id = _user_agent->get_free_call_id();
+            if (new_call_id == SIP_Object_ID::INVALID_CALL)
             {
-                logger.warning("Failed to receive request: no free call-id (method=%d)", method);
+                logger.warning("Failed to receive request: no free call-id (method=%d) [%s]",
+                               method, _user_agent->get_id().to_string().c_str());
                 return false;
             }
+
+            SIP_Object_ID call_id = _user_agent->get_id();
+            call_id._call = new_call_id;
 
             call = new SIP_Call(call_id);
             call->set_header_call_id(header_call_id->get_call_id());
@@ -401,14 +429,17 @@ bool SIP_User_Agent_Server::receive_request(SIP_Request *request)
             call_created = true;
         }else
         {
-            logger.warning("Failed to receive request: invalid call (method=%d)", method);
+            logger.warning("Failed to receive request: invalid call (method=%d) [%s]",
+                           method, _user_agent->get_id().to_string().c_str());
             return false;
         }
     }
 
     if (!call->receive_request(request))
     {
-        logger.warning("Failed to receive request: process receive request returned false (method=%d)", method);
+        logger.warning("Failed to receive request: receive request failed (method=%d) [%s]",
+                       method, _user_agent->get_id().to_string().c_str());
+
         if (call_created)
             _user_agent->remove_call(call);
         return false;
@@ -425,32 +456,27 @@ bool SIP_User_Agent_Server::receive_request(SIP_Call *call, SIP_Request *request
 
     try
     {
-        if (_receive_request_callback)
+        if (!_receive_request_callback)
         {
-            logger.trace("Calling receive request callback");
-            return _receive_request_callback(_receive_request_callback_data, _user_agent, call->get_call_id(), request);
+            logger.warning("Receive request callback not configured [%s]", _user_agent->get_id().to_string().c_str());
+            return false;
         }
 
-        logger.trace("Receive request callback not configured");
-        return false;
+        logger.trace("Calling receive request callback [%s]", _user_agent->get_id().to_string().c_str());
+        return _receive_request_callback(_receive_request_callback_data, _user_agent, call->get_call_id(), request);
+
     }catch (std::exception &e)
     {
-        logger.warning("Exception when calling receive request callback (msg=%s)", e.what());
+        logger.warning("Exception in receive request (msg=%s) [%s]", e.what(), _user_agent->get_id().to_string().c_str());
         return false;
     }catch (...)
     {
-        logger.warning("Exception when calling receive request callback");
+        logger.warning("Exception in receive request [%s]", _user_agent->get_id().to_string().c_str());
         return false;
     }
 }
 
 //-------------------------------------------
-//-------------------------------------------
-
-SIP_User_Agent::SIP_User_Agent() : _user_agent_client(this), _user_agent_server(this)
-{
-}
-
 //-------------------------------------------
 
 SIP_User_Agent::~SIP_User_Agent()
@@ -466,34 +492,40 @@ bool SIP_User_Agent::init(std::string address, unsigned short port)
     _address = address;
     _port = port;
 
-    SIP_Transport_UDP *udp = new SIP_Transport_UDP();
+    SIP_Object_ID udp_transport_id = _id;
+    udp_transport_id._transport = _next_transport_id++;
+
+    SIP_Transport_UDP *udp = new SIP_Transport_UDP(udp_transport_id);
     add_transport(udp);
 
     if (!udp->init(_address, _port))
     {
-        _logger.warning("Failed to init: UDP transport");
+        _logger.warning("Failed to init: UDP transport init failed [%s]", _id.to_string().c_str());
         clear_transports();
         return false;
     }
 
-    SIP_Transport_TCP_Server *tcp_server = new SIP_Transport_TCP_Server();
+    SIP_Object_ID tcp_transport_id = _id;
+    tcp_transport_id._transport = _next_transport_id++;
+
+    SIP_Transport_TCP_Server *tcp_server = new SIP_Transport_TCP_Server(tcp_transport_id);
     add_transport(tcp_server);
 
     if (!tcp_server->init(_address, _port))
     {
-        _logger.warning("Failed to init: TCP server transport");
+        _logger.warning("Failed to init: TCP server transport init failed [%s]", _id.to_string().c_str());
         clear_transports();
         return false;
     }
 
     if (!tcp_server->listen(MAX_CALLS))
     {
-        _logger.warning("Failed to init: TCP server transport listen");
+        _logger.warning("Failed to init: TCP server transport listen failed [%s]", _id.to_string().c_str());
         clear_transports();
         return false;
     }
 
-    _logger.trace("User agent initialized");
+    _logger.trace("User agent initialized [%s]", _id.to_string().c_str());
     return true;
 }
 
@@ -504,7 +536,7 @@ bool SIP_User_Agent::close()
     clear_calls();
     clear_transports();
 
-    _logger.trace("User agent closed");
+    _logger.trace("User agent closed [%s]", _id.to_string().c_str());
     return true;
 }
 
@@ -517,7 +549,7 @@ SIP_Call *SIP_User_Agent::get_call(SIP_Message *msg)
     SIP_Header_To *header_to = dynamic_cast<SIP_Header_To *>(msg->get_header(SIP_HEADER_TO));
     if ((!header_call_id) || (!header_from) || (!header_to))
     {
-        _logger.warning("Failed to get call: invalid headers");
+        _logger.warning("Failed to get call: invalid headers [%s]", _id.to_string().c_str());
         return NULL;
     }
 
@@ -598,7 +630,7 @@ unsigned int SIP_User_Agent::get_free_call_id()
         call_id--;
     }
 
-    return SIP_Call::INVALID_CALL_ID;
+    return SIP_Object_ID::INVALID_CALL;
 }
 
 //-------------------------------------------
@@ -679,7 +711,7 @@ bool SIP_User_Agent::send_message(SIP_Message *msg)
 {
     if (!msg)
     {
-        _logger.warning("Failed to send message: invalid parameter");
+        _logger.warning("Failed to send message: invalid parameter [%s]", _id.to_string().c_str());
         return false;
     }
 
@@ -688,7 +720,7 @@ bool SIP_User_Agent::send_message(SIP_Message *msg)
     SIP_Header_Via *header_via = dynamic_cast<SIP_Header_Via *>(msg->get_header(SIP_HEADER_VIA));
     if (!header_via)
     {
-        _logger.warning("Failed to send request: invalid Via header (method=%d)", method);
+        _logger.warning("Failed to send request: invalid Via header (method=%d) [%s]", method, _id.to_string().c_str());
         return false;
     }
 
@@ -710,7 +742,7 @@ bool SIP_User_Agent::send_message(SIP_Message *msg)
             SIP_Request *request = dynamic_cast<SIP_Request *>(msg);
             if (!request)
             {
-                _logger.warning("Failed to send message: invalid request (method=%d)", method);
+                _logger.warning("Failed to send message: invalid request (method=%d) [%s]", method, _id.to_string().c_str());
                 return false;
             }
 
@@ -728,8 +760,8 @@ bool SIP_User_Agent::send_message(SIP_Message *msg)
 
     if ((remote_address.empty()) || (remote_port == SIP_Transport::INVALID_PORT))
     {
-        _logger.warning("Failed to send message: invalid remote address (method=%d, address=%s, port=%d)",
-                        method, remote_address.c_str(), remote_port);
+        _logger.warning("Failed to send message: invalid remote address (method=%d, address=%s, port=%d) [%s]",
+                        method, remote_address.c_str(), remote_port, _id.to_string().c_str());
         return false;
     }
 
@@ -742,20 +774,24 @@ bool SIP_User_Agent::send_message(SIP_Message *msg)
     {
         if (transport_type == SIP_TRANSPORT_TCP)
         {
-            SIP_Transport_TCP_Client *tcp_client = new SIP_Transport_TCP_Client();
+            SIP_Object_ID transport_id = _id;
+            transport_id._transport = _next_transport_id++;
+
+            SIP_Transport_TCP_Client *tcp_client = new SIP_Transport_TCP_Client(transport_id);
             add_transport(tcp_client);
 
             if (!tcp_client->init(_address, 0))
             {
-                _logger.warning("Failed to send message: failed to init TCP client transport (address=%s)", _address.c_str());
+                _logger.warning("Failed to send message: failed to init TCP client transport (address=%s) [%s]",
+                                _address.c_str(), _id.to_string().c_str());
                 remove_transport(transport);
                 return false;
             }
 
             if (!tcp_client->connect(remote_address, remote_port))
             {
-                _logger.warning("Failed to send message: failed to connect TCP client transport (address=%s, port=%d)",
-                                remote_address.c_str(), remote_port);
+                _logger.warning("Failed to send message: failed to connect TCP client transport (address=%s, port=%d) [%s]",
+                                remote_address.c_str(), remote_port, _id.to_string().c_str());
                 remove_transport(transport);
                 return false;
             }
@@ -765,13 +801,13 @@ bool SIP_User_Agent::send_message(SIP_Message *msg)
 
             _pending_messages[tcp_client] = messages;
 
-            _logger.trace("Connecting TCP client transport: send message is pending (method=%d, address=%s, port=%d, size=%d)",
-                          method, remote_address.c_str(), remote_port, size);
+            _logger.trace("Connecting TCP client transport: send message is pending (method=%d, address=%s, port=%d, size=%d) [%s]",
+                          method, remote_address.c_str(), remote_port, size, _id.to_string().c_str());
             return true;
         }else
         {
-            _logger.warning("Failed to send request: transport not found (method=%d, transport=%d, address=%s, port=%d)",
-                            method, transport_type, remote_address.c_str(), remote_port);
+            _logger.warning("Failed to send request: transport not found (method=%d, transport=%d, address=%s, port=%d) [%s]",
+                            method, transport_type, remote_address.c_str(), remote_port, _id.to_string().c_str());
             return false;
         }
     }else
@@ -784,19 +820,21 @@ bool SIP_User_Agent::send_message(SIP_Message *msg)
             {
                 _pending_messages[tcp_client].push_back(send_buffer);
 
-                _logger.trace("Waiting TCP client transport connection: send message is pending (method=%d, address=%s, port=%d, size=%d)",
-                                method, remote_address.c_str(), remote_port, size);
+                _logger.trace("Waiting TCP client transport connection: send message is pending (method=%d, address=%s, port=%d, size=%d) [%s]",
+                                method, remote_address.c_str(), remote_port, size, _id.to_string().c_str());
                 return true;
             }else
             {
-                _logger.warning("Failed to send request: invalid TCP client transport state (method=%d, address=%s, port=%d)",
-                                method, remote_address.c_str(), remote_port);
+                _logger.warning("Failed to send request: invalid TCP client transport state (method=%d, address=%s, port=%d) [%s]",
+                                method, remote_address.c_str(), remote_port, _id.to_string().c_str());
                 return false;
             }
         }
     }
 
-    _logger.trace("Sending message (method=%d, address=%s, port=%d, size=%d)", method, remote_address.c_str(), remote_port, size);
+    _logger.trace("Sending message (method=%d, address=%s, port=%d, size=%d) [%s]", method, remote_address.c_str(),
+                  remote_port, size, _id.to_string().c_str());
+
     return transport->send_message(send_buffer.c_str(), size, remote_address, remote_port);
 }
 
@@ -854,7 +892,7 @@ bool SIP_User_Agent::transport_connect_callback(void *data, SIP_Transport *trans
         return false;
     }
 
-    _logger.trace("Transport connect callback (success=%d)", success);
+    _logger.trace("Transport connect callback (success=%d) [%s]", success, user_agent->_id.to_string().c_str());
 
     std::map<SIP_Transport *, std::list<std::string>>::iterator it = user_agent->_pending_messages.find(transport);
     if (it != user_agent->_pending_messages.end())
@@ -868,16 +906,22 @@ bool SIP_User_Agent::transport_connect_callback(void *data, SIP_Transport *trans
                 std::string &message = *it2++;
                 int size = (int) message.size();
 
-                _logger.trace("Sending pending message (size=%d)", size);
+                _logger.trace("Sending pending message (size=%d) [%s]", size, user_agent->_id.to_string().c_str());
 
                 if (!transport->send_message(message.c_str(), size, transport_tcp->get_remote_address(), transport_tcp->get_remote_port()))
-                    _logger.warning("Failed to send message in transport connect callback (size=%d)", size);
+                {
+                    _logger.warning("Failed in transport connect callback: send message failed (size=%d) [%s]",
+                                    size, user_agent->_id.to_string().c_str());
+                }
             }
         }
 
         user_agent->_pending_messages.erase(transport);
     }else
-        _logger.warning("Failed in transport connect callback: invalid pending messages (success=%d)", success);
+    {
+        _logger.warning("Failed in transport connect callback: invalid pending messages (success=%d) [%s]",
+                        success, user_agent->_id.to_string().c_str());
+    }
 
     return true;
 }
@@ -890,12 +934,16 @@ bool SIP_User_Agent::transport_accept_callback(void *data, SIP_Transport *transp
     SIP_User_Agent *user_agent = reinterpret_cast<SIP_User_Agent *>(data);
     if ((!user_agent) || (!transport))
     {
-        _logger.warning("Invalid transport connect callback parameters");
+        _logger.warning("Invalid transport accept callback parameters");
         return false;
     }
 
-    _logger.trace("Transport accept callback (address=%s, port=%d)", address.c_str(), port);
+    _logger.trace("Transport accept callback (address=%s, port=%d) [%s]", address.c_str(), port, user_agent->_id.to_string().c_str());
 
+    SIP_Object_ID transport_id = user_agent->_id;
+    transport_id._transport = user_agent->_next_transport_id++;
+
+    accepted->set_id(transport_id);
     user_agent->add_transport(accepted);
     return true;
 }
@@ -915,7 +963,7 @@ bool SIP_User_Agent::transport_receive_callback(void *data, SIP_Transport *trans
     SIP_Message *msg = SIP_Message::decode_msg(buffer);
     if (!msg)
     {
-        _logger.warning("Failed to decode SIP message received");
+        _logger.warning("Failed in transport receive callback: decode message failed [%s]", user_agent->_id.to_string().c_str());
         return false;
     }
 
@@ -925,26 +973,29 @@ bool SIP_User_Agent::transport_receive_callback(void *data, SIP_Transport *trans
     if ((!msg->get_header(SIP_HEADER_CALL_ID)) || (!msg->get_header(SIP_HEADER_CSEQ)) || (!msg->get_header(SIP_HEADER_FROM)) ||
         (!msg->get_header(SIP_HEADER_TO)) || (!header_via))
     {
-        _logger.warning("Invalid SIP message received: required headers are not present (method=%d)", method);
+        _logger.warning("Failed in transport receive callback: required headers not present (method=%d) [%s]",
+                        method, user_agent->_id.to_string().c_str());
         delete msg;
         return false;
     }
 
-    _logger.trace("Message received (method=%d)", method);
+    _logger.trace("Message received (method=%d) [%s]", method, user_agent->_id.to_string().c_str());
 
     if (method != SIP_RESPONSE)
     {
         SIP_Request *request = dynamic_cast<SIP_Request *>(msg);
         if (!request)
         {
-            _logger.warning("Invalid SIP request received (method=%d)", method);
+            _logger.warning("Failed in transport receive callback: invalid received SIP request (method=%d) [%s]",
+                            method, user_agent->_id.to_string().c_str());
             delete msg;
             return false;
         }
 
         if (!user_agent->_user_agent_server.receive_request(request))
         {
-            _logger.warning("Receive request returned false (method=%d)", method);
+            _logger.warning("Failed in transport receive callback: receive request failed (method=%d) [%s]",
+                            method, user_agent->_id.to_string().c_str());
             delete msg;
             return false;
         }
@@ -959,14 +1010,16 @@ bool SIP_User_Agent::transport_receive_callback(void *data, SIP_Transport *trans
         SIP_Response *response = dynamic_cast<SIP_Response *>(msg);
         if (!response)
         {
-            _logger.warning("Invalid SIP response received (method=%d)", method);
+            _logger.warning("Failed in transport receive callback: invalid received SIP response (method=%d) [%s]",
+                            method, user_agent->_id.to_string().c_str());
             delete msg;
             return false;
         }
 
         if (!user_agent->_user_agent_client.receive_response(response))
         {
-            _logger.warning("Receive response returned false (method=%d)", method);
+            _logger.warning("Failed in transport receive callback: receive response failed (method=%d) [%s]",
+                            method, user_agent->_id.to_string().c_str());
             delete msg;
             return false;
         }
