@@ -14,9 +14,27 @@
 
 //-------------------------------------------
 
-SIP_Call_Test::SIP_Call_Test() : _client_call(0), _server_call(1), _use_prack(false), _client_sequence(314158), _server_sequence(230),
-    _invite_sequence(0), _prack_rseq(988788), _sent_message(false), _received_request(false), _received_response(false)
+SIP_Call_Test::SIP_Call_Test() : _use_prack(false), _client_sequence(314158), _server_sequence(230), _invite_sequence(0),
+    _prack_rseq(988788), _sent_message(false), _received_request(false), _received_response(false)
 {
+    SIP_Object_ID client_id;
+    client_id._call = 0;
+    _client_call = new SIP_Call(client_id);
+
+    SIP_Object_ID server_id;
+    server_id._call = 1;
+    _server_call = new SIP_Call(server_id);
+}
+
+//-------------------------------------------
+
+SIP_Call_Test::~SIP_Call_Test()
+{
+    if (_client_call)
+        delete _client_call;
+
+    if (_server_call)
+        delete _server_call;
 }
 
 //-------------------------------------------
@@ -88,13 +106,13 @@ template<class T> bool SIP_Call_Test::run()
 
 bool SIP_Call_Test::set_callbacks()
 {
-    _server_call.set_send_message_callback(send_message_callback, this);
-    _server_call.set_receive_request_callback(receive_request_callback, this);
-    _server_call.set_receive_response_callback(receive_response_callback, this);
+    _server_call->set_send_message_callback(send_message_callback, this);
+    _server_call->set_receive_request_callback(receive_request_callback, this);
+    _server_call->set_receive_response_callback(receive_response_callback, this);
 
-    _client_call.set_send_message_callback(send_message_callback, this);
-    _client_call.set_receive_request_callback(receive_request_callback, this);
-    _client_call.set_receive_response_callback(receive_response_callback, this);
+    _client_call->set_send_message_callback(send_message_callback, this);
+    _client_call->set_receive_request_callback(receive_request_callback, this);
+    _client_call->set_receive_response_callback(receive_response_callback, this);
 
     return true;
 }
@@ -868,7 +886,7 @@ bool SIP_Call_Test::process_invite()
 
     _sent_message = false;
 
-    if (!_client_call.send_request(invite))
+    if (!_client_call->send_request(invite))
     {
         std::cout << "SIP_Call_Test::process_invite -> Failed to send request\n";
         delete invite;
@@ -882,16 +900,16 @@ bool SIP_Call_Test::process_invite()
         return false;
     }
 
-    if (_client_call.get_state() != SIP_Call::STATE_CALLING_OUT)
+    if (_client_call->get_state() != SIP_Call::STATE_CALLING_OUT)
     {
         std::cout << "SIP_Call_Test::process_invite -> Invalid client call state:\n";
         std::cout << std::setw(12) << "Expected: " << SIP_Call::STATE_CALLING_OUT << "\n";
-        std::cout << std::setw(12) << "State: " << _client_call.get_state() << "\n";
+        std::cout << std::setw(12) << "State: " << _client_call->get_state() << "\n";
         delete invite;
         return false;
     }
 
-    if (_client_call.get_client_dialog(invite))
+    if (_client_call->get_client_dialog(invite))
     {
         std::cout << "SIP_Call_Test::process_invite -> Invalid client dialog\n";
         delete invite;
@@ -900,7 +918,7 @@ bool SIP_Call_Test::process_invite()
 
     _received_request = false;
 
-    if (!_server_call.receive_request(invite))
+    if (!_server_call->receive_request(invite))
     {
         std::cout << "SIP_Call_Test::process_invite -> Failed to receive request\n";
         delete invite;
@@ -914,16 +932,16 @@ bool SIP_Call_Test::process_invite()
         return false;
     }
 
-    if (_server_call.get_state() != SIP_Call::STATE_CALLING_IN)
+    if (_server_call->get_state() != SIP_Call::STATE_CALLING_IN)
     {
         std::cout << "SIP_Call_Test::process_invite -> Invalid server call state:\n";
         std::cout << std::setw(12) << "Expected: " << SIP_Call::STATE_CALLING_IN << "\n";
-        std::cout << std::setw(12) << "State: " << _server_call.get_state() << "\n";
+        std::cout << std::setw(12) << "State: " << _server_call->get_state() << "\n";
         delete invite;
         return false;
     }
 
-    if (_server_call.get_server_dialog(invite))
+    if (_server_call->get_server_dialog(invite))
     {
         std::cout << "SIP_Call_Test::process_invite -> Invalid server dialog\n";
         delete invite;
@@ -947,7 +965,7 @@ bool SIP_Call_Test::process_invite_response_100()
 
     _sent_message = false;
 
-    if (!_server_call.send_response(invite_response_100))
+    if (!_server_call->send_response(invite_response_100))
     {
         std::cout << "SIP_Call_Test::process_invite_response_100 -> Failed to send response\n";
         delete invite_response_100;
@@ -961,16 +979,16 @@ bool SIP_Call_Test::process_invite_response_100()
         return false;
     }
 
-    if (_server_call.get_state() != SIP_Call::STATE_RINGING_IN)
+    if (_server_call->get_state() != SIP_Call::STATE_RINGING_IN)
     {
         std::cout << "SIP_Call_Test::process_invite_response_100 -> Invalid server call state:\n";
         std::cout << std::setw(12) << "Expected: " << SIP_Call::STATE_RINGING_IN << "\n";
-        std::cout << std::setw(12) << "State: " << _server_call.get_state() << "\n";
+        std::cout << std::setw(12) << "State: " << _server_call->get_state() << "\n";
         delete invite_response_100;
         return false;
     }
 
-    if (_server_call.get_server_dialog(invite_response_100))
+    if (_server_call->get_server_dialog(invite_response_100))
     {
         std::cout << "SIP_Call_Test::process_invite_response_100 -> Invalid server response dialog\n";
         delete invite_response_100;
@@ -979,7 +997,7 @@ bool SIP_Call_Test::process_invite_response_100()
 
     _received_response = false;
 
-    if (!_client_call.receive_response(invite_response_100))
+    if (!_client_call->receive_response(invite_response_100))
     {
         std::cout << "SIP_Call_Test::process_invite_response_100 -> Failed to receive response\n";
         delete invite_response_100;
@@ -993,16 +1011,16 @@ bool SIP_Call_Test::process_invite_response_100()
         return false;
     }
 
-    if (_client_call.get_state() != SIP_Call::STATE_RINGING_OUT)
+    if (_client_call->get_state() != SIP_Call::STATE_RINGING_OUT)
     {
         std::cout << "SIP_Call_Test::process_invite_response_100 -> Invalid client call state:\n";
         std::cout << std::setw(12) << "Expected: " << SIP_Call::STATE_RINGING_OUT << "\n";
-        std::cout << std::setw(12) << "State: " << _client_call.get_state() << "\n";
+        std::cout << std::setw(12) << "State: " << _client_call->get_state() << "\n";
         delete invite_response_100;
         return false;
     }
 
-    if (_client_call.get_client_dialog(invite_response_100))
+    if (_client_call->get_client_dialog(invite_response_100))
     {
         std::cout << "SIP_Call_Test::process_invite_response_100 -> Invalid client response dialog\n";
         delete invite_response_100;
@@ -1026,7 +1044,7 @@ bool SIP_Call_Test::process_invite_response_180()
 
     _sent_message = false;
 
-    if (!_server_call.send_response(invite_response_180))
+    if (!_server_call->send_response(invite_response_180))
     {
         std::cout << "SIP_Call_Test::process_invite_response_180 -> Failed to send response\n";
         delete invite_response_180;
@@ -1040,16 +1058,16 @@ bool SIP_Call_Test::process_invite_response_180()
         return false;
     }
 
-    if (_server_call.get_state() != SIP_Call::STATE_RINGING_IN)
+    if (_server_call->get_state() != SIP_Call::STATE_RINGING_IN)
     {
         std::cout << "SIP_Call_Test::process_invite_response_180 -> Invalid server call state:\n";
         std::cout << std::setw(12) << "Expected: " << SIP_Call::STATE_RINGING_IN << "\n";
-        std::cout << std::setw(12) << "State: " << _server_call.get_state() << "\n";
+        std::cout << std::setw(12) << "State: " << _server_call->get_state() << "\n";
         delete invite_response_180;
         return false;
     }
 
-    if (!_server_call.get_server_dialog(invite_response_180))
+    if (!_server_call->get_server_dialog(invite_response_180))
     {
         std::cout << "SIP_Call_Test::process_invite_response_180 -> Invalid server response dialog\n";
         delete invite_response_180;
@@ -1058,7 +1076,7 @@ bool SIP_Call_Test::process_invite_response_180()
 
     _received_response = false;
 
-    if (!_client_call.receive_response(invite_response_180))
+    if (!_client_call->receive_response(invite_response_180))
     {
         std::cout << "SIP_Call_Test::process_invite_response_180 -> Failed to receive response\n";
         delete invite_response_180;
@@ -1072,16 +1090,16 @@ bool SIP_Call_Test::process_invite_response_180()
         return false;
     }
 
-    if (_client_call.get_state() != SIP_Call::STATE_RINGING_OUT)
+    if (_client_call->get_state() != SIP_Call::STATE_RINGING_OUT)
     {
         std::cout << "SIP_Call_Test::process_invite_response_180 -> Invalid client call state:\n";
         std::cout << std::setw(12) << "Expected: " << SIP_Call::STATE_RINGING_OUT << "\n";
-        std::cout << std::setw(12) << "State: " << _client_call.get_state() << "\n";
+        std::cout << std::setw(12) << "State: " << _client_call->get_state() << "\n";
         delete invite_response_180;
         return false;
     }
 
-    if (!_client_call.get_client_dialog(invite_response_180))
+    if (!_client_call->get_client_dialog(invite_response_180))
     {
         std::cout << "SIP_Call_Test::process_invite_response_180 -> Invalid client response dialog\n";
         delete invite_response_180;
@@ -1105,7 +1123,7 @@ bool SIP_Call_Test::process_invite_response_183()
 
     _sent_message = false;
 
-    if (!_server_call.send_response(invite_response_183))
+    if (!_server_call->send_response(invite_response_183))
     {
         std::cout << "SIP_Call_Test::process_invite_response_183 -> Failed to send response\n";
         delete invite_response_183;
@@ -1119,16 +1137,16 @@ bool SIP_Call_Test::process_invite_response_183()
         return false;
     }
 
-    if (_server_call.get_state() != SIP_Call::STATE_RINGING_IN)
+    if (_server_call->get_state() != SIP_Call::STATE_RINGING_IN)
     {
         std::cout << "SIP_Call_Test::process_invite_response_183 -> Invalid server call state:\n";
         std::cout << std::setw(12) << "Expected: " << SIP_Call::STATE_RINGING_IN << "\n";
-        std::cout << std::setw(12) << "State: " << _server_call.get_state() << "\n";
+        std::cout << std::setw(12) << "State: " << _server_call->get_state() << "\n";
         delete invite_response_183;
         return false;
     }
 
-    if (!_server_call.get_server_dialog(invite_response_183))
+    if (!_server_call->get_server_dialog(invite_response_183))
     {
         std::cout << "SIP_Call_Test::process_invite_response_183 -> Invalid server response dialog\n";
         delete invite_response_183;
@@ -1137,7 +1155,7 @@ bool SIP_Call_Test::process_invite_response_183()
 
     _received_response = false;
 
-    if (!_client_call.receive_response(invite_response_183))
+    if (!_client_call->receive_response(invite_response_183))
     {
         std::cout << "SIP_Call_Test::process_invite_response_183 -> Failed to receive response\n";
         delete invite_response_183;
@@ -1151,16 +1169,16 @@ bool SIP_Call_Test::process_invite_response_183()
         return false;
     }
 
-    if (_client_call.get_state() != SIP_Call::STATE_RINGING_OUT)
+    if (_client_call->get_state() != SIP_Call::STATE_RINGING_OUT)
     {
         std::cout << "SIP_Call_Test::process_invite_response_183 -> Invalid client call state:\n";
         std::cout << std::setw(12) << "Expected: " << SIP_Call::STATE_RINGING_OUT << "\n";
-        std::cout << std::setw(12) << "State: " << _client_call.get_state() << "\n";
+        std::cout << std::setw(12) << "State: " << _client_call->get_state() << "\n";
         delete invite_response_183;
         return false;
     }
 
-    if (!_client_call.get_client_dialog(invite_response_183))
+    if (!_client_call->get_client_dialog(invite_response_183))
     {
         std::cout << "SIP_Call_Test::process_invite_response_183 -> Invalid client response dialog\n";
         delete invite_response_183;
@@ -1184,7 +1202,7 @@ bool SIP_Call_Test::process_invite_response_200()
 
     _sent_message = false;
 
-    if (!_server_call.send_response(invite_response_200))
+    if (!_server_call->send_response(invite_response_200))
     {
         std::cout << "SIP_Call_Test::process_invite_response_200 -> Failed to send response\n";
         delete invite_response_200;
@@ -1198,16 +1216,16 @@ bool SIP_Call_Test::process_invite_response_200()
         return false;
     }
 
-    if (_server_call.get_state() != SIP_Call::STATE_WAITING_ACK_IN)
+    if (_server_call->get_state() != SIP_Call::STATE_WAITING_ACK_IN)
     {
         std::cout << "SIP_Call_Test::process_invite_response_200 -> Invalid server call state:\n";
         std::cout << std::setw(12) << "Expected: " << SIP_Call::STATE_WAITING_ACK_IN << "\n";
-        std::cout << std::setw(12) << "State: " << _server_call.get_state() << "\n";
+        std::cout << std::setw(12) << "State: " << _server_call->get_state() << "\n";
         delete invite_response_200;
         return false;
     }
 
-    if (!_server_call.get_server_dialog(invite_response_200))
+    if (!_server_call->get_server_dialog(invite_response_200))
     {
         std::cout << "SIP_Call_Test::process_invite_response_200 -> Invalid server response dialog\n";
         delete invite_response_200;
@@ -1216,7 +1234,7 @@ bool SIP_Call_Test::process_invite_response_200()
 
     _received_response = false;
 
-    if (!_client_call.receive_response(invite_response_200))
+    if (!_client_call->receive_response(invite_response_200))
     {
         std::cout << "SIP_Call_Test::process_invite_response_200 -> Failed to receive response\n";
         delete invite_response_200;
@@ -1230,16 +1248,16 @@ bool SIP_Call_Test::process_invite_response_200()
         return false;
     }
 
-    if (_client_call.get_state() != SIP_Call::STATE_WAITING_ACK_OUT)
+    if (_client_call->get_state() != SIP_Call::STATE_WAITING_ACK_OUT)
     {
         std::cout << "SIP_Call_Test::process_invite_response_200 -> Invalid client call state:\n";
         std::cout << std::setw(12) << "Expected: " << SIP_Call::STATE_WAITING_ACK_OUT << "\n";
-        std::cout << std::setw(12) << "State: " << _client_call.get_state() << "\n";
+        std::cout << std::setw(12) << "State: " << _client_call->get_state() << "\n";
         delete invite_response_200;
         return false;
     }
 
-    if (!_client_call.get_client_dialog(invite_response_200))
+    if (!_client_call->get_client_dialog(invite_response_200))
     {
         std::cout << "SIP_Call_Test::process_invite_response_200 -> Invalid client response dialog\n";
         delete invite_response_200;
@@ -1263,7 +1281,7 @@ bool SIP_Call_Test::process_invite_response_480()
 
     _sent_message = false;
 
-    if (!_server_call.send_response(invite_response_480))
+    if (!_server_call->send_response(invite_response_480))
     {
         std::cout << "SIP_Call_Test::process_invite_response_480 -> Failed to send response\n";
         delete invite_response_480;
@@ -1277,16 +1295,16 @@ bool SIP_Call_Test::process_invite_response_480()
         return false;
     }
 
-    if (_server_call.get_state() != SIP_Call::STATE_CLOSED)
+    if (_server_call->get_state() != SIP_Call::STATE_CLOSED)
     {
         std::cout << "SIP_Call_Test::process_invite_response_480 -> Invalid server call state:\n";
         std::cout << std::setw(12) << "Expected: " << SIP_Call::STATE_CLOSED << "\n";
-        std::cout << std::setw(12) << "State: " << _server_call.get_state() << "\n";
+        std::cout << std::setw(12) << "State: " << _server_call->get_state() << "\n";
         delete invite_response_480;
         return false;
     }
 
-    if (_server_call.get_server_dialog(invite_response_480))
+    if (_server_call->get_server_dialog(invite_response_480))
     {
         std::cout << "SIP_Call_Test::process_invite_response_480 -> Invalid server response dialog\n";
         delete invite_response_480;
@@ -1295,7 +1313,7 @@ bool SIP_Call_Test::process_invite_response_480()
 
     _received_response = false;
 
-    if (!_client_call.receive_response(invite_response_480))
+    if (!_client_call->receive_response(invite_response_480))
     {
         std::cout << "SIP_Call_Test::process_invite_response_480 -> Failed to receive response\n";
         delete invite_response_480;
@@ -1309,16 +1327,16 @@ bool SIP_Call_Test::process_invite_response_480()
         return false;
     }
 
-    if (_client_call.get_state() != SIP_Call::STATE_CLOSED)
+    if (_client_call->get_state() != SIP_Call::STATE_CLOSED)
     {
         std::cout << "SIP_Call_Test::process_invite_response_480 -> Invalid client call state:\n";
         std::cout << std::setw(12) << "Expected: " << SIP_Call::STATE_CLOSED << "\n";
-        std::cout << std::setw(12) << "State: " << _client_call.get_state() << "\n";
+        std::cout << std::setw(12) << "State: " << _client_call->get_state() << "\n";
         delete invite_response_480;
         return false;
     }
 
-    if (_client_call.get_client_dialog(invite_response_480))
+    if (_client_call->get_client_dialog(invite_response_480))
     {
         std::cout << "SIP_Call_Test::process_invite_response_480 -> Invalid client response dialog\n";
         delete invite_response_480;
@@ -1342,7 +1360,7 @@ bool SIP_Call_Test::process_invite_response_487()
 
     _sent_message = false;
 
-    if (!_server_call.send_response(invite_response_487))
+    if (!_server_call->send_response(invite_response_487))
     {
         std::cout << "SIP_Call_Test::process_invite_response_487 -> Failed to send response\n";
         delete invite_response_487;
@@ -1356,16 +1374,16 @@ bool SIP_Call_Test::process_invite_response_487()
         return false;
     }
 
-    if (_server_call.get_state() != SIP_Call::STATE_CLOSED)
+    if (_server_call->get_state() != SIP_Call::STATE_CLOSED)
     {
         std::cout << "SIP_Call_Test::process_invite_response_487 -> Invalid server call state:\n";
         std::cout << std::setw(12) << "Expected: " << SIP_Call::STATE_CLOSED << "\n";
-        std::cout << std::setw(12) << "State: " << _server_call.get_state() << "\n";
+        std::cout << std::setw(12) << "State: " << _server_call->get_state() << "\n";
         delete invite_response_487;
         return false;
     }
 
-    if (_server_call.get_server_dialog(invite_response_487))
+    if (_server_call->get_server_dialog(invite_response_487))
     {
         std::cout << "SIP_Call_Test::process_invite_response_487 -> Invalid server response dialog\n";
         delete invite_response_487;
@@ -1374,7 +1392,7 @@ bool SIP_Call_Test::process_invite_response_487()
 
     _received_response = false;
 
-    if (!_client_call.receive_response(invite_response_487))
+    if (!_client_call->receive_response(invite_response_487))
     {
         std::cout << "SIP_Call_Test::process_invite_response_487 -> Failed to receive response\n";
         delete invite_response_487;
@@ -1388,16 +1406,16 @@ bool SIP_Call_Test::process_invite_response_487()
         return false;
     }
 
-    if (_client_call.get_state() != SIP_Call::STATE_CLOSED)
+    if (_client_call->get_state() != SIP_Call::STATE_CLOSED)
     {
         std::cout << "SIP_Call_Test::process_invite_response_487 -> Invalid client call state:\n";
         std::cout << std::setw(12) << "Expected: " << SIP_Call::STATE_CLOSED << "\n";
-        std::cout << std::setw(12) << "State: " << _client_call.get_state() << "\n";
+        std::cout << std::setw(12) << "State: " << _client_call->get_state() << "\n";
         delete invite_response_487;
         return false;
     }
 
-    if (_client_call.get_client_dialog(invite_response_487))
+    if (_client_call->get_client_dialog(invite_response_487))
     {
         std::cout << "SIP_Call_Test::process_invite_response_487 -> Invalid client response dialog\n";
         delete invite_response_487;
@@ -1421,7 +1439,7 @@ bool SIP_Call_Test::process_ack()
 
     _sent_message = false;
 
-    if (!_client_call.send_request(ack))
+    if (!_client_call->send_request(ack))
     {
         std::cout << "SIP_Call_Test::process_ack -> Failed to send request\n";
         delete ack;
@@ -1435,16 +1453,16 @@ bool SIP_Call_Test::process_ack()
         return false;
     }
 
-    if (_client_call.get_state() != SIP_Call::STATE_ACTIVE)
+    if (_client_call->get_state() != SIP_Call::STATE_ACTIVE)
     {
         std::cout << "SIP_Call_Test::process_ack -> Invalid client call state:\n";
         std::cout << std::setw(12) << "Expected: " << SIP_Call::STATE_ACTIVE << "\n";
-        std::cout << std::setw(12) << "State: " << _client_call.get_state() << "\n";
+        std::cout << std::setw(12) << "State: " << _client_call->get_state() << "\n";
         delete ack;
         return false;
     }
 
-    if (!_client_call.get_client_dialog(ack))
+    if (!_client_call->get_client_dialog(ack))
     {
         std::cout << "SIP_Call_Test::process_ack -> Invalid client dialog\n";
         delete ack;
@@ -1453,7 +1471,7 @@ bool SIP_Call_Test::process_ack()
 
     _received_request = false;
 
-    if (!_server_call.receive_request(ack))
+    if (!_server_call->receive_request(ack))
     {
         std::cout << "SIP_Call_Test::process_ack -> Failed to receive request\n";
         delete ack;
@@ -1467,16 +1485,16 @@ bool SIP_Call_Test::process_ack()
         return false;
     }
 
-    if (_server_call.get_state() != SIP_Call::STATE_ACTIVE)
+    if (_server_call->get_state() != SIP_Call::STATE_ACTIVE)
     {
         std::cout << "SIP_Call_Test::process_ack -> Invalid server call state:\n";
         std::cout << std::setw(12) << "Expected: " << SIP_Call::STATE_ACTIVE << "\n";
-        std::cout << std::setw(12) << "State: " << _server_call.get_state() << "\n";
+        std::cout << std::setw(12) << "State: " << _server_call->get_state() << "\n";
         delete ack;
         return false;
     }
 
-    if (!_server_call.get_server_dialog(ack))
+    if (!_server_call->get_server_dialog(ack))
     {
         std::cout << "SIP_Call_Test::process_ack -> Invalid server dialog\n";
         delete ack;
@@ -1500,7 +1518,7 @@ bool SIP_Call_Test::process_client_bye()
 
     _sent_message = false;
 
-    if (!_client_call.send_request(bye))
+    if (!_client_call->send_request(bye))
     {
         std::cout << "SIP_Call_Test::process_client_bye -> Failed to send request\n";
         delete bye;
@@ -1514,16 +1532,16 @@ bool SIP_Call_Test::process_client_bye()
         return false;
     }
 
-    if (_client_call.get_state() != SIP_Call::STATE_CLOSING_OUT)
+    if (_client_call->get_state() != SIP_Call::STATE_CLOSING_OUT)
     {
         std::cout << "SIP_Call_Test::process_client_bye -> Invalid client call state:\n";
         std::cout << std::setw(12) << "Expected: " << SIP_Call::STATE_CLOSING_OUT << "\n";
-        std::cout << std::setw(12) << "State: " << _client_call.get_state() << "\n";
+        std::cout << std::setw(12) << "State: " << _client_call->get_state() << "\n";
         delete bye;
         return false;
     }
 
-    if (!_client_call.get_client_dialog(bye))
+    if (!_client_call->get_client_dialog(bye))
     {
         std::cout << "SIP_Call_Test::process_client_bye -> Invalid client dialog\n";
         delete bye;
@@ -1532,7 +1550,7 @@ bool SIP_Call_Test::process_client_bye()
 
     _received_request = false;
 
-    if (!_server_call.receive_request(bye))
+    if (!_server_call->receive_request(bye))
     {
         std::cout << "SIP_Call_Test::process_client_bye -> Failed to receive request\n";
         delete bye;
@@ -1546,16 +1564,16 @@ bool SIP_Call_Test::process_client_bye()
         return false;
     }
 
-    if (_server_call.get_state() != SIP_Call::STATE_CLOSING_IN)
+    if (_server_call->get_state() != SIP_Call::STATE_CLOSING_IN)
     {
         std::cout << "SIP_Call_Test::process_client_bye -> Invalid server call state:\n";
         std::cout << std::setw(12) << "Expected: " << SIP_Call::STATE_CLOSING_IN << "\n";
-        std::cout << std::setw(12) << "State: " << _server_call.get_state() << "\n";
+        std::cout << std::setw(12) << "State: " << _server_call->get_state() << "\n";
         delete bye;
         return false;
     }
 
-    if (!_server_call.get_server_dialog(bye))
+    if (!_server_call->get_server_dialog(bye))
     {
         std::cout << "SIP_Call_Test::process_client_bye -> Invalid server dialog\n";
         delete bye;
@@ -1579,7 +1597,7 @@ bool SIP_Call_Test::process_server_bye_response_200()
 
     _sent_message = false;
 
-    if (!_server_call.send_response(bye_response_200))
+    if (!_server_call->send_response(bye_response_200))
     {
         std::cout << "SIP_Call_Test::process_server_bye_response_200 -> Failed to send response\n";
         delete bye_response_200;
@@ -1593,16 +1611,16 @@ bool SIP_Call_Test::process_server_bye_response_200()
         return false;
     }
 
-    if (_server_call.get_state() != SIP_Call::STATE_CLOSED)
+    if (_server_call->get_state() != SIP_Call::STATE_CLOSED)
     {
         std::cout << "SIP_Call_Test::process_server_bye_response_200 -> Invalid server call state:\n";
         std::cout << std::setw(12) << "Expected: " << SIP_Call::STATE_CLOSED << "\n";
-        std::cout << std::setw(12) << "State: " << _server_call.get_state() << "\n";
+        std::cout << std::setw(12) << "State: " << _server_call->get_state() << "\n";
         delete bye_response_200;
         return false;
     }
 
-    if (_server_call.get_server_dialog(bye_response_200))
+    if (_server_call->get_server_dialog(bye_response_200))
     {
         std::cout << "SIP_Call_Test::process_server_bye_response_200 -> Invalid server response dialog\n";
         delete bye_response_200;
@@ -1611,7 +1629,7 @@ bool SIP_Call_Test::process_server_bye_response_200()
 
     _received_response = false;
 
-    if (!_client_call.receive_response(bye_response_200))
+    if (!_client_call->receive_response(bye_response_200))
     {
         std::cout << "SIP_Call_Test::process_server_bye_response_200 -> Failed to receive response\n";
         delete bye_response_200;
@@ -1625,16 +1643,16 @@ bool SIP_Call_Test::process_server_bye_response_200()
         return false;
     }
 
-    if (_client_call.get_state() != SIP_Call::STATE_CLOSED)
+    if (_client_call->get_state() != SIP_Call::STATE_CLOSED)
     {
         std::cout << "SIP_Call_Test::process_server_bye_response_200 -> Invalid client call state:\n";
         std::cout << std::setw(12) << "Expected: " << SIP_Call::STATE_CLOSED << "\n";
-        std::cout << std::setw(12) << "State: " << _client_call.get_state() << "\n";
+        std::cout << std::setw(12) << "State: " << _client_call->get_state() << "\n";
         delete bye_response_200;
         return false;
     }
 
-    if (_client_call.get_client_dialog(bye_response_200))
+    if (_client_call->get_client_dialog(bye_response_200))
     {
         std::cout << "SIP_Call_Test::process_server_bye_response_200 -> Invalid client response dialog\n";
         delete bye_response_200;
@@ -1658,7 +1676,7 @@ bool SIP_Call_Test::process_server_bye()
 
     _sent_message = false;
 
-    if (!_server_call.send_request(bye))
+    if (!_server_call->send_request(bye))
     {
         std::cout << "SIP_Call_Test::process_server_bye -> Failed to send request\n";
         delete bye;
@@ -1672,16 +1690,16 @@ bool SIP_Call_Test::process_server_bye()
         return false;
     }
 
-    if (_server_call.get_state() != SIP_Call::STATE_CLOSING_OUT)
+    if (_server_call->get_state() != SIP_Call::STATE_CLOSING_OUT)
     {
         std::cout << "SIP_Call_Test::process_server_bye -> Invalid server call state:\n";
         std::cout << std::setw(12) << "Expected: " << SIP_Call::STATE_CLOSING_OUT << "\n";
-        std::cout << std::setw(12) << "State: " << _server_call.get_state() << "\n";
+        std::cout << std::setw(12) << "State: " << _server_call->get_state() << "\n";
         delete bye;
         return false;
     }
 
-    if (!_server_call.get_client_dialog(bye))
+    if (!_server_call->get_client_dialog(bye))
     {
         std::cout << "SIP_Call_Test::process_server_bye -> Invalid server dialog\n";
         delete bye;
@@ -1690,7 +1708,7 @@ bool SIP_Call_Test::process_server_bye()
 
     _received_request = false;
 
-    if (!_client_call.receive_request(bye))
+    if (!_client_call->receive_request(bye))
     {
         std::cout << "SIP_Call_Test::process_server_bye -> Failed to receive request\n";
         delete bye;
@@ -1704,16 +1722,16 @@ bool SIP_Call_Test::process_server_bye()
         return false;
     }
 
-    if (_client_call.get_state() != SIP_Call::STATE_CLOSING_IN)
+    if (_client_call->get_state() != SIP_Call::STATE_CLOSING_IN)
     {
         std::cout << "SIP_Call_Test::process_server_bye -> Invalid client call state:\n";
         std::cout << std::setw(12) << "Expected: " << SIP_Call::STATE_CLOSING_IN << "\n";
-        std::cout << std::setw(12) << "State: " << _server_call.get_state() << "\n";
+        std::cout << std::setw(12) << "State: " << _server_call->get_state() << "\n";
         delete bye;
         return false;
     }
 
-    if (!_client_call.get_server_dialog(bye))
+    if (!_client_call->get_server_dialog(bye))
     {
         std::cout << "SIP_Call_Test::process_server_bye -> Invalid client dialog\n";
         delete bye;
@@ -1737,7 +1755,7 @@ bool SIP_Call_Test::process_client_bye_response_200()
 
     _sent_message = false;
 
-    if (!_client_call.send_response(bye_response_200))
+    if (!_client_call->send_response(bye_response_200))
     {
         std::cout << "SIP_Call_Test::process_client_bye_response_200 -> Failed to send response\n";
         delete bye_response_200;
@@ -1751,16 +1769,16 @@ bool SIP_Call_Test::process_client_bye_response_200()
         return false;
     }
 
-    if (_client_call.get_state() != SIP_Call::STATE_CLOSED)
+    if (_client_call->get_state() != SIP_Call::STATE_CLOSED)
     {
         std::cout << "SIP_Call_Test::process_client_bye_response_200 -> Invalid client call state:\n";
         std::cout << std::setw(12) << "Expected: " << SIP_Call::STATE_CLOSED << "\n";
-        std::cout << std::setw(12) << "State: " << _server_call.get_state() << "\n";
+        std::cout << std::setw(12) << "State: " << _server_call->get_state() << "\n";
         delete bye_response_200;
         return false;
     }
 
-    if (_client_call.get_server_dialog(bye_response_200))
+    if (_client_call->get_server_dialog(bye_response_200))
     {
         std::cout << "SIP_Call_Test::process_client_bye_response_200 -> Invalid client response dialog\n";
         delete bye_response_200;
@@ -1769,7 +1787,7 @@ bool SIP_Call_Test::process_client_bye_response_200()
 
     _received_response = false;
 
-    if (!_server_call.receive_response(bye_response_200))
+    if (!_server_call->receive_response(bye_response_200))
     {
         std::cout << "SIP_Call_Test::process_client_bye_response_200 -> Failed to receive response\n";
         delete bye_response_200;
@@ -1783,16 +1801,16 @@ bool SIP_Call_Test::process_client_bye_response_200()
         return false;
     }
 
-    if (_server_call.get_state() != SIP_Call::STATE_CLOSED)
+    if (_server_call->get_state() != SIP_Call::STATE_CLOSED)
     {
         std::cout << "SIP_Call_Test::process_client_bye_response_200 -> Invalid server call state:\n";
         std::cout << std::setw(12) << "Expected: " << SIP_Call::STATE_CLOSED << "\n";
-        std::cout << std::setw(12) << "State: " << _server_call.get_state() << "\n";
+        std::cout << std::setw(12) << "State: " << _server_call->get_state() << "\n";
         delete bye_response_200;
         return false;
     }
 
-    if (_server_call.get_client_dialog(bye_response_200))
+    if (_server_call->get_client_dialog(bye_response_200))
     {
         std::cout << "SIP_Call_Test::process_client_bye_response_200 -> Invalid server response dialog\n";
         delete bye_response_200;
@@ -1816,7 +1834,7 @@ bool SIP_Call_Test::process_client_update()
 
     _sent_message = false;
 
-    if (!_client_call.send_request(update))
+    if (!_client_call->send_request(update))
     {
         std::cout << "SIP_Call_Test::process_client_update -> Failed to send request\n";
         delete update;
@@ -1830,16 +1848,16 @@ bool SIP_Call_Test::process_client_update()
         return false;
     }
 
-    if (_client_call.get_state() != SIP_Call::STATE_RINGING_OUT)
+    if (_client_call->get_state() != SIP_Call::STATE_RINGING_OUT)
     {
         std::cout << "SIP_Call_Test::process_client_update -> Invalid client call state:\n";
         std::cout << std::setw(12) << "Expected: " << SIP_Call::STATE_RINGING_OUT << "\n";
-        std::cout << std::setw(12) << "State: " << _client_call.get_state() << "\n";
+        std::cout << std::setw(12) << "State: " << _client_call->get_state() << "\n";
         delete update;
         return false;
     }
 
-    if (!_client_call.get_client_dialog(update))
+    if (!_client_call->get_client_dialog(update))
     {
         std::cout << "SIP_Call_Test::process_client_update -> Invalid client dialog\n";
         delete update;
@@ -1848,7 +1866,7 @@ bool SIP_Call_Test::process_client_update()
 
     _received_request = false;
 
-    if (!_server_call.receive_request(update))
+    if (!_server_call->receive_request(update))
     {
         std::cout << "SIP_Call_Test::process_client_update -> Failed to receive request\n";
         delete update;
@@ -1862,16 +1880,16 @@ bool SIP_Call_Test::process_client_update()
         return false;
     }
 
-    if (_server_call.get_state() != SIP_Call::STATE_RINGING_IN)
+    if (_server_call->get_state() != SIP_Call::STATE_RINGING_IN)
     {
         std::cout << "SIP_Call_Test::process_client_update -> Invalid server call state:\n";
         std::cout << std::setw(12) << "Expected: " << SIP_Call::STATE_RINGING_IN << "\n";
-        std::cout << std::setw(12) << "State: " << _server_call.get_state() << "\n";
+        std::cout << std::setw(12) << "State: " << _server_call->get_state() << "\n";
         delete update;
         return false;
     }
 
-    if (!_server_call.get_server_dialog(update))
+    if (!_server_call->get_server_dialog(update))
     {
         std::cout << "SIP_Call_Test::process_client_update -> Invalid server dialog\n";
         delete update;
@@ -1895,7 +1913,7 @@ bool SIP_Call_Test::process_server_update_response_200()
 
     _sent_message = false;
 
-    if (!_server_call.send_response(update_response_200))
+    if (!_server_call->send_response(update_response_200))
     {
         std::cout << "SIP_Call_Test::process_server_update_response_200 -> Failed to send response\n";
         delete update_response_200;
@@ -1909,16 +1927,16 @@ bool SIP_Call_Test::process_server_update_response_200()
         return false;
     }
 
-    if (_server_call.get_state() != SIP_Call::STATE_RINGING_IN)
+    if (_server_call->get_state() != SIP_Call::STATE_RINGING_IN)
     {
         std::cout << "SIP_Call_Test::process_server_update_response_200 -> Invalid server call state:\n";
         std::cout << std::setw(12) << "Expected: " << SIP_Call::STATE_RINGING_IN << "\n";
-        std::cout << std::setw(12) << "State: " << _server_call.get_state() << "\n";
+        std::cout << std::setw(12) << "State: " << _server_call->get_state() << "\n";
         delete update_response_200;
         return false;
     }
 
-    if (!_server_call.get_server_dialog(update_response_200))
+    if (!_server_call->get_server_dialog(update_response_200))
     {
         std::cout << "SIP_Call_Test::process_server_update_response_200 -> Invalid server response dialog\n";
         delete update_response_200;
@@ -1927,7 +1945,7 @@ bool SIP_Call_Test::process_server_update_response_200()
 
     _received_response = false;
 
-    if (!_client_call.receive_response(update_response_200))
+    if (!_client_call->receive_response(update_response_200))
     {
         std::cout << "SIP_Call_Test::process_server_update_response_200 -> Failed to receive response\n";
         delete update_response_200;
@@ -1941,16 +1959,16 @@ bool SIP_Call_Test::process_server_update_response_200()
         return false;
     }
 
-    if (_client_call.get_state() != SIP_Call::STATE_RINGING_OUT)
+    if (_client_call->get_state() != SIP_Call::STATE_RINGING_OUT)
     {
         std::cout << "SIP_Call_Test::process_server_update_response_200 -> Invalid client call state:\n";
         std::cout << std::setw(12) << "Expected: " << SIP_Call::STATE_RINGING_OUT << "\n";
-        std::cout << std::setw(12) << "State: " << _client_call.get_state() << "\n";
+        std::cout << std::setw(12) << "State: " << _client_call->get_state() << "\n";
         delete update_response_200;
         return false;
     }
 
-    if (!_client_call.get_client_dialog(update_response_200))
+    if (!_client_call->get_client_dialog(update_response_200))
     {
         std::cout << "SIP_Call_Test::process_server_update_response_200 -> Invalid client response dialog\n";
         delete update_response_200;
@@ -1974,7 +1992,7 @@ bool SIP_Call_Test::process_server_update()
 
     _sent_message = false;
 
-    if (!_server_call.send_request(update))
+    if (!_server_call->send_request(update))
     {
         std::cout << "SIP_Call_Test::process_server_update -> Failed to send request\n";
         delete update;
@@ -1988,16 +2006,16 @@ bool SIP_Call_Test::process_server_update()
         return false;
     }
 
-    if (_server_call.get_state() != SIP_Call::STATE_RINGING_IN)
+    if (_server_call->get_state() != SIP_Call::STATE_RINGING_IN)
     {
         std::cout << "SIP_Call_Test::process_server_update -> Invalid server call state:\n";
         std::cout << std::setw(12) << "Expected: " << SIP_Call::STATE_RINGING_IN << "\n";
-        std::cout << std::setw(12) << "State: " << _server_call.get_state() << "\n";
+        std::cout << std::setw(12) << "State: " << _server_call->get_state() << "\n";
         delete update;
         return false;
     }
 
-    if (!_server_call.get_client_dialog(update))
+    if (!_server_call->get_client_dialog(update))
     {
         std::cout << "SIP_Call_Test::process_server_update -> Invalid server dialog\n";
         delete update;
@@ -2006,7 +2024,7 @@ bool SIP_Call_Test::process_server_update()
 
     _received_request = false;
 
-    if (!_client_call.receive_request(update))
+    if (!_client_call->receive_request(update))
     {
         std::cout << "SIP_Call_Test::process_server_update -> Failed to receive request\n";
         delete update;
@@ -2020,16 +2038,16 @@ bool SIP_Call_Test::process_server_update()
         return false;
     }
 
-    if (_client_call.get_state() != SIP_Call::STATE_RINGING_OUT)
+    if (_client_call->get_state() != SIP_Call::STATE_RINGING_OUT)
     {
         std::cout << "SIP_Call_Test::process_server_update -> Invalid client call state:\n";
         std::cout << std::setw(12) << "Expected: " << SIP_Call::STATE_RINGING_OUT << "\n";
-        std::cout << std::setw(12) << "State: " << _server_call.get_state() << "\n";
+        std::cout << std::setw(12) << "State: " << _server_call->get_state() << "\n";
         delete update;
         return false;
     }
 
-    if (!_client_call.get_server_dialog(update))
+    if (!_client_call->get_server_dialog(update))
     {
         std::cout << "SIP_Call_Test::process_server_update -> Invalid client dialog\n";
         delete update;
@@ -2053,7 +2071,7 @@ bool SIP_Call_Test::process_client_update_response_200()
 
     _sent_message = false;
 
-    if (!_client_call.send_response(update_response_200))
+    if (!_client_call->send_response(update_response_200))
     {
         std::cout << "SIP_Call_Test::process_client_update_response_200 -> Failed to send response\n";
         delete update_response_200;
@@ -2067,16 +2085,16 @@ bool SIP_Call_Test::process_client_update_response_200()
         return false;
     }
 
-    if (_client_call.get_state() != SIP_Call::STATE_RINGING_OUT)
+    if (_client_call->get_state() != SIP_Call::STATE_RINGING_OUT)
     {
         std::cout << "SIP_Call_Test::process_client_update_response_200 -> Invalid client call state:\n";
         std::cout << std::setw(12) << "Expected: " << SIP_Call::STATE_RINGING_OUT << "\n";
-        std::cout << std::setw(12) << "State: " << _server_call.get_state() << "\n";
+        std::cout << std::setw(12) << "State: " << _server_call->get_state() << "\n";
         delete update_response_200;
         return false;
     }
 
-    if (!_client_call.get_server_dialog(update_response_200))
+    if (!_client_call->get_server_dialog(update_response_200))
     {
         std::cout << "SIP_Call_Test::process_client_update_response_200 -> Invalid client response dialog\n";
         delete update_response_200;
@@ -2085,7 +2103,7 @@ bool SIP_Call_Test::process_client_update_response_200()
 
     _received_response = false;
 
-    if (!_server_call.receive_response(update_response_200))
+    if (!_server_call->receive_response(update_response_200))
     {
         std::cout << "SIP_Call_Test::process_client_update_response_200 -> Failed to receive response\n";
         delete update_response_200;
@@ -2099,16 +2117,16 @@ bool SIP_Call_Test::process_client_update_response_200()
         return false;
     }
 
-    if (_server_call.get_state() != SIP_Call::STATE_RINGING_IN)
+    if (_server_call->get_state() != SIP_Call::STATE_RINGING_IN)
     {
         std::cout << "SIP_Call_Test::process_client_update_response_200 -> Invalid server call state:\n";
         std::cout << std::setw(12) << "Expected: " << SIP_Call::STATE_RINGING_IN << "\n";
-        std::cout << std::setw(12) << "State: " << _server_call.get_state() << "\n";
+        std::cout << std::setw(12) << "State: " << _server_call->get_state() << "\n";
         delete update_response_200;
         return false;
     }
 
-    if (!_server_call.get_client_dialog(update_response_200))
+    if (!_server_call->get_client_dialog(update_response_200))
     {
         std::cout << "SIP_Call_Test::process_client_update_response_200 -> Invalid server response dialog\n";
         delete update_response_200;
@@ -2132,7 +2150,7 @@ bool SIP_Call_Test::process_cancel()
 
     _sent_message = false;
 
-    if (!_client_call.send_request(cancel))
+    if (!_client_call->send_request(cancel))
     {
         std::cout << "SIP_Call_Test::process_cancel -> Failed to send request\n";
         delete cancel;
@@ -2146,16 +2164,16 @@ bool SIP_Call_Test::process_cancel()
         return false;
     }
 
-    if (_client_call.get_state() != SIP_Call::STATE_CANCELING_OUT)
+    if (_client_call->get_state() != SIP_Call::STATE_CANCELING_OUT)
     {
         std::cout << "SIP_Call_Test::process_cancel -> Invalid client call state:\n";
         std::cout << std::setw(12) << "Expected: " << SIP_Call::STATE_CANCELING_OUT << "\n";
-        std::cout << std::setw(12) << "State: " << _client_call.get_state() << "\n";
+        std::cout << std::setw(12) << "State: " << _client_call->get_state() << "\n";
         delete cancel;
         return false;
     }
 
-    if (!_client_call.get_client_dialog(cancel))
+    if (!_client_call->get_client_dialog(cancel))
     {
         std::cout << "SIP_Call_Test::process_cancel -> Invalid client dialog\n";
         delete cancel;
@@ -2164,7 +2182,7 @@ bool SIP_Call_Test::process_cancel()
 
     _received_request = false;
 
-    if (!_server_call.receive_request(cancel))
+    if (!_server_call->receive_request(cancel))
     {
         std::cout << "SIP_Call_Test::process_cancel -> Failed to receive request\n";
         delete cancel;
@@ -2178,16 +2196,16 @@ bool SIP_Call_Test::process_cancel()
         return false;
     }
 
-    if (_server_call.get_state() != SIP_Call::STATE_CANCELING_IN)
+    if (_server_call->get_state() != SIP_Call::STATE_CANCELING_IN)
     {
         std::cout << "SIP_Call_Test::process_cancel -> Invalid server call state:\n";
         std::cout << std::setw(12) << "Expected: " << SIP_Call::STATE_CANCELING_IN << "\n";
-        std::cout << std::setw(12) << "State: " << _server_call.get_state() << "\n";
+        std::cout << std::setw(12) << "State: " << _server_call->get_state() << "\n";
         delete cancel;
         return false;
     }
 
-    if (!_server_call.get_server_dialog(cancel))
+    if (!_server_call->get_server_dialog(cancel))
     {
         std::cout << "SIP_Call_Test::process_cancel -> Invalid server dialog\n";
         delete cancel;
@@ -2211,7 +2229,7 @@ bool SIP_Call_Test::process_cancel_response_200()
 
     _sent_message = false;
 
-    if (!_server_call.send_response(cancel_response_200))
+    if (!_server_call->send_response(cancel_response_200))
     {
         std::cout << "SIP_Call_Test::process_cancel_response_200 -> Failed to send response\n";
         delete cancel_response_200;
@@ -2225,16 +2243,16 @@ bool SIP_Call_Test::process_cancel_response_200()
         return false;
     }
 
-    if (_server_call.get_state() != SIP_Call::STATE_CANCELED_IN)
+    if (_server_call->get_state() != SIP_Call::STATE_CANCELED_IN)
     {
         std::cout << "SIP_Call_Test::process_cancel_response_200 -> Invalid server call state:\n";
         std::cout << std::setw(12) << "Expected: " << SIP_Call::STATE_CANCELED_IN << "\n";
-        std::cout << std::setw(12) << "State: " << _server_call.get_state() << "\n";
+        std::cout << std::setw(12) << "State: " << _server_call->get_state() << "\n";
         delete cancel_response_200;
         return false;
     }
 
-    if (!_server_call.get_server_dialog(cancel_response_200))
+    if (!_server_call->get_server_dialog(cancel_response_200))
     {
         std::cout << "SIP_Call_Test::process_cancel_response_200 -> Invalid server response dialog\n";
         delete cancel_response_200;
@@ -2243,7 +2261,7 @@ bool SIP_Call_Test::process_cancel_response_200()
 
     _received_response = false;
 
-    if (!_client_call.receive_response(cancel_response_200))
+    if (!_client_call->receive_response(cancel_response_200))
     {
         std::cout << "SIP_Call_Test::process_cancel_response_200 -> Failed to receive response\n";
         delete cancel_response_200;
@@ -2257,16 +2275,16 @@ bool SIP_Call_Test::process_cancel_response_200()
         return false;
     }
 
-    if (_client_call.get_state() != SIP_Call::STATE_CANCELED_OUT)
+    if (_client_call->get_state() != SIP_Call::STATE_CANCELED_OUT)
     {
         std::cout << "SIP_Call_Test::process_cancel_response_200 -> Invalid client call state:\n";
         std::cout << std::setw(12) << "Expected: " << SIP_Call::STATE_CANCELED_OUT << "\n";
-        std::cout << std::setw(12) << "State: " << _client_call.get_state() << "\n";
+        std::cout << std::setw(12) << "State: " << _client_call->get_state() << "\n";
         delete cancel_response_200;
         return false;
     }
 
-    if (!_client_call.get_client_dialog(cancel_response_200))
+    if (!_client_call->get_client_dialog(cancel_response_200))
     {
         std::cout << "SIP_Call_Test::process_cancel_response_200 -> Invalid client response dialog\n";
         delete cancel_response_200;
@@ -2290,7 +2308,7 @@ bool SIP_Call_Test::process_prack()
 
     _sent_message = false;
 
-    if (!_client_call.send_request(prack))
+    if (!_client_call->send_request(prack))
     {
         std::cout << "SIP_Call_Test::process_prack -> Failed to send request\n";
         delete prack;
@@ -2304,16 +2322,16 @@ bool SIP_Call_Test::process_prack()
         return false;
     }
 
-    if (_client_call.get_state() != SIP_Call::STATE_RINGING_OUT)
+    if (_client_call->get_state() != SIP_Call::STATE_RINGING_OUT)
     {
         std::cout << "SIP_Call_Test::process_prack -> Invalid client call state:\n";
         std::cout << std::setw(12) << "Expected: " << SIP_Call::STATE_ACTIVE << "\n";
-        std::cout << std::setw(12) << "State: " << _client_call.get_state() << "\n";
+        std::cout << std::setw(12) << "State: " << _client_call->get_state() << "\n";
         delete prack;
         return false;
     }
 
-    if (!_client_call.get_client_dialog(prack))
+    if (!_client_call->get_client_dialog(prack))
     {
         std::cout << "SIP_Call_Test::process_prack -> Invalid client dialog\n";
         delete prack;
@@ -2322,7 +2340,7 @@ bool SIP_Call_Test::process_prack()
 
     _received_request = false;
 
-    if (!_server_call.receive_request(prack))
+    if (!_server_call->receive_request(prack))
     {
         std::cout << "SIP_Call_Test::process_prack -> Failed to receive request\n";
         delete prack;
@@ -2336,16 +2354,16 @@ bool SIP_Call_Test::process_prack()
         return false;
     }
 
-    if (_server_call.get_state() != SIP_Call::STATE_RINGING_IN)
+    if (_server_call->get_state() != SIP_Call::STATE_RINGING_IN)
     {
         std::cout << "SIP_Call_Test::process_prack -> Invalid server call state:\n";
         std::cout << std::setw(12) << "Expected: " << SIP_Call::STATE_ACTIVE << "\n";
-        std::cout << std::setw(12) << "State: " << _server_call.get_state() << "\n";
+        std::cout << std::setw(12) << "State: " << _server_call->get_state() << "\n";
         delete prack;
         return false;
     }
 
-    if (!_server_call.get_server_dialog(prack))
+    if (!_server_call->get_server_dialog(prack))
     {
         std::cout << "SIP_Call_Test::process_prack -> Invalid server dialog\n";
         delete prack;
@@ -2369,7 +2387,7 @@ bool SIP_Call_Test::process_prack_response_200()
 
     _sent_message = false;
 
-    if (!_server_call.send_response(prack_response_200))
+    if (!_server_call->send_response(prack_response_200))
     {
         std::cout << "SIP_Call_Test::process_prack_response_200 -> Failed to send response\n";
         delete prack_response_200;
@@ -2383,16 +2401,16 @@ bool SIP_Call_Test::process_prack_response_200()
         return false;
     }
 
-    if (_server_call.get_state() != SIP_Call::STATE_RINGING_IN)
+    if (_server_call->get_state() != SIP_Call::STATE_RINGING_IN)
     {
         std::cout << "SIP_Call_Test::process_prack_response_200 -> Invalid server call state:\n";
         std::cout << std::setw(12) << "Expected: " << SIP_Call::STATE_ACTIVE << "\n";
-        std::cout << std::setw(12) << "State: " << _server_call.get_state() << "\n";
+        std::cout << std::setw(12) << "State: " << _server_call->get_state() << "\n";
         delete prack_response_200;
         return false;
     }
 
-    if (!_server_call.get_server_dialog(prack_response_200))
+    if (!_server_call->get_server_dialog(prack_response_200))
     {
         std::cout << "SIP_Call_Test::process_prack_response_200 -> Invalid server response dialog\n";
         delete prack_response_200;
@@ -2401,7 +2419,7 @@ bool SIP_Call_Test::process_prack_response_200()
 
     _received_response = false;
 
-    if (!_client_call.receive_response(prack_response_200))
+    if (!_client_call->receive_response(prack_response_200))
     {
         std::cout << "SIP_Call_Test::process_prack_response_200 -> Failed to receive response\n";
         delete prack_response_200;
@@ -2415,16 +2433,16 @@ bool SIP_Call_Test::process_prack_response_200()
         return false;
     }
 
-    if (_client_call.get_state() != SIP_Call::STATE_RINGING_OUT)
+    if (_client_call->get_state() != SIP_Call::STATE_RINGING_OUT)
     {
         std::cout << "SIP_Call_Test::process_prack_response_200 -> Invalid client call state:\n";
         std::cout << std::setw(12) << "Expected: " << SIP_Call::STATE_ACTIVE << "\n";
-        std::cout << std::setw(12) << "State: " << _client_call.get_state() << "\n";
+        std::cout << std::setw(12) << "State: " << _client_call->get_state() << "\n";
         delete prack_response_200;
         return false;
     }
 
-    if (!_client_call.get_client_dialog(prack_response_200))
+    if (!_client_call->get_client_dialog(prack_response_200))
     {
         std::cout << "SIP_Call_Test::process_prack_response_200 -> Invalid client response dialog\n";
         delete prack_response_200;
@@ -2448,7 +2466,7 @@ bool SIP_Call_Test::process_info()
 
     _sent_message = false;
 
-    if (!_client_call.send_request(info))
+    if (!_client_call->send_request(info))
     {
         std::cout << "SIP_Call_Test::process_info -> Failed to send request\n";
         delete info;
@@ -2462,16 +2480,16 @@ bool SIP_Call_Test::process_info()
         return false;
     }
 
-    if (_client_call.get_state() != SIP_Call::STATE_ACTIVE)
+    if (_client_call->get_state() != SIP_Call::STATE_ACTIVE)
     {
         std::cout << "SIP_Call_Test::process_info -> Invalid client call state:\n";
         std::cout << std::setw(12) << "Expected: " << SIP_Call::STATE_ACTIVE << "\n";
-        std::cout << std::setw(12) << "State: " << _client_call.get_state() << "\n";
+        std::cout << std::setw(12) << "State: " << _client_call->get_state() << "\n";
         delete info;
         return false;
     }
 
-    if (!_client_call.get_client_dialog(info))
+    if (!_client_call->get_client_dialog(info))
     {
         std::cout << "SIP_Call_Test::process_info -> Invalid client dialog\n";
         delete info;
@@ -2480,7 +2498,7 @@ bool SIP_Call_Test::process_info()
 
     _received_request = false;
 
-    if (!_server_call.receive_request(info))
+    if (!_server_call->receive_request(info))
     {
         std::cout << "SIP_Call_Test::process_info -> Failed to receive request\n";
         delete info;
@@ -2494,16 +2512,16 @@ bool SIP_Call_Test::process_info()
         return false;
     }
 
-    if (_server_call.get_state() != SIP_Call::STATE_ACTIVE)
+    if (_server_call->get_state() != SIP_Call::STATE_ACTIVE)
     {
         std::cout << "SIP_Call_Test::process_info -> Invalid server call state:\n";
         std::cout << std::setw(12) << "Expected: " << SIP_Call::STATE_ACTIVE << "\n";
-        std::cout << std::setw(12) << "State: " << _server_call.get_state() << "\n";
+        std::cout << std::setw(12) << "State: " << _server_call->get_state() << "\n";
         delete info;
         return false;
     }
 
-    if (!_server_call.get_server_dialog(info))
+    if (!_server_call->get_server_dialog(info))
     {
         std::cout << "SIP_Call_Test::process_info -> Invalid server dialog\n";
         delete info;
@@ -2527,7 +2545,7 @@ bool SIP_Call_Test::process_info_response_200()
 
     _sent_message = false;
 
-    if (!_server_call.send_response(info_response_200))
+    if (!_server_call->send_response(info_response_200))
     {
         std::cout << "SIP_Call_Test::process_info_response_200 -> Failed to send response\n";
         delete info_response_200;
@@ -2541,16 +2559,16 @@ bool SIP_Call_Test::process_info_response_200()
         return false;
     }
 
-    if (_server_call.get_state() != SIP_Call::STATE_ACTIVE)
+    if (_server_call->get_state() != SIP_Call::STATE_ACTIVE)
     {
         std::cout << "SIP_Call_Test::process_info_response_200 -> Invalid server call state:\n";
         std::cout << std::setw(12) << "Expected: " << SIP_Call::STATE_ACTIVE << "\n";
-        std::cout << std::setw(12) << "State: " << _server_call.get_state() << "\n";
+        std::cout << std::setw(12) << "State: " << _server_call->get_state() << "\n";
         delete info_response_200;
         return false;
     }
 
-    if (!_server_call.get_server_dialog(info_response_200))
+    if (!_server_call->get_server_dialog(info_response_200))
     {
         std::cout << "SIP_Call_Test::process_info_response_200 -> Invalid server response dialog\n";
         delete info_response_200;
@@ -2559,7 +2577,7 @@ bool SIP_Call_Test::process_info_response_200()
 
     _received_response = false;
 
-    if (!_client_call.receive_response(info_response_200))
+    if (!_client_call->receive_response(info_response_200))
     {
         std::cout << "SIP_Call_Test::process_info_response_200 -> Failed to receive response\n";
         delete info_response_200;
@@ -2573,16 +2591,16 @@ bool SIP_Call_Test::process_info_response_200()
         return false;
     }
 
-    if (_client_call.get_state() != SIP_Call::STATE_ACTIVE)
+    if (_client_call->get_state() != SIP_Call::STATE_ACTIVE)
     {
         std::cout << "SIP_Call_Test::process_info_response_200 -> Invalid client call state:\n";
         std::cout << std::setw(12) << "Expected: " << SIP_Call::STATE_ACTIVE << "\n";
-        std::cout << std::setw(12) << "State: " << _client_call.get_state() << "\n";
+        std::cout << std::setw(12) << "State: " << _client_call->get_state() << "\n";
         delete info_response_200;
         return false;
     }
 
-    if (!_client_call.get_client_dialog(info_response_200))
+    if (!_client_call->get_client_dialog(info_response_200))
     {
         std::cout << "SIP_Call_Test::process_info_response_200 -> Invalid client response dialog\n";
         delete info_response_200;
@@ -2606,7 +2624,7 @@ bool SIP_Call_Test::process_register()
 
     _sent_message = false;
 
-    if (!_client_call.send_request(request))
+    if (!_client_call->send_request(request))
     {
         std::cout << "SIP_Call_Test::process_register -> Failed to send request\n";
         delete request;
@@ -2620,16 +2638,16 @@ bool SIP_Call_Test::process_register()
         return false;
     }
 
-    if (_client_call.get_state() != SIP_Call::STATE_REGISTER_OUT)
+    if (_client_call->get_state() != SIP_Call::STATE_REGISTER_OUT)
     {
         std::cout << "SIP_Call_Test::process_register -> Invalid client call state:\n";
         std::cout << std::setw(12) << "Expected: " << SIP_Call::STATE_REGISTER_OUT << "\n";
-        std::cout << std::setw(12) << "State: " << _client_call.get_state() << "\n";
+        std::cout << std::setw(12) << "State: " << _client_call->get_state() << "\n";
         delete request;
         return false;
     }
 
-    if (_client_call.get_client_dialog(request))
+    if (_client_call->get_client_dialog(request))
     {
         std::cout << "SIP_Call_Test::process_register -> Invalid client dialog\n";
         delete request;
@@ -2638,7 +2656,7 @@ bool SIP_Call_Test::process_register()
 
     _received_request = false;
 
-    if (!_server_call.receive_request(request))
+    if (!_server_call->receive_request(request))
     {
         std::cout << "SIP_Call_Test::process_register -> Failed to receive request\n";
         delete request;
@@ -2652,16 +2670,16 @@ bool SIP_Call_Test::process_register()
         return false;
     }
 
-    if (_server_call.get_state() != SIP_Call::STATE_REGISTER_IN)
+    if (_server_call->get_state() != SIP_Call::STATE_REGISTER_IN)
     {
         std::cout << "SIP_Call_Test::process_register -> Invalid server call state:\n";
         std::cout << std::setw(12) << "Expected: " << SIP_Call::STATE_REGISTER_IN << "\n";
-        std::cout << std::setw(12) << "State: " << _server_call.get_state() << "\n";
+        std::cout << std::setw(12) << "State: " << _server_call->get_state() << "\n";
         delete request;
         return false;
     }
 
-    if (_server_call.get_server_dialog(request))
+    if (_server_call->get_server_dialog(request))
     {
         std::cout << "SIP_Call_Test::process_register -> Invalid server dialog\n";
         delete request;
@@ -2685,7 +2703,7 @@ bool SIP_Call_Test::process_register_response_100()
 
     _sent_message = false;
 
-    if (!_server_call.send_response(register_response_100))
+    if (!_server_call->send_response(register_response_100))
     {
         std::cout << "SIP_Call_Test::process_register_response_100 -> Failed to send response\n";
         delete register_response_100;
@@ -2699,16 +2717,16 @@ bool SIP_Call_Test::process_register_response_100()
         return false;
     }
 
-    if (_server_call.get_state() != SIP_Call::STATE_REGISTER_IN)
+    if (_server_call->get_state() != SIP_Call::STATE_REGISTER_IN)
     {
         std::cout << "SIP_Call_Test::process_register_response_100 -> Invalid server call state:\n";
         std::cout << std::setw(12) << "Expected: " << SIP_Call::STATE_REGISTER_IN << "\n";
-        std::cout << std::setw(12) << "State: " << _server_call.get_state() << "\n";
+        std::cout << std::setw(12) << "State: " << _server_call->get_state() << "\n";
         delete register_response_100;
         return false;
     }
 
-    if (_server_call.get_server_dialog(register_response_100))
+    if (_server_call->get_server_dialog(register_response_100))
     {
         std::cout << "SIP_Call_Test::process_register_response_100 -> Invalid server response dialog\n";
         delete register_response_100;
@@ -2717,7 +2735,7 @@ bool SIP_Call_Test::process_register_response_100()
 
     _received_response = false;
 
-    if (!_client_call.receive_response(register_response_100))
+    if (!_client_call->receive_response(register_response_100))
     {
         std::cout << "SIP_Call_Test::process_register_response_100 -> Failed to receive response\n";
         delete register_response_100;
@@ -2731,16 +2749,16 @@ bool SIP_Call_Test::process_register_response_100()
         return false;
     }
 
-    if (_client_call.get_state() != SIP_Call::STATE_REGISTER_OUT)
+    if (_client_call->get_state() != SIP_Call::STATE_REGISTER_OUT)
     {
         std::cout << "SIP_Call_Test::process_register_response_100 -> Invalid client call state:\n";
         std::cout << std::setw(12) << "Expected: " << SIP_Call::STATE_REGISTER_OUT << "\n";
-        std::cout << std::setw(12) << "State: " << _client_call.get_state() << "\n";
+        std::cout << std::setw(12) << "State: " << _client_call->get_state() << "\n";
         delete register_response_100;
         return false;
     }
 
-    if (_client_call.get_client_dialog(register_response_100))
+    if (_client_call->get_client_dialog(register_response_100))
     {
         std::cout << "SIP_Call_Test::process_register_response_100 -> Invalid client response dialog\n";
         delete register_response_100;
@@ -2764,7 +2782,7 @@ bool SIP_Call_Test::process_register_response_200()
 
     _sent_message = false;
 
-    if (!_server_call.send_response(register_response_200))
+    if (!_server_call->send_response(register_response_200))
     {
         std::cout << "SIP_Call_Test::process_register_response_200 -> Failed to send response\n";
         delete register_response_200;
@@ -2778,16 +2796,16 @@ bool SIP_Call_Test::process_register_response_200()
         return false;
     }
 
-    if (_server_call.get_state() != SIP_Call::STATE_CLOSED)
+    if (_server_call->get_state() != SIP_Call::STATE_CLOSED)
     {
         std::cout << "SIP_Call_Test::process_register_response_200 -> Invalid server call state:\n";
         std::cout << std::setw(12) << "Expected: " << SIP_Call::STATE_CLOSED << "\n";
-        std::cout << std::setw(12) << "State: " << _server_call.get_state() << "\n";
+        std::cout << std::setw(12) << "State: " << _server_call->get_state() << "\n";
         delete register_response_200;
         return false;
     }
 
-    if (_server_call.get_server_dialog(register_response_200))
+    if (_server_call->get_server_dialog(register_response_200))
     {
         std::cout << "SIP_Call_Test::process_register_response_200 -> Invalid server response dialog\n";
         delete register_response_200;
@@ -2796,7 +2814,7 @@ bool SIP_Call_Test::process_register_response_200()
 
     _received_response = false;
 
-    if (!_client_call.receive_response(register_response_200))
+    if (!_client_call->receive_response(register_response_200))
     {
         std::cout << "SIP_Call_Test::process_register_response_200 -> Failed to receive response\n";
         delete register_response_200;
@@ -2810,16 +2828,16 @@ bool SIP_Call_Test::process_register_response_200()
         return false;
     }
 
-    if (_client_call.get_state() != SIP_Call::STATE_CLOSED)
+    if (_client_call->get_state() != SIP_Call::STATE_CLOSED)
     {
         std::cout << "SIP_Call_Test::process_register_response_200 -> Invalid client call state:\n";
         std::cout << std::setw(12) << "Expected: " << SIP_Call::STATE_CLOSED << "\n";
-        std::cout << std::setw(12) << "State: " << _client_call.get_state() << "\n";
+        std::cout << std::setw(12) << "State: " << _client_call->get_state() << "\n";
         delete register_response_200;
         return false;
     }
 
-    if (_client_call.get_client_dialog(register_response_200))
+    if (_client_call->get_client_dialog(register_response_200))
     {
         std::cout << "SIP_Call_Test::process_register_response_200 -> Invalid client response dialog\n";
         delete register_response_200;
@@ -2843,7 +2861,7 @@ bool SIP_Call_Test::process_register_response_401()
 
     _sent_message = false;
 
-    if (!_server_call.send_response(register_response_401))
+    if (!_server_call->send_response(register_response_401))
     {
         std::cout << "SIP_Call_Test::process_register_response_401 -> Failed to send response\n";
         delete register_response_401;
@@ -2857,16 +2875,16 @@ bool SIP_Call_Test::process_register_response_401()
         return false;
     }
 
-    if (_server_call.get_state() != SIP_Call::STATE_CLOSED)
+    if (_server_call->get_state() != SIP_Call::STATE_CLOSED)
     {
         std::cout << "SIP_Call_Test::process_register_response_401 -> Invalid server call state:\n";
         std::cout << std::setw(12) << "Expected: " << SIP_Call::STATE_CLOSED << "\n";
-        std::cout << std::setw(12) << "State: " << _server_call.get_state() << "\n";
+        std::cout << std::setw(12) << "State: " << _server_call->get_state() << "\n";
         delete register_response_401;
         return false;
     }
 
-    if (_server_call.get_server_dialog(register_response_401))
+    if (_server_call->get_server_dialog(register_response_401))
     {
         std::cout << "SIP_Call_Test::process_register_response_401 -> Invalid server response dialog\n";
         delete register_response_401;
@@ -2875,7 +2893,7 @@ bool SIP_Call_Test::process_register_response_401()
 
     _received_response = false;
 
-    if (!_client_call.receive_response(register_response_401))
+    if (!_client_call->receive_response(register_response_401))
     {
         std::cout << "SIP_Call_Test::process_register_response_401 -> Failed to receive response\n";
         delete register_response_401;
@@ -2889,16 +2907,16 @@ bool SIP_Call_Test::process_register_response_401()
         return false;
     }
 
-    if (_client_call.get_state() != SIP_Call::STATE_CLOSED)
+    if (_client_call->get_state() != SIP_Call::STATE_CLOSED)
     {
         std::cout << "SIP_Call_Test::process_register_response_401 -> Invalid client call state:\n";
         std::cout << std::setw(12) << "Expected: " << SIP_Call::STATE_CLOSED << "\n";
-        std::cout << std::setw(12) << "State: " << _client_call.get_state() << "\n";
+        std::cout << std::setw(12) << "State: " << _client_call->get_state() << "\n";
         delete register_response_401;
         return false;
     }
 
-    if (_client_call.get_client_dialog(register_response_401))
+    if (_client_call->get_client_dialog(register_response_401))
     {
         std::cout << "SIP_Call_Test::process_register_response_401 -> Invalid client response dialog\n";
         delete register_response_401;
@@ -2922,7 +2940,7 @@ bool SIP_Call_Test::process_options()
 
     _sent_message = false;
 
-    if (!_client_call.send_request(options))
+    if (!_client_call->send_request(options))
     {
         std::cout << "SIP_Call_Test::process_options -> Failed to send request\n";
         delete options;
@@ -2936,16 +2954,16 @@ bool SIP_Call_Test::process_options()
         return false;
     }
 
-    if (_client_call.get_state() != SIP_Call::STATE_OPTIONS_OUT)
+    if (_client_call->get_state() != SIP_Call::STATE_OPTIONS_OUT)
     {
         std::cout << "SIP_Call_Test::process_options -> Invalid client call state:\n";
         std::cout << std::setw(12) << "Expected: " << SIP_Call::STATE_OPTIONS_OUT << "\n";
-        std::cout << std::setw(12) << "State: " << _client_call.get_state() << "\n";
+        std::cout << std::setw(12) << "State: " << _client_call->get_state() << "\n";
         delete options;
         return false;
     }
 
-    if (_client_call.get_client_dialog(options))
+    if (_client_call->get_client_dialog(options))
     {
         std::cout << "SIP_Call_Test::process_options -> Invalid client dialog\n";
         delete options;
@@ -2954,7 +2972,7 @@ bool SIP_Call_Test::process_options()
 
     _received_request = false;
 
-    if (!_server_call.receive_request(options))
+    if (!_server_call->receive_request(options))
     {
         std::cout << "SIP_Call_Test::process_options -> Failed to receive request\n";
         delete options;
@@ -2968,16 +2986,16 @@ bool SIP_Call_Test::process_options()
         return false;
     }
 
-    if (_server_call.get_state() != SIP_Call::STATE_OPTIONS_IN)
+    if (_server_call->get_state() != SIP_Call::STATE_OPTIONS_IN)
     {
         std::cout << "SIP_Call_Test::process_options -> Invalid server call state:\n";
         std::cout << std::setw(12) << "Expected: " << SIP_Call::STATE_OPTIONS_IN << "\n";
-        std::cout << std::setw(12) << "State: " << _server_call.get_state() << "\n";
+        std::cout << std::setw(12) << "State: " << _server_call->get_state() << "\n";
         delete options;
         return false;
     }
 
-    if (_server_call.get_server_dialog(options))
+    if (_server_call->get_server_dialog(options))
     {
         std::cout << "SIP_Call_Test::process_options -> Invalid server dialog\n";
         delete options;
@@ -3001,7 +3019,7 @@ bool SIP_Call_Test::process_options_response_100()
 
     _sent_message = false;
 
-    if (!_server_call.send_response(options_response_100))
+    if (!_server_call->send_response(options_response_100))
     {
         std::cout << "SIP_Call_Test::process_options_response_100 -> Failed to send response\n";
         delete options_response_100;
@@ -3015,16 +3033,16 @@ bool SIP_Call_Test::process_options_response_100()
         return false;
     }
 
-    if (_server_call.get_state() != SIP_Call::STATE_OPTIONS_IN)
+    if (_server_call->get_state() != SIP_Call::STATE_OPTIONS_IN)
     {
         std::cout << "SIP_Call_Test::process_options_response_100 -> Invalid server call state:\n";
         std::cout << std::setw(12) << "Expected: " << SIP_Call::STATE_OPTIONS_IN << "\n";
-        std::cout << std::setw(12) << "State: " << _server_call.get_state() << "\n";
+        std::cout << std::setw(12) << "State: " << _server_call->get_state() << "\n";
         delete options_response_100;
         return false;
     }
 
-    if (_server_call.get_server_dialog(options_response_100))
+    if (_server_call->get_server_dialog(options_response_100))
     {
         std::cout << "SIP_Call_Test::process_options_response_100 -> Invalid server response dialog\n";
         delete options_response_100;
@@ -3033,7 +3051,7 @@ bool SIP_Call_Test::process_options_response_100()
 
     _received_response = false;
 
-    if (!_client_call.receive_response(options_response_100))
+    if (!_client_call->receive_response(options_response_100))
     {
         std::cout << "SIP_Call_Test::process_options_response_100 -> Failed to receive response\n";
         delete options_response_100;
@@ -3047,16 +3065,16 @@ bool SIP_Call_Test::process_options_response_100()
         return false;
     }
 
-    if (_client_call.get_state() != SIP_Call::STATE_OPTIONS_OUT)
+    if (_client_call->get_state() != SIP_Call::STATE_OPTIONS_OUT)
     {
         std::cout << "SIP_Call_Test::process_options_response_100 -> Invalid client call state:\n";
         std::cout << std::setw(12) << "Expected: " << SIP_Call::STATE_OPTIONS_OUT << "\n";
-        std::cout << std::setw(12) << "State: " << _client_call.get_state() << "\n";
+        std::cout << std::setw(12) << "State: " << _client_call->get_state() << "\n";
         delete options_response_100;
         return false;
     }
 
-    if (_client_call.get_client_dialog(options_response_100))
+    if (_client_call->get_client_dialog(options_response_100))
     {
         std::cout << "SIP_Call_Test::process_options_response_100 -> Invalid client response dialog\n";
         delete options_response_100;
@@ -3080,7 +3098,7 @@ bool SIP_Call_Test::process_options_response_200()
 
     _sent_message = false;
 
-    if (!_server_call.send_response(options_response_200))
+    if (!_server_call->send_response(options_response_200))
     {
         std::cout << "SIP_Call_Test::process_options_response_200 -> Failed to send response\n";
         delete options_response_200;
@@ -3094,16 +3112,16 @@ bool SIP_Call_Test::process_options_response_200()
         return false;
     }
 
-    if (_server_call.get_state() != SIP_Call::STATE_CLOSED)
+    if (_server_call->get_state() != SIP_Call::STATE_CLOSED)
     {
         std::cout << "SIP_Call_Test::process_options_response_200 -> Invalid server call state:\n";
         std::cout << std::setw(12) << "Expected: " << SIP_Call::STATE_CLOSED << "\n";
-        std::cout << std::setw(12) << "State: " << _server_call.get_state() << "\n";
+        std::cout << std::setw(12) << "State: " << _server_call->get_state() << "\n";
         delete options_response_200;
         return false;
     }
 
-    if (_server_call.get_server_dialog(options_response_200))
+    if (_server_call->get_server_dialog(options_response_200))
     {
         std::cout << "SIP_Call_Test::process_options_response_200 -> Invalid server response dialog\n";
         delete options_response_200;
@@ -3112,7 +3130,7 @@ bool SIP_Call_Test::process_options_response_200()
 
     _received_response = false;
 
-    if (!_client_call.receive_response(options_response_200))
+    if (!_client_call->receive_response(options_response_200))
     {
         std::cout << "SIP_Call_Test::process_options_response_200 -> Failed to receive response\n";
         delete options_response_200;
@@ -3126,16 +3144,16 @@ bool SIP_Call_Test::process_options_response_200()
         return false;
     }
 
-    if (_client_call.get_state() != SIP_Call::STATE_CLOSED)
+    if (_client_call->get_state() != SIP_Call::STATE_CLOSED)
     {
         std::cout << "SIP_Call_Test::process_options_response_200 -> Invalid client call state:\n";
         std::cout << std::setw(12) << "Expected: " << SIP_Call::STATE_CLOSED << "\n";
-        std::cout << std::setw(12) << "State: " << _client_call.get_state() << "\n";
+        std::cout << std::setw(12) << "State: " << _client_call->get_state() << "\n";
         delete options_response_200;
         return false;
     }
 
-    if (_client_call.get_client_dialog(options_response_200))
+    if (_client_call->get_client_dialog(options_response_200))
     {
         std::cout << "SIP_Call_Test::process_options_response_200 -> Invalid client response dialog\n";
         delete options_response_200;

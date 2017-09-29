@@ -19,7 +19,7 @@ class SIP_Call_Test
 {
 public:
     SIP_Call_Test();
-    virtual ~SIP_Call_Test() {}
+    virtual ~SIP_Call_Test();
 
     static bool init();
     template<class T> static bool run();
@@ -109,8 +109,8 @@ protected:
     static bool receive_response_callback(void *data, SIP_Call *call, SIP_Request *request, SIP_Response *response);
 
 protected:
-    SIP_Call _client_call;
-    SIP_Call _server_call;
+    SIP_Call *_client_call;
+    SIP_Call *_server_call;
 
     bool _use_prack;
 
