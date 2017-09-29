@@ -50,7 +50,7 @@ protected:
     static bool check_network_address(Socket::Address_Family family, std::string address);
 
 protected:
-    SIP_User_Agent _user_agent;
+    SIP_User_Agent *_user_agent;
 
     unsigned int _call_id_callback;
     std::list<SIP_Request *> _received_requests;

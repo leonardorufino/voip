@@ -14,15 +14,21 @@
 
 //-------------------------------------------
 
-SIP_User_Agent_Test::SIP_User_Agent_Test() : _call_id_callback(SIP_Call::INVALID_CALL_ID), _request_callback(NULL),
+SIP_User_Agent_Test::SIP_User_Agent_Test() : _call_id_callback(SIP_Object_ID::INVALID_CALL), _request_callback(NULL),
     _response_callback(NULL)
 {
+    SIP_Object_ID user_agent_id;
+    user_agent_id._user_agent = 0;
+    _user_agent = new SIP_User_Agent(user_agent_id);
 }
 
 //-------------------------------------------
 
 SIP_User_Agent_Test::~SIP_User_Agent_Test()
 {
+    if (_user_agent)
+        delete _user_agent;
+
     std::list<SIP_Request *>::iterator it = _received_requests.begin();
     while (it != _received_requests.end())
         delete *it++;
@@ -124,7 +130,7 @@ bool SIP_User_Agent_Test::init_user_agent(std::string address, unsigned short po
 
     set_callbacks();
 
-    if (!_user_agent.init(address, port))
+    if (!_user_agent->init(address, port))
     {
         std::cout << "SIP_User_Agent_Test::init_user_agent -> Failed to init user agent\n";
         return false;
@@ -137,7 +143,7 @@ bool SIP_User_Agent_Test::init_user_agent(std::string address, unsigned short po
 
 bool SIP_User_Agent_Test::close_user_agent()
 {
-    if (!_user_agent.close())
+    if (!_user_agent->close())
     {
         std::cout << "SIP_User_Agent_Invite_UDP_Test::close_user_agent -> Failed to close user agent\n";
         return false;
@@ -156,8 +162,8 @@ bool SIP_User_Agent_Test::close_user_agent()
 
 bool SIP_User_Agent_Test::set_callbacks()
 {
-    _user_agent.get_user_agent_server().set_receive_request_callback(receive_request_callback, this);
-    _user_agent.get_user_agent_client().set_receive_response_callback(receive_response_callback, this);
+    _user_agent->get_user_agent_server().set_receive_request_callback(receive_request_callback, this);
+    _user_agent->get_user_agent_client().set_receive_response_callback(receive_response_callback, this);
     return true;
 }
 
@@ -165,7 +171,7 @@ bool SIP_User_Agent_Test::set_callbacks()
 
 void SIP_User_Agent_Test::clear_callback_params()
 {
-    _call_id_callback = SIP_Call::INVALID_CALL_ID;
+    _call_id_callback = SIP_Object_ID::INVALID_CALL;
 
     if (_request_callback)
     {
@@ -186,7 +192,7 @@ void SIP_User_Agent_Test::clear_callback_params()
 bool SIP_User_Agent_Test::process_request(unsigned int call_id, SIP_Method_Type method, std::string address, unsigned short port,
                                           SIP_Transport_Type transport)
 {
-    SIP_User_Agent_Client &user_agent_client = _user_agent.get_user_agent_client();
+    SIP_User_Agent_Client &user_agent_client = _user_agent->get_user_agent_client();
 
     SIP_Request *request = user_agent_client.create_request(call_id, method);
     if (!request)
@@ -231,13 +237,13 @@ bool SIP_User_Agent_Test::process_request(unsigned int call_id, SIP_Method_Type 
 
     while ((Util_Functions::get_tick() - start) < MAX_WAIT_TIME)
     {
-        if ((_call_id_callback != SIP_Call::INVALID_CALL_ID) && (_request_callback))
+        if ((_call_id_callback != SIP_Object_ID::INVALID_CALL) && (_request_callback))
             break;
 
         Util_Functions::delay(DELAY);
     }
 
-    if ((_call_id_callback == SIP_Call::INVALID_CALL_ID) || (!_request_callback))
+    if ((_call_id_callback == SIP_Object_ID::INVALID_CALL) || (!_request_callback))
     {
         std::cout << "SIP_User_Agent_Test::process_request -> Request not received (call_id=" << call_id
                   << ", method=" << method << ")\n";
@@ -273,7 +279,7 @@ bool SIP_User_Agent_Test::process_response(unsigned int call_id, SIP_Method_Type
         return false;
     }
 
-    SIP_User_Agent_Server &user_agent_server = _user_agent.get_user_agent_server();
+    SIP_User_Agent_Server &user_agent_server = _user_agent->get_user_agent_server();
 
     SIP_Response *response = user_agent_server.create_response(call_id, request, status_code);
     if (!response)
@@ -297,13 +303,13 @@ bool SIP_User_Agent_Test::process_response(unsigned int call_id, SIP_Method_Type
 
     while ((Util_Functions::get_tick() - start) < MAX_WAIT_TIME)
     {
-        if ((_call_id_callback != SIP_Call::INVALID_CALL_ID) && (_request_callback) && (_response_callback))
+        if ((_call_id_callback != SIP_Object_ID::INVALID_CALL) && (_request_callback) && (_response_callback))
             break;
 
         Util_Functions::delay(DELAY);
     }
 
-    if ((_call_id_callback == SIP_Call::INVALID_CALL_ID) || (!_request_callback) || (!_response_callback))
+    if ((_call_id_callback == SIP_Object_ID::INVALID_CALL) || (!_request_callback) || (!_response_callback))
     {
         std::cout << "SIP_User_Agent_Test::process_response -> Response not received (call_id=" << call_id
                   << ", method=" << method << ", status_code=" << status_code << ")\n";
@@ -321,7 +327,7 @@ bool SIP_User_Agent_Test::process_response(unsigned int call_id, SIP_Method_Type
 bool SIP_User_Agent_Test::receive_request_callback(void *data, SIP_User_Agent *user_agent, unsigned int call_id, SIP_Request *request)
 {
     SIP_User_Agent_Test *test = reinterpret_cast<SIP_User_Agent_Test *>(data);
-    if ((!test) || (!user_agent) || (call_id == SIP_Call::INVALID_CALL_ID) || (!request))
+    if ((!test) || (!user_agent) || (call_id == SIP_Object_ID::INVALID_CALL) || (!request))
     {
         std::cout << "SIP_User_Agent_Test::receive_request_callback -> Invalid parameters\n";
         return false;
@@ -342,7 +348,7 @@ bool SIP_User_Agent_Test::receive_response_callback(void *data, SIP_User_Agent *
                                                     SIP_Request *request, SIP_Response *response)
 {
     SIP_User_Agent_Test *test = reinterpret_cast<SIP_User_Agent_Test *>(data);
-    if ((!test) || (!user_agent) || (call_id == SIP_Call::INVALID_CALL_ID) || (!request) || (!response))
+    if ((!test) || (!user_agent) || (call_id == SIP_Object_ID::INVALID_CALL) || (!request) || (!response))
     {
         std::cout << "SIP_User_Agent_Test::receive_response_callback -> Invalid parameters\n";
         return false;
