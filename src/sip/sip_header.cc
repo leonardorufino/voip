@@ -242,7 +242,7 @@ bool SIP_Header::decode_headers(std::string &sip_msg, sip_header_list &headers)
     bool matched = String_Functions::match(sip_msg, ":", type);
     if (!matched)
     {
-        _logger.warning("SIP_Header::decode_header -> Failed to get \":\" character (msg=%s)", sip_msg.c_str());
+        _logger.warning("Failed to decode headers: character \":\" not present (msg=%s)", sip_msg.c_str());
         return false;
     }
 
@@ -251,7 +251,7 @@ bool SIP_Header::decode_headers(std::string &sip_msg, sip_header_list &headers)
     SIP_Header_Type header_type = SIP_Functions::get_header_type(type);
     if (header_type == SIP_HEADER_INVALID)
     {
-        _logger.warning("SIP_Header::decode_header -> Invalid header type (header=%s)", type.c_str());
+        _logger.warning("Failed to decode headers: invalid header type (header=%s)", type.c_str());
         return false;
     }
 
@@ -275,7 +275,7 @@ bool SIP_Header::decode_headers(std::string &sip_msg, sip_header_list &headers)
 
         if (!header->decode(result))
         {
-            _logger.warning("SIP_Header::decode_header -> Failed to decode header (header=%d)", header_type);
+            _logger.warning("Failed to decode headers: decode failed (header=%d)", header_type);
             delete header;
             return false;
         }
@@ -305,7 +305,7 @@ bool SIP_Header::encode_headers(std::string &sip_msg, sip_header_list &headers)
             type = SIP_Functions::get_header_type(header_type);
             if (type.empty())
             {
-                _logger.warning("SIP_Header::encode_headers -> Failed to get header type (header=%d)", header_type);
+                _logger.warning("Failed to encode headers: invalid header type (header=%d)", header_type);
                 return false;
             }
 
@@ -324,7 +324,7 @@ bool SIP_Header::encode_headers(std::string &sip_msg, sip_header_list &headers)
 
         if (!header->encode(sip_msg))
         {
-            _logger.warning("SIP_Header::encode_header -> Failed to encode header (header=%d)", header->get_header_type());
+            _logger.warning("Failed to encode headers: encode failed (header=%d)", header->get_header_type());
             return false;
         }
     }
