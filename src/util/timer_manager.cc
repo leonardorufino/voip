@@ -47,7 +47,7 @@ bool Timer::start(unsigned long time)
     if (!CreateTimerQueueTimer(&_timer, NULL, (WAITORTIMERCALLBACK) Timer_Manager::timer_handler, (void *) _timer_id,
                                time, 0, WT_EXECUTEDEFAULT))
     {
-        _logger.warning("Timer::start -> Failed to create timer queue timer (timer=%d, error=%d)", _timer_id, GetLastError());
+        _logger.warning("Failed to start: create timer queue timer failed (timer=%d, error=%d)", _timer_id, GetLastError());
         return false;
     }
 #else
@@ -57,7 +57,7 @@ bool Timer::start(unsigned long time)
 
     if (sigaction(SIGRTMIN, &_sig_action, NULL))
     {
-        _logger.warning("Timer::start -> Failed to call sigaction (timer=%d, error=%d)", _timer_id, errno);
+        _logger.warning("Failed to start: sigaction failed (timer=%d, error=%d)", _timer_id, errno);
         return false;
     }
 
@@ -67,7 +67,7 @@ bool Timer::start(unsigned long time)
 
     if (timer_create(CLOCK_MONOTONIC, &_sig_event, &_timer))
     {
-        _logger.warning("Timer::start -> Failed to create timer (timer=%d, error=%d)", _timer_id, errno);
+        _logger.warning("Failed to start: timer create failed (timer=%d, error=%d)", _timer_id, errno);
         return false;
     }
 
@@ -76,12 +76,12 @@ bool Timer::start(unsigned long time)
 
     if (timer_settime(_timer, 0, &_timer_spec, NULL))
     {
-        _logger.warning("Timer::start -> Failed to set time (timer=%d, error=%d)", _timer_id, errno);
+        _logger.warning("Failed to start: set time failed (timer=%d, error=%d)", _timer_id, errno);
         return false;
     }
 #endif
 
-    _logger.trace("Timer::start -> Timer started (timer=%d)", _timer_id);
+    _logger.trace("Timer started (timer=%d)", _timer_id);
     return true;
 }
 
@@ -94,14 +94,14 @@ bool Timer::stop()
     {
         if (!DeleteTimerQueueTimer(NULL, _timer, NULL))
         {
-            _logger.warning("Timer::stop -> Failed to delete timer (timer=%d, error=%d)", _timer_id, GetLastError());
+            _logger.warning("Failed to stop: delete timer queue timer failed (timer=%d, error=%d)", _timer_id, GetLastError());
             _timer = NULL;
             return false;
         }
 
         _timer = NULL;
 
-        _logger.trace("Timer::stop -> Timer stopped (timer=%d)", _timer_id);
+        _logger.trace("Timer stopped (timer=%d)", _timer_id);
     }
 #else
     if (_timer)
@@ -111,19 +111,19 @@ bool Timer::stop()
 
         if (timer_settime(_timer, 0, &_timer_spec, NULL))
         {
-            _logger.warning("Timer::stop -> Failed to set time (timer=%d, error=%d)", _timer_id, errno);
+            _logger.warning("Failed to stop: set time failed (timer=%d, error=%d)", _timer_id, errno);
             return false;
         }
 
         if (timer_delete(_timer))
         {
-            _logger.warning("Timer::stop -> Failed to delete timer (timer=%d, error=%d)", _timer_id, errno);
+            _logger.warning("Failed to stop: timer delete failed (timer=%d, error=%d)", _timer_id, errno);
             return false;
         }
 
         _timer = 0;
 
-        _logger.trace("Timer::stop -> Timer stopped (timer=%d)", _timer_id);
+        _logger.trace("Timer stopped (timer=%d)", _timer_id);
     }
 #endif
 
@@ -141,16 +141,16 @@ bool Timer::expired()
             _timer = NULL;
 #endif
 
-        _logger.trace("Timer::expired -> Timer expired (timer=%d)", _timer_id);
+        _logger.trace("Timer expired (timer=%d)", _timer_id);
         return _callback(_callback_data);
 
     }catch (std::exception &e)
     {
-        _logger.warning("Timer::expired -> Exception in timer callback (timer=%d, msg=%s)", _timer_id, e.what());
+        _logger.warning("Exception in timer expired (timer=%d, msg=%s)", _timer_id, e.what());
         return false;
     }catch (...)
     {
-        _logger.warning("Timer::expired -> Unknown exception in timer callback (timer=%d)", _timer_id);
+        _logger.warning("Exception in timer expired (timer=%d)", _timer_id);
         return false;
     }
 }
