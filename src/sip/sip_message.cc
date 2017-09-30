@@ -69,7 +69,7 @@ SIP_Message *SIP_Message::decode_msg(std::string sip_msg)
     SIP_Method_Type method = SIP_Functions::get_method_type(msg);
     if (method == SIP_METHOD_INVALID)
     {
-        _logger.warning("SIP_Message::decode_msg -> Invalid method (method=%s)", msg.c_str());
+        _logger.warning("Failed to decode message: invalid method (method=%s)", msg.c_str());
         return NULL;
     }
 
@@ -81,7 +81,7 @@ SIP_Message *SIP_Message::decode_msg(std::string sip_msg)
 
     if (!message->decode(sip_msg))
     {
-        _logger.warning("SIP_Message::decode_msg -> Failed to decode message (method=%s)", msg.c_str());
+        _logger.warning("Failed to decode message: decode failed (method=%s)", msg.c_str());
         delete message;
         return NULL;
     }
@@ -277,7 +277,7 @@ bool SIP_Request::decode_start_line(std::string &sip_msg)
     String_Functions::skip(line, " \t");
     if (!String_Functions::match(line, " ", result))
     {
-        _logger.warning("SIP_Request::decode_start_line -> Failed to decode request URI (request_uri=%s)", line.c_str());
+        _logger.warning("Failed to decode start line: invalid request URI (request_uri=%s)", line.c_str());
         return false;
     }
 
@@ -288,7 +288,7 @@ bool SIP_Request::decode_start_line(std::string &sip_msg)
     _sip_version = line;
     if ((_sip_version.empty()) || (_sip_version != SIP_VERSION))
     {
-        _logger.warning("SIP_Request::decode_start_line -> Failed to decode SIP version (version=%s)", _sip_version.c_str());
+        _logger.warning("Failed to decode start line: invalid SIP version (version=%s)", _sip_version.c_str());
         return false;
     }
 
@@ -392,14 +392,14 @@ bool SIP_Response::decode_start_line(std::string &sip_msg)
     String_Functions::skip(line, " \t");
     if (!String_Functions::match(line, " ", result))
     {
-        _logger.warning("SIP_Response::decode_start_line -> Failed to decode status code (status_code=%s)", line.c_str());
+        _logger.warning("Failed to decode start line: invalid status code (status_code=%s)", line.c_str());
         return false;
     }
 
     _status_code = String_Functions::str_to_us(result);
     if ((_status_code < 100) || (_status_code > 699))
     {
-        _logger.warning("SIP_Response::decode_start_line -> Invalid status code (status_code=%d)", _status_code);
+        _logger.warning("Failed to decode start line: invalid status code value (status_code=%d)", _status_code);
         return false;
     }
 
