@@ -56,12 +56,12 @@ bool Socket::call_connect_callback(bool success)
         return false;
     }catch (std::exception &e)
     {
-        _logger.warning("Exception when calling connect callback (state=%d, socket=%d, success=%d, msg=%s)",
+        _logger.warning("Exception in call connect callback (state=%d, socket=%d, success=%d, msg=%s)",
                         _state, _socket, success, e.what());
         return false;
     }catch (...)
     {
-        _logger.warning("Exception when calling connect callback (state=%d, socket=%d, success=%d)", _state, _socket, success);
+        _logger.warning("Exception in call connect callback (state=%d, socket=%d, success=%d)", _state, _socket, success);
         return false;
     }
 }
@@ -93,12 +93,12 @@ bool Socket::call_accept_callback(Socket_TCP_Client *accepted, std::string addre
         return false;
     }catch (std::exception &e)
     {
-        _logger.warning("Exception when calling accept callback (state=%d, socket=%d, accepted=%d, address=%s, port=%d)",
+        _logger.warning("Exception in call accept callback (state=%d, socket=%d, accepted=%d, address=%s, port=%d)",
                         _state, _socket, accepted->_socket, address.c_str(), port, e.what());
         return false;
     }catch (...)
     {
-        _logger.warning("Exception when calling accept callback (state=%d, socket=%d, accepted=%d, address=%s, port=%d)",
+        _logger.warning("Exception in call accept callback (state=%d, socket=%d, accepted=%d, address=%s, port=%d)",
                         _state, _socket, accepted->_socket, address.c_str(), port);
         return false;
     }
@@ -130,12 +130,12 @@ bool Socket::call_receive_callback(const char *buffer, int size, std::string add
         return false;
     }catch (std::exception &e)
     {
-        _logger.warning("Exception when calling receive callback (state=%d, socket=%d, address=%s, port=%d, size=%d, msg=%s)",
+        _logger.warning("Exception in call receive callback (state=%d, socket=%d, address=%s, port=%d, size=%d, msg=%s)",
                         _state, _socket, address.c_str(), port, size, e.what());
         return false;
     }catch (...)
     {
-        _logger.warning("Exception when calling receive callback (state=%d, socket=%d, address=%s, port=%d, size=%d)",
+        _logger.warning("Exception in call receive callback (state=%d, socket=%d, address=%s, port=%d, size=%d)",
                         _state, _socket, address.c_str(), port, size);
         return false;
     }
@@ -147,14 +147,14 @@ bool Socket::create(int af, int type, int protocol)
 {
     if (_state != STATE_IDLE)
     {
-        _logger.warning("Invalid state to create socket (state=%d)", _state);
+        _logger.warning("Failed to create: invalid state (state=%d)", _state);
         return false;
     }
 
     _socket = socket(af, type, protocol);
     if (_socket == INVALID_SOCKET)
     {
-        _logger.warning("Failed to create socket (af=%d, type=%d, protocol=%d, error=%d)", af, type, protocol, GET_LAST_ERROR);
+        _logger.warning("Failed to create: socket failed (af=%d, type=%d, protocol=%d, error=%d)", af, type, protocol, GET_LAST_ERROR);
         return false;
     }
 
@@ -169,13 +169,13 @@ bool Socket::close()
 {
     if ((_state == STATE_IDLE) || (_state == STATE_CLOSED))
     {
-        _logger.warning("Invalid state to close socket (state=%d)", _state);
+        _logger.warning("Failed to close: invalid state (state=%d)", _state);
         return false;
     }
 
     if (::closesocket(_socket))
     {
-        _logger.warning("Failed to close socket (socket=%d, error=%d)", _socket, GET_LAST_ERROR);
+        _logger.warning("Failed to close: close socket failed(socket=%d, error=%d)", _socket, GET_LAST_ERROR);
         _state = STATE_CLOSED;
         _socket = INVALID_SOCKET;
         return false;
@@ -193,17 +193,18 @@ bool Socket::set_so_snd_buf(int size)
 {
     if ((_state == STATE_IDLE) || (_state == STATE_CLOSED))
     {
-        _logger.warning("Invalid state to set socket option send buffer size (state=%d)", _state);
+        _logger.warning("Failed to set socket option send buffer: invalid state (state=%d)", _state);
         return false;
     }
 
     if (setsockopt(_socket, SOL_SOCKET, SO_SNDBUF, (const char *) &size, sizeof(size)))
     {
-        _logger.warning("Failed to set socket option send buffer size (socket=%d, size=%d, error=%d)", _socket, size, GET_LAST_ERROR);
+        _logger.warning("Failed to set socket option send buffer: setsockopt failed (socket=%d, size=%d, error=%d)",
+                        _socket, size, GET_LAST_ERROR);
         return false;
     }
 
-    _logger.trace("Set socket option send buffer size (socket=%d, size=%d)", _socket, size);
+    _logger.trace("Set socket option send buffer (socket=%d, size=%d)", _socket, size);
     return true;
 }
 
@@ -213,17 +214,17 @@ bool Socket::set_so_rcv_buf(int size)
 {
     if ((_state == STATE_IDLE) || (_state == STATE_CLOSED))
     {
-        _logger.warning("Invalid state to set socket option receive buffer size (state=%d)", _state);
+        _logger.warning("Failed to set socket option receive buffer: invalid state (state=%d)", _state);
         return false;
     }
 
     if (setsockopt(_socket, SOL_SOCKET, SO_RCVBUF, (const char * ) &size, sizeof(size)))
     {
-        _logger.warning("Failed to set socket option receive buffer size (socket=%d, size=%d, error=%d)", _socket, size, GET_LAST_ERROR);
+        _logger.warning("Failed to set socket option receive buffer: setsockopt failed (socket=%d, size=%d, error=%d)", _socket, size, GET_LAST_ERROR);
         return false;
     }
 
-    _logger.trace("Set socket option receive buffer size (socket=%d, size=%d)", _socket, size);
+    _logger.trace("Set socket option receive buffer (socket=%d, size=%d)", _socket, size);
     return true;
 }
 
@@ -233,17 +234,18 @@ bool Socket::set_so_reuse_addr(int value)
 {
     if ((_state == STATE_IDLE) || (_state == STATE_CLOSED))
     {
-        _logger.warning("Invalid state to set socket option reuse addr (state=%d)", _state);
+        _logger.warning("Failed to set socket option reuse address: invalid state (state=%d)", _state);
         return false;
     }
 
     if (setsockopt(_socket, SOL_SOCKET, SO_REUSEADDR, (const char *) &value, sizeof(value)))
     {
-        _logger.warning("Failed to set socket option reuse addr (socket=%d, value=%d, error=%d)", _socket, value, GET_LAST_ERROR);
+        _logger.warning("Failed to set socket option reuse address: setsockopt failed (socket=%d, value=%d, error=%d)",
+                        _socket, value, GET_LAST_ERROR);
         return false;
     }
 
-    _logger.trace("Set socket option reuse addr (socket=%d, value=%d)", _socket, value);
+    _logger.trace("Set socket option reuse address (socket=%d, value=%d)", _socket, value);
     return true;
 }
 
@@ -253,7 +255,7 @@ bool Socket::set_non_blocking(bool non_blocking)
 {
     if ((_state == STATE_IDLE) || (_state == STATE_CLOSED))
     {
-        _logger.warning("Invalid state to set non-blocking flag (state=%d)", _state);
+        _logger.warning("Failed to set non-blocking: invalid state (state=%d)", _state);
         return false;
     }
 
@@ -261,14 +263,16 @@ bool Socket::set_non_blocking(bool non_blocking)
     unsigned long arg = non_blocking ? 1 : 0;
     if (ioctlsocket(_socket, FIONBIO, &arg))
     {
-        _logger.warning("Failed to set non-blocking flag (socket=%d, non_blocking=%d, error=%d)", _socket, non_blocking, GET_LAST_ERROR);
+        _logger.warning("Failed to set non-blocking: ioctlsocket failed (socket=%d, non_blocking=%d, error=%d)",
+                        _socket, non_blocking, GET_LAST_ERROR);
         return false;
     }
 #else
     int flags = fcntl(_socket, F_GETFL, 0);
     if (flags < 0)
     {
-        _logger.warning("Failed to get status flags (socket=%d, non_blocking=%d, error=%d)", _socket, non_blocking, GET_LAST_ERROR);
+        _logger.warning("Failed to set non-blocking: fcntl get failed (socket=%d, non_blocking=%d, error=%d)",
+                        _socket, non_blocking, GET_LAST_ERROR);
         return false;
     }
 
@@ -279,7 +283,8 @@ bool Socket::set_non_blocking(bool non_blocking)
 
     if (fcntl(_socket, F_SETFL, flags))
     {
-        _logger.warning("Failed to set status flags (socket=%d, non_blocking=%d, error=%d)", _socket, non_blocking, GET_LAST_ERROR);
+        _logger.warning("Failed to set non-blocking: fcntl set failed (socket=%d, non_blocking=%d, error=%d)",
+                        _socket, non_blocking, GET_LAST_ERROR);
         return false;
     }
 #endif
@@ -294,14 +299,15 @@ bool Socket::get_so_error(int &value)
 {
     if ((_state == STATE_IDLE) || (_state == STATE_CLOSED))
     {
-        _logger.warning("Invalid state to get socket option error (state=%d)", _state);
+        _logger.warning("Failed to get socket option error: invalid state (state=%d)", _state);
         return false;
     }
 
     socklen_t len = sizeof(value);
     if (getsockopt(_socket, SOL_SOCKET, SO_ERROR, (char *) &value, &len))
     {
-        _logger.warning("Failed to get socket option error (socket=%d, value=%d, error=%d)", _socket, value, GET_LAST_ERROR);
+        _logger.warning("Failed to get socket option error: getsockopt failed (socket=%d, value=%d, error=%d)",
+                        _socket, value, GET_LAST_ERROR);
         return false;
     }
 
@@ -315,14 +321,14 @@ bool Socket::bind(std::string address, unsigned short port)
 {
     if ((_state == STATE_IDLE) || (_state == STATE_CLOSED))
     {
-        _logger.warning("Invalid state to bind (state=%d)", _state);
+        _logger.warning("Failed to bind: invalid state (state=%d)", _state);
         return false;
     }
 
     sockaddr_storage ss;
     if (!address_to_sockaddr(address, port, ss))
     {
-        _logger.warning("Failed to get socket address to bind (socket=%d, address=%s, port=%d)", _socket, address.c_str(), port);
+        _logger.warning("Failed to bind: address to sockaddr failed (socket=%d, address=%s, port=%d)", _socket, address.c_str(), port);
         return false;
     }
 
@@ -334,7 +340,8 @@ bool Socket::bind(std::string address, unsigned short port)
 
     if (::bind(_socket, (sockaddr *) &ss, sizeof(ss)))
     {
-        _logger.warning("Failed to bind (socket=%d, address=%s, port=%d, error=%d)", _socket, address.c_str(), port, GET_LAST_ERROR);
+        _logger.warning("Failed to bind: bind failed (socket=%d, address=%s, port=%d, error=%d)",
+                        _socket, address.c_str(), port, GET_LAST_ERROR);
         return false;
     }
 
@@ -348,13 +355,13 @@ bool Socket::listen(int backlog)
 {
     if ((_state == STATE_IDLE) || (_state == STATE_CLOSED))
     {
-        _logger.warning("Invalid state to listen (state=%d)", _state);
+        _logger.warning("Failed to listen: invalid state (state=%d)", _state);
         return false;
     }
 
     if (::listen(_socket, backlog))
     {
-        _logger.warning("Failed to listen (socket=%d, backlog=%d, error=%d)", _socket, backlog, GET_LAST_ERROR);
+        _logger.warning("Failed to listen: listen failed (socket=%d, backlog=%d, error=%d)", _socket, backlog, GET_LAST_ERROR);
         return false;
     }
 
@@ -369,7 +376,7 @@ bool Socket::accept(socket_t &accept_socket, std::string &address, unsigned shor
 {
     if (_state != STATE_LISTENING)
     {
-        _logger.warning("Invalid state to accept (state=%d)", _state);
+        _logger.warning("Failed to accept: invalid state (state=%d)", _state);
         return false;
     }
 
@@ -379,17 +386,18 @@ bool Socket::accept(socket_t &accept_socket, std::string &address, unsigned shor
     accept_socket = ::accept(_socket, (sockaddr *) &ss, &ss_len);
     if (accept_socket == INVALID_SOCKET)
     {
-        _logger.warning("Failed to accept (socket=%d, error=%d)", _socket, GET_LAST_ERROR);
+        _logger.warning("Failed to accept: accept failed (socket=%d, error=%d)", _socket, GET_LAST_ERROR);
         return false;
     }
 
     if (!sockaddr_to_address(ss, address, port))
     {
-        _logger.warning("Failed to get accept address (socket=%d, accepted=%d)", _socket, accept_socket);
+        _logger.warning("Failed to accept: sockaddr to address failed (socket=%d, accepted=%d)", _socket, accept_socket);
 
         if (::closesocket(accept_socket))
         {
-            _logger.warning("Failed to close accept socket (socket=%d, accepted=%d, error=%d)", _socket, accept_socket, GET_LAST_ERROR);
+            _logger.warning("Failed to accept: close socket failed (socket=%d, accepted=%d, error=%d)",
+                            _socket, accept_socket, GET_LAST_ERROR);
             accept_socket = INVALID_SOCKET;
         }
 
@@ -406,14 +414,14 @@ bool Socket::connect(std::string address, unsigned short port)
 {
     if ((_state == STATE_IDLE) || (_state == STATE_CLOSED))
     {
-        _logger.warning("Invalid state to connect (state=%d)", _state);
+        _logger.warning("Failed to connect: invalid state (state=%d)", _state);
         return false;
     }
 
     sockaddr_storage ss;
     if (!address_to_sockaddr(address, port, ss))
     {
-        _logger.warning("Failed to get socket address to connect (socket=%d, address=%s, port=%d)", _socket, address.c_str(), port);
+        _logger.warning("Failed to connect: address to sockaddr failed (socket=%d, address=%s, port=%d)", _socket, address.c_str(), port);
         return false;
     }
 
@@ -436,7 +444,7 @@ bool Socket::connect(std::string address, unsigned short port)
 
             default:
             {
-                _logger.warning("Failed to connect (socket=%d, address=%s, port=%d, error=%d)",
+                _logger.warning("Failed to connect: connect failed (socket=%d, address=%s, port=%d, error=%d)",
                                 _socket, address.c_str(), port, GET_LAST_ERROR);
                 return false;
             }
@@ -455,7 +463,7 @@ bool Socket::send(const char *buffer, int size)
 {
     if ((_state == STATE_IDLE) || (_state == STATE_CLOSED))
     {
-        _logger.warning("Invalid state to send (state=%d)", _state);
+        _logger.warning("Failed to send: invalid state (state=%d)", _state);
         return false;
     }
 
@@ -476,7 +484,7 @@ bool Socket::send(const char *buffer, int size)
 
             default:
             {
-                _logger.warning("Failed to send (socket=%d, error=%d)", _socket, GET_LAST_ERROR);
+                _logger.warning("Failed to send: send failed (socket=%d, error=%d)", _socket, GET_LAST_ERROR);
                 return false;
             }
         }
@@ -492,14 +500,14 @@ bool Socket::send(const char *buffer, int size, std::string address, unsigned sh
 {
     if ((_state == STATE_IDLE) || (_state == STATE_CLOSED))
     {
-        _logger.warning("Invalid state to send (state=%d)", _state);
+        _logger.warning("Failed to send: invalid state (state=%d)", _state);
         return false;
     }
 
     sockaddr_storage ss;
     if (!address_to_sockaddr(address, port, ss))
     {
-        _logger.warning("Failed to get socket address to send (socket=%d, address=%s, port=%d)", _socket, address.c_str(), port);
+        _logger.warning("Failed to send: address to sockaddr failed (socket=%d, address=%s, port=%d)", _socket, address.c_str(), port);
         return false;
     }
 
@@ -521,7 +529,7 @@ bool Socket::send(const char *buffer, int size, std::string address, unsigned sh
 
             default:
             {
-                _logger.warning("Failed to send (socket=%d, address=%s, port=%d, error=%d)",
+                _logger.warning("Failed to send: sendto failed (socket=%d, address=%s, port=%d, error=%d)",
                                 _socket, address.c_str(), port, GET_LAST_ERROR);
                 return false;
             }
@@ -538,14 +546,14 @@ int Socket::receive(char *buffer, int size)
 {
     if ((_state == STATE_IDLE) || (_state == STATE_CLOSED))
     {
-        _logger.warning("Invalid state to receive (state=%d)", _state);
+        _logger.warning("Failed to receive: invalid state (state=%d)", _state);
         return false;
     }
 
     int len = recv(_socket, buffer, size, 0);
     if (len < 0)
     {
-        _logger.warning("Failed to receive (socket=%d, error=%d)", _socket, GET_LAST_ERROR);
+        _logger.warning("Failed to receive: recv failed (socket=%d, error=%d)", _socket, GET_LAST_ERROR);
         return -1;
     }
 
@@ -559,7 +567,7 @@ int Socket::receive(char *buffer, int size, std::string &address, unsigned short
 {
     if ((_state == STATE_IDLE) || (_state == STATE_CLOSED))
     {
-        _logger.warning("Invalid state to receive (state=%d)", _state);
+        _logger.warning("Failed to receive: invalid state (state=%d)", _state);
         return false;
     }
 
@@ -569,13 +577,13 @@ int Socket::receive(char *buffer, int size, std::string &address, unsigned short
     int len = recvfrom(_socket, buffer, size, 0, (sockaddr *) &ss, &ss_len);
     if (len < 0)
     {
-        _logger.warning("Failed to receive (socket=%d, error=%d)", _socket, GET_LAST_ERROR);
+        _logger.warning("Failed to receive: recvfrom failed (socket=%d, error=%d)", _socket, GET_LAST_ERROR);
         return -1;
     }
 
     if (!sockaddr_to_address(ss, address, port))
     {
-        _logger.warning("Failed to get received address (socket=%d)", _socket);
+        _logger.warning("Failed to receive: sockaddr to address failed (socket=%d)", _socket);
         return -1;
     }
 
@@ -589,7 +597,7 @@ int Socket::select(unsigned long timeout, int *read, int *write, int *except)
 {
     if ((_state == STATE_IDLE) || (_state == STATE_CLOSED))
     {
-        _logger.warning("Invalid state to select (state=%d)", _state);
+        _logger.warning("Failed to select: invalid state (state=%d)", _state);
         return -1;
     }
 
@@ -630,7 +638,7 @@ int Socket::select(unsigned long timeout, int *read, int *write, int *except)
     int ret = ::select(_socket + 1, p_read_set, p_write_set, p_except_set, &tv);
     if (ret < 0)
     {
-        _logger.warning("Failed to select (socket=%d, error=%d)", _socket, GET_LAST_ERROR);
+        _logger.warning("Failed to select: select failed (socket=%d, error=%d)", _socket, GET_LAST_ERROR);
         return -1;
     }
 
@@ -732,7 +740,7 @@ bool Socket::sockaddr_to_address(sockaddr_storage &ss, std::string &address)
 
         if (!inet_ntop(ss.ss_family, &sin->sin_addr, buf, sizeof(buf)))
         {
-            _logger.warning("Failed to convert IPv4 sockaddr to address (error=%d)", GET_LAST_ERROR);
+            _logger.warning("Failed in sockaddr to address: IPv4 inet_ntop failed (error=%d)", GET_LAST_ERROR);
             return false;
         }
 
@@ -747,7 +755,7 @@ bool Socket::sockaddr_to_address(sockaddr_storage &ss, std::string &address)
 
         if (!inet_ntop(ss.ss_family, &sin->sin6_addr, buf, sizeof(buf)))
         {
-            _logger.warning("Failed to convert IPv6 sockaddr to address (error=%d)", GET_LAST_ERROR);
+            _logger.warning("Failed in sockaddr to address: IPv6 inet_ntop failed (error=%d)", GET_LAST_ERROR);
             return false;
         }
 
@@ -792,7 +800,7 @@ unsigned long Socket::get_scope_id(std::string address)
             adapter_addresses = NULL;
         }
 
-        _logger.warning("Failed to get adapters addresses (error=%d)", ret);
+        _logger.warning("Failed to get scope id: get adapters addresses failed (error=%d)", ret);
         return 0;
     }
 
@@ -811,7 +819,7 @@ unsigned long Socket::get_scope_id(std::string address)
 
                     if (!inet_ntop(sin->sin6_family, &sin->sin6_addr, buf, sizeof(buf)))
                     {
-                        _logger.warning("Failed to convert IPv6 sockaddr to address (error=%d)", GET_LAST_ERROR);
+                        _logger.warning("Failed to get scope id: IPv6 inet_ntop failed (error=%d)", GET_LAST_ERROR);
                         return 0;
                     }
 
@@ -835,7 +843,7 @@ unsigned long Socket::get_scope_id(std::string address)
     ifaddrs *interfaces;
     if (getifaddrs(&interfaces))
     {
-        _logger.warning("Failed to get interface addresses (error=%d)", GET_LAST_ERROR);
+        _logger.warning("Failed to get scope id: getifaddrs failed (error=%d)", GET_LAST_ERROR);
         return 0;
     }
 
@@ -855,7 +863,7 @@ unsigned long Socket::get_scope_id(std::string address)
 
             if (!inet_ntop(sin->sin6_family, &sin->sin6_addr, buf, sizeof(buf)))
             {
-                _logger.warning("Failed to convert IPv6 sockaddr to address (error=%d)", GET_LAST_ERROR);
+                _logger.warning("Failed to get scope id: IPv6 inet_ntop failed (error=%d)", GET_LAST_ERROR);
                 return 0;
             }
 
@@ -874,7 +882,7 @@ unsigned long Socket::get_scope_id(std::string address)
 
     if (!found)
     {
-        _logger.warning("Scope id not found (address=%s)", address.c_str());
+        _logger.warning("Failed to get scope id: IP not found (address=%s)", address.c_str());
         return 0;
     }
 
@@ -914,7 +922,7 @@ bool Socket::get_network_addresses(std::list<Network_Address> &addresses)
             adapter_addresses = NULL;
         }
 
-        _logger.warning("Failed to get adapters addresses (error=%d)", ret);
+        _logger.warning("Failed to get network addresses: get adapters addresses failed (error=%d)", ret);
         return false;
     }
 
@@ -933,7 +941,7 @@ bool Socket::get_network_addresses(std::list<Network_Address> &addresses)
 
                     if (!inet_ntop(sin->sin_family, &sin->sin_addr, buf, sizeof(buf)))
                     {
-                        _logger.warning("Failed to convert IPv4 sockaddr to address (error=%d)", GET_LAST_ERROR);
+                        _logger.warning("Failed to get network addresses: IPv4 inet_ntop failed (error=%d)", GET_LAST_ERROR);
                         return false;
                     }
 
@@ -950,7 +958,7 @@ bool Socket::get_network_addresses(std::list<Network_Address> &addresses)
 
                     if (!inet_ntop(sin->sin6_family, &sin->sin6_addr, buf, sizeof(buf)))
                     {
-                        _logger.warning("Failed to convert IPv6 sockaddr to address (error=%d)", GET_LAST_ERROR);
+                        _logger.warning("Failed to get network addresses: IPv6 inet_ntop failed (error=%d)", GET_LAST_ERROR);
                         return false;
                     }
 
@@ -974,7 +982,7 @@ bool Socket::get_network_addresses(std::list<Network_Address> &addresses)
     ifaddrs *interfaces;
     if (getifaddrs(&interfaces))
     {
-        _logger.warning("Failed to get interface addresses (error=%d)", GET_LAST_ERROR);
+        _logger.warning("Failed to get network addresses: getifaddrs failed (error=%d)", GET_LAST_ERROR);
         return false;
     }
 
@@ -994,7 +1002,7 @@ bool Socket::get_network_addresses(std::list<Network_Address> &addresses)
 
             if (!inet_ntop(sin->sin_family, &sin->sin_addr, buf, sizeof(buf)))
             {
-                _logger.warning("Failed to convert IPv4 sockaddr to address (error=%d)", GET_LAST_ERROR);
+                _logger.warning("Failed to get network addresses: IPv4 inet_ntop failed (error=%d)", GET_LAST_ERROR);
                 return false;
             }
 
@@ -1011,7 +1019,7 @@ bool Socket::get_network_addresses(std::list<Network_Address> &addresses)
 
             if (!inet_ntop(sin->sin6_family, &sin->sin6_addr, buf, sizeof(buf)))
             {
-                _logger.warning("Failed to convert IPv6 sockaddr to address (error=%d)", GET_LAST_ERROR);
+                _logger.warning("Failed to get network addresses: IPv6 inet_ntop failed (error=%d)", GET_LAST_ERROR);
                 return false;
             }
 
@@ -1030,7 +1038,7 @@ bool Socket::get_network_addresses(std::list<Network_Address> &addresses)
 
     if (addresses.empty())
     {
-        _logger.warning("Failed to get network addresses");
+        _logger.warning("Failed to get network addresses: no address found");
         return false;
     }
 
@@ -1071,7 +1079,7 @@ bool Socket::Startup()
         int ret = WSAStartup(wVersionRequested, &wsaData);
         if (ret != 0)
         {
-            _logger.error("Failed to startup (error=%d)", ret);
+            _logger.error("Failed to startup: WSAStartup failed (error=%d)", ret);
             return false;
         }
 
@@ -1275,7 +1283,7 @@ void Socket_Control::control_thread()
         int select_nb = ::select(max_fd + 1, &read_set, &write_set, &except_set, &tv);
         if (select_nb < 0)
         {
-            logger.warning("Failed to select in control thread (error=%d)", GET_LAST_ERROR);
+            logger.warning("Failed in control thread: select failed (error=%d)", GET_LAST_ERROR);
             continue;
         }
 
@@ -1307,7 +1315,7 @@ void Socket_Control::control_thread()
 
                     if (size < 0)
                     {
-                        logger.warning("Failed to receive message (socket=%d)", socket->get_socket());
+                        logger.warning("Failed in control thread: receive failed (socket=%d)", socket->get_socket());
                         continue;
                     }
 
@@ -1315,6 +1323,7 @@ void Socket_Control::control_thread()
 
                     logger.trace("Message received (socket=%d, address=%s, port=%d, size=%d)",
                                  socket->get_socket(), address.c_str(), port, size);
+
                     socket->call_receive_callback(control._receive_buffer, size, address, port);
                 }
             }else if (state == Socket::STATE_LISTENING)
@@ -1327,7 +1336,7 @@ void Socket_Control::control_thread()
                     socket_t accept_socket;
                     if (!socket->accept(accept_socket, address, port))
                     {
-                        logger.warning("Failed to accept socket");
+                        logger.warning("Failed in control thread: accept failed");
                         continue;
                     }
 
@@ -1348,7 +1357,7 @@ void Socket_Control::control_thread()
                     int value = 0;
                     if (!socket->get_so_error(value))
                     {
-                        logger.warning("Failed to get socket option error");
+                        logger.warning("Failed in control thread: get socket option error failed");
                         continue;
                     }
 
@@ -1359,7 +1368,7 @@ void Socket_Control::control_thread()
                         socket->call_connect_callback(true);
                     }else
                     {
-                        logger.warning("Failed to connect in control thread (socket=%d, error=%d)", handle, value);
+                        logger.warning("Failed in control thread: connect failed (socket=%d, error=%d)", handle, value);
                         socket->call_connect_callback(false);
                     }
                 }
