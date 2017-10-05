@@ -113,7 +113,6 @@ bool SIP_Call_Test::set_callbacks()
     _client_call->set_send_message_callback(send_message_callback, this);
     _client_call->set_receive_request_callback(receive_request_callback, this);
     _client_call->set_receive_response_callback(receive_response_callback, this);
-
     return true;
 }
 
@@ -1502,6 +1501,40 @@ bool SIP_Call_Test::process_ack()
     }
 
     delete ack;
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Call_Test::wait_invite_timeout()
+{
+    _received_response = false;
+
+    unsigned long start = Util_Functions::get_tick();
+    unsigned long max_wait_time = (SIP_Transaction::SIP_TIMER_1 * 64) + MAX_WAIT_TIME;
+
+    while ((Util_Functions::get_tick() - start) < max_wait_time)
+    {
+        if ((_received_response) && (_client_call->get_state() == SIP_Call::STATE_CLOSED))
+            break;
+
+        Util_Functions::delay(DELAY);
+    }
+
+    if (_client_call->get_state() != SIP_Call::STATE_CLOSED)
+    {
+        std::cout << "SIP_Call_Test::wait_invite_timeout -> Invalid call state:\n";
+        std::cout << std::setw(12) << "Expected: " << SIP_Call::STATE_CLOSED << "\n";
+        std::cout << std::setw(12) << "State: " << _client_call->get_state() << "\n";
+        return false;
+    }
+
+    if (!_received_response)
+    {
+        std::cout << "SIP_Call_Test::wait_invite_timeout -> Response not received\n";
+        return false;
+    }
+
     return true;
 }
 

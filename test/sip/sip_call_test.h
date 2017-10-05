@@ -13,10 +13,15 @@
 
 #include "sip/sip_call.h"
 #include "util/string_functions.h"
+#include "util/util_functions.h"
 #include <iomanip>
 
 class SIP_Call_Test
 {
+public:
+    static const unsigned long MAX_WAIT_TIME = 5000;
+    static const unsigned long DELAY = 500;
+
 public:
     SIP_Call_Test();
     virtual ~SIP_Call_Test();
@@ -75,6 +80,7 @@ protected:
     bool process_invite_response_480();
     bool process_invite_response_487();
     bool process_ack();
+    bool wait_invite_timeout();
 
     bool process_client_bye();
     bool process_server_bye_response_200();
