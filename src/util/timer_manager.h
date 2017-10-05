@@ -49,6 +49,8 @@ public:
 
     void set_callback(timer_callback *callback, void *data);
 
+    void *get_callback_data() { return _callback_data; }
+
     bool operator==(const Timer &other);
 
 #ifndef WIN32
@@ -83,7 +85,7 @@ public:
     static Timer_Manager &instance();
 
     timer_id_t start_timer(unsigned long time, void *data, Timer::timer_callback *callback);
-    void stop_timer(timer_id_t timer_id);
+    void *stop_timer(timer_id_t timer_id);
 
 #ifdef WIN32
     static VOID CALLBACK timer_handler(PVOID id, BOOLEAN timed_out);

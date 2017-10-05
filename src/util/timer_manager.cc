@@ -217,17 +217,21 @@ timer_id_t Timer_Manager::start_timer(unsigned long time, void *data, Timer::tim
 
 //-------------------------------------------
 
-void Timer_Manager::stop_timer(timer_id_t timer_id)
+void *Timer_Manager::stop_timer(timer_id_t timer_id)
 {
     std::lock_guard<std::recursive_mutex> lock(_timer_list_mutex);
 
+    void *data = NULL;
     Timer *timer = get_timer(timer_id);
     if (timer)
     {
         timer->stop();
         _timer_list.remove(timer);
+        data = timer->get_callback_data();
         delete timer;
     }
+
+    return data;
 }
 
 //-------------------------------------------
