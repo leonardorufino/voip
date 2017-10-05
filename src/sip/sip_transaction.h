@@ -74,7 +74,7 @@ public:
 
     unsigned long get_timer_value(SIP_Timer timer);
     void set_timer_value(SIP_Timer timer, unsigned long timer_value);
-    void start_timer(SIP_Timer timer, SIP_Transaction *p);
+    void start_timer(SIP_Timer timer);
     void stop_timer(SIP_Timer timer);
 
 protected:
@@ -123,9 +123,14 @@ public:
 
     bool send_invite(SIP_Request *msg);
     bool send_ack(SIP_Response *msg);
+
     bool receive_1xx(SIP_Response *msg);
     bool receive_2xx(SIP_Response *msg);
     bool receive_3xx_6xx(SIP_Response *msg);
+
+    bool timer_A_expired();
+    bool timer_B_expired();
+    bool timer_D_expired();
 
     static bool timer_A_callback(void *p);
     static bool timer_B_callback(void *p);
@@ -159,8 +164,13 @@ public:
     std::string get_state_str();
 
     bool send_request(SIP_Request *msg);
+
     bool receive_1xx(SIP_Response *msg);
     bool receive_2xx_6xx(SIP_Response *msg);
+
+    bool timer_E_expired();
+    bool timer_F_expired();
+    bool timer_K_expired();
 
     static bool timer_E_callback(void *p);
     static bool timer_F_callback(void *p);
@@ -195,9 +205,14 @@ public:
 
     bool receive_invite(SIP_Request *msg);
     bool receive_ack(SIP_Request *msg);
+
     bool send_1xx(SIP_Response *msg);
     bool send_2xx(SIP_Response *msg);
     bool send_3xx_6xx(SIP_Response *msg);
+
+    bool timer_G_expired();
+    bool timer_H_expired();
+    bool timer_I_expired();
 
     static bool timer_G_callback(void *p);
     static bool timer_H_callback(void *p);
@@ -232,8 +247,11 @@ public:
     std::string get_state_str();
 
     bool receive_request(SIP_Request *msg);
+
     bool send_1xx(SIP_Response *msg);
     bool send_2xx_6xx(SIP_Response *msg);
+
+    bool timer_J_expired();
 
     static bool timer_J_callback(void *p);
 

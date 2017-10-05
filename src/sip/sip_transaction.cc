@@ -290,41 +290,41 @@ void SIP_Transaction::set_timer_value(SIP_Timer timer, unsigned long timer_value
 
 //-------------------------------------------
 
-void SIP_Transaction::start_timer(SIP_Timer timer, SIP_Transaction *p)
+void SIP_Transaction::start_timer(SIP_Timer timer)
 {
     Timer_Manager &tm = Timer_Manager::instance();
 
     switch (timer)
     {
         case SIP_TIMER_A:
-            _timer_ids[SIP_TIMER_A] = tm.start_timer(_timer_values[timer], p, SIP_Transaction_Client_Invite::timer_A_callback);
+            _timer_ids[SIP_TIMER_A] = tm.start_timer(_timer_values[timer], this, SIP_Transaction_Client_Invite::timer_A_callback);
             break;
         case SIP_TIMER_B:
-            _timer_ids[SIP_TIMER_B] = tm.start_timer(_timer_values[timer], p, SIP_Transaction_Client_Invite::timer_B_callback);
+            _timer_ids[SIP_TIMER_B] = tm.start_timer(_timer_values[timer], this, SIP_Transaction_Client_Invite::timer_B_callback);
             break;
         case SIP_TIMER_D:
-            _timer_ids[SIP_TIMER_D] = tm.start_timer(_timer_values[timer], p, SIP_Transaction_Client_Invite::timer_D_callback);
+            _timer_ids[SIP_TIMER_D] = tm.start_timer(_timer_values[timer], this, SIP_Transaction_Client_Invite::timer_D_callback);
             break;
         case SIP_TIMER_E:
-            _timer_ids[SIP_TIMER_E] = tm.start_timer(_timer_values[timer], p, SIP_Transaction_Client_Non_Invite::timer_E_callback);
+            _timer_ids[SIP_TIMER_E] = tm.start_timer(_timer_values[timer], this, SIP_Transaction_Client_Non_Invite::timer_E_callback);
             break;
         case SIP_TIMER_F:
-            _timer_ids[SIP_TIMER_F] = tm.start_timer(_timer_values[timer], p, SIP_Transaction_Client_Non_Invite::timer_F_callback);
+            _timer_ids[SIP_TIMER_F] = tm.start_timer(_timer_values[timer], this, SIP_Transaction_Client_Non_Invite::timer_F_callback);
             break;
         case SIP_TIMER_G:
-            _timer_ids[SIP_TIMER_G] = tm.start_timer(_timer_values[timer], p, SIP_Transaction_Server_Invite::timer_G_callback);
+            _timer_ids[SIP_TIMER_G] = tm.start_timer(_timer_values[timer], this, SIP_Transaction_Server_Invite::timer_G_callback);
             break;
         case SIP_TIMER_H:
-            _timer_ids[SIP_TIMER_H] = tm.start_timer(_timer_values[timer], p, SIP_Transaction_Server_Invite::timer_H_callback);
+            _timer_ids[SIP_TIMER_H] = tm.start_timer(_timer_values[timer], this, SIP_Transaction_Server_Invite::timer_H_callback);
             break;
         case SIP_TIMER_I:
-            _timer_ids[SIP_TIMER_I] = tm.start_timer(_timer_values[timer], p, SIP_Transaction_Server_Invite::timer_I_callback);
+            _timer_ids[SIP_TIMER_I] = tm.start_timer(_timer_values[timer], this, SIP_Transaction_Server_Invite::timer_I_callback);
             break;
         case SIP_TIMER_J:
-            _timer_ids[SIP_TIMER_J] = tm.start_timer(_timer_values[timer], p, SIP_Transaction_Server_Non_Invite::timer_J_callback);
+            _timer_ids[SIP_TIMER_J] = tm.start_timer(_timer_values[timer], this, SIP_Transaction_Server_Non_Invite::timer_J_callback);
             break;
         case SIP_TIMER_K:
-            _timer_ids[SIP_TIMER_K] = tm.start_timer(_timer_values[timer], p, SIP_Transaction_Client_Non_Invite::timer_K_callback);
+            _timer_ids[SIP_TIMER_K] = tm.start_timer(_timer_values[timer], this, SIP_Transaction_Client_Non_Invite::timer_K_callback);
             break;
         default:
             _logger.warning("Failed to start timer: invalid timer (timer=%d) [%s]", timer, _id.to_string().c_str());
@@ -390,9 +390,9 @@ bool SIP_Transaction_Client_Invite::send_invite(SIP_Request *msg)
             }
 
             set_timer_value(SIP_TIMER_A, SIP_TIMER_1);
-            start_timer(SIP_TIMER_A, this);
+            start_timer(SIP_TIMER_A);
             set_timer_value(SIP_TIMER_B, SIP_TIMER_1 * 64);
-            start_timer(SIP_TIMER_B, this);
+            start_timer(SIP_TIMER_B);
             return true;
 
         default:
@@ -514,7 +514,7 @@ bool SIP_Transaction_Client_Invite::receive_3xx_6xx(SIP_Response *msg)
             _state = STATE_COMPLETED;
             send_ack(msg);
             set_timer_value(SIP_TIMER_D, SIP_TIMER_32s);
-            start_timer(SIP_TIMER_D, this);
+            start_timer(SIP_TIMER_D);
             stop_timer(SIP_TIMER_A);
             stop_timer(SIP_TIMER_B);
 
@@ -526,7 +526,7 @@ bool SIP_Transaction_Client_Invite::receive_3xx_6xx(SIP_Response *msg)
             _state = STATE_COMPLETED;
             send_ack(msg);
             set_timer_value(SIP_TIMER_D, SIP_TIMER_32s);
-            start_timer(SIP_TIMER_D, this);
+            start_timer(SIP_TIMER_D);
 
             if (_receive_response_callback)
                 return _receive_response_callback(_receive_response_callback_data, this, _saved_request, msg);
@@ -535,6 +535,64 @@ bool SIP_Transaction_Client_Invite::receive_3xx_6xx(SIP_Response *msg)
         case STATE_COMPLETED:
             //_state = STATE_COMPLETED;
             return send_ack(msg);
+
+        default:
+            return false;
+    }
+}
+
+//-------------------------------------------
+
+bool SIP_Transaction_Client_Invite::timer_A_expired()
+{
+    switch (_state)
+    {
+        case STATE_CALLING:
+            //_state = STATE_CALLING;
+            set_timer_value(SIP_TIMER_A, get_timer_value(SIP_TIMER_A) * 2);
+            start_timer(SIP_TIMER_A);
+
+            if (_send_message_callback)
+                return _send_message_callback(_send_message_callback_data, this, _saved_request);
+            return true;
+
+        default:
+            return false;
+    }
+}
+
+//-------------------------------------------
+
+bool SIP_Transaction_Client_Invite::timer_B_expired()
+{
+    switch (_state)
+    {
+        case STATE_CALLING:
+        {
+            _state = STATE_TERMINATED;
+            stop_timer(SIP_TIMER_A);
+
+            SIP_Response response(408, *_saved_request);
+
+            if (_receive_response_callback)
+                return _receive_response_callback(_receive_response_callback_data, this, _saved_request, &response);
+            return true;
+        }
+
+        default:
+            return false;
+    }
+}
+
+//-------------------------------------------
+
+bool SIP_Transaction_Client_Invite::timer_D_expired()
+{
+    switch (_state)
+    {
+        case STATE_COMPLETED:
+            _state = STATE_TERMINATED;
+            return true;
 
         default:
             return false;
@@ -553,22 +611,8 @@ bool SIP_Transaction_Client_Invite::timer_A_callback(void *p)
     }
 
     transaction->_timer_ids[SIP_TIMER_A] = Timer::INVALID_TIMER_ID;
-
-    switch (transaction->_state)
-    {
-        case STATE_CALLING:
-            //transaction->_state = STATE_CALLING;
-            transaction->set_timer_value(SIP_TIMER_A, transaction->get_timer_value(SIP_TIMER_A) * 2);
-            transaction->start_timer(SIP_TIMER_A, transaction);
-
-            if (transaction->_send_message_callback)
-                return transaction->_send_message_callback(transaction->_send_message_callback_data, transaction,
-                                                           transaction->_saved_request);
-            return true;
-
-        default:
-            return false;
-    }
+    transaction->timer_A_expired();
+    return true;
 }
 
 //-------------------------------------------
@@ -583,25 +627,8 @@ bool SIP_Transaction_Client_Invite::timer_B_callback(void *p)
     }
 
     transaction->_timer_ids[SIP_TIMER_B] = Timer::INVALID_TIMER_ID;
-
-    switch (transaction->_state)
-    {
-        case STATE_CALLING:
-        {
-            transaction->_state = STATE_TERMINATED;
-            transaction->stop_timer(SIP_TIMER_A);
-
-            SIP_Response response(408);
-
-            if (transaction->_receive_response_callback)
-                return transaction->_receive_response_callback(transaction->_receive_response_callback_data, transaction,
-                                                               transaction->_saved_request, &response);
-            return true;
-        }
-
-        default:
-            return false;
-    }
+    transaction->timer_B_expired();
+    return true;
 }
 
 //-------------------------------------------
@@ -616,16 +643,8 @@ bool SIP_Transaction_Client_Invite::timer_D_callback(void *p)
     }
 
     transaction->_timer_ids[SIP_TIMER_D] = Timer::INVALID_TIMER_ID;
-
-    switch (transaction->_state)
-    {
-        case STATE_COMPLETED:
-            transaction->_state = STATE_TERMINATED;
-            return true;
-
-        default:
-            return false;
-    }
+    transaction->timer_D_expired();
+    return true;
 }
 
 //-------------------------------------------
@@ -661,9 +680,9 @@ bool SIP_Transaction_Client_Non_Invite::send_request(SIP_Request *msg)
             }
 
             set_timer_value(SIP_TIMER_E, SIP_TIMER_1);
-            start_timer(SIP_TIMER_E, this);
+            start_timer(SIP_TIMER_E);
             set_timer_value(SIP_TIMER_F, SIP_TIMER_1 * 64);
-            start_timer(SIP_TIMER_F, this);
+            start_timer(SIP_TIMER_F);
             return true;
 
         default:
@@ -699,12 +718,83 @@ bool SIP_Transaction_Client_Non_Invite::receive_2xx_6xx(SIP_Response *msg)
         case STATE_PROCEEDING:
             _state = STATE_COMPLETED;
             set_timer_value(SIP_TIMER_K, SIP_TIMER_4);
-            start_timer(SIP_TIMER_K, this);
+            start_timer(SIP_TIMER_K);
             stop_timer(SIP_TIMER_E);
             stop_timer(SIP_TIMER_F);
 
             if (_receive_response_callback)
                 return _receive_response_callback(_receive_response_callback_data, this, _saved_request, msg);
+            return true;
+
+        default:
+            return false;
+    }
+}
+
+//-------------------------------------------
+
+bool SIP_Transaction_Client_Non_Invite::timer_E_expired()
+{
+    switch (_state)
+    {
+        case STATE_TRYING:
+        {
+            //_state = STATE_TRYING;
+            unsigned long value = ((get_timer_value(SIP_TIMER_E) * 2) < SIP_TIMER_2) ? get_timer_value(SIP_TIMER_E) * 2 : SIP_TIMER_2;
+            set_timer_value(SIP_TIMER_E, value);
+            start_timer(SIP_TIMER_E);
+
+            if (_send_message_callback)
+                return _send_message_callback(_send_message_callback_data, this, _saved_request);
+            return true;
+        }
+
+        case STATE_PROCEEDING:
+            //_state = STATE_PROCEEDING;
+            set_timer_value(SIP_TIMER_E, SIP_TIMER_2);
+            start_timer(SIP_TIMER_E);
+
+            if (_send_message_callback)
+                return _send_message_callback(_send_message_callback_data, this, _saved_request);
+            return true;
+
+        default:
+            return false;
+    }
+}
+
+//-------------------------------------------
+
+bool SIP_Transaction_Client_Non_Invite::timer_F_expired()
+{
+    switch (_state)
+    {
+        case STATE_TRYING:
+        case STATE_PROCEEDING:
+        {
+            _state = STATE_TERMINATED;
+            stop_timer(SIP_TIMER_E);
+
+            SIP_Response response(408, *_saved_request);
+
+            if (_receive_response_callback)
+                return _receive_response_callback(_receive_response_callback_data, this, _saved_request, &response);
+            return true;
+        }
+
+        default:
+            return false;
+    }
+}
+
+//-------------------------------------------
+
+bool SIP_Transaction_Client_Non_Invite::timer_K_expired()
+{
+    switch (_state)
+    {
+        case STATE_COMPLETED:
+            _state = STATE_TERMINATED;
             return true;
 
         default:
@@ -724,36 +814,8 @@ bool SIP_Transaction_Client_Non_Invite::timer_E_callback(void *p)
     }
 
     transaction->_timer_ids[SIP_TIMER_E] = Timer::INVALID_TIMER_ID;
-
-    switch (transaction->_state)
-    {
-        case STATE_TRYING:
-        {
-            //_state = STATE_TRYING;
-            unsigned long value = ((transaction->get_timer_value(SIP_TIMER_E) * 2) < SIP_TIMER_2)
-                                ? transaction->get_timer_value(SIP_TIMER_E) * 2 : SIP_TIMER_2;
-            transaction->set_timer_value(SIP_TIMER_E, value);
-            transaction->start_timer(SIP_TIMER_E, transaction);
-
-            if (transaction->_send_message_callback)
-                return transaction->_send_message_callback(transaction->_send_message_callback_data, transaction,
-                                                           transaction->_saved_request);
-            return true;
-        }
-
-        case STATE_PROCEEDING:
-            //_state = STATE_PROCEEDING;
-            transaction->set_timer_value(SIP_TIMER_E, SIP_TIMER_2);
-            transaction->start_timer(SIP_TIMER_E, transaction);
-
-            if (transaction->_send_message_callback)
-                return transaction->_send_message_callback(transaction->_send_message_callback_data, transaction,
-                                                           transaction->_saved_request);
-            return true;
-
-        default:
-            return false;
-    }
+    transaction->timer_E_expired();
+    return true;
 }
 
 //-------------------------------------------
@@ -768,26 +830,8 @@ bool SIP_Transaction_Client_Non_Invite::timer_F_callback(void *p)
     }
 
     transaction->_timer_ids[SIP_TIMER_F] = Timer::INVALID_TIMER_ID;
-
-    switch (transaction->_state)
-    {
-        case STATE_TRYING:
-        case STATE_PROCEEDING:
-        {
-            transaction->_state = STATE_TERMINATED;
-            transaction->stop_timer(SIP_TIMER_E);
-
-            SIP_Response response(408);
-
-            if (transaction->_receive_response_callback)
-                return transaction->_receive_response_callback(transaction->_receive_response_callback_data, transaction,
-                                                               transaction->_saved_request, &response);
-            return true;
-        }
-
-        default:
-            return false;
-    }
+    transaction->timer_F_expired();
+    return true;
 }
 
 //-------------------------------------------
@@ -802,16 +846,8 @@ bool SIP_Transaction_Client_Non_Invite::timer_K_callback(void *p)
     }
 
     transaction->_timer_ids[SIP_TIMER_K] = Timer::INVALID_TIMER_ID;
-
-    switch (transaction->_state)
-    {
-        case STATE_COMPLETED:
-            transaction->_state = STATE_TERMINATED;
-            return true;
-
-        default:
-            return false;
-    }
+    transaction->timer_K_expired();
+    return true;
 }
 
 //-------------------------------------------
@@ -878,7 +914,7 @@ bool SIP_Transaction_Server_Invite::receive_ack(SIP_Request *msg)
         case STATE_COMPLETED:
             _state = STATE_CONFIRMED;
             set_timer_value(SIP_TIMER_I, SIP_TIMER_4);
-            start_timer(SIP_TIMER_I, this);
+            start_timer(SIP_TIMER_I);
             stop_timer(SIP_TIMER_G);
             stop_timer(SIP_TIMER_H);
             return true;
@@ -945,9 +981,63 @@ bool SIP_Transaction_Server_Invite::send_3xx_6xx(SIP_Response *msg)
             }
 
             set_timer_value(SIP_TIMER_G, SIP_TIMER_1);
-            start_timer(SIP_TIMER_G, this);
+            start_timer(SIP_TIMER_G);
             set_timer_value(SIP_TIMER_H, SIP_TIMER_1 * 64);
-            start_timer(SIP_TIMER_H, this);
+            start_timer(SIP_TIMER_H);
+            return true;
+
+        default:
+            return false;
+    }
+}
+
+//-------------------------------------------
+
+bool SIP_Transaction_Server_Invite::timer_G_expired()
+{
+    switch (_state)
+    {
+        case STATE_COMPLETED:
+        {
+            //_state = STATE_COMPLETED;
+            unsigned long value = ((get_timer_value(SIP_TIMER_G) * 2) < SIP_TIMER_2) ? get_timer_value(SIP_TIMER_G) * 2 : SIP_TIMER_2;
+            set_timer_value(SIP_TIMER_G, value);
+            start_timer(SIP_TIMER_G);
+
+            if ((_last_response) && (_send_message_callback))
+                return _send_message_callback(_send_message_callback_data, this, _last_response);
+            return true;
+        }
+
+        default:
+            return false;
+    }
+}
+
+//-------------------------------------------
+
+bool SIP_Transaction_Server_Invite::timer_H_expired()
+{
+    switch (_state)
+    {
+        case STATE_COMPLETED:
+            _state = STATE_TERMINATED;
+            stop_timer(SIP_TIMER_G);
+            return true;
+
+        default:
+            return false;
+    }
+}
+
+//-------------------------------------------
+
+bool SIP_Transaction_Server_Invite::timer_I_expired()
+{
+    switch (_state)
+    {
+        case STATE_CONFIRMED:
+            _state = STATE_TERMINATED;
             return true;
 
         default:
@@ -967,25 +1057,8 @@ bool SIP_Transaction_Server_Invite::timer_G_callback(void *p)
     }
 
     transaction->_timer_ids[SIP_TIMER_G] = Timer::INVALID_TIMER_ID;
-
-    switch (transaction->_state)
-    {
-        case STATE_COMPLETED:
-        {
-            //transaction->_state = STATE_COMPLETED;
-            unsigned long value = ((transaction->get_timer_value(SIP_TIMER_G) * 2) < SIP_TIMER_2)
-                                ? transaction->get_timer_value(SIP_TIMER_G) * 2 : SIP_TIMER_2;
-            transaction->set_timer_value(SIP_TIMER_G, value);
-            transaction->start_timer(SIP_TIMER_G, transaction);
-
-            if ((transaction->_last_response) && (transaction->_send_message_callback))
-                return transaction->_send_message_callback(transaction->_send_message_callback_data, transaction, transaction->_last_response);
-            return true;
-        }
-
-        default:
-            return false;
-    }
+    transaction->timer_G_expired();
+    return true;
 }
 
 //-------------------------------------------
@@ -1000,17 +1073,8 @@ bool SIP_Transaction_Server_Invite::timer_H_callback(void *p)
     }
 
     transaction->_timer_ids[SIP_TIMER_H] = Timer::INVALID_TIMER_ID;
-
-    switch (transaction->_state)
-    {
-        case STATE_COMPLETED:
-            transaction->_state = STATE_TERMINATED;
-            transaction->stop_timer(SIP_TIMER_G);
-            return true;
-
-        default:
-            return false;
-    }
+    transaction->timer_H_expired();
+    return true;
 }
 
 //-------------------------------------------
@@ -1025,16 +1089,8 @@ bool SIP_Transaction_Server_Invite::timer_I_callback(void *p)
     }
 
     transaction->_timer_ids[SIP_TIMER_I] = Timer::INVALID_TIMER_ID;
-
-    switch (transaction->_state)
-    {
-        case STATE_CONFIRMED:
-            transaction->_state = STATE_TERMINATED;
-            return true;
-
-        default:
-            return false;
-    }
+    transaction->timer_I_expired();
+    return true;
 }
 
 //-------------------------------------------
@@ -1134,7 +1190,22 @@ bool SIP_Transaction_Server_Non_Invite::send_2xx_6xx(SIP_Response *msg)
             }
 
             set_timer_value(SIP_TIMER_J, SIP_TIMER_1 * 64);
-            start_timer(SIP_TIMER_J, this);
+            start_timer(SIP_TIMER_J);
+            return true;
+
+        default:
+            return false;
+    }
+}
+
+//-------------------------------------------
+
+bool SIP_Transaction_Server_Non_Invite::timer_J_expired()
+{
+    switch (_state)
+    {
+        case STATE_COMPLETED:
+            _state = STATE_TERMINATED;
             return true;
 
         default:
@@ -1154,16 +1225,8 @@ bool SIP_Transaction_Server_Non_Invite::timer_J_callback(void *p)
     }
 
     transaction->_timer_ids[SIP_TIMER_J] = Timer::INVALID_TIMER_ID;
-
-    switch (transaction->_state)
-    {
-        case STATE_COMPLETED:
-            transaction->_state = STATE_TERMINATED;
-            return true;
-
-        default:
-            return false;
-    }
+    transaction->timer_J_expired();
+    return true;
 }
 
 //-------------------------------------------
