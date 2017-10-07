@@ -14,16 +14,10 @@
 
 //-------------------------------------------
 
-Socket_Test::Socket_Test()
+Socket_Test::Socket_Test() : _connected(false), _accepted_socket(NULL), _accepted_port(INVALID_UNSIGNED_SHORT),
+    _received_size(0), _received_port(INVALID_UNSIGNED_SHORT), _stop_thread(false)
 {
-    _connected = false;
-
-    _accepted_socket = NULL;
-    _accepted_port = INVALID_UNSIGNED_SHORT;
-
     _received_buffer[0] = 0;
-    _received_size = 0;
-    _received_port = INVALID_UNSIGNED_SHORT;
 }
 
 //-------------------------------------------
@@ -71,6 +65,8 @@ bool Socket_Test::init()
 
         if (!run<Socket_TCP_Non_Blocking_Control_Test>(family_ipv4, address_ipv4, port_ipv4))
             return false;
+
+        std::cout << "IPv4 socket test completed successfully\n";
     }else
         std::cout << "IPv4 socket test disabled\n";
 
@@ -106,6 +102,8 @@ bool Socket_Test::init()
 
         if (!run<Socket_TCP_Non_Blocking_Control_Test>(family_ipv6, address_ipv6, port_ipv6))
             return false;
+
+        std::cout << "IPv6 socket test completed successfully\n";
     }else
         std::cout << "IPv6 socket test disabled\n";
 
@@ -118,9 +116,26 @@ bool Socket_Test::init()
 template<class T> bool Socket_Test::run(Socket::Address_Family family, std::string address, unsigned short port)
 {
     T test;
-    if (!test.run(family, address, port))
-        return false;
-    return true;
+    test._thread = std::thread(thread, &test);
+
+    bool ret = test.run(family, address, port);
+
+    test._stop_thread = true;
+    test._thread.join();
+    return ret;
+}
+
+//-------------------------------------------
+
+void Socket_Test::thread(Socket_Test *test)
+{
+    Socket_Control &socket = Socket_Control::instance();
+
+    while (!test->_stop_thread)
+    {
+        socket.run();
+        Util_Functions::delay(THREAD_DELAY);
+    }
 }
 
 //-------------------------------------------
@@ -494,6 +509,8 @@ bool Socket_Test::receive_callback(void *data, const char *buffer, int size, std
 
 bool Socket_UDP_Blocking_Test::run(Socket::Address_Family family, std::string address, unsigned short port)
 {
+    std::cout << "Socket UDP blocking test initialized\n";
+
     if (!configure_socket(family, address, port, false))
         return false;
 
@@ -543,6 +560,7 @@ bool Socket_UDP_Blocking_Test::run(Socket::Address_Family family, std::string ad
     if (!close())
         return false;
 
+    std::cout << "Socket UDP blocking test completed successfully\n";
     return true;
 }
 
@@ -551,6 +569,8 @@ bool Socket_UDP_Blocking_Test::run(Socket::Address_Family family, std::string ad
 
 bool Socket_UDP_Blocking_Connect_Test::run(Socket::Address_Family family, std::string address, unsigned short port)
 {
+    std::cout << "Socket UDP blocking connect test initialized\n";
+
     if (!configure_socket(family, address, port, false))
         return false;
 
@@ -599,6 +619,7 @@ bool Socket_UDP_Blocking_Connect_Test::run(Socket::Address_Family family, std::s
     if (!close())
         return false;
 
+    std::cout << "Socket UDP blocking connect test completed successfully\n";
     return true;
 }
 
@@ -607,6 +628,8 @@ bool Socket_UDP_Blocking_Connect_Test::run(Socket::Address_Family family, std::s
 
 bool Socket_UDP_Non_Blocking_Test::run(Socket::Address_Family family, std::string address, unsigned short port)
 {
+    std::cout << "Socket UDP non-blocking test initialized\n";
+
     if (!configure_socket(family, address, port, true))
         return false;
 
@@ -656,6 +679,7 @@ bool Socket_UDP_Non_Blocking_Test::run(Socket::Address_Family family, std::strin
     if (!close())
         return false;
 
+    std::cout << "Socket UDP non-blocking test completed successfully\n";
     return true;
 }
 
@@ -664,6 +688,8 @@ bool Socket_UDP_Non_Blocking_Test::run(Socket::Address_Family family, std::strin
 
 bool Socket_UDP_Non_Blocking_Connect_Test::run(Socket::Address_Family family, std::string address, unsigned short port)
 {
+    std::cout << "Socket UDP non-blocking connect test initialized\n";
+
     if (!configure_socket(family, address, port, true))
         return false;
 
@@ -721,6 +747,7 @@ bool Socket_UDP_Non_Blocking_Connect_Test::run(Socket::Address_Family family, st
     if (!close())
         return false;
 
+    std::cout << "Socket UDP non-blocking connect test completed successfully\n";
     return true;
 }
 
@@ -729,13 +756,9 @@ bool Socket_UDP_Non_Blocking_Connect_Test::run(Socket::Address_Family family, st
 
 bool Socket_UDP_Non_Blocking_Control_Test::run(Socket::Address_Family family, std::string address, unsigned short port)
 {
-    Socket_Control &control = Socket_Control::instance();
+    std::cout << "Socket UDP non-blocking control test initialized\n";
 
-    if (!control.start())
-    {
-        std::cout << "Socket_UDP_Non_Blocking_Control_Test::run -> Failed to start socket control\n";
-        return false;
-    }
+    Socket_Control &control = Socket_Control::instance();
 
     if (!configure_socket(family, address, port, true))
         return false;
@@ -822,12 +845,7 @@ bool Socket_UDP_Non_Blocking_Control_Test::run(Socket::Address_Family family, st
     if (!close())
         return false;
 
-    if (!control.stop())
-    {
-        std::cout << "Socket_UDP_Non_Blocking_Control_Test::run -> Failed to stop socket control\n";
-        return false;
-    }
-
+    std::cout << "Socket UDP non-blocking control test completed successfully\n";
     return true;
 }
 
@@ -836,6 +854,8 @@ bool Socket_UDP_Non_Blocking_Control_Test::run(Socket::Address_Family family, st
 
 bool Socket_TCP_Blocking_Test::run(Socket::Address_Family family, std::string address, unsigned short port)
 {
+    std::cout << "Socket TCP blocking test initialized\n";
+
     _current_socket = &_socket_tcp_client;
     if (!configure_socket(family, address, 0, false))
         return false;
@@ -936,6 +956,7 @@ bool Socket_TCP_Blocking_Test::run(Socket::Address_Family family, std::string ad
     if (!close())
         return false;
 
+    std::cout << "Socket TCP blocking test completed successfully\n";
     return true;
 }
 
@@ -944,6 +965,8 @@ bool Socket_TCP_Blocking_Test::run(Socket::Address_Family family, std::string ad
 
 bool Socket_TCP_Non_Blocking_Test::run(Socket::Address_Family family, std::string address, unsigned short port)
 {
+    std::cout << "Socket TCP non-blocking test initialized\n";
+
     _current_socket = &_socket_tcp_client;
     if (!configure_socket(family, address, 0, true))
         return false;
@@ -1048,6 +1071,7 @@ bool Socket_TCP_Non_Blocking_Test::run(Socket::Address_Family family, std::strin
     if (!close())
         return false;
 
+    std::cout << "Socket TCP non-blocking test completed successfully\n";
     return true;
 }
 
@@ -1056,13 +1080,9 @@ bool Socket_TCP_Non_Blocking_Test::run(Socket::Address_Family family, std::strin
 
 bool Socket_TCP_Non_Blocking_Control_Test::run(Socket::Address_Family family, std::string address, unsigned short port)
 {
-    Socket_Control &control = Socket_Control::instance();
+    std::cout << "Socket TCP non-blocking control test initialized\n";
 
-    if (!control.start())
-    {
-        std::cout << "Socket_TCP_Non_Blocking_Control_Test::run -> Failed to start socket control\n";
-        return false;
-    }
+    Socket_Control &control = Socket_Control::instance();
 
     _current_socket = &_socket_tcp_client;
     if (!configure_socket(family, address, 0, true))
@@ -1228,12 +1248,7 @@ bool Socket_TCP_Non_Blocking_Control_Test::run(Socket::Address_Family family, st
     if (!close())
         return false;
 
-    if (!control.stop())
-    {
-        std::cout << "Socket_TCP_Non_Blocking_Control_Test::run -> Failed to stop socket control\n";
-        return false;
-    }
-
+    std::cout << "Socket TCP non-blocking control test completed successfully\n";
     return true;
 }
 

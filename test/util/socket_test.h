@@ -16,11 +16,13 @@
 #include "util/socket.h"
 #include <iomanip>
 #include <cstring>
+#include <thread>
 
 class Socket_Test
 {
 public:
-    static const unsigned long MAX_WAIT_TIME = 5000;
+    static const unsigned long THREAD_DELAY = 10;
+    static const unsigned long MAX_WAIT_TIME = 500000;
     static const unsigned long DELAY = 500;
 
 public:
@@ -29,6 +31,8 @@ public:
 
     static bool init();
     template<class T> static bool run(Socket::Address_Family family, std::string address, unsigned short port);
+
+    static void thread(Socket_Test *test);
 
 protected:
     virtual bool run(Socket::Address_Family family, std::string address, unsigned short port) = 0;
@@ -73,6 +77,10 @@ protected:
     int _received_size;
     std::string _received_address;
     unsigned short _received_port;
+
+private:
+    std::thread _thread;
+    bool _stop_thread;
 };
 
 //-------------------------------------------
