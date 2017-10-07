@@ -14,18 +14,28 @@
 #include "util/util_functions.h"
 #include "util/timer_manager.h"
 #include <iomanip>
+#include <thread>
 
 class Timer_Manager_Test
 {
 public:
-    Timer_Manager_Test() {}
+    static const unsigned long THREAD_DELAY = 10;
+
+public:
+    Timer_Manager_Test() : _stop_thread(false) {}
     virtual ~Timer_Manager_Test() {}
 
     static bool init();
     template<class T> static bool run();
 
+    static void thread(Timer_Manager_Test *test);
+
 protected:
     virtual bool run() = 0;
+
+private:
+    std::thread _thread;
+    bool _stop_thread;
 };
 
 //-------------------------------------------

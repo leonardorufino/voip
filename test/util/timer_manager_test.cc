@@ -36,9 +36,26 @@ bool Timer_Manager_Test::init()
 template<class T> bool Timer_Manager_Test::run()
 {
     T test;
-    if (!test.run())
-        return false;
-    return true;
+    test._thread = std::thread(thread, &test);
+
+    bool ret = test.run();
+
+    test._stop_thread = true;
+    test._thread.join();
+    return ret;
+}
+
+//-------------------------------------------
+
+void Timer_Manager_Test::thread(Timer_Manager_Test *test)
+{
+    Timer_Manager &timer = Timer_Manager::instance();
+
+    while (!test->_stop_thread)
+    {
+        timer.run();
+        Util_Functions::delay(THREAD_DELAY);
+    }
 }
 
 //-------------------------------------------
@@ -46,6 +63,8 @@ template<class T> bool Timer_Manager_Test::run()
 
 bool Timer_Manager_Stop_Test::run()
 {
+    std::cout << "Timer manager stop test initialized\n";
+
     Timer_Manager &manager = Timer_Manager::instance();
 
     timer_id_t id = manager.start_timer(_time, this, callback);
@@ -68,6 +87,7 @@ bool Timer_Manager_Stop_Test::run()
         return false;
     }
 
+    std::cout << "Timer manager stop test completed successfully\n";
     return true;
 }
 
@@ -91,6 +111,8 @@ bool Timer_Manager_Stop_Test::callback(void *data)
 
 bool Timer_Manager_Callback_Test::run()
 {
+    std::cout << "Timer manager callback test initialized\n";
+
     Timer_Manager &manager = Timer_Manager::instance();
 
     timer_id_t id = manager.start_timer(_time, this, callback);
@@ -111,6 +133,7 @@ bool Timer_Manager_Callback_Test::run()
         return false;
     }
 
+    std::cout << "Timer manager callback test completed successfully\n";
     return true;
 }
 
@@ -147,6 +170,8 @@ Timer_Manager_Multiple_Timers_Test::Timer_Manager_Multiple_Timers_Test()
 
 bool Timer_Manager_Multiple_Timers_Test::run()
 {
+    std::cout << "Timer manager multiple timers test initialized\n";
+
     Timer_Manager &manager = Timer_Manager::instance();
 
     timer_id_t id[ARRAY_SIZE];
@@ -180,6 +205,7 @@ bool Timer_Manager_Multiple_Timers_Test::run()
         }
     }
 
+    std::cout << "Timer manager multiple timers test completed successfully\n";
     return true;
 }
 
