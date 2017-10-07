@@ -213,6 +213,18 @@ public:
 //-------------------------------------------
 //-------------------------------------------
 
+class SIP_Call_No_Answer_Test : public SIP_Call_Test
+{
+public:
+    SIP_Call_No_Answer_Test() {}
+    virtual ~SIP_Call_No_Answer_Test() {}
+
+    bool run();
+};
+
+//-------------------------------------------
+//-------------------------------------------
+
 class SIP_Call_Update_Test : public SIP_Call_Test
 {
 public:

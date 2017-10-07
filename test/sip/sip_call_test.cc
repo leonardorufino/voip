@@ -64,6 +64,9 @@ bool SIP_Call_Test::init()
     if (!run<SIP_Call_Update_Test>())
         return false;
 
+    if (!run<SIP_Call_No_Answer_Test>())
+        return false;
+
     if (!run<SIP_Call_Cancel_Test>())
         return false;
 
@@ -3391,6 +3394,22 @@ bool SIP_Call_Reject_No_1xx_Test::run()
         return false;
 
     if (!process_invite_response_480())
+        return false;
+
+    return true;
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+bool SIP_Call_No_Answer_Test::run()
+{
+    set_callbacks();
+
+    if (!process_invite())
+        return false;
+
+    if (!wait_invite_timeout())
         return false;
 
     return true;
