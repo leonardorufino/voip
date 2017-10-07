@@ -218,32 +218,25 @@ public:
 class Socket_Control
 {
 public:
-    static const unsigned long SELECT_TIMEOUT = 100; // Milliseconds
+    static const unsigned long SELECT_TIMEOUT = 0; // Milliseconds
     static const unsigned short RECEIVE_BUFFER_SIZE = 5000;
 
 public:
-    Socket_Control() : _stopped(true) {}
-    ~Socket_Control();
+    Socket_Control() {}
+    ~Socket_Control() {}
 
     static Socket_Control &instance();
-
-    bool start();
-    bool stop();
 
     bool add_socket(Socket &socket);
     bool remove_socket(Socket &socket);
 
-private:
-    static void control_thread();
+    void run();
 
 protected:
-    std::thread _control_thread;
-
     std::list<Socket *> _socket_list;
     std::recursive_mutex _socket_list_mutex;
 
     char _receive_buffer[RECEIVE_BUFFER_SIZE + 1];
-    bool _stopped;
 };
 
 //-------------------------------------------
