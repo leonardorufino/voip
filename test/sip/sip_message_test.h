@@ -34,6 +34,7 @@ protected:
     class SIP_Message_Input_Output
     {
     public:
+        SIP_Method_Type _method_type;
         std::string _input;
         std::string _output;
         bool _response_answer;

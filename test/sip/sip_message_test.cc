@@ -50,11 +50,14 @@ bool SIP_Message_Test::run()
     {
         SIP_Message_Input_Output message_input_output = *it++;
 
+        std::cout << "SIP message test initialized (type: " << message_input_output._method_type << ")\n";
+
         std::string input = message_input_output._input;
         SIP_Message *message = SIP_Message::decode_msg(input);
         if (!message)
         {
             std::cout << "SIP_Message_Test::run -> Failed to decode message:\n";
+            std::cout << std::setw(12) << "Type: " << message_input_output._method_type << "\n";
             std::cout << std::setw(12) << "Input: " << message_input_output._input.c_str() << "\n";
             return false;
         }
@@ -63,6 +66,7 @@ bool SIP_Message_Test::run()
         if (!copy)
         {
             std::cout << "SIP_Message_Test::run -> Failed to copy message:\n";
+            std::cout << std::setw(12) << "Type: " << message_input_output._method_type << "\n";
             std::cout << std::setw(12) << "Input: " << message_input_output._input.c_str() << "\n";
             delete message;
             return false;
@@ -75,6 +79,7 @@ bool SIP_Message_Test::run()
         if (!copy->encode(output))
         {
             std::cout << "SIP_Message_Test::run -> Failed to encode message:\n";
+            std::cout << std::setw(12) << "Type: " << message_input_output._method_type << "\n";
             std::cout << std::setw(12) << "Input: " << message_input_output._input.c_str() << "\n";
             delete copy;
             return false;
@@ -83,6 +88,7 @@ bool SIP_Message_Test::run()
         if (output != message_input_output._output)
         {
             std::cout << "SIP_Message_Test::run -> Invalid encoded message:\n";
+            std::cout << std::setw(12) << "Type: " << message_input_output._method_type << "\n";
             std::cout << std::setw(12) << "Input: " << message_input_output._input.c_str() << "\n";
             std::cout << std::setw(12) << "Expected: " << message_input_output._output.c_str() << "\n";
             std::cout << std::setw(12) << "Output: " << output.c_str() << "\n";
@@ -92,6 +98,8 @@ bool SIP_Message_Test::run()
 
         delete copy;
         copy = NULL;
+
+        std::cout << "SIP message test completed successfully (type: " << message_input_output._method_type << ")\n";
     }
 
     return true;
@@ -135,6 +143,8 @@ SIP_Message *SIP_Message_Test::copy_message(SIP_Message &message, bool response_
 SIP_Request_Test::SIP_Request_Test()
 {
     SIP_Message_Input_Output msg1;
+    msg1._method_type = SIP_REQUEST_INVITE;
+
     msg1._input   = "INVITE sip:bob@biloxi.com SIP/2.0\r\n";
     msg1._input  += "Via: SIP/2.0/UDP pc33.atlanta.com;branch=z9hG4bK776asdhds\r\n";
     msg1._input  += "Max-Forwards: 70\r\n";
@@ -167,6 +177,8 @@ SIP_Request_Test::SIP_Request_Test()
 SIP_Response_Test::SIP_Response_Test()
 {
     SIP_Message_Input_Output msg1;
+    msg1._method_type = SIP_RESPONSE;
+
     msg1._input   = "SIP/2.0 200 OK\r\n";
     msg1._input  += "Via: SIP/2.0/UDP server10.biloxi.com;branch=z9hG4bKnashds8;received=192.0.2.3,";
     msg1._input  += " SIP/2.0/UDP bigbox3.site3.atlanta.com;branch=z9hG4bK77ef4c2312983.1;received=192.0.2.2\r\n";
@@ -202,6 +214,8 @@ SIP_Response_Test::SIP_Response_Test()
 SIP_Response_Answer_Test::SIP_Response_Answer_Test()
 {
     SIP_Message_Input_Output msg1;
+    msg1._method_type = SIP_REQUEST_INVITE;
+
     msg1._input   = "INVITE sip:bob@biloxi.com SIP/2.0\r\n";
     msg1._input  += "Via: SIP/2.0/UDP server10.biloxi.com;branch=z9hG4bKnashds8;received=192.0.2.3,";
     msg1._input  += " SIP/2.0/UDP bigbox3.site3.atlanta.com;branch=z9hG4bK77ef4c2312983.1\r\n";
