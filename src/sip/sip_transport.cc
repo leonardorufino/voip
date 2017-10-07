@@ -31,36 +31,6 @@ SIP_Transport::~SIP_Transport()
 
 //-------------------------------------------
 
-bool SIP_Transport::start()
-{
-    Socket_Control &control = Socket_Control::instance();
-    if (!control.start())
-    {
-        _logger.warning("Failed to start: socket control start failed");
-        return false;
-    }
-
-    _logger.trace("Transport started");
-    return true;
-}
-
-//-------------------------------------------
-
-bool SIP_Transport::stop()
-{
-    Socket_Control &control = Socket_Control::instance();
-    if (!control.stop())
-    {
-        _logger.warning("Failed to stop: socket control stop failed");
-        return false;
-    }
-
-    _logger.trace("Transport stopped");
-    return true;
-}
-
-//-------------------------------------------
-
 void SIP_Transport::set_connect_callback(connect_callback *callback, void *data)
 {
     _connect_callback = callback;

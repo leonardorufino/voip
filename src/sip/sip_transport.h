@@ -31,9 +31,6 @@ public:
     SIP_Transport(SIP_Object_ID id);
     virtual ~SIP_Transport();
 
-    static bool start();
-    static bool stop();
-
     void set_connect_callback(connect_callback *callback, void *data);
     void set_accept_callback(accept_callback *callback, void *data);
     void set_receive_callback(receive_callback *callback, void *data);
