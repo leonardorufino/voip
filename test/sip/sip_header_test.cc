@@ -193,6 +193,8 @@ bool SIP_Header_Test::run()
     {
         SIP_Header_Input_Output header_input_output = *it++;
 
+        std::cout << "SIP header test initialized (type: " << header_input_output._header_type << ")\n";
+
         sip_header_list headers;
 
         std::string input = header_input_output._input;
@@ -211,6 +213,7 @@ bool SIP_Header_Test::run()
         if (!decode)
         {
             clear(headers);
+            std::cout << "SIP header test completed successfully (type: " << header_input_output._header_type << ")\n";
             continue;
         }
 
@@ -265,6 +268,7 @@ bool SIP_Header_Test::run()
         if (!encode)
         {
             clear(copy);
+            std::cout << "SIP header test completed successfully (type: " << header_input_output._header_type << ")\n";
             continue;
         }
 
@@ -279,6 +283,8 @@ bool SIP_Header_Test::run()
         }
 
         clear(copy);
+
+        std::cout << "SIP header test completed successfully (type: " << header_input_output._header_type << ")\n";
     }
 
     return true;
