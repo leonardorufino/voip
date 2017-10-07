@@ -16,16 +16,7 @@
 #include <list>
 #include <mutex>
 
-#ifdef WIN32
-    #include <winsock2.h>
-    #include <windows.h>
-#else
-    #include <csignal>
-    #include <ctime>
-    #include <cstring>
-#endif
-
-typedef unsigned int timer_id_t;
+typedef unsigned long timer_id_t;
 
 class Timer
 {
@@ -35,11 +26,10 @@ public:
     typedef bool (timer_callback)(void *data);
 
 public:
-    Timer();
-    ~Timer();
+    Timer() : _timer_id(INVALID_TIMER_ID), _time(0), _flag(false), _callback(NULL), _callback_data(NULL) {}
+    ~Timer() {}
 
-    bool start(unsigned long time);
-    bool stop();
+    bool check_expired(unsigned long now, bool flag);
     bool expired();
 
     static timer_id_t next_timer_id();
@@ -47,29 +37,19 @@ public:
     void set_timer_id(timer_id_t timer_id) { _timer_id = timer_id; }
     timer_id_t get_timer_id() { return _timer_id; }
 
+    void set_time(unsigned long time) { _time = time; }
+    void set_flag(bool flag) { _flag = flag; }
     void set_callback(timer_callback *callback, void *data);
-
     void *get_callback_data() { return _callback_data; }
 
     bool operator==(const Timer &other);
 
-#ifndef WIN32
-    timer_t &get_timer() { return _timer; }
-#endif
-
 private:
     timer_id_t _timer_id;
+    unsigned long _time;
+    bool _flag;
     timer_callback *_callback;
     void *_callback_data;
-
-#ifdef WIN32
-    HANDLE _timer;
-#else
-    timer_t _timer;
-    struct sigevent _sig_event;
-    struct itimerspec _timer_spec;
-    struct sigaction _sig_action;
-#endif
 
     static Logger _logger;
 };
@@ -79,7 +59,7 @@ private:
 class Timer_Manager
 {
 public:
-    Timer_Manager() {}
+    Timer_Manager() : _last_tick(0), _flag(false) {}
     ~Timer_Manager() {}
 
     static Timer_Manager &instance();
@@ -87,22 +67,17 @@ public:
     timer_id_t start_timer(unsigned long time, void *data, Timer::timer_callback *callback);
     void *stop_timer(timer_id_t timer_id);
 
-#ifdef WIN32
-    static VOID CALLBACK timer_handler(PVOID id, BOOLEAN timed_out);
-#else
-    static void timer_handler(int sig, siginfo_t *info, void *ucontext);
-#endif
+    void run();
 
 private:
     Timer *get_timer(timer_id_t timer_id);
 
-#ifndef WIN32
-    Timer *get_timer_linux(timer_t &tid);
-#endif
-
 private:
     std::list<Timer *> _timer_list;
     std::recursive_mutex _timer_list_mutex;
+
+    unsigned long _last_tick;
+    bool _flag;
 };
 
 //-------------------------------------------

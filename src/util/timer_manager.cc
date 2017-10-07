@@ -16,118 +16,12 @@ Logger Timer::_logger(Log_Manager::LOG_TIMER);
 
 //-------------------------------------------
 
-Timer::Timer()
+bool Timer::check_expired(unsigned long now, bool flag)
 {
-    _timer_id = INVALID_TIMER_ID;
-    _callback = NULL;
-    _callback_data = NULL;
+    if (((_time <= now) && (_flag == flag)) || ((_time > now) && (_flag != flag)))
+        return true;
 
-#ifdef WIN32
-    _timer = NULL;
-#else
-    _timer = 0;
-    memset(&_sig_event, 0, sizeof(_sig_event));
-    memset(&_timer_spec, 0, sizeof(_timer_spec));
-    memset(&_sig_action, 0, sizeof(_sig_action));
-#endif
-}
-
-//-------------------------------------------
-
-Timer::~Timer()
-{
-    stop();
-}
-
-//-------------------------------------------
-
-bool Timer::start(unsigned long time)
-{
-#ifdef WIN32
-    if (!CreateTimerQueueTimer(&_timer, NULL, (WAITORTIMERCALLBACK) Timer_Manager::timer_handler, (void *) _timer_id,
-                               time, 0, WT_EXECUTEDEFAULT))
-    {
-        _logger.warning("Failed to start: create timer queue timer failed (timer=%d, error=%d)", _timer_id, GetLastError());
-        return false;
-    }
-#else
-    _sig_action.sa_flags = SA_SIGINFO;
-    _sig_action.sa_sigaction = Timer_Manager::timer_handler;
-    sigemptyset(&_sig_action.sa_mask);
-
-    if (sigaction(SIGRTMIN, &_sig_action, NULL))
-    {
-        _logger.warning("Failed to start: sigaction failed (timer=%d, error=%d)", _timer_id, errno);
-        return false;
-    }
-
-    _sig_event.sigev_notify = SIGEV_SIGNAL;
-    _sig_event.sigev_signo = SIGRTMIN;
-    _sig_event.sigev_value.sival_ptr = &_timer;
-
-    if (timer_create(CLOCK_MONOTONIC, &_sig_event, &_timer))
-    {
-        _logger.warning("Failed to start: timer create failed (timer=%d, error=%d)", _timer_id, errno);
-        return false;
-    }
-
-    _timer_spec.it_value.tv_sec = time / 1000;
-    _timer_spec.it_value.tv_nsec = (time % 1000) * 1000 * 1000;
-
-    if (timer_settime(_timer, 0, &_timer_spec, NULL))
-    {
-        _logger.warning("Failed to start: set time failed (timer=%d, error=%d)", _timer_id, errno);
-        return false;
-    }
-#endif
-
-    _logger.trace("Timer started (timer=%d)", _timer_id);
-    return true;
-}
-
-//-------------------------------------------
-
-bool Timer::stop()
-{
-#ifdef WIN32
-    if (_timer)
-    {
-        if (!DeleteTimerQueueTimer(NULL, _timer, NULL))
-        {
-            _logger.warning("Failed to stop: delete timer queue timer failed (timer=%d, error=%d)", _timer_id, GetLastError());
-            _timer = NULL;
-            return false;
-        }
-
-        _timer = NULL;
-
-        _logger.trace("Timer stopped (timer=%d)", _timer_id);
-    }
-#else
-    if (_timer)
-    {
-        _timer_spec.it_value.tv_sec = 0;
-        _timer_spec.it_value.tv_nsec = 0;
-
-        if (timer_settime(_timer, 0, &_timer_spec, NULL))
-        {
-            _logger.warning("Failed to stop: set time failed (timer=%d, error=%d)", _timer_id, errno);
-            return false;
-        }
-
-        if (timer_delete(_timer))
-        {
-            _logger.warning("Failed to stop: timer delete failed (timer=%d, error=%d)", _timer_id, errno);
-            return false;
-        }
-
-        _timer = 0;
-
-        _logger.trace("Timer stopped (timer=%d)", _timer_id);
-    }
-#endif
-
-    return true;
+    return false;
 }
 
 //-------------------------------------------
@@ -136,11 +30,6 @@ bool Timer::expired()
 {
     try
     {
-#ifdef WIN32
-        if (_timer)
-            _timer = NULL;
-#endif
-
         _logger.trace("Timer expired (timer=%d)", _timer_id);
         return _callback(_callback_data);
 
@@ -200,18 +89,19 @@ Timer_Manager &Timer_Manager::instance()
 
 timer_id_t Timer_Manager::start_timer(unsigned long time, void *data, Timer::timer_callback *callback)
 {
-    std::lock_guard<std::recursive_mutex> lock(_timer_list_mutex);
-
     timer_id_t id = Timer::next_timer_id();
+    unsigned long now = Util_Functions::get_tick();
+    unsigned long expire = now + time;
+
+    std::lock_guard<std::recursive_mutex> lock(_timer_list_mutex);
 
     Timer *timer = new Timer();
     timer->set_timer_id(id);
+    timer->set_time(expire);
+    timer->set_flag((expire < _last_tick) ? !_flag : _flag);
     timer->set_callback(callback, data);
 
-    timer->start(time);
-
     _timer_list.push_back(timer);
-
     return id;
 }
 
@@ -225,7 +115,6 @@ void *Timer_Manager::stop_timer(timer_id_t timer_id)
     Timer *timer = get_timer(timer_id);
     if (timer)
     {
-        timer->stop();
         _timer_list.remove(timer);
         data = timer->get_callback_data();
         delete timer;
@@ -236,29 +125,26 @@ void *Timer_Manager::stop_timer(timer_id_t timer_id)
 
 //-------------------------------------------
 
-#ifdef WIN32
-    VOID CALLBACK Timer_Manager::timer_handler(PVOID id, BOOLEAN timed_out)
-#else
-    void Timer_Manager::timer_handler(int sig, siginfo_t *info, void *ucontext)
-#endif
+void Timer_Manager::run()
 {
-    Timer_Manager &manager = instance();
+    unsigned long now = Util_Functions::get_tick();
+    if (now < _last_tick)
+        _flag = !_flag;
 
-    std::lock_guard<std::recursive_mutex> lock(manager._timer_list_mutex);
+    _last_tick = now;
 
-#ifdef WIN32
-    timer_id_t timer_id = (timer_id_t) id;
-    Timer *timer = manager.get_timer(timer_id);
-#else
-    timer_t tid = info->si_value.sival_ptr;
-    Timer *timer = manager.get_timer_linux(tid);
-#endif
+    std::lock_guard<std::recursive_mutex> lock(_timer_list_mutex);
 
-    if (timer)
+    std::list<Timer *>::iterator it = _timer_list.begin();
+    while (it != _timer_list.end())
     {
-        timer->expired();
-        manager._timer_list.remove(timer);
-        delete timer;
+        Timer *timer = *it;
+        if (timer->check_expired(now, _flag))
+        {
+            timer->expired();
+            it = _timer_list.erase(it);
+        }else
+            it++;
     }
 }
 
@@ -281,27 +167,5 @@ Timer *Timer_Manager::get_timer(timer_id_t timer_id)
 
     return ret;
 }
-
-//-------------------------------------------
-
-#ifndef WIN32
-Timer *Timer_Manager::get_timer_linux(timer_t &tid)
-{
-    Timer *ret = NULL;
-
-    std::list<Timer *>::iterator it = _timer_list.begin();
-    while (it != _timer_list.end())
-    {
-        Timer *timer = *it++;
-        if (&timer->get_timer() == tid)
-        {
-            ret = timer;
-            break;
-        }
-    }
-
-    return ret;
-}
-#endif
 
 //-------------------------------------------
