@@ -15,10 +15,12 @@
 #include "util/string_functions.h"
 #include "util/util_functions.h"
 #include <iomanip>
+#include <thread>
 
 class SIP_Call_Test
 {
 public:
+    static const unsigned long THREAD_DELAY = 10;
     static const unsigned long MAX_WAIT_TIME = 5000;
     static const unsigned long DELAY = 500;
 
@@ -28,6 +30,8 @@ public:
 
     static bool init();
     template<class T> static bool run();
+
+    static void thread(SIP_Call_Test *test);
 
 protected:
     virtual bool run() = 0;
@@ -136,6 +140,10 @@ protected:
     bool _sent_message;
     bool _received_request;
     bool _received_response;
+
+private:
+    std::thread _thread;
+    bool _stop_thread;
 };
 
 //-------------------------------------------

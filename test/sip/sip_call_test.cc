@@ -15,7 +15,7 @@
 //-------------------------------------------
 
 SIP_Call_Test::SIP_Call_Test() : _use_prack(false), _client_sequence(314158), _server_sequence(230), _invite_sequence(0),
-    _prack_rseq(988788), _sent_message(false), _received_request(false), _received_response(false)
+    _prack_rseq(988788), _sent_message(false), _received_request(false), _received_response(false), _stop_thread(false)
 {
     SIP_Object_ID client_id;
     client_id._call = 0;
@@ -100,9 +100,26 @@ bool SIP_Call_Test::init()
 template<class T> bool SIP_Call_Test::run()
 {
     T test;
-    if (!test.run())
-        return false;
-    return true;
+    test._thread = std::thread(thread, &test);
+
+    bool ret = test.run();
+
+    test._stop_thread = true;
+    test._thread.join();
+    return ret;
+}
+
+//-------------------------------------------
+
+void SIP_Call_Test::thread(SIP_Call_Test *test)
+{
+    Timer_Manager &timer = Timer_Manager::instance();
+
+    while (!test->_stop_thread)
+    {
+        timer.run();
+        Util_Functions::delay(THREAD_DELAY);
+    }
 }
 
 //-------------------------------------------
@@ -3251,6 +3268,8 @@ bool SIP_Call_Test::receive_response_callback(void *data, SIP_Call *call, SIP_Re
 
 bool SIP_Call_Success_Test::run()
 {
+    std::cout << "SIP call success test initialized\n";
+
     set_callbacks();
 
     if (!process_invite())
@@ -3283,6 +3302,7 @@ bool SIP_Call_Success_Test::run()
     if (!process_server_bye_response_200())
         return false;
 
+    std::cout << "SIP call success test completed successfully\n";
     return true;
 }
 
@@ -3291,6 +3311,8 @@ bool SIP_Call_Success_Test::run()
 
 bool SIP_Call_Success_No_100_Test::run()
 {
+    std::cout << "SIP call success no 100 test initialized\n";
+
     set_callbacks();
 
     if (!process_invite())
@@ -3311,6 +3333,7 @@ bool SIP_Call_Success_No_100_Test::run()
     if (!process_client_bye_response_200())
         return false;
 
+    std::cout << "SIP call success no 100 test completed successfully\n";
     return true;
 }
 
@@ -3319,6 +3342,8 @@ bool SIP_Call_Success_No_100_Test::run()
 
 bool SIP_Call_Success_No_1xx_Test::run()
 {
+    std::cout << "SIP call success no 1xx test initialized\n";
+
     set_callbacks();
 
     if (!process_invite())
@@ -3336,6 +3361,7 @@ bool SIP_Call_Success_No_1xx_Test::run()
     if (!process_server_bye_response_200())
         return false;
 
+    std::cout << "SIP call success no 1xx test completed successfully\n";
     return true;
 }
 
@@ -3344,6 +3370,8 @@ bool SIP_Call_Success_No_1xx_Test::run()
 
 bool SIP_Call_Reject_Test::run()
 {
+    std::cout << "SIP call reject test initialized\n";
+
     set_callbacks();
 
     if (!process_invite())
@@ -3361,6 +3389,7 @@ bool SIP_Call_Reject_Test::run()
     if (!process_invite_response_480())
         return false;
 
+    std::cout << "SIP call reject test completed successfully\n";
     return true;
 }
 
@@ -3369,6 +3398,8 @@ bool SIP_Call_Reject_Test::run()
 
 bool SIP_Call_Reject_No_100_Test::run()
 {
+    std::cout << "SIP call reject no 100 test initialized\n";
+
     set_callbacks();
 
     if (!process_invite())
@@ -3380,6 +3411,7 @@ bool SIP_Call_Reject_No_100_Test::run()
     if (!process_invite_response_480())
         return false;
 
+    std::cout << "SIP call reject no 100 test completed successfully\n";
     return true;
 }
 
@@ -3388,6 +3420,8 @@ bool SIP_Call_Reject_No_100_Test::run()
 
 bool SIP_Call_Reject_No_1xx_Test::run()
 {
+    std::cout << "SIP call reject no 1xx test initialized\n";
+
     set_callbacks();
 
     if (!process_invite())
@@ -3396,6 +3430,7 @@ bool SIP_Call_Reject_No_1xx_Test::run()
     if (!process_invite_response_480())
         return false;
 
+    std::cout << "SIP call reject no 1xx test completed successfully\n";
     return true;
 }
 
@@ -3404,6 +3439,8 @@ bool SIP_Call_Reject_No_1xx_Test::run()
 
 bool SIP_Call_No_Answer_Test::run()
 {
+    std::cout << "SIP call no answer test initialized\n";
+
     set_callbacks();
 
     if (!process_invite())
@@ -3412,6 +3449,7 @@ bool SIP_Call_No_Answer_Test::run()
     if (!wait_invite_timeout())
         return false;
 
+    std::cout << "SIP call no answer test completed successfully\n";
     return true;
 }
 
@@ -3420,6 +3458,8 @@ bool SIP_Call_No_Answer_Test::run()
 
 bool SIP_Call_Update_Test::run()
 {
+    std::cout << "SIP call update test initialized\n";
+
     set_callbacks();
 
     if (!process_invite())
@@ -3458,6 +3498,7 @@ bool SIP_Call_Update_Test::run()
     if (!process_server_bye_response_200())
         return false;
 
+    std::cout << "SIP call update test completed successfully\n";
     return true;
 }
 
@@ -3466,6 +3507,8 @@ bool SIP_Call_Update_Test::run()
 
 bool SIP_Call_Cancel_Test::run()
 {
+    std::cout << "SIP call cancel test initialized\n";
+
     set_callbacks();
 
     if (!process_invite())
@@ -3489,6 +3532,7 @@ bool SIP_Call_Cancel_Test::run()
     if (!process_invite_response_487())
         return false;
 
+    std::cout << "SIP call cancel test completed successfully\n";
     return true;
 }
 
@@ -3497,6 +3541,8 @@ bool SIP_Call_Cancel_Test::run()
 
 bool SIP_Call_Prack_Test::run()
 {
+    std::cout << "SIP call prack test initialized\n";
+
     set_callbacks();
     set_use_prack(true);
 
@@ -3536,6 +3582,7 @@ bool SIP_Call_Prack_Test::run()
     if (!process_server_bye_response_200())
         return false;
 
+    std::cout << "SIP call prack test completed successfully\n";
     return true;
 }
 
@@ -3544,6 +3591,8 @@ bool SIP_Call_Prack_Test::run()
 
 bool SIP_Call_Prack_No_100_Test::run()
 {
+    std::cout << "SIP call prack no 100 test initialized\n";
+
     set_callbacks();
     set_use_prack(true);
 
@@ -3580,6 +3629,7 @@ bool SIP_Call_Prack_No_100_Test::run()
     if (!process_client_bye_response_200())
         return false;
 
+    std::cout << "SIP call prack no 100 test completed successfully\n";
     return true;
 }
 
@@ -3588,6 +3638,8 @@ bool SIP_Call_Prack_No_100_Test::run()
 
 bool SIP_Call_Register_Test::run()
 {
+    std::cout << "SIP call register test initialized\n";
+
     set_callbacks();
 
     if (!process_register())
@@ -3596,6 +3648,7 @@ bool SIP_Call_Register_Test::run()
     if (!process_register_response_200())
         return false;
 
+    std::cout << "SIP call register test completed successfully\n";
     return true;
 }
 
@@ -3604,6 +3657,8 @@ bool SIP_Call_Register_Test::run()
 
 bool SIP_Call_Register_With_100_Test::run()
 {
+    std::cout << "SIP call register with 100 test initialized\n";
+
     set_callbacks();
 
     if (!process_register())
@@ -3615,6 +3670,7 @@ bool SIP_Call_Register_With_100_Test::run()
     if (!process_register_response_200())
         return false;
 
+    std::cout << "SIP call register with 100 test completed successfully\n";
     return true;
 }
 
@@ -3623,6 +3679,8 @@ bool SIP_Call_Register_With_100_Test::run()
 
 bool SIP_Call_Register_Reject_Test::run()
 {
+    std::cout << "SIP call register reject test initialized\n";
+
     set_callbacks();
 
     if (!process_register())
@@ -3631,6 +3689,7 @@ bool SIP_Call_Register_Reject_Test::run()
     if (!process_register_response_401())
         return false;
 
+    std::cout << "SIP call register reject test completed successfully\n";
     return true;
 }
 
@@ -3639,6 +3698,8 @@ bool SIP_Call_Register_Reject_Test::run()
 
 bool SIP_Call_Options_Test::run()
 {
+    std::cout << "SIP call options test initialized\n";
+
     set_callbacks();
 
     if (!process_options())
@@ -3647,6 +3708,7 @@ bool SIP_Call_Options_Test::run()
     if (!process_options_response_200())
         return false;
 
+    std::cout << "SIP call options test completed successfully\n";
     return true;
 }
 
@@ -3655,6 +3717,8 @@ bool SIP_Call_Options_Test::run()
 
 bool SIP_Call_Options_With_100_Test::run()
 {
+    std::cout << "SIP call options with 100 test initialized\n";
+
     set_callbacks();
 
     if (!process_options())
@@ -3666,6 +3730,7 @@ bool SIP_Call_Options_With_100_Test::run()
     if (!process_options_response_200())
         return false;
 
+    std::cout << "SIP call options with 100 test completed successfully\n";
     return true;
 }
 
