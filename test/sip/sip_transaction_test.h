@@ -16,10 +16,12 @@
 #include "sip/sip_transaction.h"
 #include "util/util_functions.h"
 #include <iomanip>
+#include <thread>
 
 class SIP_Transaction_Test
 {
 public:
+    static const unsigned long THREAD_DELAY = 10;
     static const unsigned long MAX_WAIT_TIME = 5000;
     static const unsigned long DELAY = 500;
 
@@ -27,8 +29,10 @@ public:
     static bool init();
     template<class T> static bool run();
 
+    static void thread(SIP_Transaction_Test *test);
+
 protected:
-    SIP_Transaction_Test() : _transaction(NULL), _sent_message(false), _received_request(false), _received_response(false) {}
+    SIP_Transaction_Test();
     virtual ~SIP_Transaction_Test();
 
     virtual bool run() = 0;
@@ -57,6 +61,10 @@ protected:
     bool _sent_message;
     bool _received_request;
     bool _received_response;
+
+private:
+    std::thread _thread;
+    bool _stop_thread;
 };
 
 //-------------------------------------------
