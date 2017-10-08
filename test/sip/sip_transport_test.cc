@@ -31,6 +31,8 @@ bool SIP_Transport_Test::init()
 
         if (!run<SIP_Transport_TCP_Test>(family_ipv4, address_ipv4, port_ipv4))
             return false;
+
+        std::cout << "IPv4 SIP transport test completed successfully\n";
     }else
         std::cout << "IPv4 SIP transport test disabled\n";
 
@@ -48,6 +50,8 @@ bool SIP_Transport_Test::init()
 
         if (!run<SIP_Transport_TCP_Test>(family_ipv6, address_ipv6, port_ipv6))
             return false;
+
+        std::cout << "IPv6 SIP transport test completed successfully\n";
     }else
         std::cout << "IPv6 SIP transport test disabled\n";
 
@@ -60,16 +64,33 @@ bool SIP_Transport_Test::init()
 template<class T> bool SIP_Transport_Test::run(Socket::Address_Family family, std::string address, unsigned short port)
 {
     T test;
-    if (!test.run(family, address, port))
-        return false;
-    return true;
+    test._thread = std::thread(thread, &test);
+
+    bool ret = test.run(family, address, port);
+
+    test._stop_thread = true;
+    test._thread.join();
+    return ret;
+}
+
+//-------------------------------------------
+
+void SIP_Transport_Test::thread(SIP_Transport_Test *test)
+{
+    Socket_Control &socket = Socket_Control::instance();
+
+    while (!test->_stop_thread)
+    {
+        socket.run();
+        Util_Functions::delay(THREAD_DELAY);
+    }
 }
 
 //-------------------------------------------
 //-------------------------------------------
 
 SIP_Transport_Test::SIP_Transport_Test() : _connected(false), _accepted_transport(NULL), _accepted_port(SIP_Transport::INVALID_PORT),
-    _received_size(0), _received_port(SIP_Transport::INVALID_PORT)
+    _received_size(0), _received_port(SIP_Transport::INVALID_PORT), _stop_thread(false)
 {
     _received_buffer[0] = 0;
 }
@@ -234,15 +255,11 @@ SIP_Transport_UDP_Test::~SIP_Transport_UDP_Test()
 
 bool SIP_Transport_UDP_Test::run(Socket::Address_Family family, std::string address, unsigned short port)
 {
+    std::cout << "SIP transport UDP test initialized\n";
+
     if (!_transport_udp)
     {
         std::cout << "SIP_Transport_UDP_Test::run -> Invalid transport\n";
-        return false;
-    }
-
-    if (!SIP_Transport::start())
-    {
-        std::cout << "SIP_Transport_UDP_Test::run -> Failed to start SIP transport\n";
         return false;
     }
 
@@ -308,12 +325,7 @@ bool SIP_Transport_UDP_Test::run(Socket::Address_Family family, std::string addr
         return false;
     }
 
-    if (!SIP_Transport::stop())
-    {
-        std::cout << "SIP_Transport_UDP_Test::run -> Failed to stop SIP transport\n";
-        return false;
-    }
-
+    std::cout << "SIP transport UDP test completed successfully\n";
     return true;
 }
 
@@ -346,15 +358,11 @@ SIP_Transport_TCP_Test::~SIP_Transport_TCP_Test()
 
 bool SIP_Transport_TCP_Test::run(Socket::Address_Family family, std::string address, unsigned short port)
 {
+    std::cout << "SIP transport TCP test initialized\n";
+
     if ((!_transport_tcp_client) || (!_transport_tcp_server))
     {
         std::cout << "SIP_Transport_TCP_Test::run -> Invalid transports\n";
-        return false;
-    }
-
-    if (!SIP_Transport::start())
-    {
-        std::cout << "SIP_Transport_TCP_Test::run -> Failed to start SIP transport\n";
         return false;
     }
 
@@ -493,12 +501,7 @@ bool SIP_Transport_TCP_Test::run(Socket::Address_Family family, std::string addr
         return false;
     }
 
-    if (!SIP_Transport::stop())
-    {
-        std::cout << "SIP_Transport_TCP_Test::run -> Failed to stop SIP transport\n";
-        return false;
-    }
-
+    std::cout << "SIP transport TCP test completed successfully\n";
     return true;
 }
 

@@ -15,16 +15,20 @@
 #include "util/util_functions.h"
 #include "util/socket.h"
 #include <iomanip>
+#include <thread>
 
 class SIP_Transport_Test
 {
 public:
+    static const unsigned long THREAD_DELAY = 10;
     static const unsigned long MAX_WAIT_TIME = 5000;
     static const unsigned long DELAY = 500;
 
 public:
     static bool init();
     template<class T> static bool run(Socket::Address_Family family, std::string address, unsigned short port);
+
+    static void thread(SIP_Transport_Test *test);
 
 protected:
     SIP_Transport_Test();
@@ -58,6 +62,10 @@ protected:
     int _received_size;
     std::string _received_address;
     unsigned short _received_port;
+
+private:
+    std::thread _thread;
+    bool _stop_thread;
 };
 
 //-------------------------------------------
