@@ -479,6 +479,13 @@ bool SIP_User_Agent_Server::receive_request(SIP_Call *call, SIP_Request *request
 //-------------------------------------------
 //-------------------------------------------
 
+SIP_User_Agent::SIP_User_Agent(SIP_Object_ID id) : _id(id), _user_agent_client(this), _user_agent_server(this),
+    _next_transport_id(0)
+{
+}
+
+//-------------------------------------------
+
 SIP_User_Agent::~SIP_User_Agent()
 {
     clear_calls();
@@ -570,14 +577,14 @@ SIP_Call *SIP_User_Agent::get_call(SIP_Message *msg)
 
 //-------------------------------------------
 
-SIP_Call *SIP_User_Agent::get_call(unsigned int call_id)
+SIP_Call *SIP_User_Agent::get_call(unsigned int id)
 {
     std::list<SIP_Call *>::iterator it = _calls.begin();
     while (it != _calls.end())
     {
         SIP_Call *call = *it++;
 
-        if (call->get_call_id() == call_id)
+        if (call->get_call_id() == id)
             return call;
     }
 

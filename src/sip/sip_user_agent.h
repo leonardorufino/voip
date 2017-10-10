@@ -81,7 +81,7 @@ public:
     static const unsigned int MAX_CALLS = 5000;
 
 public:
-    SIP_User_Agent(SIP_Object_ID id) : _id(id), _user_agent_client(this), _user_agent_server(this), _next_transport_id(0) {}
+    SIP_User_Agent(SIP_Object_ID id);
     ~SIP_User_Agent();
 
     bool init(std::string address, unsigned short port);
@@ -96,7 +96,7 @@ public:
     SIP_User_Agent_Server &get_user_agent_server() { return _user_agent_server; }
 
     SIP_Call *get_call(SIP_Message *msg);
-    SIP_Call *get_call(unsigned int call_id);
+    SIP_Call *get_call(unsigned int id);
     void add_call(SIP_Call *call);
     void remove_call(SIP_Call *call);
     void clear_calls();
