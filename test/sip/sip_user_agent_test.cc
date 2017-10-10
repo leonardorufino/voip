@@ -15,7 +15,7 @@
 //-------------------------------------------
 
 SIP_User_Agent_Test::SIP_User_Agent_Test() : _call_id_callback(SIP_Object_ID::INVALID_CALL), _request_callback(NULL),
-    _response_callback(NULL)
+    _response_callback(NULL), _stop_thread(false)
 {
     SIP_Object_ID user_agent_id;
     user_agent_id._user_agent = 0;
@@ -83,6 +83,8 @@ bool SIP_User_Agent_Test::init()
 
         if (!run<SIP_User_Agent_Call_Reject_No_100_Test>(family_ipv4, address_ipv4, port_ipv4, SIP_TRANSPORT_TCP))
             return false;
+
+        std::cout << "IPv4 SIP user agent test completed successfully\n";
     }else
         std::cout << "IPv4 SIP user agent test disabled\n";
 
@@ -124,6 +126,8 @@ bool SIP_User_Agent_Test::init()
 
         if (!run<SIP_User_Agent_Call_Reject_No_100_Test>(family_ipv6, address_ipv6, port_ipv6, SIP_TRANSPORT_TCP))
             return false;
+
+        std::cout << "IPv6 SIP user agent test completed successfully\n";
     }else
         std::cout << "IPv6 SIP user agent test disabled\n";
 
@@ -137,21 +141,34 @@ template<class T> bool SIP_User_Agent_Test::run(Socket::Address_Family family, s
                                                 SIP_Transport_Type transport)
 {
     T test;
-    if (!test.run(family, address, port, transport))
-        return false;
-    return true;
+    test._thread = std::thread(thread, &test);
+
+    bool ret = test.run(family, address, port, transport);
+
+    test._stop_thread = true;
+    test._thread.join();
+    return ret;
+}
+
+//-------------------------------------------
+
+void SIP_User_Agent_Test::thread(SIP_User_Agent_Test *test)
+{
+    Timer_Manager &timer = Timer_Manager::instance();
+    Socket_Control &socket = Socket_Control::instance();
+
+    while (!test->_stop_thread)
+    {
+        timer.run();
+        socket.run();
+        Util_Functions::delay(THREAD_DELAY);
+    }
 }
 
 //-------------------------------------------
 
 bool SIP_User_Agent_Test::init_user_agent(std::string address, unsigned short port)
 {
-    if (!SIP_Transport::start())
-    {
-        std::cout << "SIP_User_Agent_Test::init_user_agent -> Failed to start SIP transport\n";
-        return false;
-    }
-
     set_callbacks();
 
     if (!_user_agent->init(address, port))
@@ -170,12 +187,6 @@ bool SIP_User_Agent_Test::close_user_agent()
     if (!_user_agent->close())
     {
         std::cout << "SIP_User_Agent_Invite_UDP_Test::close_user_agent -> Failed to close user agent\n";
-        return false;
-    }
-
-    if (!SIP_Transport::stop())
-    {
-        std::cout << "SIP_User_Agent_Invite_UDP_Test::close_user_agent -> Failed to stop SIP transport\n";
         return false;
     }
 
@@ -429,6 +440,8 @@ bool SIP_User_Agent_Test::check_network_address(Socket::Address_Family family, s
 bool SIP_User_Agent_Call_Success_Test::run(Socket::Address_Family family, std::string address, unsigned short port,
                                            SIP_Transport_Type transport)
 {
+    std::cout << "SIP user agent call success test initialized\n";
+
     if (!init_user_agent(address, port))
         return false;
 
@@ -475,6 +488,7 @@ bool SIP_User_Agent_Call_Success_Test::run(Socket::Address_Family family, std::s
     if (!close_user_agent())
         return false;
 
+    std::cout << "SIP user agent call success test completed successfully\n";
     return true;
 }
 
@@ -484,6 +498,8 @@ bool SIP_User_Agent_Call_Success_Test::run(Socket::Address_Family family, std::s
 bool SIP_User_Agent_Call_Success_No_100_Test::run(Socket::Address_Family family, std::string address, unsigned short port,
                                                   SIP_Transport_Type transport)
 {
+    std::cout << "SIP user agent call success no 100 test initialized\n";
+
     if (!init_user_agent(address, port))
         return false;
 
@@ -524,6 +540,7 @@ bool SIP_User_Agent_Call_Success_No_100_Test::run(Socket::Address_Family family,
     if (!close_user_agent())
         return false;
 
+    std::cout << "SIP user agent call success no 100 test completed successfully\n";
     return true;
 }
 
@@ -533,6 +550,8 @@ bool SIP_User_Agent_Call_Success_No_100_Test::run(Socket::Address_Family family,
 bool SIP_User_Agent_Call_Success_No_1xx_Test::run(Socket::Address_Family family, std::string address, unsigned short port,
                                                   SIP_Transport_Type transport)
 {
+    std::cout << "SIP user agent call success no 1xx test initialized\n";
+
     if (!init_user_agent(address, port))
         return false;
 
@@ -558,6 +577,7 @@ bool SIP_User_Agent_Call_Success_No_1xx_Test::run(Socket::Address_Family family,
     if (!close_user_agent())
         return false;
 
+    std::cout << "SIP user agent call success no 1xx test completed successfully\n";
     return true;
 }
 
@@ -567,6 +587,8 @@ bool SIP_User_Agent_Call_Success_No_1xx_Test::run(Socket::Address_Family family,
 bool SIP_User_Agent_Call_Reject_Test::run(Socket::Address_Family family, std::string address, unsigned short port,
                                           SIP_Transport_Type transport)
 {
+    std::cout << "SIP user agent call reject test initialized\n";
+
     if (!init_user_agent(address, port))
         return false;
 
@@ -592,6 +614,7 @@ bool SIP_User_Agent_Call_Reject_Test::run(Socket::Address_Family family, std::st
     if (!close_user_agent())
         return false;
 
+    std::cout << "SIP user agent call reject test completed successfully\n";
     return true;
 }
 
@@ -601,6 +624,8 @@ bool SIP_User_Agent_Call_Reject_Test::run(Socket::Address_Family family, std::st
 bool SIP_User_Agent_Call_Reject_No_100_Test::run(Socket::Address_Family family, std::string address, unsigned short port,
                                                  SIP_Transport_Type transport)
 {
+    std::cout << "SIP user agent call reject no 100 test initialized\n";
+
     if (!init_user_agent(address, port))
         return false;
 
@@ -620,6 +645,7 @@ bool SIP_User_Agent_Call_Reject_No_100_Test::run(Socket::Address_Family family, 
     if (!close_user_agent())
         return false;
 
+    std::cout << "SIP user agent call reject no 100 test completed successfully\n";
     return true;
 }
 

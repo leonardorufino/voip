@@ -15,10 +15,12 @@
 #include "sip/sip_call.h"
 #include "util/util_functions.h"
 #include <iomanip>
+#include <thread>
 
 class SIP_User_Agent_Test
 {
 public:
+    static const unsigned long THREAD_DELAY = 10;
     static const unsigned long MAX_WAIT_TIME = 5000;
     static const unsigned long DELAY = 500;
 
@@ -29,6 +31,8 @@ public:
     static bool init();
     template<class T> static bool run(Socket::Address_Family family, std::string address, unsigned short port,
                                       SIP_Transport_Type transport);
+
+    static void thread(SIP_User_Agent_Test *test);
 
 protected:
     virtual bool run(Socket::Address_Family family, std::string address, unsigned short port, SIP_Transport_Type transport) = 0;
@@ -56,6 +60,10 @@ protected:
     std::list<SIP_Request *> _received_requests;
     SIP_Request *_request_callback;
     SIP_Response *_response_callback;
+
+private:
+    std::thread _thread;
+    bool _stop_thread;
 };
 
 //-------------------------------------------
