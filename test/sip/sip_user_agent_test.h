@@ -127,3 +127,15 @@ public:
 };
 
 //-------------------------------------------
+//-------------------------------------------
+
+class SIP_User_Agent_Call_Reject_No_1xx_Test : public SIP_User_Agent_Test
+{
+public:
+    SIP_User_Agent_Call_Reject_No_1xx_Test() {}
+    virtual ~SIP_User_Agent_Call_Reject_No_1xx_Test() {}
+
+    bool run(Socket::Address_Family family, std::string address, unsigned short port, SIP_Transport_Type transport);
+};
+
+//-------------------------------------------
