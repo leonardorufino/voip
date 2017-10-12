@@ -45,6 +45,7 @@ protected:
     bool process_request(unsigned int call_id, SIP_Method_Type method, std::string address = "",
                          unsigned short port = SIP_URI::INVALID_PORT, SIP_Transport_Type transport = SIP_TRANSPORT_INVALID);
     bool process_response(unsigned int call_id, SIP_Method_Type method, unsigned short status_code);
+    bool wait_timeout(unsigned int call_id);
 
     static bool receive_request_callback(void *data, SIP_User_Agent *user_agent, unsigned int call_id, SIP_Request *request);
     static bool receive_response_callback(void *data, SIP_User_Agent *user_agent, unsigned int call_id, SIP_Request *request,

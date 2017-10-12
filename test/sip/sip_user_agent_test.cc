@@ -369,6 +369,32 @@ bool SIP_User_Agent_Test::process_response(unsigned int call_id, SIP_Method_Type
 }
 
 //-------------------------------------------
+
+bool SIP_User_Agent_Test::wait_timeout(unsigned int call_id)
+{
+    clear_callback_params();
+
+    unsigned long start = Util_Functions::get_tick();
+    unsigned long max_wait_time = (SIP_Transaction::SIP_TIMER_1 * 64) + MAX_WAIT_TIME;
+
+    while ((Util_Functions::get_tick() - start) < max_wait_time)
+    {
+        if ((_call_id_callback != SIP_Object_ID::INVALID_CALL) && (_request_callback) && (_response_callback))
+            break;
+
+        Util_Functions::delay(DELAY);
+    }
+
+    if ((_call_id_callback == SIP_Object_ID::INVALID_CALL) || (!_request_callback) || (!_response_callback))
+    {
+        std::cout << "SIP_User_Agent_Test::wait_timeout -> Response not received (call_id=" << call_id << ")\n";
+        return false;
+    }
+
+    return true;
+}
+
+//-------------------------------------------
 //-------------------------------------------
 
 bool SIP_User_Agent_Test::receive_request_callback(void *data, SIP_User_Agent *user_agent, unsigned int call_id, SIP_Request *request)
