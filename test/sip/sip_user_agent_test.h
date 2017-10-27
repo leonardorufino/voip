@@ -236,3 +236,15 @@ public:
 };
 
 //-------------------------------------------
+//-------------------------------------------
+
+class SIP_User_Agent_Options_Test : public SIP_User_Agent_Test
+{
+public:
+    SIP_User_Agent_Options_Test() {}
+    virtual ~SIP_User_Agent_Options_Test() {}
+
+    bool run(Socket::Address_Family family, std::string address, unsigned short port, SIP_Transport_Type transport);
+};
+
+//-------------------------------------------
