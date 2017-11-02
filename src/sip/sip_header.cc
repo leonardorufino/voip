@@ -261,6 +261,11 @@ bool SIP_Header::decode_headers(std::string &sip_msg, sip_header_list &headers)
     do
     {
         SIP_Header *header = create_header(header_type);
+        if (!header)
+        {
+            _logger.warning("Failed to decode headers: create header failed (header=%d)", header_type);
+            return false;
+        }
 
         if (header->decode_separator() == HEADER_SEPARATOR_COMMA)
         {
