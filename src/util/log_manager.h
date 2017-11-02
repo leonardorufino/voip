@@ -44,6 +44,7 @@ public:
         LOG_SIP_DIALOG      = 0x0100,
         LOG_SIP_CALL        = 0x0200,
         LOG_SIP_USER_AGENT  = 0x0400,
+        LOG_SDP_FIELD       = 0x1000,
     };
 
     typedef bool (log_callback)(Log_Level level, Log_Source source, const std::string &msg);
