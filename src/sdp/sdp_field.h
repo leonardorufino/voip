@@ -42,3 +42,28 @@ protected:
 };
 
 //-------------------------------------------
+//-------------------------------------------
+
+class SDP_Field_Protocol_Version : public SDP_Field
+{
+public:
+    static const unsigned short INVALID_VERSION = INVALID_UNSIGNED_SHORT;
+
+public:
+    SDP_Field_Protocol_Version() : _version(INVALID_VERSION) {}
+    SDP_Field_Protocol_Version(const SDP_Field_Protocol_Version &field) { *this = field; }
+    ~SDP_Field_Protocol_Version() {}
+
+    // Virtual pure functions
+    SDP_Field_Type get_field_type() { return SDP_FIELD_PROTOCOL_VERSION; }
+    bool decode(std::string &msg);
+    bool encode(std::string &msg);
+
+    void set_version(unsigned short version) { _version = version; }
+    unsigned short get_version() { return _version; }
+
+private:
+    unsigned short _version;
+};
+
+//-------------------------------------------

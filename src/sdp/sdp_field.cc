@@ -23,6 +23,10 @@ SDP_Field *SDP_Field::create_field(SDP_Field_Type field_type, const SDP_Field *c
 
     switch (field_type)
     {
+        case SDP_FIELD_PROTOCOL_VERSION:
+            field = (!copy) ? new SDP_Field_Protocol_Version()
+                            : new SDP_Field_Protocol_Version(dynamic_cast<const SDP_Field_Protocol_Version &>(*copy));
+            break;
         default:
             break;
     }
@@ -101,6 +105,32 @@ bool SDP_Field::encode_fields(std::string &msg, sdp_field_list &fields)
 		msg += "\r\n";
     }
 
+    return true;
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+bool SDP_Field_Protocol_Version::decode(std::string &msg)
+{
+    if (msg.empty())
+        return false;
+
+    _version = String_Functions::str_to_us(msg);
+    if (_version == INVALID_VERSION)
+        return false;
+
+    return true;
+}
+
+//-------------------------------------------
+
+bool SDP_Field_Protocol_Version::encode(std::string &msg)
+{
+    if (_version == INVALID_VERSION)
+        return false;
+
+    msg += std::to_string(_version);
     return true;
 }
 
