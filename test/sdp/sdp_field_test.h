@@ -46,3 +46,12 @@ protected:
 };
 
 //-------------------------------------------
+//-------------------------------------------
+
+class SDP_Field_Protocol_Version_Test : public SDP_Field_Test
+{
+public:
+    SDP_Field_Protocol_Version_Test();
+};
+
+//-------------------------------------------

@@ -17,6 +17,9 @@ bool SDP_Field_Test::init()
 {
     std::cout << "SDP field test initialized\n";
 
+    if (!run<SDP_Field_Protocol_Version_Test>())
+        return false;
+
     std::cout << "SDP field test completed successfully\n";
     return true;
 }
@@ -165,6 +168,39 @@ void SDP_Field_Test::clear(sdp_field_list &fields)
         delete *it++;
 
     fields.clear();
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+SDP_Field_Protocol_Version_Test::SDP_Field_Protocol_Version_Test()
+{
+    SDP_Field_Input_Output field1;
+    field1._field_type     = SDP_FIELD_PROTOCOL_VERSION;
+    field1._input          = "v=0";
+    field1._output         = "v=0\r\n";
+    field1._field_nb       = 1;
+    field1._decode_success = true;
+    field1._encode_success = true;
+    _field_input_output.push_back(field1);
+
+    SDP_Field_Input_Output field2;
+    field2._field_type     = SDP_FIELD_PROTOCOL_VERSION;
+    field2._input          = "v=9";
+    field2._output         = "v=9\r\n";
+    field2._field_nb       = 1;
+    field2._decode_success = true;
+    field2._encode_success = true;
+    _field_input_output.push_back(field2);
+
+    SDP_Field_Input_Output field3;
+    field3._field_type     = SDP_FIELD_PROTOCOL_VERSION;
+    field3._input          = "v=9999";
+    field3._output         = "v=9999\r\n";
+    field3._field_nb       = 1;
+    field3._decode_success = true;
+    field3._encode_success = true;
+    _field_input_output.push_back(field3);
 }
 
 //-------------------------------------------
