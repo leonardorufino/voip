@@ -28,6 +28,11 @@ message("Creating SIP library..")
 file(GLOB SIP_SOURCES "src/sip/*")
 add_library(sip STATIC ${SIP_SOURCES})
 
+### SDP library ###
+message("Creating SDP library..")
+file(GLOB SDP_SOURCES "src/sdp/*")
+add_library(sdp STATIC ${SDP_SOURCES})
+
 ### Util test ###
 message("Creating util test executable..")
 file(GLOB UTIL_TEST_SOURCES "test/util/*")
@@ -40,6 +45,13 @@ file(GLOB SIP_TEST_SOURCES "test/sip/*")
 add_executable(sip_test ${SIP_TEST_SOURCES})
 target_link_libraries(sip_test sip util)
 
+### SDP test ###
+message("Creating SDP test executable..")
+file(GLOB SDP_TEST_SOURCES "test/sdp/*")
+add_executable(sdp_test ${SDP_TEST_SOURCES})
+target_link_libraries(sdp_test sdp util)
+
 enable_testing()
 add_test(Util_Test ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/util_test)
 add_test(SIP_Test ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/sip_test)
+add_test(SDP_Test ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/sdp_test)
