@@ -27,6 +27,10 @@ SDP_Field *SDP_Field::create_field(SDP_Field_Type field_type, const SDP_Field *c
             field = (!copy) ? new SDP_Field_Protocol_Version()
                             : new SDP_Field_Protocol_Version(dynamic_cast<const SDP_Field_Protocol_Version &>(*copy));
             break;
+        case SDP_FIELD_ORIGIN:
+            field = (!copy) ? new SDP_Field_Origin()
+                            : new SDP_Field_Origin(dynamic_cast<const SDP_Field_Origin &>(*copy));
+            break;
         default:
             break;
     }
@@ -131,6 +135,82 @@ bool SDP_Field_Protocol_Version::encode(std::string &msg)
         return false;
 
     msg += std::to_string(_version);
+    return true;
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+bool SDP_Field_Origin::decode(std::string &msg)
+{
+    std::string result;
+
+    if (!String_Functions::match(msg, " ", result))
+        return false;
+
+    if (result.empty())
+        return false;
+
+    _username = result;
+
+    if (!String_Functions::match(msg, " ", result))
+        return false;
+
+    if (result.empty())
+        return false;
+
+    _session_id = result;
+
+    if (!String_Functions::match(msg, " ", result))
+        return false;
+
+    if (result.empty())
+        return false;
+
+    _session_version = result;
+
+    if (!String_Functions::match(msg, " ", result))
+        return false;
+
+    if (result.empty())
+        return false;
+
+    _network_type = result;
+
+    if (!String_Functions::match(msg, " ", result))
+        return false;
+
+    if (result.empty())
+        return false;
+
+    _address_type = result;
+
+    if (msg.empty())
+        return false;
+
+    _unicast_address = msg;
+    return true;
+}
+
+//-------------------------------------------
+
+bool SDP_Field_Origin::encode(std::string &msg)
+{
+    if ((_username.empty()) || (_session_id.empty()) || (_session_version.empty()) || (_network_type.empty()) ||
+        (_address_type.empty()) || (_unicast_address.empty()))
+        return false;
+
+    msg += _username;
+    msg += " ";
+    msg += _session_id;
+    msg += " ";
+    msg += _session_version;
+    msg += " ";
+    msg += _network_type;
+    msg += " ";
+    msg += _address_type;
+    msg += " ";
+    msg += _unicast_address;
     return true;
 }
 

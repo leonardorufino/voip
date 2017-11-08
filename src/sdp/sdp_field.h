@@ -67,3 +67,44 @@ private:
 };
 
 //-------------------------------------------
+
+class SDP_Field_Origin : public SDP_Field
+{
+public:
+    SDP_Field_Origin() {}
+    SDP_Field_Origin(const SDP_Field_Origin &field) { *this = field; }
+    ~SDP_Field_Origin() {}
+
+    // Virtual pure functions
+    SDP_Field_Type get_field_type() { return SDP_FIELD_ORIGIN; }
+    bool decode(std::string &msg);
+    bool encode(std::string &msg);
+
+    void set_username(std::string username) { _username = username; }
+    std::string get_username() { return _username; }
+
+    void set_session_id(std::string id) { _session_id = id; }
+    std::string get_session_id() { return _session_id; }
+
+    void set_session_version(std::string version) { _session_version = version; }
+    std::string get_session_version() { return _session_version; }
+
+    void set_network_type(std::string type) { _network_type = type; }
+    std::string get_network_type() { return _network_type; }
+
+    void set_address_type(std::string type) { _address_type = type; }
+    std::string get_address_type() { return _address_type; }
+
+    void set_unicast_address(std::string address) { _unicast_address = address; }
+    std::string get_unicast_address() { return _unicast_address; }
+
+private:
+    std::string _username;
+    std::string _session_id;
+    std::string _session_version;
+    std::string _network_type;
+    std::string _address_type;
+    std::string _unicast_address;
+};
+
+//-------------------------------------------
