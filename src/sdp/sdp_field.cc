@@ -31,6 +31,10 @@ SDP_Field *SDP_Field::create_field(SDP_Field_Type field_type, const SDP_Field *c
             field = (!copy) ? new SDP_Field_Origin()
                             : new SDP_Field_Origin(dynamic_cast<const SDP_Field_Origin &>(*copy));
             break;
+        case SDP_FIELD_SESSION_NAME:
+            field = (!copy) ? new SDP_Field_Session_Name()
+                            : new SDP_Field_Session_Name(dynamic_cast<const SDP_Field_Session_Name &>(*copy));
+            break;
         default:
             break;
     }
@@ -211,6 +215,29 @@ bool SDP_Field_Origin::encode(std::string &msg)
     msg += _address_type;
     msg += " ";
     msg += _unicast_address;
+    return true;
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+bool SDP_Field_Session_Name::decode(std::string &msg)
+{
+    if (msg.empty())
+        return false;
+
+    _session_name = msg;
+    return true;
+}
+
+//-------------------------------------------
+
+bool SDP_Field_Session_Name::encode(std::string &msg)
+{
+    if (_session_name.empty())
+        return false;
+
+    msg += _session_name;
     return true;
 }
 
