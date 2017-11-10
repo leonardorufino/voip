@@ -55,3 +55,11 @@ public:
 };
 
 //-------------------------------------------
+
+class SDP_Field_Origin_Test : public SDP_Field_Test
+{
+public:
+    SDP_Field_Origin_Test();
+};
+
+//-------------------------------------------
