@@ -23,6 +23,9 @@ bool SDP_Field_Test::init()
     if (!run<SDP_Field_Origin_Test>())
         return false;
 
+    if (!run<SDP_Field_Session_Name_Test>())
+        return false;
+
     std::cout << "SDP field test completed successfully\n";
     return true;
 }
@@ -233,6 +236,39 @@ SDP_Field_Origin_Test::SDP_Field_Origin_Test()
     field3._field_type     = SDP_FIELD_ORIGIN;
     field3._input          = "o=test 99887766554433221100 11223344556677889900 IN IP6 2200:05FF::1111:2222:EEFC";
     field3._output         = "o=test 99887766554433221100 11223344556677889900 IN IP6 2200:05FF::1111:2222:EEFC\r\n";
+    field3._field_nb       = 1;
+    field3._decode_success = true;
+    field3._encode_success = true;
+    _field_input_output.push_back(field3);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+SDP_Field_Session_Name_Test::SDP_Field_Session_Name_Test()
+{
+    SDP_Field_Input_Output field1;
+    field1._field_type     = SDP_FIELD_SESSION_NAME;
+    field1._input          = "s=SDP Seminar";
+    field1._output         = "s=SDP Seminar\r\n";
+    field1._field_nb       = 1;
+    field1._decode_success = true;
+    field1._encode_success = true;
+    _field_input_output.push_back(field1);
+
+    SDP_Field_Input_Output field2;
+    field2._field_type     = SDP_FIELD_SESSION_NAME;
+    field2._input          = "s= ";
+    field2._output         = "s= \r\n";
+    field2._field_nb       = 1;
+    field2._decode_success = true;
+    field2._encode_success = true;
+    _field_input_output.push_back(field2);
+
+    SDP_Field_Input_Output field3;
+    field3._field_type     = SDP_FIELD_SESSION_NAME;
+    field3._input          = "s=This is a session name";
+    field3._output         = "s=This is a session name\r\n";
     field3._field_nb       = 1;
     field3._decode_success = true;
     field3._encode_success = true;
