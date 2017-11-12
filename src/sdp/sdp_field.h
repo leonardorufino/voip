@@ -129,3 +129,24 @@ private:
 };
 
 //-------------------------------------------
+
+class SDP_Field_Session_Information : public SDP_Field
+{
+public:
+    SDP_Field_Session_Information() {}
+    SDP_Field_Session_Information(const SDP_Field_Session_Information &field) { *this = field; }
+    ~SDP_Field_Session_Information() {}
+
+    // Virtual pure functions
+    SDP_Field_Type get_field_type() { return SDP_FIELD_SESSION_INFORMATION; }
+    bool decode(std::string &msg);
+    bool encode(std::string &msg);
+
+    void set_session_information(std::string information) { _session_information = information; }
+    std::string get_session_information() { return _session_information; }
+
+private:
+    std::string _session_information;
+};
+
+//-------------------------------------------

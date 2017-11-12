@@ -35,6 +35,10 @@ SDP_Field *SDP_Field::create_field(SDP_Field_Type field_type, const SDP_Field *c
             field = (!copy) ? new SDP_Field_Session_Name()
                             : new SDP_Field_Session_Name(dynamic_cast<const SDP_Field_Session_Name &>(*copy));
             break;
+        case SDP_FIELD_SESSION_INFORMATION:
+            field = (!copy) ? new SDP_Field_Session_Information()
+                            : new SDP_Field_Session_Information(dynamic_cast<const SDP_Field_Session_Information &>(*copy));
+            break;
         default:
             break;
     }
@@ -238,6 +242,23 @@ bool SDP_Field_Session_Name::encode(std::string &msg)
         return false;
 
     msg += _session_name;
+    return true;
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+bool SDP_Field_Session_Information::decode(std::string &msg)
+{
+    _session_information = msg;
+    return true;
+}
+
+//-------------------------------------------
+
+bool SDP_Field_Session_Information::encode(std::string &msg)
+{
+    msg += _session_information;
     return true;
 }
 
