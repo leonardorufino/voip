@@ -71,3 +71,11 @@ public:
 };
 
 //-------------------------------------------
+
+class SDP_Field_Session_Information_Test : public SDP_Field_Test
+{
+public:
+    SDP_Field_Session_Information_Test();
+};
+
+//-------------------------------------------

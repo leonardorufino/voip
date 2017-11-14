@@ -26,6 +26,9 @@ bool SDP_Field_Test::init()
     if (!run<SDP_Field_Session_Name_Test>())
         return false;
 
+    if (!run<SDP_Field_Session_Information_Test>())
+        return false;
+
     std::cout << "SDP field test completed successfully\n";
     return true;
 }
@@ -269,6 +272,39 @@ SDP_Field_Session_Name_Test::SDP_Field_Session_Name_Test()
     field3._field_type     = SDP_FIELD_SESSION_NAME;
     field3._input          = "s=This is a session name";
     field3._output         = "s=This is a session name\r\n";
+    field3._field_nb       = 1;
+    field3._decode_success = true;
+    field3._encode_success = true;
+    _field_input_output.push_back(field3);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+SDP_Field_Session_Information_Test::SDP_Field_Session_Information_Test()
+{
+    SDP_Field_Input_Output field1;
+    field1._field_type     = SDP_FIELD_SESSION_INFORMATION;
+    field1._input          = "i=A Seminar on the session description protocol";
+    field1._output         = "i=A Seminar on the session description protocol\r\n";
+    field1._field_nb       = 1;
+    field1._decode_success = true;
+    field1._encode_success = true;
+    _field_input_output.push_back(field1);
+
+    SDP_Field_Input_Output field2;
+    field2._field_type     = SDP_FIELD_SESSION_INFORMATION;
+    field2._input          = "i=Test ";
+    field2._output         = "i=Test \r\n";
+    field2._field_nb       = 1;
+    field2._decode_success = true;
+    field2._encode_success = true;
+    _field_input_output.push_back(field2);
+
+    SDP_Field_Input_Output field3;
+    field3._field_type     = SDP_FIELD_SESSION_INFORMATION;
+    field3._input          = "i=";
+    field3._output         = "i=\r\n";
     field3._field_nb       = 1;
     field3._decode_success = true;
     field3._encode_success = true;
