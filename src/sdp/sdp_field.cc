@@ -39,6 +39,10 @@ SDP_Field *SDP_Field::create_field(SDP_Field_Type field_type, const SDP_Field *c
             field = (!copy) ? new SDP_Field_Session_Information()
                             : new SDP_Field_Session_Information(dynamic_cast<const SDP_Field_Session_Information &>(*copy));
             break;
+        case SDP_FIELD_URI:
+            field = (!copy) ? new SDP_Field_URI()
+                            : new SDP_Field_URI(dynamic_cast<const SDP_Field_URI &>(*copy));
+            break;
         default:
             break;
     }
@@ -259,6 +263,23 @@ bool SDP_Field_Session_Information::decode(std::string &msg)
 bool SDP_Field_Session_Information::encode(std::string &msg)
 {
     msg += _session_information;
+    return true;
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+bool SDP_Field_URI::decode(std::string &msg)
+{
+    _uri = msg;
+    return true;
+}
+
+//-------------------------------------------
+
+bool SDP_Field_URI::encode(std::string &msg)
+{
+    msg += _uri;
     return true;
 }
 

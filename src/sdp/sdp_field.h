@@ -150,3 +150,24 @@ private:
 };
 
 //-------------------------------------------
+
+class SDP_Field_URI : public SDP_Field
+{
+public:
+    SDP_Field_URI() {}
+    SDP_Field_URI(const SDP_Field_URI &field) { *this = field; }
+    ~SDP_Field_URI() {}
+
+    // Virtual pure functions
+    SDP_Field_Type get_field_type() { return SDP_FIELD_URI; }
+    bool decode(std::string &msg);
+    bool encode(std::string &msg);
+
+    void set_uri(std::string uri) { _uri = uri; }
+    std::string get_uri() { return _uri; }
+
+private:
+    std::string _uri;
+};
+
+//-------------------------------------------
