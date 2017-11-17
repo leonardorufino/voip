@@ -29,6 +29,9 @@ bool SDP_Field_Test::init()
     if (!run<SDP_Field_Session_Information_Test>())
         return false;
 
+    if (!run<SDP_Field_URI_Test>())
+        return false;
+
     std::cout << "SDP field test completed successfully\n";
     return true;
 }
@@ -305,6 +308,39 @@ SDP_Field_Session_Information_Test::SDP_Field_Session_Information_Test()
     field3._field_type     = SDP_FIELD_SESSION_INFORMATION;
     field3._input          = "i=";
     field3._output         = "i=\r\n";
+    field3._field_nb       = 1;
+    field3._decode_success = true;
+    field3._encode_success = true;
+    _field_input_output.push_back(field3);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+SDP_Field_URI_Test::SDP_Field_URI_Test()
+{
+    SDP_Field_Input_Output field1;
+    field1._field_type     = SDP_FIELD_URI;
+    field1._input          = "u=http://www.example.com/seminars/sdp.pdf";
+    field1._output         = "u=http://www.example.com/seminars/sdp.pdf\r\n";
+    field1._field_nb       = 1;
+    field1._decode_success = true;
+    field1._encode_success = true;
+    _field_input_output.push_back(field1);
+
+    SDP_Field_Input_Output field2;
+    field2._field_type     = SDP_FIELD_URI;
+    field2._input          = "u=www.test.com ";
+    field2._output         = "u=www.test.com \r\n";
+    field2._field_nb       = 1;
+    field2._decode_success = true;
+    field2._encode_success = true;
+    _field_input_output.push_back(field2);
+
+    SDP_Field_Input_Output field3;
+    field3._field_type     = SDP_FIELD_URI;
+    field3._input          = "u=";
+    field3._output         = "u=\r\n";
     field3._field_nb       = 1;
     field3._decode_success = true;
     field3._encode_success = true;
