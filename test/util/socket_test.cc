@@ -152,7 +152,8 @@ bool Socket_Test::set_callbacks()
 
 //-------------------------------------------
 
-bool Socket_Test::configure_socket(Socket::Address_Family family, std::string address, unsigned short port, bool non_blocking)
+bool Socket_Test::configure_socket(Socket::Address_Family family, std::string address, unsigned short port, bool non_blocking,
+                                   bool tcp_no_delay)
 {
     if (!set_callbacks())
         return false;
@@ -168,6 +169,12 @@ bool Socket_Test::configure_socket(Socket::Address_Family family, std::string ad
 
     if (!set_so_reuse_addr())
         return false;
+
+    if (tcp_no_delay)
+    {
+        if (!set_tcp_no_delay())
+            return false;
+    }
 
     if (!bind(address, port))
         return false;
@@ -248,6 +255,21 @@ bool Socket_Test::set_so_reuse_addr()
     if (!socket.set_so_reuse_addr())
     {
         std::cout << "Socket_Test::set_so_reuse_addr -> Failed to set socket option reuse addr\n";
+        return false;
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+
+bool Socket_Test::set_tcp_no_delay()
+{
+    Socket &socket = get_socket();
+
+    if (!socket.set_tcp_no_delay())
+    {
+        std::cout << "Socket_Test::set_tcp_no_delay -> Failed to set tcp no delay\n";
         return false;
     }
 
@@ -511,7 +533,7 @@ bool Socket_UDP_Blocking_Test::run(Socket::Address_Family family, std::string ad
 {
     std::cout << "Socket UDP blocking test initialized\n";
 
-    if (!configure_socket(family, address, port, false))
+    if (!configure_socket(family, address, port, false, false))
         return false;
 
     const int MSG_SIZE = 256;
@@ -571,7 +593,7 @@ bool Socket_UDP_Blocking_Connect_Test::run(Socket::Address_Family family, std::s
 {
     std::cout << "Socket UDP blocking connect test initialized\n";
 
-    if (!configure_socket(family, address, port, false))
+    if (!configure_socket(family, address, port, false, false))
         return false;
 
     _connected = false;
@@ -630,7 +652,7 @@ bool Socket_UDP_Non_Blocking_Test::run(Socket::Address_Family family, std::strin
 {
     std::cout << "Socket UDP non-blocking test initialized\n";
 
-    if (!configure_socket(family, address, port, true))
+    if (!configure_socket(family, address, port, true, false))
         return false;
 
     const int MSG_SIZE = 256;
@@ -690,7 +712,7 @@ bool Socket_UDP_Non_Blocking_Connect_Test::run(Socket::Address_Family family, st
 {
     std::cout << "Socket UDP non-blocking connect test initialized\n";
 
-    if (!configure_socket(family, address, port, true))
+    if (!configure_socket(family, address, port, true, false))
         return false;
 
     unsigned long start = Util_Functions::get_tick();
@@ -760,7 +782,7 @@ bool Socket_UDP_Non_Blocking_Control_Test::run(Socket::Address_Family family, st
 
     Socket_Control &control = Socket_Control::instance();
 
-    if (!configure_socket(family, address, port, true))
+    if (!configure_socket(family, address, port, true, false))
         return false;
 
     if (!control.add_socket(_socket_udp))
@@ -857,11 +879,11 @@ bool Socket_TCP_Blocking_Test::run(Socket::Address_Family family, std::string ad
     std::cout << "Socket TCP blocking test initialized\n";
 
     _current_socket = &_socket_tcp_client;
-    if (!configure_socket(family, address, 0, false))
+    if (!configure_socket(family, address, 0, false, true))
         return false;
 
     _current_socket = &_socket_tcp_server;
-    if (!configure_socket(family, address, port, false))
+    if (!configure_socket(family, address, port, false, true))
         return false;
 
     if (!listen(10))
@@ -968,11 +990,11 @@ bool Socket_TCP_Non_Blocking_Test::run(Socket::Address_Family family, std::strin
     std::cout << "Socket TCP non-blocking test initialized\n";
 
     _current_socket = &_socket_tcp_client;
-    if (!configure_socket(family, address, 0, true))
+    if (!configure_socket(family, address, 0, true, true))
         return false;
 
     _current_socket = &_socket_tcp_server;
-    if (!configure_socket(family, address, port, true))
+    if (!configure_socket(family, address, port, true, true))
         return false;
 
     if (!listen(10))
@@ -1085,11 +1107,11 @@ bool Socket_TCP_Non_Blocking_Control_Test::run(Socket::Address_Family family, st
     Socket_Control &control = Socket_Control::instance();
 
     _current_socket = &_socket_tcp_client;
-    if (!configure_socket(family, address, 0, true))
+    if (!configure_socket(family, address, 0, true, true))
         return false;
 
     _current_socket = &_socket_tcp_server;
-    if (!configure_socket(family, address, port, true))
+    if (!configure_socket(family, address, port, true, true))
         return false;
 
     if (!control.add_socket(_socket_tcp_client))

@@ -39,7 +39,8 @@ protected:
     virtual Socket &get_socket() = 0;
 
     virtual bool set_callbacks();
-    virtual bool configure_socket(Socket::Address_Family family, std::string address, unsigned short port, bool non_blocking);
+    virtual bool configure_socket(Socket::Address_Family family, std::string address, unsigned short port, bool non_blocking,
+                                  bool tcp_no_delay);
 
     virtual bool create(Socket::Address_Family family);
     virtual bool close();
@@ -47,6 +48,7 @@ protected:
     virtual bool set_so_snd_buf();
     virtual bool set_so_rcv_buf();
     virtual bool set_so_reuse_addr();
+    virtual bool set_tcp_no_delay();
     virtual bool set_non_blocking(bool non_blocking = true);
 
     virtual bool bind(std::string address, unsigned short port);
