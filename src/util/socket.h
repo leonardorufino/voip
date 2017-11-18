@@ -115,6 +115,7 @@ public:
     virtual bool set_so_snd_buf(int size = 128 * 1024);
     virtual bool set_so_rcv_buf(int size = 128 * 1024);
     virtual bool set_so_reuse_addr(int value = 1);
+    virtual bool set_tcp_no_delay(int value = 1);
     virtual bool set_non_blocking(bool non_blocking = true);
     virtual bool get_so_error(int &value);
 

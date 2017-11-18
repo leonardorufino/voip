@@ -251,6 +251,27 @@ bool Socket::set_so_reuse_addr(int value)
 
 //-------------------------------------------
 
+bool Socket::set_tcp_no_delay(int value)
+{
+    if ((_state == STATE_IDLE) || (_state == STATE_CLOSED))
+    {
+        _logger.warning("Failed to set tcp no delay: invalid state (state=%d)", _state);
+        return false;
+    }
+
+    if (setsockopt(_socket, IPPROTO_TCP, TCP_NODELAY, (const char *) &value, sizeof(value)))
+    {
+        _logger.warning("Failed to set tcp no delay: setsockopt failed (socket=%d, value=%d, error=%d)",
+            _socket, value, GET_LAST_ERROR);
+        return false;
+    }
+
+    _logger.trace("Set tcp no delay (socket=%d, value=%d)", _socket, value);
+    return true;
+}
+
+//-------------------------------------------
+
 bool Socket::set_non_blocking(bool non_blocking)
 {
     if ((_state == STATE_IDLE) || (_state == STATE_CLOSED))
