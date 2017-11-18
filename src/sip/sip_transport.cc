@@ -245,6 +245,7 @@ bool SIP_Transport::socket_accept_callback(void *data, Socket_TCP_Client *accept
         accepted->set_so_snd_buf();
         accepted->set_so_rcv_buf();
         accepted->set_so_reuse_addr();
+        accepted->set_tcp_no_delay();
 
         if (!accepted->set_non_blocking())
         {
@@ -359,7 +360,11 @@ bool SIP_Transport_TCP_Client::init(std::string address, unsigned short port)
     }
 
     _socket = new Socket_TCP_Client();
-    return SIP_Transport::init(address, port);
+    if (!SIP_Transport::init(address, port))
+        return false;
+
+    _socket->set_tcp_no_delay();
+    return true;
 }
 
 //-------------------------------------------
@@ -397,7 +402,11 @@ bool SIP_Transport_TCP_Server::init(std::string address, unsigned short port)
     }
 
     _socket = new Socket_TCP_Server();
-    return SIP_Transport::init(address, port);
+    if (!SIP_Transport::init(address, port))
+        return false;
+
+    _socket->set_tcp_no_delay();
+    return true;
 }
 
 //-------------------------------------------
