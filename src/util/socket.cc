@@ -656,7 +656,7 @@ int Socket::select(unsigned long timeout, int *read, int *write, int *except)
         *except = 0;
     }
 
-    int ret = ::select(_socket + 1, p_read_set, p_write_set, p_except_set, &tv);
+    int ret = ::select((int) _socket + 1, p_read_set, p_write_set, p_except_set, &tv);
     if (ret < 0)
     {
         _logger.warning("Failed to select: select failed (socket=%d, error=%d)", _socket, GET_LAST_ERROR);
