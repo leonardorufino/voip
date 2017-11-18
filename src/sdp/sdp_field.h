@@ -171,3 +171,24 @@ private:
 };
 
 //-------------------------------------------
+
+class SDP_Field_Email_Address : public SDP_Field
+{
+public:
+    SDP_Field_Email_Address() {}
+    SDP_Field_Email_Address(const SDP_Field_Email_Address &field) { *this = field; }
+    ~SDP_Field_Email_Address() {}
+
+    // Virtual pure functions
+    SDP_Field_Type get_field_type() { return SDP_FIELD_EMAIL_ADDRESS; }
+    bool decode(std::string &msg);
+    bool encode(std::string &msg);
+
+    void set_email(std::string email) { _email = email; }
+    std::string get_email() { return _email; }
+
+private:
+    std::string _email;
+};
+
+//-------------------------------------------

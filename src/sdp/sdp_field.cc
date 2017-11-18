@@ -43,6 +43,10 @@ SDP_Field *SDP_Field::create_field(SDP_Field_Type field_type, const SDP_Field *c
             field = (!copy) ? new SDP_Field_URI()
                             : new SDP_Field_URI(dynamic_cast<const SDP_Field_URI &>(*copy));
             break;
+        case SDP_FIELD_EMAIL_ADDRESS:
+            field = (!copy) ? new SDP_Field_Email_Address()
+                            : new SDP_Field_Email_Address(dynamic_cast<const SDP_Field_Email_Address &>(*copy));
+            break;
         default:
             break;
     }
@@ -280,6 +284,23 @@ bool SDP_Field_URI::decode(std::string &msg)
 bool SDP_Field_URI::encode(std::string &msg)
 {
     msg += _uri;
+    return true;
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+bool SDP_Field_Email_Address::decode(std::string &msg)
+{
+    _email = msg;
+    return true;
+}
+
+//-------------------------------------------
+
+bool SDP_Field_Email_Address::encode(std::string &msg)
+{
+    msg += _email;
     return true;
 }
 
