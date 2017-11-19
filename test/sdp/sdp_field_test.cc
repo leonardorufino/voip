@@ -32,6 +32,9 @@ bool SDP_Field_Test::init()
     if (!run<SDP_Field_URI_Test>())
         return false;
 
+    if (!run<SDP_Field_Email_Address_Test>())
+        return false;
+
     std::cout << "SDP field test completed successfully\n";
     return true;
 }
@@ -341,6 +344,39 @@ SDP_Field_URI_Test::SDP_Field_URI_Test()
     field3._field_type     = SDP_FIELD_URI;
     field3._input          = "u=";
     field3._output         = "u=\r\n";
+    field3._field_nb       = 1;
+    field3._decode_success = true;
+    field3._encode_success = true;
+    _field_input_output.push_back(field3);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+SDP_Field_Email_Address_Test::SDP_Field_Email_Address_Test()
+{
+    SDP_Field_Input_Output field1;
+    field1._field_type     = SDP_FIELD_EMAIL_ADDRESS;
+    field1._input          = "e=j.doe@example.com (Jane Doe)";
+    field1._output         = "e=j.doe@example.com (Jane Doe)\r\n";
+    field1._field_nb       = 1;
+    field1._decode_success = true;
+    field1._encode_success = true;
+    _field_input_output.push_back(field1);
+
+    SDP_Field_Input_Output field2;
+    field2._field_type     = SDP_FIELD_EMAIL_ADDRESS;
+    field2._input          = "e=Jane Doe <j.doe@example.com>";
+    field2._output         = "e=Jane Doe <j.doe@example.com>\r\n";
+    field2._field_nb       = 1;
+    field2._decode_success = true;
+    field2._encode_success = true;
+    _field_input_output.push_back(field2);
+
+    SDP_Field_Input_Output field3;
+    field3._field_type     = SDP_FIELD_EMAIL_ADDRESS;
+    field3._input          = "e=test@domain.com";
+    field3._output         = "e=test@domain.com\r\n";
     field3._field_nb       = 1;
     field3._decode_success = true;
     field3._encode_success = true;

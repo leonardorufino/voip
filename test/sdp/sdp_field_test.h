@@ -87,3 +87,11 @@ public:
 };
 
 //-------------------------------------------
+
+class SDP_Field_Email_Address_Test : public SDP_Field_Test
+{
+public:
+    SDP_Field_Email_Address_Test();
+};
+
+//-------------------------------------------
