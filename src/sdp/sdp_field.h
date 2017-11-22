@@ -192,3 +192,24 @@ private:
 };
 
 //-------------------------------------------
+
+class SDP_Field_Phone_Number : public SDP_Field
+{
+public:
+    SDP_Field_Phone_Number() {}
+    SDP_Field_Phone_Number(const SDP_Field_Phone_Number &field) { *this = field; }
+    ~SDP_Field_Phone_Number() {}
+
+    // Virtual pure functions
+    SDP_Field_Type get_field_type() { return SDP_FIELD_PHONE_NUMBER; }
+    bool decode(std::string &msg);
+    bool encode(std::string &msg);
+
+    void set_phone(std::string phone) { _phone = phone; }
+    std::string get_phone() { return _phone; }
+
+private:
+    std::string _phone;
+};
+
+//-------------------------------------------
