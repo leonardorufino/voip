@@ -568,14 +568,23 @@ SIP_Call *SIP_User_Agent::get_call(SIP_Message *msg)
 
     std::string call_id = header_call_id->get_call_id();
     std::string local_tag = (msg->get_message_type() == SIP_RESPONSE) ? header_from->get_tag() : header_to->get_tag();
+    std::string remote_tag = (msg->get_message_type() == SIP_RESPONSE) ? header_to->get_tag() : header_from->get_tag();
 
     std::list<SIP_Call *>::iterator it = _calls.begin();
     while (it != _calls.end())
     {
         SIP_Call *call = *it++;
 
-        if ((call->get_header_call_id() == call_id) && (call->get_local_tag() == local_tag))
-            return call;
+        if (call->get_header_call_id() != call_id)
+            continue;
+
+        if ((!call->get_local_tag().empty()) && (!local_tag.empty()) && (call->get_local_tag() != local_tag))
+            continue;
+
+        if (call->get_local_tag() == remote_tag)
+            continue;
+
+        return call;
     }
 
     return NULL;
