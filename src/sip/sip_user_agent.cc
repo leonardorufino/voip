@@ -198,6 +198,9 @@ bool SIP_User_Agent_Client::send_request(unsigned int call_id, SIP_Request *requ
             call->set_local_tag(header_from->get_tag());
             _user_agent->add_call(call);
             call_created = true;
+
+            logger.trace("New call created to send request (call_id=%d, method=%d) [%s]",
+                         call_id, method, _user_agent->get_id().to_string().c_str());
         }else
         {
             logger.warning("Failed to send request: invalid call (call_id=%d, method=%d) [%s]",
@@ -245,8 +248,8 @@ bool SIP_User_Agent_Client::receive_response(SIP_Response *response)
 
     if (!call->receive_response(response))
     {
-        logger.warning("Failed to receive response: receive response failed (status_code=%d) [%s]",
-                       status_code, _user_agent->get_id().to_string().c_str());
+        logger.warning("Failed to receive response: receive response failed (call_id=%d, status_code=%d) [%s]",
+                       call->get_call_id(), status_code, _user_agent->get_id().to_string().c_str());
         return false;
     }
 
@@ -427,6 +430,9 @@ bool SIP_User_Agent_Server::receive_request(SIP_Request *request)
             call->set_header_call_id(header_call_id->get_call_id());
             _user_agent->add_call(call);
             call_created = true;
+
+            logger.trace("New call created to receive request (call_id=%d, method=%d) [%s]",
+                         new_call_id, method, _user_agent->get_id().to_string().c_str());
         }else
         {
             logger.warning("Failed to receive request: invalid call (method=%d) [%s]",
@@ -437,8 +443,8 @@ bool SIP_User_Agent_Server::receive_request(SIP_Request *request)
 
     if (!call->receive_request(request))
     {
-        logger.warning("Failed to receive request: receive request failed (method=%d) [%s]",
-                       method, _user_agent->get_id().to_string().c_str());
+        logger.warning("Failed to receive request: receive request failed (call_id=%d, method=%d) [%s]",
+                       call->get_call_id(), method, _user_agent->get_id().to_string().c_str());
 
         if (call_created)
             _user_agent->remove_call(call);
