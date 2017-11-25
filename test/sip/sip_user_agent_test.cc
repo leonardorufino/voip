@@ -356,15 +356,15 @@ void SIP_User_Agent_Test::clear_callback_params()
 //-------------------------------------------
 //-------------------------------------------
 
-bool SIP_User_Agent_Test::process_request(unsigned int call_id, SIP_Method_Type method, std::string address, unsigned short port,
-                                          SIP_Transport_Type transport)
+bool SIP_User_Agent_Test::send_request(unsigned int call_id, SIP_Method_Type method, std::string address, unsigned short port,
+                                       SIP_Transport_Type transport)
 {
     SIP_User_Agent_Client &user_agent_client = _user_agent->get_user_agent_client();
 
     SIP_Request *request = user_agent_client.create_request(call_id, method);
     if (!request)
     {
-        std::cout << "SIP_User_Agent_Test::process_request -> Failed to create request (call_id=" << call_id
+        std::cout << "SIP_User_Agent_Test::send_request -> Failed to create request (call_id=" << call_id
                   << ", method=" << method << ")\n";
         return false;
     }
@@ -375,7 +375,7 @@ bool SIP_User_Agent_Test::process_request(unsigned int call_id, SIP_Method_Type 
         SIP_Header_Via *header_via = dynamic_cast<SIP_Header_Via *>(request->get_header(SIP_HEADER_VIA));
         if ((!header_to) || (!header_via))
         {
-            std::cout << "SIP_User_Agent_Test::process_request -> Failed to get headers\n";
+            std::cout << "SIP_User_Agent_Test::send_request -> Failed to get headers\n";
             delete request;
             return false;
         }
@@ -394,25 +394,7 @@ bool SIP_User_Agent_Test::process_request(unsigned int call_id, SIP_Method_Type 
 
     if (!user_agent_client.send_request(call_id, request))
     {
-        std::cout << "SIP_User_Agent_Test::process_request -> Failed to send request (call_id=" << call_id
-                  << ", method=" << method << ")\n";
-        delete request;
-        return false;
-    }
-
-    unsigned long start = Util_Functions::get_tick();
-
-    while ((Util_Functions::get_tick() - start) < MAX_WAIT_TIME)
-    {
-        if ((_call_id_callback != SIP_Object_ID::INVALID_CALL) && (_request_callback))
-            break;
-
-        Util_Functions::delay(DELAY);
-    }
-
-    if ((_call_id_callback == SIP_Object_ID::INVALID_CALL) || (!_request_callback))
-    {
-        std::cout << "SIP_User_Agent_Test::process_request -> Request not received (call_id=" << call_id
+        std::cout << "SIP_User_Agent_Test::send_request -> Failed to send request (call_id=" << call_id
                   << ", method=" << method << ")\n";
         delete request;
         return false;
@@ -424,7 +406,7 @@ bool SIP_User_Agent_Test::process_request(unsigned int call_id, SIP_Method_Type 
 
 //-------------------------------------------
 
-bool SIP_User_Agent_Test::process_response(unsigned int call_id, SIP_Method_Type method, unsigned short status_code)
+bool SIP_User_Agent_Test::send_response(unsigned int call_id, SIP_Method_Type method, unsigned short status_code)
 {
     SIP_Request *request = NULL;
 
@@ -441,7 +423,7 @@ bool SIP_User_Agent_Test::process_response(unsigned int call_id, SIP_Method_Type
 
     if (!request)
     {
-        std::cout << "SIP_User_Agent_Test::process_response -> Invalid request (call_id=" << call_id
+        std::cout << "SIP_User_Agent_Test::send_response -> Invalid request (call_id=" << call_id
                   << ", method=" << method << ", status_code=" << status_code << ")\n";
         return false;
     }
@@ -451,7 +433,7 @@ bool SIP_User_Agent_Test::process_response(unsigned int call_id, SIP_Method_Type
     SIP_Response *response = user_agent_server.create_response(call_id, request, status_code);
     if (!response)
     {
-        std::cout << "SIP_User_Agent_Test::process_response -> Failed to create response (call_id=" << call_id
+        std::cout << "SIP_User_Agent_Test::send_response -> Failed to create response (call_id=" << call_id
                   << ", method=" << method << ", status_code=" << status_code << ")\n";
         return false;
     }
@@ -460,31 +442,67 @@ bool SIP_User_Agent_Test::process_response(unsigned int call_id, SIP_Method_Type
 
     if (!user_agent_server.send_response(call_id, response))
     {
-        std::cout << "SIP_User_Agent_Test::process_response -> Failed to send response (call_id=" << call_id
-                  << ", method=" << method << ", status_code=" << status_code << ")\n";
-        delete response;
-        return false;
-    }
-
-    unsigned long start = Util_Functions::get_tick();
-
-    while ((Util_Functions::get_tick() - start) < MAX_WAIT_TIME)
-    {
-        if ((_call_id_callback != SIP_Object_ID::INVALID_CALL) && (_request_callback) && (_response_callback))
-            break;
-
-        Util_Functions::delay(DELAY);
-    }
-
-    if ((_call_id_callback == SIP_Object_ID::INVALID_CALL) || (!_request_callback) || (!_response_callback))
-    {
-        std::cout << "SIP_User_Agent_Test::process_response -> Response not received (call_id=" << call_id
+        std::cout << "SIP_User_Agent_Test::send_response -> Failed to send response (call_id=" << call_id
                   << ", method=" << method << ", status_code=" << status_code << ")\n";
         delete response;
         return false;
     }
 
     delete response;
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_User_Agent_Test::receive_request(unsigned int call_id, SIP_Method_Type method)
+{
+    unsigned long start = Util_Functions::get_tick();
+
+    while ((Util_Functions::get_tick() - start) < MAX_WAIT_TIME)
+    {
+        if ((((call_id == SIP_Object_ID::INVALID_CALL) && (_call_id_callback != SIP_Object_ID::INVALID_CALL)) ||
+             ((call_id != SIP_Object_ID::INVALID_CALL) && (_call_id_callback == call_id))) &&
+             (_request_callback))
+            break;
+
+        Util_Functions::delay(DELAY);
+    }
+
+    if ((_call_id_callback == SIP_Object_ID::INVALID_CALL) || ((call_id != SIP_Object_ID::INVALID_CALL) && (_call_id_callback != call_id)) ||
+        (!_request_callback))
+    {
+        std::cout << "SIP_User_Agent_Test::receive_request -> Request not received (call_id=" << call_id
+                  << ", method=" << method << ")\n";
+        return false;
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_User_Agent_Test::receive_response(unsigned int call_id, SIP_Method_Type method, unsigned short status_code)
+{
+    unsigned long start = Util_Functions::get_tick();
+
+    while ((Util_Functions::get_tick() - start) < MAX_WAIT_TIME)
+    {
+        if ((((call_id == SIP_Object_ID::INVALID_CALL) && (_call_id_callback != SIP_Object_ID::INVALID_CALL)) ||
+             ((call_id != SIP_Object_ID::INVALID_CALL) && (_call_id_callback == call_id))) &&
+              (_request_callback) && (_response_callback))
+            break;
+
+        Util_Functions::delay(DELAY);
+    }
+
+    if ((_call_id_callback == SIP_Object_ID::INVALID_CALL) || ((call_id != SIP_Object_ID::INVALID_CALL) && (_call_id_callback != call_id)) ||
+        (!_request_callback) || (!_response_callback))
+    {
+        std::cout << "SIP_User_Agent_Test::receive_response -> Response not received (call_id=" << call_id
+                  << ", method=" << method << ", status_code=" << status_code << ")\n";
+        return false;
+    }
+
     return true;
 }
 
@@ -604,43 +622,80 @@ bool SIP_User_Agent_Call_Success_Test::run(Socket::Address_Family family, std::s
         return false;
 
     unsigned int call_id_1 = 0;
+    unsigned int call_id_2 = SIP_Object_ID::INVALID_CALL;
 
-    if (!process_request(call_id_1, SIP_REQUEST_INVITE, address, port, transport))
+    if (!send_request(call_id_1, SIP_REQUEST_INVITE, address, port, transport))
         return false;
 
-    unsigned int call_id_2 = _call_id_callback;
-
-    if (!process_response(call_id_2, SIP_REQUEST_INVITE, 100))
+    if (!receive_request(call_id_2, SIP_REQUEST_INVITE))
         return false;
 
-    if (!process_response(call_id_2, SIP_REQUEST_INVITE, 180))
+    call_id_2 = _call_id_callback;
+
+    if (!send_response(call_id_2, SIP_REQUEST_INVITE, 100))
         return false;
 
-    if (!process_response(call_id_2, SIP_REQUEST_INVITE, 183))
+    if (!receive_response(call_id_1, SIP_REQUEST_INVITE, 100))
         return false;
 
-    if (!process_response(call_id_2, SIP_REQUEST_INVITE, 200))
+    if (!send_response(call_id_2, SIP_REQUEST_INVITE, 180))
         return false;
 
-    if (!process_request(call_id_1, SIP_REQUEST_ACK))
+    if (!receive_response(call_id_1, SIP_REQUEST_INVITE, 180))
         return false;
 
-    if (!process_request(call_id_1, SIP_REQUEST_INFO))
+    if (!send_response(call_id_2, SIP_REQUEST_INVITE, 183))
         return false;
 
-    if (!process_response(call_id_2, SIP_REQUEST_INFO, 200))
+    if (!receive_response(call_id_1, SIP_REQUEST_INVITE, 183))
         return false;
 
-    if (!process_request(call_id_2, SIP_REQUEST_MESSAGE))
+    if (!send_response(call_id_2, SIP_REQUEST_INVITE, 200))
         return false;
 
-    if (!process_response(call_id_1, SIP_REQUEST_MESSAGE, 200))
+    if (!receive_response(call_id_1, SIP_REQUEST_INVITE, 200))
         return false;
 
-    if (!process_request(call_id_1, SIP_REQUEST_BYE))
+    if (!send_request(call_id_1, SIP_REQUEST_ACK))
         return false;
 
-    if (!process_response(call_id_2, SIP_REQUEST_BYE, 200))
+    if (!receive_request(call_id_2, SIP_REQUEST_ACK))
+        return false;
+
+    if (!send_request(call_id_1, SIP_REQUEST_INFO))
+        return false;
+
+    if (!receive_request(call_id_2, SIP_REQUEST_INFO))
+        return false;
+
+    if (!send_response(call_id_2, SIP_REQUEST_INFO, 200))
+        return false;
+
+    if (!receive_response(call_id_1, SIP_REQUEST_INFO, 200))
+        return false;
+
+    if (!send_request(call_id_2, SIP_REQUEST_MESSAGE))
+        return false;
+
+    if (!receive_request(call_id_1, SIP_REQUEST_MESSAGE))
+        return false;
+
+    if (!send_response(call_id_1, SIP_REQUEST_MESSAGE, 200))
+        return false;
+
+    if (!receive_response(call_id_2, SIP_REQUEST_MESSAGE, 200))
+        return false;
+
+    if (!send_request(call_id_1, SIP_REQUEST_BYE))
+        return false;
+
+    if (!receive_request(call_id_2, SIP_REQUEST_BYE))
+        return false;
+
+    if (!send_response(call_id_2, SIP_REQUEST_BYE, 200))
+        return false;
+
+    if (!receive_response(call_id_1, SIP_REQUEST_BYE, 200))
         return false;
 
     if (!close_user_agent())
@@ -662,37 +717,68 @@ bool SIP_User_Agent_Call_Success_No_100_Test::run(Socket::Address_Family family,
         return false;
 
     unsigned int call_id_1 = 0;
+    unsigned int call_id_2 = SIP_Object_ID::INVALID_CALL;
 
-    if (!process_request(call_id_1, SIP_REQUEST_INVITE, address, port, transport))
+    if (!send_request(call_id_1, SIP_REQUEST_INVITE, address, port, transport))
         return false;
 
-    unsigned int call_id_2 = _call_id_callback;
-
-    if (!process_response(call_id_2, SIP_REQUEST_INVITE, 183))
+    if (!receive_request(call_id_2, SIP_REQUEST_INVITE))
         return false;
 
-    if (!process_response(call_id_2, SIP_REQUEST_INVITE, 200))
+    call_id_2 = _call_id_callback;
+
+    if (!send_response(call_id_2, SIP_REQUEST_INVITE, 183))
         return false;
 
-    if (!process_request(call_id_1, SIP_REQUEST_ACK))
+    if (!receive_response(call_id_1, SIP_REQUEST_INVITE, 183))
         return false;
 
-    if (!process_request(call_id_2, SIP_REQUEST_INFO))
+    if (!send_response(call_id_2, SIP_REQUEST_INVITE, 200))
         return false;
 
-    if (!process_response(call_id_1, SIP_REQUEST_INFO, 200))
+    if (!receive_response(call_id_1, SIP_REQUEST_INVITE, 200))
         return false;
 
-    if (!process_request(call_id_1, SIP_REQUEST_MESSAGE))
+    if (!send_request(call_id_1, SIP_REQUEST_ACK))
         return false;
 
-    if (!process_response(call_id_2, SIP_REQUEST_MESSAGE, 200))
+    if (!receive_request(call_id_2, SIP_REQUEST_ACK))
         return false;
 
-    if (!process_request(call_id_2, SIP_REQUEST_BYE))
+    if (!send_request(call_id_2, SIP_REQUEST_INFO))
         return false;
 
-    if (!process_response(call_id_1, SIP_REQUEST_BYE, 200))
+    if (!receive_request(call_id_1, SIP_REQUEST_INFO))
+        return false;
+
+    if (!send_response(call_id_1, SIP_REQUEST_INFO, 200))
+        return false;
+
+    if (!receive_response(call_id_2, SIP_REQUEST_INFO, 200))
+        return false;
+
+    if (!send_request(call_id_1, SIP_REQUEST_MESSAGE))
+        return false;
+
+    if (!receive_request(call_id_2, SIP_REQUEST_MESSAGE))
+        return false;
+
+    if (!send_response(call_id_2, SIP_REQUEST_MESSAGE, 200))
+        return false;
+
+    if (!receive_response(call_id_1, SIP_REQUEST_MESSAGE, 200))
+        return false;
+
+    if (!send_request(call_id_2, SIP_REQUEST_BYE))
+        return false;
+
+    if (!receive_request(call_id_1, SIP_REQUEST_BYE))
+        return false;
+
+    if (!send_response(call_id_1, SIP_REQUEST_BYE, 200))
+        return false;
+
+    if (!receive_response(call_id_2, SIP_REQUEST_BYE, 200))
         return false;
 
     if (!close_user_agent())
@@ -714,22 +800,38 @@ bool SIP_User_Agent_Call_Success_No_1xx_Test::run(Socket::Address_Family family,
         return false;
 
     unsigned int call_id_1 = 0;
+    unsigned int call_id_2 = SIP_Object_ID::INVALID_CALL;
 
-    if (!process_request(call_id_1, SIP_REQUEST_INVITE, address, port, transport))
+    if (!send_request(call_id_1, SIP_REQUEST_INVITE, address, port, transport))
         return false;
 
-    unsigned int call_id_2 = _call_id_callback;
-
-    if (!process_response(call_id_2, SIP_REQUEST_INVITE, 200))
+    if (!receive_request(call_id_2, SIP_REQUEST_INVITE))
         return false;
 
-    if (!process_request(call_id_1, SIP_REQUEST_ACK))
+    call_id_2 = _call_id_callback;
+
+    if (!send_response(call_id_2, SIP_REQUEST_INVITE, 200))
         return false;
 
-    if (!process_request(call_id_1, SIP_REQUEST_BYE))
+    if (!receive_response(call_id_1, SIP_REQUEST_INVITE, 200))
         return false;
 
-    if (!process_response(call_id_2, SIP_REQUEST_BYE, 200))
+    if (!send_request(call_id_1, SIP_REQUEST_ACK))
+        return false;
+
+    if (!receive_request(call_id_2, SIP_REQUEST_ACK))
+        return false;
+
+    if (!send_request(call_id_1, SIP_REQUEST_BYE))
+        return false;
+
+    if (!receive_request(call_id_2, SIP_REQUEST_BYE))
+        return false;
+
+    if (!send_response(call_id_2, SIP_REQUEST_BYE, 200))
+        return false;
+
+    if (!receive_response(call_id_1, SIP_REQUEST_BYE, 200))
         return false;
 
     if (!close_user_agent())
@@ -751,22 +853,38 @@ bool SIP_User_Agent_Call_Reject_Test::run(Socket::Address_Family family, std::st
         return false;
 
     unsigned int call_id_1 = 0;
+    unsigned int call_id_2 = SIP_Object_ID::INVALID_CALL;
 
-    if (!process_request(call_id_1, SIP_REQUEST_INVITE, address, port, transport))
+    if (!send_request(call_id_1, SIP_REQUEST_INVITE, address, port, transport))
         return false;
 
-    unsigned int call_id_2 = _call_id_callback;
-
-    if (!process_response(call_id_2, SIP_REQUEST_INVITE, 100))
+    if (!receive_request(call_id_2, SIP_REQUEST_INVITE))
         return false;
 
-    if (!process_response(call_id_2, SIP_REQUEST_INVITE, 180))
+    call_id_2 = _call_id_callback;
+
+    if (!send_response(call_id_2, SIP_REQUEST_INVITE, 100))
         return false;
 
-    if (!process_response(call_id_2, SIP_REQUEST_INVITE, 183))
+    if (!receive_response(call_id_1, SIP_REQUEST_INVITE, 100))
         return false;
 
-    if (!process_response(call_id_2, SIP_REQUEST_INVITE, 480))
+    if (!send_response(call_id_2, SIP_REQUEST_INVITE, 180))
+        return false;
+
+    if (!receive_response(call_id_1, SIP_REQUEST_INVITE, 180))
+        return false;
+
+    if (!send_response(call_id_2, SIP_REQUEST_INVITE, 183))
+        return false;
+
+    if (!receive_response(call_id_1, SIP_REQUEST_INVITE, 183))
+        return false;
+
+    if (!send_response(call_id_2, SIP_REQUEST_INVITE, 480))
+        return false;
+
+    if (!receive_response(call_id_1, SIP_REQUEST_INVITE, 480))
         return false;
 
     if (!close_user_agent())
@@ -788,16 +906,26 @@ bool SIP_User_Agent_Call_Reject_No_100_Test::run(Socket::Address_Family family, 
         return false;
 
     unsigned int call_id_1 = 0;
+    unsigned int call_id_2 = SIP_Object_ID::INVALID_CALL;
 
-    if (!process_request(call_id_1, SIP_REQUEST_INVITE, address, port, transport))
+    if (!send_request(call_id_1, SIP_REQUEST_INVITE, address, port, transport))
         return false;
 
-    unsigned int call_id_2 = _call_id_callback;
-
-    if (!process_response(call_id_2, SIP_REQUEST_INVITE, 183))
+    if (!receive_request(call_id_2, SIP_REQUEST_INVITE))
         return false;
 
-    if (!process_response(call_id_2, SIP_REQUEST_INVITE, 480))
+    call_id_2 = _call_id_callback;
+
+    if (!send_response(call_id_2, SIP_REQUEST_INVITE, 183))
+        return false;
+
+    if (!receive_response(call_id_1, SIP_REQUEST_INVITE, 183))
+        return false;
+
+    if (!send_response(call_id_2, SIP_REQUEST_INVITE, 480))
+        return false;
+
+    if (!receive_response(call_id_1, SIP_REQUEST_INVITE, 480))
         return false;
 
     if (!close_user_agent())
@@ -819,13 +947,20 @@ bool SIP_User_Agent_Call_Reject_No_1xx_Test::run(Socket::Address_Family family, 
         return false;
 
     unsigned int call_id_1 = 0;
+    unsigned int call_id_2 = SIP_Object_ID::INVALID_CALL;
 
-    if (!process_request(call_id_1, SIP_REQUEST_INVITE, address, port, transport))
+    if (!send_request(call_id_1, SIP_REQUEST_INVITE, address, port, transport))
         return false;
 
-    unsigned int call_id_2 = _call_id_callback;
+    if (!receive_request(call_id_2, SIP_REQUEST_INVITE))
+        return false;
 
-    if (!process_response(call_id_2, SIP_REQUEST_INVITE, 480))
+    call_id_2 = _call_id_callback;
+
+    if (!send_response(call_id_2, SIP_REQUEST_INVITE, 480))
+        return false;
+
+    if (!receive_response(call_id_1, SIP_REQUEST_INVITE, 480))
         return false;
 
     if (!close_user_agent())
@@ -848,7 +983,10 @@ bool SIP_User_Agent_Call_No_Answer_Test::run(Socket::Address_Family family, std:
 
     unsigned int call_id_1 = 0;
 
-    if (!process_request(call_id_1, SIP_REQUEST_INVITE, address, port, transport))
+    if (!send_request(call_id_1, SIP_REQUEST_INVITE, address, port, transport))
+        return false;
+
+    if (!receive_request(SIP_Object_ID::INVALID_CALL, SIP_REQUEST_INVITE))
         return false;
 
     if (!wait_timeout(call_id_1))
@@ -873,43 +1011,80 @@ bool SIP_User_Agent_Call_Update_Test::run(Socket::Address_Family family, std::st
         return false;
 
     unsigned int call_id_1 = 0;
+    unsigned int call_id_2 = SIP_Object_ID::INVALID_CALL;
 
-    if (!process_request(call_id_1, SIP_REQUEST_INVITE, address, port, transport))
+    if (!send_request(call_id_1, SIP_REQUEST_INVITE, address, port, transport))
         return false;
 
-    unsigned int call_id_2 = _call_id_callback;
-
-    if (!process_response(call_id_2, SIP_REQUEST_INVITE, 100))
+    if (!receive_request(call_id_2, SIP_REQUEST_INVITE))
         return false;
 
-    if (!process_response(call_id_2, SIP_REQUEST_INVITE, 180))
+    call_id_2 = _call_id_callback;
+
+    if (!send_response(call_id_2, SIP_REQUEST_INVITE, 100))
         return false;
 
-    if (!process_response(call_id_2, SIP_REQUEST_INVITE, 183))
+    if (!receive_response(call_id_1, SIP_REQUEST_INVITE, 100))
         return false;
 
-    if (!process_request(call_id_1, SIP_REQUEST_UPDATE))
+    if (!send_response(call_id_2, SIP_REQUEST_INVITE, 180))
         return false;
 
-    if (!process_response(call_id_2, SIP_REQUEST_UPDATE, 200))
+    if (!receive_response(call_id_1, SIP_REQUEST_INVITE, 180))
         return false;
 
-    if (!process_request(call_id_2, SIP_REQUEST_UPDATE))
+    if (!send_response(call_id_2, SIP_REQUEST_INVITE, 183))
         return false;
 
-    if (!process_response(call_id_1, SIP_REQUEST_UPDATE, 200))
+    if (!receive_response(call_id_1, SIP_REQUEST_INVITE, 183))
         return false;
 
-    if (!process_response(call_id_2, SIP_REQUEST_INVITE, 200))
+    if (!send_request(call_id_1, SIP_REQUEST_UPDATE))
         return false;
 
-    if (!process_request(call_id_1, SIP_REQUEST_ACK))
+    if (!receive_request(call_id_2, SIP_REQUEST_UPDATE))
         return false;
 
-    if (!process_request(call_id_1, SIP_REQUEST_BYE))
+    if (!send_response(call_id_2, SIP_REQUEST_UPDATE, 200))
         return false;
 
-    if (!process_response(call_id_2, SIP_REQUEST_BYE, 200))
+    if (!receive_response(call_id_1, SIP_REQUEST_UPDATE, 200))
+        return false;
+
+    if (!send_request(call_id_2, SIP_REQUEST_UPDATE))
+        return false;
+
+    if (!receive_request(call_id_1, SIP_REQUEST_UPDATE))
+        return false;
+
+    if (!send_response(call_id_1, SIP_REQUEST_UPDATE, 200))
+        return false;
+
+    if (!receive_response(call_id_2, SIP_REQUEST_UPDATE, 200))
+        return false;
+
+    if (!send_response(call_id_2, SIP_REQUEST_INVITE, 200))
+        return false;
+
+    if (!receive_response(call_id_1, SIP_REQUEST_INVITE, 200))
+        return false;
+
+    if (!send_request(call_id_1, SIP_REQUEST_ACK))
+        return false;
+
+    if (!receive_request(call_id_2, SIP_REQUEST_ACK))
+        return false;
+
+    if (!send_request(call_id_1, SIP_REQUEST_BYE))
+        return false;
+
+    if (!receive_request(call_id_2, SIP_REQUEST_BYE))
+        return false;
+
+    if (!send_response(call_id_2, SIP_REQUEST_BYE, 200))
+        return false;
+
+    if (!receive_response(call_id_1, SIP_REQUEST_BYE, 200))
         return false;
 
     if (!close_user_agent())
@@ -931,28 +1106,50 @@ bool SIP_User_Agent_Call_Cancel_Test::run(Socket::Address_Family family, std::st
         return false;
 
     unsigned int call_id_1 = 0;
+    unsigned int call_id_2 = SIP_Object_ID::INVALID_CALL;
 
-    if (!process_request(call_id_1, SIP_REQUEST_INVITE, address, port, transport))
+    if (!send_request(call_id_1, SIP_REQUEST_INVITE, address, port, transport))
         return false;
 
-    unsigned int call_id_2 = _call_id_callback;
-
-    if (!process_response(call_id_2, SIP_REQUEST_INVITE, 100))
+    if (!receive_request(call_id_2, SIP_REQUEST_INVITE))
         return false;
 
-    if (!process_response(call_id_2, SIP_REQUEST_INVITE, 180))
+    call_id_2 = _call_id_callback;
+
+    if (!send_response(call_id_2, SIP_REQUEST_INVITE, 100))
         return false;
 
-    if (!process_response(call_id_2, SIP_REQUEST_INVITE, 183))
+    if (!receive_response(call_id_1, SIP_REQUEST_INVITE, 100))
         return false;
 
-    if (!process_request(call_id_1, SIP_REQUEST_CANCEL))
+    if (!send_response(call_id_2, SIP_REQUEST_INVITE, 180))
         return false;
 
-    if (!process_response(call_id_2, SIP_REQUEST_CANCEL, 200))
+    if (!receive_response(call_id_1, SIP_REQUEST_INVITE, 180))
         return false;
 
-    if (!process_response(call_id_2, SIP_REQUEST_INVITE, 487))
+    if (!send_response(call_id_2, SIP_REQUEST_INVITE, 183))
+        return false;
+
+    if (!receive_response(call_id_1, SIP_REQUEST_INVITE, 183))
+        return false;
+
+    if (!send_request(call_id_1, SIP_REQUEST_CANCEL))
+        return false;
+
+    if (!receive_request(call_id_2, SIP_REQUEST_CANCEL))
+        return false;
+
+    if (!send_response(call_id_2, SIP_REQUEST_CANCEL, 200))
+        return false;
+
+    if (!receive_response(call_id_1, SIP_REQUEST_CANCEL, 200))
+        return false;
+
+    if (!send_response(call_id_2, SIP_REQUEST_INVITE, 487))
+        return false;
+
+    if (!receive_response(call_id_1, SIP_REQUEST_INVITE, 487))
         return false;
 
     if (!close_user_agent())
@@ -974,43 +1171,80 @@ bool SIP_User_Agent_Call_Prack_Test::run(Socket::Address_Family family, std::str
         return false;
 
     unsigned int call_id_1 = 0;
+    unsigned int call_id_2 = SIP_Object_ID::INVALID_CALL;
 
-    if (!process_request(call_id_1, SIP_REQUEST_INVITE, address, port, transport))
+    if (!send_request(call_id_1, SIP_REQUEST_INVITE, address, port, transport))
         return false;
 
-    unsigned int call_id_2 = _call_id_callback;
-
-    if (!process_response(call_id_2, SIP_REQUEST_INVITE, 100))
+    if (!receive_request(call_id_2, SIP_REQUEST_INVITE))
         return false;
 
-    if (!process_response(call_id_2, SIP_REQUEST_INVITE, 180))
+    call_id_2 = _call_id_callback;
+
+    if (!send_response(call_id_2, SIP_REQUEST_INVITE, 100))
         return false;
 
-    if (!process_request(call_id_1, SIP_REQUEST_PRACK))
+    if (!receive_response(call_id_1, SIP_REQUEST_INVITE, 100))
         return false;
 
-    if (!process_response(call_id_2, SIP_REQUEST_PRACK, 200))
+    if (!send_response(call_id_2, SIP_REQUEST_INVITE, 180))
         return false;
 
-    if (!process_response(call_id_2, SIP_REQUEST_INVITE, 183))
+    if (!receive_response(call_id_1, SIP_REQUEST_INVITE, 180))
         return false;
 
-    if (!process_request(call_id_1, SIP_REQUEST_PRACK))
+    if (!send_request(call_id_1, SIP_REQUEST_PRACK))
         return false;
 
-    if (!process_response(call_id_2, SIP_REQUEST_PRACK, 200))
+    if (!receive_request(call_id_2, SIP_REQUEST_PRACK))
         return false;
 
-    if (!process_response(call_id_2, SIP_REQUEST_INVITE, 200))
+    if (!send_response(call_id_2, SIP_REQUEST_PRACK, 200))
         return false;
 
-    if (!process_request(call_id_1, SIP_REQUEST_ACK))
+    if (!receive_response(call_id_1, SIP_REQUEST_PRACK, 200))
         return false;
 
-    if (!process_request(call_id_1, SIP_REQUEST_BYE))
+    if (!send_response(call_id_2, SIP_REQUEST_INVITE, 183))
         return false;
 
-    if (!process_response(call_id_2, SIP_REQUEST_BYE, 200))
+    if (!receive_response(call_id_1, SIP_REQUEST_INVITE, 183))
+        return false;
+
+    if (!send_request(call_id_1, SIP_REQUEST_PRACK))
+        return false;
+
+    if (!receive_request(call_id_2, SIP_REQUEST_PRACK))
+        return false;
+
+    if (!send_response(call_id_2, SIP_REQUEST_PRACK, 200))
+        return false;
+
+    if (!receive_response(call_id_1, SIP_REQUEST_PRACK, 200))
+        return false;
+
+    if (!send_response(call_id_2, SIP_REQUEST_INVITE, 200))
+        return false;
+
+    if (!receive_response(call_id_1, SIP_REQUEST_INVITE, 200))
+        return false;
+
+    if (!send_request(call_id_1, SIP_REQUEST_ACK))
+        return false;
+
+    if (!receive_request(call_id_2, SIP_REQUEST_ACK))
+        return false;
+
+    if (!send_request(call_id_1, SIP_REQUEST_BYE))
+        return false;
+
+    if (!receive_request(call_id_2, SIP_REQUEST_BYE))
+        return false;
+
+    if (!send_response(call_id_2, SIP_REQUEST_BYE, 200))
+        return false;
+
+    if (!receive_response(call_id_1, SIP_REQUEST_BYE, 200))
         return false;
 
     if (!close_user_agent())
@@ -1032,40 +1266,74 @@ bool SIP_User_Agent_Call_Prack_No_100_Test::run(Socket::Address_Family family, s
         return false;
 
     unsigned int call_id_1 = 0;
+    unsigned int call_id_2 = SIP_Object_ID::INVALID_CALL;
 
-    if (!process_request(call_id_1, SIP_REQUEST_INVITE, address, port, transport))
+    if (!send_request(call_id_1, SIP_REQUEST_INVITE, address, port, transport))
         return false;
 
-    unsigned int call_id_2 = _call_id_callback;
-
-    if (!process_response(call_id_2, SIP_REQUEST_INVITE, 180))
+    if (!receive_request(call_id_2, SIP_REQUEST_INVITE))
         return false;
 
-    if (!process_request(call_id_1, SIP_REQUEST_PRACK))
+    call_id_2 = _call_id_callback;
+
+    if (!send_response(call_id_2, SIP_REQUEST_INVITE, 180))
         return false;
 
-    if (!process_response(call_id_2, SIP_REQUEST_PRACK, 200))
+    if (!receive_response(call_id_1, SIP_REQUEST_INVITE, 180))
         return false;
 
-    if (!process_response(call_id_2, SIP_REQUEST_INVITE, 183))
+    if (!send_request(call_id_1, SIP_REQUEST_PRACK))
         return false;
 
-    if (!process_request(call_id_1, SIP_REQUEST_PRACK))
+    if (!receive_request(call_id_2, SIP_REQUEST_PRACK))
         return false;
 
-    if (!process_response(call_id_2, SIP_REQUEST_PRACK, 200))
+    if (!send_response(call_id_2, SIP_REQUEST_PRACK, 200))
         return false;
 
-    if (!process_response(call_id_2, SIP_REQUEST_INVITE, 200))
+    if (!receive_response(call_id_1, SIP_REQUEST_PRACK, 200))
         return false;
 
-    if (!process_request(call_id_1, SIP_REQUEST_ACK))
+    if (!send_response(call_id_2, SIP_REQUEST_INVITE, 183))
         return false;
 
-    if (!process_request(call_id_2, SIP_REQUEST_BYE))
+    if (!receive_response(call_id_1, SIP_REQUEST_INVITE, 183))
         return false;
 
-    if (!process_response(call_id_1, SIP_REQUEST_BYE, 200))
+    if (!send_request(call_id_1, SIP_REQUEST_PRACK))
+        return false;
+
+    if (!receive_request(call_id_2, SIP_REQUEST_PRACK))
+        return false;
+
+    if (!send_response(call_id_2, SIP_REQUEST_PRACK, 200))
+        return false;
+
+    if (!receive_response(call_id_1, SIP_REQUEST_PRACK, 200))
+        return false;
+
+    if (!send_response(call_id_2, SIP_REQUEST_INVITE, 200))
+        return false;
+
+    if (!receive_response(call_id_1, SIP_REQUEST_INVITE, 200))
+        return false;
+
+    if (!send_request(call_id_1, SIP_REQUEST_ACK))
+        return false;
+
+    if (!receive_request(call_id_2, SIP_REQUEST_ACK))
+        return false;
+
+    if (!send_request(call_id_2, SIP_REQUEST_BYE))
+        return false;
+
+    if (!receive_request(call_id_1, SIP_REQUEST_BYE))
+        return false;
+
+    if (!send_response(call_id_1, SIP_REQUEST_BYE, 200))
+        return false;
+
+    if (!receive_response(call_id_2, SIP_REQUEST_BYE, 200))
         return false;
 
     if (!close_user_agent())
@@ -1087,13 +1355,20 @@ bool SIP_User_Agent_Register_Test::run(Socket::Address_Family family, std::strin
         return false;
 
     unsigned int call_id_1 = 0;
+    unsigned int call_id_2 = SIP_Object_ID::INVALID_CALL;
 
-    if (!process_request(call_id_1, SIP_REQUEST_REGISTER, address, port, transport))
+    if (!send_request(call_id_1, SIP_REQUEST_REGISTER, address, port, transport))
         return false;
 
-    unsigned int call_id_2 = _call_id_callback;
+    if (!receive_request(call_id_2, SIP_REQUEST_REGISTER))
+        return false;
 
-    if (!process_response(call_id_2, SIP_REQUEST_REGISTER, 200))
+    call_id_2 = _call_id_callback;
+
+    if (!send_response(call_id_2, SIP_REQUEST_REGISTER, 200))
+        return false;
+
+    if (!receive_response(call_id_1, SIP_REQUEST_REGISTER, 200))
         return false;
 
     if (!close_user_agent())
@@ -1115,16 +1390,26 @@ bool SIP_User_Agent_Register_With_100_Test::run(Socket::Address_Family family, s
         return false;
 
     unsigned int call_id_1 = 0;
+    unsigned int call_id_2 = SIP_Object_ID::INVALID_CALL;
 
-    if (!process_request(call_id_1, SIP_REQUEST_REGISTER, address, port, transport))
+    if (!send_request(call_id_1, SIP_REQUEST_REGISTER, address, port, transport))
         return false;
 
-    unsigned int call_id_2 = _call_id_callback;
-
-    if (!process_response(call_id_2, SIP_REQUEST_REGISTER, 100))
+    if (!receive_request(call_id_2, SIP_REQUEST_REGISTER))
         return false;
 
-    if (!process_response(call_id_2, SIP_REQUEST_REGISTER, 200))
+    call_id_2 = _call_id_callback;
+
+    if (!send_response(call_id_2, SIP_REQUEST_REGISTER, 100))
+        return false;
+
+    if (!receive_response(call_id_1, SIP_REQUEST_REGISTER, 100))
+        return false;
+
+    if (!send_response(call_id_2, SIP_REQUEST_REGISTER, 200))
+        return false;
+
+    if (!receive_response(call_id_1, SIP_REQUEST_REGISTER, 200))
         return false;
 
     if (!close_user_agent())
@@ -1146,13 +1431,20 @@ bool SIP_User_Agent_Register_Reject_Test::run(Socket::Address_Family family, std
         return false;
 
     unsigned int call_id_1 = 0;
+    unsigned int call_id_2 = SIP_Object_ID::INVALID_CALL;
 
-    if (!process_request(call_id_1, SIP_REQUEST_REGISTER, address, port, transport))
+    if (!send_request(call_id_1, SIP_REQUEST_REGISTER, address, port, transport))
         return false;
 
-    unsigned int call_id_2 = _call_id_callback;
+    if (!receive_request(call_id_2, SIP_REQUEST_REGISTER))
+        return false;
 
-    if (!process_response(call_id_2, SIP_REQUEST_REGISTER, 401))
+    call_id_2 = _call_id_callback;
+
+    if (!send_response(call_id_2, SIP_REQUEST_REGISTER, 401))
+        return false;
+
+    if (!receive_response(call_id_1, SIP_REQUEST_REGISTER, 401))
         return false;
 
     if (!close_user_agent())
@@ -1174,13 +1466,20 @@ bool SIP_User_Agent_Options_Test::run(Socket::Address_Family family, std::string
         return false;
 
     unsigned int call_id_1 = 0;
+    unsigned int call_id_2 = SIP_Object_ID::INVALID_CALL;
 
-    if (!process_request(call_id_1, SIP_REQUEST_OPTIONS, address, port, transport))
+    if (!send_request(call_id_1, SIP_REQUEST_OPTIONS, address, port, transport))
         return false;
 
-    unsigned int call_id_2 = _call_id_callback;
+    if (!receive_request(call_id_2, SIP_REQUEST_OPTIONS))
+        return false;
 
-    if (!process_response(call_id_2, SIP_REQUEST_OPTIONS, 200))
+    call_id_2 = _call_id_callback;
+
+    if (!send_response(call_id_2, SIP_REQUEST_OPTIONS, 200))
+        return false;
+
+    if (!receive_response(call_id_1, SIP_REQUEST_OPTIONS, 200))
         return false;
 
     if (!close_user_agent())
@@ -1202,16 +1501,26 @@ bool SIP_User_Agent_Options_With_100_Test::run(Socket::Address_Family family, st
         return false;
 
     unsigned int call_id_1 = 0;
+    unsigned int call_id_2 = SIP_Object_ID::INVALID_CALL;
 
-    if (!process_request(call_id_1, SIP_REQUEST_OPTIONS, address, port, transport))
+    if (!send_request(call_id_1, SIP_REQUEST_OPTIONS, address, port, transport))
         return false;
 
-    unsigned int call_id_2 = _call_id_callback;
-
-    if (!process_response(call_id_2, SIP_REQUEST_OPTIONS, 100))
+    if (!receive_request(call_id_2, SIP_REQUEST_OPTIONS))
         return false;
 
-    if (!process_response(call_id_2, SIP_REQUEST_OPTIONS, 200))
+    call_id_2 = _call_id_callback;
+
+    if (!send_response(call_id_2, SIP_REQUEST_OPTIONS, 100))
+        return false;
+
+    if (!receive_response(call_id_1, SIP_REQUEST_OPTIONS, 100))
+        return false;
+
+    if (!send_response(call_id_2, SIP_REQUEST_OPTIONS, 200))
+        return false;
+
+    if (!receive_response(call_id_1, SIP_REQUEST_OPTIONS, 200))
         return false;
 
     if (!close_user_agent())
