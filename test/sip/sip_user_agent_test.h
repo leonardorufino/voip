@@ -16,6 +16,7 @@
 #include "util/util_functions.h"
 #include <iomanip>
 #include <thread>
+#include <mutex>
 
 class SIP_User_Agent_Test
 {
@@ -63,6 +64,8 @@ protected:
     std::list<SIP_Request *> _received_requests;
     SIP_Request *_request_callback;
     SIP_Response *_response_callback;
+
+    std::mutex _thread_mutex;
 
 private:
     std::thread _thread;

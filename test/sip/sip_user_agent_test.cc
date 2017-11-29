@@ -291,9 +291,11 @@ void SIP_User_Agent_Test::thread(SIP_User_Agent_Test *test)
 
     while (!test->_stop_thread)
     {
+        Util_Functions::delay(THREAD_DELAY);
+
+        std::lock_guard<std::mutex> lock(test->_thread_mutex);
         timer.run();
         socket.run();
-        Util_Functions::delay(THREAD_DELAY);
     }
 }
 
@@ -301,6 +303,8 @@ void SIP_User_Agent_Test::thread(SIP_User_Agent_Test *test)
 
 bool SIP_User_Agent_Test::init_user_agent(std::string address, unsigned short port)
 {
+    std::lock_guard<std::mutex> lock(_thread_mutex);
+
     set_callbacks();
 
     if (!_user_agent->init(address, port))
@@ -316,6 +320,8 @@ bool SIP_User_Agent_Test::init_user_agent(std::string address, unsigned short po
 
 bool SIP_User_Agent_Test::close_user_agent()
 {
+    std::lock_guard<std::mutex> lock(_thread_mutex);
+
     if (!_user_agent->close())
     {
         std::cout << "SIP_User_Agent_Invite_UDP_Test::close_user_agent -> Failed to close user agent\n";
@@ -359,6 +365,8 @@ void SIP_User_Agent_Test::clear_callback_params()
 bool SIP_User_Agent_Test::send_request(unsigned int call_id, SIP_Method_Type method, std::string address, unsigned short port,
                                        SIP_Transport_Type transport)
 {
+    std::lock_guard<std::mutex> lock(_thread_mutex);
+
     SIP_User_Agent_Client &user_agent_client = _user_agent->get_user_agent_client();
 
     SIP_Request *request = user_agent_client.create_request(call_id, method);
@@ -408,6 +416,8 @@ bool SIP_User_Agent_Test::send_request(unsigned int call_id, SIP_Method_Type met
 
 bool SIP_User_Agent_Test::send_response(unsigned int call_id, SIP_Method_Type method, unsigned short status_code)
 {
+    std::lock_guard<std::mutex> lock(_thread_mutex);
+
     SIP_Request *request = NULL;
 
     std::list<SIP_Request *>::reverse_iterator it = _received_requests.rbegin();
