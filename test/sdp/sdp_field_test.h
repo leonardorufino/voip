@@ -95,3 +95,11 @@ public:
 };
 
 //-------------------------------------------
+
+class SDP_Field_Phone_Number_Test : public SDP_Field_Test
+{
+public:
+    SDP_Field_Phone_Number_Test();
+};
+
+//-------------------------------------------

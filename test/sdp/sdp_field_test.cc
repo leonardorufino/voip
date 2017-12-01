@@ -35,6 +35,9 @@ bool SDP_Field_Test::init()
     if (!run<SDP_Field_Email_Address_Test>())
         return false;
 
+    if (!run<SDP_Field_Phone_Number_Test>())
+        return false;
+
     std::cout << "SDP field test completed successfully\n";
     return true;
 }
@@ -377,6 +380,39 @@ SDP_Field_Email_Address_Test::SDP_Field_Email_Address_Test()
     field3._field_type     = SDP_FIELD_EMAIL_ADDRESS;
     field3._input          = "e=test@domain.com";
     field3._output         = "e=test@domain.com\r\n";
+    field3._field_nb       = 1;
+    field3._decode_success = true;
+    field3._encode_success = true;
+    _field_input_output.push_back(field3);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+SDP_Field_Phone_Number_Test::SDP_Field_Phone_Number_Test()
+{
+    SDP_Field_Input_Output field1;
+    field1._field_type     = SDP_FIELD_PHONE_NUMBER;
+    field1._input          = "p=+1 617 555-6011";
+    field1._output         = "p=+1 617 555-6011\r\n";
+    field1._field_nb       = 1;
+    field1._decode_success = true;
+    field1._encode_success = true;
+    _field_input_output.push_back(field1);
+
+    SDP_Field_Input_Output field2;
+    field2._field_type     = SDP_FIELD_PHONE_NUMBER;
+    field2._input          = "p=9876543210 (Jane Doe)";
+    field2._output         = "p=9876543210 (Jane Doe)\r\n";
+    field2._field_nb       = 1;
+    field2._decode_success = true;
+    field2._encode_success = true;
+    _field_input_output.push_back(field2);
+
+    SDP_Field_Input_Output field3;
+    field3._field_type     = SDP_FIELD_PHONE_NUMBER;
+    field3._input          = "p=Jane Doe <+1 234 567-8900>";
+    field3._output         = "p=Jane Doe <+1 234 567-8900>\r\n";
     field3._field_nb       = 1;
     field3._decode_success = true;
     field3._encode_success = true;
