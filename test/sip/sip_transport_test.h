@@ -63,6 +63,8 @@ protected:
     std::string _received_address;
     unsigned short _received_port;
 
+    std::mutex _thread_mutex;
+
 private:
     std::thread _thread;
     bool _stop_thread;
@@ -76,6 +78,10 @@ class SIP_Transport_UDP_Test : public SIP_Transport_Test
 public:
     SIP_Transport_UDP_Test();
     virtual ~SIP_Transport_UDP_Test();
+
+    bool init(std::string address, unsigned short port);
+    bool send_message(const char *buffer, int size, std::string address, unsigned short port);
+    bool close();
 
     bool run(Socket::Address_Family family, std::string address, unsigned short port);
     SIP_Transport *get_transport() { return _transport_udp; }
@@ -92,6 +98,12 @@ class SIP_Transport_TCP_Test : public SIP_Transport_Test
 public:
     SIP_Transport_TCP_Test();
     virtual ~SIP_Transport_TCP_Test();
+
+    bool init(std::string address, unsigned short port);
+    bool listen(int backlog);
+    bool connect(std::string address, unsigned short port);
+    bool send_message(const char *buffer, int size, std::string address, unsigned short port);
+    bool close();
 
     bool run(Socket::Address_Family family, std::string address, unsigned short port);
     SIP_Transport *get_transport() { return _current_transport; }

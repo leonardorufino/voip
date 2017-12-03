@@ -81,8 +81,10 @@ void SIP_Transport_Test::thread(SIP_Transport_Test *test)
 
     while (!test->_stop_thread)
     {
-        socket.run();
         Util_Functions::delay(THREAD_DELAY);
+
+        std::lock_guard<std::mutex> lock(test->_thread_mutex);
+        socket.run();
     }
 }
 
@@ -253,6 +255,51 @@ SIP_Transport_UDP_Test::~SIP_Transport_UDP_Test()
 
 //-------------------------------------------
 
+bool SIP_Transport_UDP_Test::init(std::string address, unsigned short port)
+{
+    std::lock_guard<std::mutex> lock(_thread_mutex);
+
+    if (!_transport_udp->init(address, port))
+    {
+        std::cout << "SIP_Transport_UDP_Test::init -> Failed to init transport\n";
+        return false;
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Transport_UDP_Test::send_message(const char *buffer, int size, std::string address, unsigned short port)
+{
+    std::lock_guard<std::mutex> lock(_thread_mutex);
+
+    if (!_transport_udp->send_message(buffer, size, address, port))
+    {
+        std::cout << "SIP_Transport_UDP_Test::send_message -> Failed to send message\n";
+        return false;
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Transport_UDP_Test::close()
+{
+    std::lock_guard<std::mutex> lock(_thread_mutex);
+
+    if (!_transport_udp->close())
+    {
+        std::cout << "SIP_Transport_UDP_Test::close -> Failed to close transport\n";
+        return false;
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+
 bool SIP_Transport_UDP_Test::run(Socket::Address_Family family, std::string address, unsigned short port)
 {
     std::cout << "SIP transport UDP test initialized\n";
@@ -266,11 +313,8 @@ bool SIP_Transport_UDP_Test::run(Socket::Address_Family family, std::string addr
     if (!set_callbacks())
         return false;
 
-    if (!_transport_udp->init(address, port))
-    {
-        std::cout << "SIP_Transport_UDP_Test::run -> Failed to init transport\n";
+    if (!init(address, port))
         return false;
-    }
 
     std::string request = create_request();
 
@@ -279,11 +323,8 @@ bool SIP_Transport_UDP_Test::run(Socket::Address_Family family, std::string addr
     _received_address.clear();
     _received_port = SIP_Transport::INVALID_PORT;
 
-    if (!_transport_udp->send_message(request.c_str(), (int) request.size(), address, port))
-    {
-        std::cout << "SIP_Transport_UDP_Test::run -> Failed to send message\n";
+    if (!send_message(request.c_str(), (int) request.size(), address, port))
         return false;
-    }
 
     unsigned long start = Util_Functions::get_tick();
 
@@ -319,11 +360,8 @@ bool SIP_Transport_UDP_Test::run(Socket::Address_Family family, std::string addr
         return false;
     }
 
-    if (!_transport_udp->close())
-    {
-        std::cout << "SIP_Transport_UDP_Test::run -> Failed to close transport\n";
+    if (!close())
         return false;
-    }
 
     std::cout << "SIP transport UDP test completed successfully\n";
     return true;
@@ -356,6 +394,99 @@ SIP_Transport_TCP_Test::~SIP_Transport_TCP_Test()
 
 //-------------------------------------------
 
+bool SIP_Transport_TCP_Test::init(std::string address, unsigned short port)
+{
+    std::lock_guard<std::mutex> lock(_thread_mutex);
+
+    if (!_transport_tcp_client->init(address, 0))
+    {
+        std::cout << "SIP_Transport_TCP_Test::init -> Failed to init TCP client transport\n";
+        return false;
+    }
+
+    if (!_transport_tcp_server->init(address, port))
+    {
+        std::cout << "SIP_Transport_TCP_Test::init -> Failed to init TCP server transport\n";
+        return false;
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Transport_TCP_Test::listen(int backlog)
+{
+    std::lock_guard<std::mutex> lock(_thread_mutex);
+
+    if (!_transport_tcp_server->listen(backlog))
+    {
+        std::cout << "SIP_Transport_TCP_Test::listen -> Failed to listen TCP server transport\n";
+        return false;
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Transport_TCP_Test::connect(std::string address, unsigned short port)
+{
+    std::lock_guard<std::mutex> lock(_thread_mutex);
+
+    if (!_transport_tcp_client->connect(address, port))
+    {
+        std::cout << "SIP_Transport_TCP_Test::connect -> Failed to connect TCP client transport\n";
+        return false;
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Transport_TCP_Test::send_message(const char *buffer, int size, std::string address, unsigned short port)
+{
+    std::lock_guard<std::mutex> lock(_thread_mutex);
+
+    if (!_transport_tcp_client->send_message(buffer, size, address, port))
+    {
+        std::cout << "SIP_Transport_TCP_Test::send_message -> Failed to send client message\n";
+        return false;
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Transport_TCP_Test::close()
+{
+    std::lock_guard<std::mutex> lock(_thread_mutex);
+
+    if (!_transport_tcp_client->close())
+    {
+        std::cout << "SIP_Transport_TCP_Test::close -> Failed to close TCP client transport\n";
+        return false;
+    }
+
+    if (!_accepted_transport->close())
+    {
+        std::cout << "SIP_Transport_TCP_Test::close -> Failed to close TCP accepted transport\n";
+        return false;
+    }
+
+    if (!_transport_tcp_server->close())
+    {
+        std::cout << "SIP_Transport_TCP_Test::close -> Failed to close TCP server transport\n";
+        return false;
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+
 bool SIP_Transport_TCP_Test::run(Socket::Address_Family family, std::string address, unsigned short port)
 {
     std::cout << "SIP transport TCP test initialized\n";
@@ -370,27 +501,15 @@ bool SIP_Transport_TCP_Test::run(Socket::Address_Family family, std::string addr
     if (!set_callbacks())
         return false;
 
-    if (!_transport_tcp_client->init(address, 0))
-    {
-        std::cout << "SIP_Transport_TCP_Test::run -> Failed to init TCP client transport\n";
-        return false;
-    }
-
     _current_transport = _transport_tcp_server;
     if (!set_callbacks())
         return false;
 
-    if (!_transport_tcp_server->init(address, port))
-    {
-        std::cout << "SIP_Transport_TCP_Test::run -> Failed to init TCP server transport\n";
+    if (!init(address, port))
         return false;
-    }
 
-    if (!_transport_tcp_server->listen(10))
-    {
-        std::cout << "SIP_Transport_TCP_Test::run -> Failed to listen TCP server transport\n";
+    if (!listen(10))
         return false;
-    }
 
     unsigned long start = Util_Functions::get_tick();
     _connected = false;
@@ -398,11 +517,8 @@ bool SIP_Transport_TCP_Test::run(Socket::Address_Family family, std::string addr
     _accepted_address = "";
     _accepted_port = SIP_Transport::INVALID_PORT;
 
-    if (!_transport_tcp_client->connect(address, port))
-    {
-        std::cout << "SIP_Transport_TCP_Test::run -> Failed to connect TCP client transport\n";
+    if (!connect(address, port))
         return false;
-    }
 
     while ((Util_Functions::get_tick() - start) < MAX_WAIT_TIME)
     {
@@ -453,11 +569,8 @@ bool SIP_Transport_TCP_Test::run(Socket::Address_Family family, std::string addr
     _received_address.clear();
     _received_port = SIP_Transport::INVALID_PORT;
 
-    if (!_transport_tcp_client->send_message(request.c_str(), (int) request.size(), address, port))
-    {
-        std::cout << "SIP_Transport_TCP_Test::run -> Failed to send client message\n";
+    if (!send_message(request.c_str(), (int) request.size(), address, port))
         return false;
-    }
 
     start = Util_Functions::get_tick();
 
@@ -483,23 +596,8 @@ bool SIP_Transport_TCP_Test::run(Socket::Address_Family family, std::string addr
         return false;
     }
 
-    if (!_transport_tcp_client->close())
-    {
-        std::cout << "SIP_Transport_UDP_Test::run -> Failed to close TCP client transport\n";
+    if (!close())
         return false;
-    }
-
-    if (!_accepted_transport->close())
-    {
-        std::cout << "SIP_Transport_UDP_Test::run -> Failed to close TCP accepted transport\n";
-        return false;
-    }
-
-    if (!_transport_tcp_server->close())
-    {
-        std::cout << "SIP_Transport_UDP_Test::run -> Failed to close TCP server transport\n";
-        return false;
-    }
 
     std::cout << "SIP transport TCP test completed successfully\n";
     return true;
