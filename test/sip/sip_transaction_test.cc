@@ -74,8 +74,10 @@ void SIP_Transaction_Test::thread(SIP_Transaction_Test *test)
 
     while (!test->_stop_thread)
     {
-        timer.run();
         Util_Functions::delay(THREAD_DELAY);
+
+        std::lock_guard<std::mutex> lock(test->_thread_mutex);
+        timer.run();
     }
 }
 
@@ -404,6 +406,8 @@ SIP_Transaction_Client_Invite_Test::SIP_Transaction_Client_Invite_Test()
 
 bool SIP_Transaction_Client_Invite_Test::send_invite()
 {
+    std::lock_guard<std::mutex> lock(_thread_mutex);
+
     SIP_Transaction_Client_Invite *transaction_client_invite = dynamic_cast<SIP_Transaction_Client_Invite *>(_transaction);
     if (!transaction_client_invite)
     {
@@ -455,6 +459,8 @@ bool SIP_Transaction_Client_Invite_Test::send_invite()
 
 bool SIP_Transaction_Client_Invite_Test::receive_response_100()
 {
+    std::lock_guard<std::mutex> lock(_thread_mutex);
+
     SIP_Transaction_Client_Invite *transaction_client_invite = dynamic_cast<SIP_Transaction_Client_Invite *>(_transaction);
     if (!transaction_client_invite)
     {
@@ -506,6 +512,8 @@ bool SIP_Transaction_Client_Invite_Test::receive_response_100()
 
 bool SIP_Transaction_Client_Invite_Test::receive_response_180()
 {
+    std::lock_guard<std::mutex> lock(_thread_mutex);
+
     SIP_Transaction_Client_Invite *transaction_client_invite = dynamic_cast<SIP_Transaction_Client_Invite *>(_transaction);
     if (!transaction_client_invite)
     {
@@ -557,6 +565,8 @@ bool SIP_Transaction_Client_Invite_Test::receive_response_180()
 
 bool SIP_Transaction_Client_Invite_Test::receive_response_200()
 {
+    std::lock_guard<std::mutex> lock(_thread_mutex);
+
     SIP_Transaction_Client_Invite *transaction_client_invite = dynamic_cast<SIP_Transaction_Client_Invite *>(_transaction);
     if (!transaction_client_invite)
     {
@@ -608,6 +618,8 @@ bool SIP_Transaction_Client_Invite_Test::receive_response_200()
 
 bool SIP_Transaction_Client_Invite_Test::receive_response_480()
 {
+    std::lock_guard<std::mutex> lock(_thread_mutex);
+
     SIP_Transaction_Client_Invite *transaction_client_invite = dynamic_cast<SIP_Transaction_Client_Invite *>(_transaction);
     if (!transaction_client_invite)
     {
@@ -844,6 +856,8 @@ SIP_Transaction_Client_Non_Invite_Test::SIP_Transaction_Client_Non_Invite_Test()
 
 bool SIP_Transaction_Client_Non_Invite_Test::send_bye()
 {
+    std::lock_guard<std::mutex> lock(_thread_mutex);
+
     SIP_Transaction_Client_Non_Invite *transaction_client_non_invite = dynamic_cast<SIP_Transaction_Client_Non_Invite *>(_transaction);
     if (!transaction_client_non_invite)
     {
@@ -895,6 +909,8 @@ bool SIP_Transaction_Client_Non_Invite_Test::send_bye()
 
 bool SIP_Transaction_Client_Non_Invite_Test::receive_response_100()
 {
+    std::lock_guard<std::mutex> lock(_thread_mutex);
+
     SIP_Transaction_Client_Non_Invite *transaction_client_non_invite = dynamic_cast<SIP_Transaction_Client_Non_Invite *>(_transaction);
     if (!transaction_client_non_invite)
     {
@@ -946,6 +962,8 @@ bool SIP_Transaction_Client_Non_Invite_Test::receive_response_100()
 
 bool SIP_Transaction_Client_Non_Invite_Test::receive_response_200()
 {
+    std::lock_guard<std::mutex> lock(_thread_mutex);
+
     SIP_Transaction_Client_Non_Invite *transaction_client_non_invite = dynamic_cast<SIP_Transaction_Client_Non_Invite *>(_transaction);
     if (!transaction_client_non_invite)
     {
@@ -1145,6 +1163,8 @@ SIP_Transaction_Server_Invite_Test::SIP_Transaction_Server_Invite_Test()
 
 bool SIP_Transaction_Server_Invite_Test::receive_invite(bool retransmission)
 {
+    std::lock_guard<std::mutex> lock(_thread_mutex);
+
     SIP_Transaction_Server_Invite *transaction_server_invite = dynamic_cast<SIP_Transaction_Server_Invite *>(_transaction);
     if (!transaction_server_invite)
     {
@@ -1197,6 +1217,8 @@ bool SIP_Transaction_Server_Invite_Test::receive_invite(bool retransmission)
 
 bool SIP_Transaction_Server_Invite_Test::receive_ack()
 {
+    std::lock_guard<std::mutex> lock(_thread_mutex);
+
     SIP_Transaction_Server_Invite *transaction_server_invite = dynamic_cast<SIP_Transaction_Server_Invite *>(_transaction);
     if (!transaction_server_invite)
     {
@@ -1239,6 +1261,8 @@ bool SIP_Transaction_Server_Invite_Test::receive_ack()
 
 bool SIP_Transaction_Server_Invite_Test::send_response_100()
 {
+    std::lock_guard<std::mutex> lock(_thread_mutex);
+
     SIP_Transaction_Server_Invite *transaction_server_invite = dynamic_cast<SIP_Transaction_Server_Invite *>(_transaction);
     if (!transaction_server_invite)
     {
@@ -1290,6 +1314,8 @@ bool SIP_Transaction_Server_Invite_Test::send_response_100()
 
 bool SIP_Transaction_Server_Invite_Test::send_response_180()
 {
+    std::lock_guard<std::mutex> lock(_thread_mutex);
+
     SIP_Transaction_Server_Invite *transaction_server_invite = dynamic_cast<SIP_Transaction_Server_Invite *>(_transaction);
     if (!transaction_server_invite)
     {
@@ -1341,6 +1367,8 @@ bool SIP_Transaction_Server_Invite_Test::send_response_180()
 
 bool SIP_Transaction_Server_Invite_Test::send_response_200()
 {
+    std::lock_guard<std::mutex> lock(_thread_mutex);
+
     SIP_Transaction_Server_Invite *transaction_server_invite = dynamic_cast<SIP_Transaction_Server_Invite *>(_transaction);
     if (!transaction_server_invite)
     {
@@ -1392,6 +1420,8 @@ bool SIP_Transaction_Server_Invite_Test::send_response_200()
 
 bool SIP_Transaction_Server_Invite_Test::send_response_480()
 {
+    std::lock_guard<std::mutex> lock(_thread_mutex);
+
     SIP_Transaction_Server_Invite *transaction_server_invite = dynamic_cast<SIP_Transaction_Server_Invite *>(_transaction);
     if (!transaction_server_invite)
     {
@@ -1622,6 +1652,8 @@ SIP_Transaction_Server_Non_Invite_Test::SIP_Transaction_Server_Non_Invite_Test()
 
 bool SIP_Transaction_Server_Non_Invite_Test::receive_bye(bool retransmission)
 {
+    std::lock_guard<std::mutex> lock(_thread_mutex);
+
     SIP_Transaction_Server_Non_Invite *transaction_server_non_invite = dynamic_cast<SIP_Transaction_Server_Non_Invite *>(_transaction);
     if (!transaction_server_non_invite)
     {
@@ -1674,6 +1706,8 @@ bool SIP_Transaction_Server_Non_Invite_Test::receive_bye(bool retransmission)
 
 bool SIP_Transaction_Server_Non_Invite_Test::send_response_100()
 {
+    std::lock_guard<std::mutex> lock(_thread_mutex);
+
     SIP_Transaction_Server_Non_Invite *transaction_server_non_invite = dynamic_cast<SIP_Transaction_Server_Non_Invite *>(_transaction);
     if (!transaction_server_non_invite)
     {
@@ -1725,6 +1759,8 @@ bool SIP_Transaction_Server_Non_Invite_Test::send_response_100()
 
 bool SIP_Transaction_Server_Non_Invite_Test::send_response_200()
 {
+    std::lock_guard<std::mutex> lock(_thread_mutex);
+
     SIP_Transaction_Server_Non_Invite *transaction_server_non_invite = dynamic_cast<SIP_Transaction_Server_Non_Invite *>(_transaction);
     if (!transaction_server_non_invite)
     {
