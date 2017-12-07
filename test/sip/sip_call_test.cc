@@ -117,8 +117,10 @@ void SIP_Call_Test::thread(SIP_Call_Test *test)
 
     while (!test->_stop_thread)
     {
-        timer.run();
         Util_Functions::delay(THREAD_DELAY);
+
+        std::lock_guard<std::mutex> lock(test->_thread_mutex);
+        timer.run();
     }
 }
 
@@ -896,6 +898,8 @@ SIP_Response *SIP_Call_Test::create_options_response_200()
 
 bool SIP_Call_Test::process_invite()
 {
+    std::lock_guard<std::mutex> lock(_thread_mutex);
+
     SIP_Request *invite = create_invite();
     if (!invite)
     {
@@ -975,6 +979,8 @@ bool SIP_Call_Test::process_invite()
 
 bool SIP_Call_Test::process_invite_response_100()
 {
+    std::lock_guard<std::mutex> lock(_thread_mutex);
+
     SIP_Response *invite_response_100 = create_invite_response_100();
     if (!invite_response_100)
     {
@@ -1054,6 +1060,8 @@ bool SIP_Call_Test::process_invite_response_100()
 
 bool SIP_Call_Test::process_invite_response_180()
 {
+    std::lock_guard<std::mutex> lock(_thread_mutex);
+
     SIP_Response *invite_response_180 = create_invite_response_180();
     if (!invite_response_180)
     {
@@ -1133,6 +1141,8 @@ bool SIP_Call_Test::process_invite_response_180()
 
 bool SIP_Call_Test::process_invite_response_183()
 {
+    std::lock_guard<std::mutex> lock(_thread_mutex);
+
     SIP_Response *invite_response_183 = create_invite_response_183();
     if (!invite_response_183)
     {
@@ -1212,6 +1222,8 @@ bool SIP_Call_Test::process_invite_response_183()
 
 bool SIP_Call_Test::process_invite_response_200()
 {
+    std::lock_guard<std::mutex> lock(_thread_mutex);
+
     SIP_Response *invite_response_200 = create_invite_response_200();
     if (!invite_response_200)
     {
@@ -1291,6 +1303,8 @@ bool SIP_Call_Test::process_invite_response_200()
 
 bool SIP_Call_Test::process_invite_response_480()
 {
+    std::lock_guard<std::mutex> lock(_thread_mutex);
+
     SIP_Response *invite_response_480 = create_invite_response_480();
     if (!invite_response_480)
     {
@@ -1370,6 +1384,8 @@ bool SIP_Call_Test::process_invite_response_480()
 
 bool SIP_Call_Test::process_invite_response_487()
 {
+    std::lock_guard<std::mutex> lock(_thread_mutex);
+
     SIP_Response *invite_response_487 = create_invite_response_487();
     if (!invite_response_487)
     {
@@ -1449,6 +1465,8 @@ bool SIP_Call_Test::process_invite_response_487()
 
 bool SIP_Call_Test::process_ack()
 {
+    std::lock_guard<std::mutex> lock(_thread_mutex);
+
     SIP_Request *ack = create_ack();
     if (!ack)
     {
@@ -1562,6 +1580,8 @@ bool SIP_Call_Test::wait_invite_timeout()
 
 bool SIP_Call_Test::process_client_bye()
 {
+    std::lock_guard<std::mutex> lock(_thread_mutex);
+
     SIP_Request *bye = create_client_bye();
     if (!bye)
     {
@@ -1641,6 +1661,8 @@ bool SIP_Call_Test::process_client_bye()
 
 bool SIP_Call_Test::process_server_bye_response_200()
 {
+    std::lock_guard<std::mutex> lock(_thread_mutex);
+
     SIP_Response *bye_response_200 = create_server_bye_response_200();
     if (!bye_response_200)
     {
@@ -1720,6 +1742,8 @@ bool SIP_Call_Test::process_server_bye_response_200()
 
 bool SIP_Call_Test::process_server_bye()
 {
+    std::lock_guard<std::mutex> lock(_thread_mutex);
+
     SIP_Request *bye = create_server_bye();
     if (!bye)
     {
@@ -1799,6 +1823,8 @@ bool SIP_Call_Test::process_server_bye()
 
 bool SIP_Call_Test::process_client_bye_response_200()
 {
+    std::lock_guard<std::mutex> lock(_thread_mutex);
+
     SIP_Response *bye_response_200 = create_client_bye_response_200();
     if (!bye_response_200)
     {
@@ -1878,6 +1904,8 @@ bool SIP_Call_Test::process_client_bye_response_200()
 
 bool SIP_Call_Test::process_client_update()
 {
+    std::lock_guard<std::mutex> lock(_thread_mutex);
+
     SIP_Request *update = create_client_update();
     if (!update)
     {
@@ -1957,6 +1985,8 @@ bool SIP_Call_Test::process_client_update()
 
 bool SIP_Call_Test::process_server_update_response_200()
 {
+    std::lock_guard<std::mutex> lock(_thread_mutex);
+
     SIP_Response *update_response_200 = create_server_update_response_200();
     if (!update_response_200)
     {
@@ -2036,6 +2066,8 @@ bool SIP_Call_Test::process_server_update_response_200()
 
 bool SIP_Call_Test::process_server_update()
 {
+    std::lock_guard<std::mutex> lock(_thread_mutex);
+
     SIP_Request *update = create_server_update();
     if (!update)
     {
@@ -2115,6 +2147,8 @@ bool SIP_Call_Test::process_server_update()
 
 bool SIP_Call_Test::process_client_update_response_200()
 {
+    std::lock_guard<std::mutex> lock(_thread_mutex);
+
     SIP_Response *update_response_200 = create_client_update_response_200();
     if (!update_response_200)
     {
@@ -2194,6 +2228,8 @@ bool SIP_Call_Test::process_client_update_response_200()
 
 bool SIP_Call_Test::process_cancel()
 {
+    std::lock_guard<std::mutex> lock(_thread_mutex);
+
     SIP_Request *cancel = create_cancel();
     if (!cancel)
     {
@@ -2273,6 +2309,8 @@ bool SIP_Call_Test::process_cancel()
 
 bool SIP_Call_Test::process_cancel_response_200()
 {
+    std::lock_guard<std::mutex> lock(_thread_mutex);
+
     SIP_Response *cancel_response_200 = create_cancel_response_200();
     if (!cancel_response_200)
     {
@@ -2352,6 +2390,8 @@ bool SIP_Call_Test::process_cancel_response_200()
 
 bool SIP_Call_Test::process_prack()
 {
+    std::lock_guard<std::mutex> lock(_thread_mutex);
+
     SIP_Request *prack = create_prack();
     if (!prack)
     {
@@ -2431,6 +2471,8 @@ bool SIP_Call_Test::process_prack()
 
 bool SIP_Call_Test::process_prack_response_200()
 {
+    std::lock_guard<std::mutex> lock(_thread_mutex);
+
     SIP_Response *prack_response_200 = create_prack_response_200();
     if (!prack_response_200)
     {
@@ -2510,6 +2552,8 @@ bool SIP_Call_Test::process_prack_response_200()
 
 bool SIP_Call_Test::process_info()
 {
+    std::lock_guard<std::mutex> lock(_thread_mutex);
+
     SIP_Request *info = create_info();
     if (!info)
     {
@@ -2589,6 +2633,8 @@ bool SIP_Call_Test::process_info()
 
 bool SIP_Call_Test::process_info_response_200()
 {
+    std::lock_guard<std::mutex> lock(_thread_mutex);
+
     SIP_Response *info_response_200 = create_info_response_200();
     if (!info_response_200)
     {
@@ -2668,6 +2714,8 @@ bool SIP_Call_Test::process_info_response_200()
 
 bool SIP_Call_Test::process_register()
 {
+    std::lock_guard<std::mutex> lock(_thread_mutex);
+
     SIP_Request *request = create_register();
     if (!request)
     {
@@ -2747,6 +2795,8 @@ bool SIP_Call_Test::process_register()
 
 bool SIP_Call_Test::process_register_response_100()
 {
+    std::lock_guard<std::mutex> lock(_thread_mutex);
+
     SIP_Response *register_response_100 = create_register_response_100();
     if (!register_response_100)
     {
@@ -2826,6 +2876,8 @@ bool SIP_Call_Test::process_register_response_100()
 
 bool SIP_Call_Test::process_register_response_200()
 {
+    std::lock_guard<std::mutex> lock(_thread_mutex);
+
     SIP_Response *register_response_200 = create_register_response_200();
     if (!register_response_200)
     {
@@ -2905,6 +2957,8 @@ bool SIP_Call_Test::process_register_response_200()
 
 bool SIP_Call_Test::process_register_response_401()
 {
+    std::lock_guard<std::mutex> lock(_thread_mutex);
+
     SIP_Response *register_response_401 = create_register_response_401();
     if (!register_response_401)
     {
@@ -2984,6 +3038,8 @@ bool SIP_Call_Test::process_register_response_401()
 
 bool SIP_Call_Test::process_options()
 {
+    std::lock_guard<std::mutex> lock(_thread_mutex);
+
     SIP_Request *options = create_options();
     if (!options)
     {
@@ -3063,6 +3119,8 @@ bool SIP_Call_Test::process_options()
 
 bool SIP_Call_Test::process_options_response_100()
 {
+    std::lock_guard<std::mutex> lock(_thread_mutex);
+
     SIP_Response *options_response_100 = create_options_response_100();
     if (!options_response_100)
     {
@@ -3142,6 +3200,8 @@ bool SIP_Call_Test::process_options_response_100()
 
 bool SIP_Call_Test::process_options_response_200()
 {
+    std::lock_guard<std::mutex> lock(_thread_mutex);
+
     SIP_Response *options_response_200 = create_options_response_200();
     if (!options_response_200)
     {

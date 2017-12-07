@@ -141,6 +141,8 @@ protected:
     bool _received_request;
     bool _received_response;
 
+    std::mutex _thread_mutex;
+
 private:
     std::thread _thread;
     bool _stop_thread;
