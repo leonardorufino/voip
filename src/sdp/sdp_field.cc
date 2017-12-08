@@ -51,6 +51,10 @@ SDP_Field *SDP_Field::create_field(SDP_Field_Type field_type, const SDP_Field *c
             field = (!copy) ? new SDP_Field_Phone_Number()
                             : new SDP_Field_Phone_Number(dynamic_cast<const SDP_Field_Phone_Number &>(*copy));
             break;
+        case SDP_FIELD_CONNECTION_DATA:
+            field = (!copy) ? new SDP_Field_Connection_Data()
+                            : new SDP_Field_Connection_Data(dynamic_cast<const SDP_Field_Connection_Data &>(*copy));
+            break;
         default:
             break;
     }
@@ -322,6 +326,97 @@ bool SDP_Field_Phone_Number::decode(std::string &msg)
 bool SDP_Field_Phone_Number::encode(std::string &msg)
 {
     msg += _phone;
+    return true;
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+bool SDP_Field_Connection_Data::decode(std::string &msg)
+{
+    std::string result;
+
+    if (!String_Functions::match(msg, " ", result))
+        return false;
+
+    if (result.empty())
+        return false;
+
+    _network_type = result;
+
+    if (!String_Functions::match(msg, " ", result))
+        return false;
+
+    if (result.empty())
+        return false;
+
+    _address_type = result;
+
+    bool has_slash = String_Functions::match(msg, "/", result);
+
+    if (result.empty())
+        return false;
+
+    _connection_address = result;
+
+    if (has_slash)
+    {
+        has_slash = String_Functions::match(msg, "/", result);
+
+        if (result.empty())
+            return false;
+
+        if (_address_type != "IP6")
+        {
+            _ttl = String_Functions::str_to_us(result);
+            if (_ttl == INVALID_TTL)
+                return false;
+
+            if (has_slash)
+            {
+                if (msg.empty())
+                    return false;
+
+                _number_addresses = String_Functions::str_to_us(msg);
+                if (_number_addresses == INVALID_NUMBER_ADDRESSES)
+                    return false;
+            }
+        }else
+        {
+            _number_addresses = String_Functions::str_to_us(result);
+            if (_number_addresses == INVALID_NUMBER_ADDRESSES)
+                return false;
+        }
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+
+bool SDP_Field_Connection_Data::encode(std::string &msg)
+{
+    if ((_network_type.empty()) || (_address_type.empty()) || (_connection_address.empty()))
+        return false;
+
+    msg += _network_type;
+    msg += " ";
+    msg += _address_type;
+    msg += " ";
+    msg += _connection_address;
+
+    if (_ttl != INVALID_TTL)
+    {
+        msg += "/";
+        msg += std::to_string(_ttl);
+    }
+
+    if (_number_addresses != INVALID_NUMBER_ADDRESSES)
+    {
+        msg += "/";
+        msg += std::to_string(_number_addresses);
+    }
+
     return true;
 }
 

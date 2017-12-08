@@ -213,3 +213,44 @@ private:
 };
 
 //-------------------------------------------
+
+class SDP_Field_Connection_Data : public SDP_Field
+{
+public:
+    static const unsigned short INVALID_TTL = INVALID_UNSIGNED_SHORT;
+    static const unsigned short INVALID_NUMBER_ADDRESSES = INVALID_UNSIGNED_SHORT;
+
+public:
+    SDP_Field_Connection_Data() : _ttl(INVALID_TTL), _number_addresses(INVALID_NUMBER_ADDRESSES) {}
+    SDP_Field_Connection_Data(const SDP_Field_Connection_Data &field) { *this = field; }
+    ~SDP_Field_Connection_Data() {}
+
+    // Virtual pure functions
+    SDP_Field_Type get_field_type() { return SDP_FIELD_CONNECTION_DATA; }
+    bool decode(std::string &msg);
+    bool encode(std::string &msg);
+
+    void set_network_type(std::string type) { _network_type = type; }
+    std::string get_network_type() { return _network_type; }
+
+    void set_address_type(std::string type) { _address_type = type; }
+    std::string get_address_type() { return _address_type; }
+
+    void set_connection_address(std::string address) { _connection_address = address; }
+    std::string get_connection_address() { return _connection_address; }
+
+    void set_ttl(unsigned short ttl) { _ttl = ttl; }
+    unsigned short get_ttl() { return _ttl; }
+
+    void set_number_addresses(unsigned short addresses) { _number_addresses = addresses; }
+    unsigned short get_number_addresses() { return _number_addresses; }
+
+private:
+    std::string _network_type;
+    std::string _address_type;
+    std::string _connection_address;
+    unsigned short _ttl;
+    unsigned short _number_addresses;
+};
+
+//-------------------------------------------
