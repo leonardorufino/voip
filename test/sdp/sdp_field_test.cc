@@ -38,6 +38,9 @@ bool SDP_Field_Test::init()
     if (!run<SDP_Field_Phone_Number_Test>())
         return false;
 
+    if (!run<SDP_Field_Connection_Data_Test>())
+        return false;
+
     std::cout << "SDP field test completed successfully\n";
     return true;
 }
@@ -417,6 +420,57 @@ SDP_Field_Phone_Number_Test::SDP_Field_Phone_Number_Test()
     field3._decode_success = true;
     field3._encode_success = true;
     _field_input_output.push_back(field3);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+SDP_Field_Connection_Data_Test::SDP_Field_Connection_Data_Test()
+{
+    SDP_Field_Input_Output field1;
+    field1._field_type     = SDP_FIELD_CONNECTION_DATA;
+    field1._input          = "c=IN IP4 224.2.1.1";
+    field1._output         = "c=IN IP4 224.2.1.1\r\n";
+    field1._field_nb       = 1;
+    field1._decode_success = true;
+    field1._encode_success = true;
+    _field_input_output.push_back(field1);
+
+    SDP_Field_Input_Output field2;
+    field2._field_type     = SDP_FIELD_CONNECTION_DATA;
+    field2._input          = "c=IN IP4 224.2.1.3/127";
+    field2._output         = "c=IN IP4 224.2.1.3/127\r\n";
+    field2._field_nb       = 1;
+    field2._decode_success = true;
+    field2._encode_success = true;
+    _field_input_output.push_back(field2);
+
+    SDP_Field_Input_Output field3;
+    field3._field_type     = SDP_FIELD_CONNECTION_DATA;
+    field3._input          = "c=IN IP4 224.2.1.1/127/3";
+    field3._output         = "c=IN IP4 224.2.1.1/127/3\r\n";
+    field3._field_nb       = 1;
+    field3._decode_success = true;
+    field3._encode_success = true;
+    _field_input_output.push_back(field3);
+
+    SDP_Field_Input_Output field4;
+    field4._field_type     = SDP_FIELD_CONNECTION_DATA;
+    field4._input          = "c=IN IP6 FF15::102";
+    field4._output         = "c=IN IP6 FF15::102\r\n";
+    field4._field_nb       = 1;
+    field4._decode_success = true;
+    field4._encode_success = true;
+    _field_input_output.push_back(field4);
+
+    SDP_Field_Input_Output field5;
+    field5._field_type     = SDP_FIELD_CONNECTION_DATA;
+    field5._input          = "c=IN IP6 FF15::101/3";
+    field5._output         = "c=IN IP6 FF15::101/3\r\n";
+    field5._field_nb       = 1;
+    field5._decode_success = true;
+    field5._encode_success = true;
+    _field_input_output.push_back(field5);
 }
 
 //-------------------------------------------
