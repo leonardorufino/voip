@@ -55,6 +55,10 @@ SDP_Field *SDP_Field::create_field(SDP_Field_Type field_type, const SDP_Field *c
             field = (!copy) ? new SDP_Field_Connection_Data()
                             : new SDP_Field_Connection_Data(dynamic_cast<const SDP_Field_Connection_Data &>(*copy));
             break;
+        case SDP_FIELD_BANDWIDTH:
+            field = (!copy) ? new SDP_Field_Bandwidth()
+                            : new SDP_Field_Bandwidth(dynamic_cast<const SDP_Field_Bandwidth &>(*copy));
+            break;
         default:
             break;
     }
@@ -417,6 +421,44 @@ bool SDP_Field_Connection_Data::encode(std::string &msg)
         msg += std::to_string(_number_addresses);
     }
 
+    return true;
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+bool SDP_Field_Bandwidth::decode(std::string &msg)
+{
+    std::string result;
+
+    if (!String_Functions::match(msg, ":", result))
+        return false;
+
+    if (result.empty())
+        return false;
+
+    _type = result;
+
+    if (msg.empty())
+        return false;
+
+    _bandwidth = String_Functions::str_to_ul(msg);
+    if (_bandwidth == INVALID_BANDWIDTH)
+        return false;
+
+    return true;
+}
+
+//-------------------------------------------
+
+bool SDP_Field_Bandwidth::encode(std::string &msg)
+{
+    if ((_type.empty()) || (_bandwidth == INVALID_BANDWIDTH))
+        return false;
+
+    msg += _type;
+    msg += ":";
+    msg += std::to_string(_bandwidth);
     return true;
 }
 

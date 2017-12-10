@@ -254,3 +254,31 @@ private:
 };
 
 //-------------------------------------------
+
+class SDP_Field_Bandwidth : public SDP_Field
+{
+public:
+    static const unsigned long INVALID_BANDWIDTH = INVALID_UNSIGNED_LONG;
+
+public:
+    SDP_Field_Bandwidth() : _bandwidth(INVALID_BANDWIDTH) {}
+    SDP_Field_Bandwidth(const SDP_Field_Bandwidth &field) { *this = field; }
+    ~SDP_Field_Bandwidth() {}
+
+    // Virtual pure functions
+    SDP_Field_Type get_field_type() { return SDP_FIELD_BANDWIDTH; }
+    bool decode(std::string &msg);
+    bool encode(std::string &msg);
+
+    void set_type(std::string type) { _type = type; }
+    std::string get_type() { return _type; }
+
+    void set_bandwidth(unsigned long bandwidth) { _bandwidth = bandwidth; }
+    unsigned long get_bandwidth() { return _bandwidth; }
+
+private:
+    std::string _type;
+    unsigned long _bandwidth;
+};
+
+//-------------------------------------------
