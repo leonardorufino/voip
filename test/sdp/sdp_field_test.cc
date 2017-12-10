@@ -41,6 +41,9 @@ bool SDP_Field_Test::init()
     if (!run<SDP_Field_Connection_Data_Test>())
         return false;
 
+    if (!run<SDP_Field_Bandwidth_Test>())
+        return false;
+
     std::cout << "SDP field test completed successfully\n";
     return true;
 }
@@ -471,6 +474,39 @@ SDP_Field_Connection_Data_Test::SDP_Field_Connection_Data_Test()
     field5._decode_success = true;
     field5._encode_success = true;
     _field_input_output.push_back(field5);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+SDP_Field_Bandwidth_Test::SDP_Field_Bandwidth_Test()
+{
+    SDP_Field_Input_Output field1;
+    field1._field_type     = SDP_FIELD_BANDWIDTH;
+    field1._input          = "b=CT:64";
+    field1._output         = "b=CT:64\r\n";
+    field1._field_nb       = 1;
+    field1._decode_success = true;
+    field1._encode_success = true;
+    _field_input_output.push_back(field1);
+
+    SDP_Field_Input_Output field2;
+    field2._field_type     = SDP_FIELD_BANDWIDTH;
+    field2._input          = "b=AS:9999999";
+    field2._output         = "b=AS:9999999\r\n";
+    field2._field_nb       = 1;
+    field2._decode_success = true;
+    field2._encode_success = true;
+    _field_input_output.push_back(field2);
+
+    SDP_Field_Input_Output field3;
+    field3._field_type     = SDP_FIELD_BANDWIDTH;
+    field3._input          = "b=X-YZ:128";
+    field3._output         = "b=X-YZ:128\r\n";
+    field3._field_nb       = 1;
+    field3._decode_success = true;
+    field3._encode_success = true;
+    _field_input_output.push_back(field3);
 }
 
 //-------------------------------------------
