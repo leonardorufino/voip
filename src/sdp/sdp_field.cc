@@ -479,14 +479,14 @@ bool SDP_Field_Timing::decode(std::string &msg)
     if (result.empty())
         return false;
 
-    _start = String_Functions::str_to_ul(result);
+    _start = String_Functions::str_to_ull(result);
     if (_start == INVALID_TIME)
         return false;
 
     if (msg.empty())
         return false;
 
-    _stop = String_Functions::str_to_ul(msg);
+    _stop = String_Functions::str_to_ull(msg);
     if (_stop == INVALID_TIME)
         return false;
 
