@@ -260,6 +260,32 @@ unsigned long String_Functions::str_to_ul(const std::string str)
 
 //-------------------------------------------
 
+unsigned long long String_Functions::str_to_ull(const std::string str)
+{
+    unsigned long long value = 0;
+
+    for (unsigned short i = 0; i < (unsigned short) str.size(); i++)
+    {
+        char digit = str.at(i);
+
+        if ((digit < '0') || (digit > '9'))
+            return INVALID_UNSIGNED_LONG_LONG;
+
+        unsigned long long check_overflow = (INVALID_UNSIGNED_LONG_LONG - (digit - '0')) / 10;
+        if (value > check_overflow)
+        {
+            // Overflow
+            return INVALID_UNSIGNED_LONG_LONG;
+        }
+
+        value = value * 10 + (digit - '0');
+    }
+
+    return value;
+}
+
+//-------------------------------------------
+
 std::string String_Functions::add_leading_zeros(unsigned long value, unsigned short digits)
 {
     std::string str = std::to_string(value);

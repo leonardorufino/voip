@@ -28,6 +28,7 @@ public:
     static void skip(std::string &str, const std::string skip);
     static unsigned short str_to_us(const std::string str);
     static unsigned long str_to_ul(const std::string str);
+    static unsigned long long str_to_ull(const std::string str);
     static std::string add_leading_zeros(unsigned long value, unsigned short digits);
     static std::string random(unsigned short len);
 };
