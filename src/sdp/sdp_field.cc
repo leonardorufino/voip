@@ -59,6 +59,10 @@ SDP_Field *SDP_Field::create_field(SDP_Field_Type field_type, const SDP_Field *c
             field = (!copy) ? new SDP_Field_Bandwidth()
                             : new SDP_Field_Bandwidth(dynamic_cast<const SDP_Field_Bandwidth &>(*copy));
             break;
+        case SDP_FIELD_TIMING:
+            field = (!copy) ? new SDP_Field_Timing()
+                            : new SDP_Field_Timing(dynamic_cast<const SDP_Field_Timing &>(*copy));
+            break;
         default:
             break;
     }
@@ -459,6 +463,46 @@ bool SDP_Field_Bandwidth::encode(std::string &msg)
     msg += _type;
     msg += ":";
     msg += std::to_string(_bandwidth);
+    return true;
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+bool SDP_Field_Timing::decode(std::string &msg)
+{
+    std::string result;
+
+    if (!String_Functions::match(msg, " ", result))
+        return false;
+
+    if (result.empty())
+        return false;
+
+    _start = String_Functions::str_to_ul(result);
+    if (_start == INVALID_TIME)
+        return false;
+
+    if (msg.empty())
+        return false;
+
+    _stop = String_Functions::str_to_ul(msg);
+    if (_stop == INVALID_TIME)
+        return false;
+
+    return true;
+}
+
+//-------------------------------------------
+
+bool SDP_Field_Timing::encode(std::string &msg)
+{
+    if ((_start == INVALID_TIME) || (_stop == INVALID_TIME))
+        return false;
+
+    msg += std::to_string(_start);
+    msg += " ";
+    msg += std::to_string(_stop);
     return true;
 }
 

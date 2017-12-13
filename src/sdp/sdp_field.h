@@ -282,3 +282,31 @@ private:
 };
 
 //-------------------------------------------
+
+class SDP_Field_Timing : public SDP_Field
+{
+public:
+    static const unsigned long INVALID_TIME = INVALID_UNSIGNED_LONG;
+
+public:
+    SDP_Field_Timing() : _start(INVALID_TIME), _stop(INVALID_TIME) {}
+    SDP_Field_Timing(const SDP_Field_Timing &field) { *this = field; }
+    ~SDP_Field_Timing() {}
+
+    // Virtual pure functions
+    SDP_Field_Type get_field_type() { return SDP_FIELD_TIMING; }
+    bool decode(std::string &msg);
+    bool encode(std::string &msg);
+
+    void set_start(unsigned long start) { _start = start; }
+    unsigned long get_start() { return _start; }
+
+    void set_stop(unsigned long stop) { _stop = stop; }
+    unsigned long get_stop() { return _stop; }
+
+private:
+    unsigned long _start;
+    unsigned long _stop;
+};
+
+//-------------------------------------------
