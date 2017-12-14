@@ -44,6 +44,9 @@ bool SDP_Field_Test::init()
     if (!run<SDP_Field_Bandwidth_Test>())
         return false;
 
+    if (!run<SDP_Field_Timing_Test>())
+        return false;
+
     std::cout << "SDP field test completed successfully\n";
     return true;
 }
@@ -507,6 +510,57 @@ SDP_Field_Bandwidth_Test::SDP_Field_Bandwidth_Test()
     field3._decode_success = true;
     field3._encode_success = true;
     _field_input_output.push_back(field3);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+SDP_Field_Timing_Test::SDP_Field_Timing_Test()
+{
+    SDP_Field_Input_Output field1;
+    field1._field_type     = SDP_FIELD_TIMING;
+    field1._input          = "t=2873397496 2873404696";
+    field1._output         = "t=2873397496 2873404696\r\n";
+    field1._field_nb       = 1;
+    field1._decode_success = true;
+    field1._encode_success = true;
+    _field_input_output.push_back(field1);
+
+    SDP_Field_Input_Output field2;
+    field2._field_type     = SDP_FIELD_TIMING;
+    field2._input          = "t=3034423619 3042462419";
+    field2._output         = "t=3034423619 3042462419\r\n";
+    field2._field_nb       = 1;
+    field2._decode_success = true;
+    field2._encode_success = true;
+    _field_input_output.push_back(field2);
+
+    SDP_Field_Input_Output field3;
+    field3._field_type     = SDP_FIELD_TIMING;
+    field3._input          = "t=9999999999 9999999999";
+    field3._output         = "t=9999999999 9999999999\r\n";
+    field3._field_nb       = 1;
+    field3._decode_success = true;
+    field3._encode_success = true;
+    _field_input_output.push_back(field3);
+
+    SDP_Field_Input_Output field4;
+    field4._field_type     = SDP_FIELD_TIMING;
+    field4._input          = "t=1234567890 0";
+    field4._output         = "t=1234567890 0\r\n";
+    field4._field_nb       = 1;
+    field4._decode_success = true;
+    field4._encode_success = true;
+    _field_input_output.push_back(field4);
+
+    SDP_Field_Input_Output field5;
+    field5._field_type     = SDP_FIELD_TIMING;
+    field5._input          = "t=0 0";
+    field5._output         = "t=0 0\r\n";
+    field5._field_nb       = 1;
+    field5._decode_success = true;
+    field5._encode_success = true;
+    _field_input_output.push_back(field5);
 }
 
 //-------------------------------------------

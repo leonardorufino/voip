@@ -119,3 +119,11 @@ public:
 };
 
 //-------------------------------------------
+
+class SDP_Field_Timing_Test : public SDP_Field_Test
+{
+public:
+    SDP_Field_Timing_Test();
+};
+
+//-------------------------------------------
