@@ -63,6 +63,10 @@ SDP_Field *SDP_Field::create_field(SDP_Field_Type field_type, const SDP_Field *c
             field = (!copy) ? new SDP_Field_Timing()
                             : new SDP_Field_Timing(dynamic_cast<const SDP_Field_Timing &>(*copy));
             break;
+        case SDP_FIELD_REPEAT_TIME:
+            field = (!copy) ? new SDP_Field_Repeat_Time()
+                            : new SDP_Field_Repeat_Time(dynamic_cast<const SDP_Field_Repeat_Time &>(*copy));
+            break;
         default:
             break;
     }
@@ -503,6 +507,68 @@ bool SDP_Field_Timing::encode(std::string &msg)
     msg += std::to_string(_start);
     msg += " ";
     msg += std::to_string(_stop);
+    return true;
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+bool SDP_Field_Repeat_Time::decode(std::string &msg)
+{
+    std::string result;
+
+    if (!String_Functions::match(msg, " ", result))
+        return false;
+
+    if (result.empty())
+        return false;
+
+    _interval = result;
+
+    if (!String_Functions::match(msg, " ", result))
+        return false;
+
+    if (result.empty())
+        return false;
+
+    _duration = result;
+
+    if (msg.empty())
+        return false;
+
+    bool matched;
+
+    do
+    {
+        matched = String_Functions::match(msg, " ", result);
+
+        if (result.empty())
+            return false;
+
+        _offsets.push_back(result);
+    }while (matched);
+
+    return true;
+}
+
+//-------------------------------------------
+
+bool SDP_Field_Repeat_Time::encode(std::string &msg)
+{
+    if ((_interval.empty()) || (_duration.empty()) || (_offsets.empty()))
+        return false;
+
+    msg += _interval;
+    msg += " ";
+    msg += _duration;
+
+    std::list<std::string>::const_iterator it = _offsets.begin();
+    while (it != _offsets.end())
+    {
+        msg += " ";
+        msg += *it++;
+    }
+
     return true;
 }
 

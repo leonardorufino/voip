@@ -310,3 +310,32 @@ private:
 };
 
 //-------------------------------------------
+
+class SDP_Field_Repeat_Time : public SDP_Field
+{
+public:
+    SDP_Field_Repeat_Time() {}
+    SDP_Field_Repeat_Time(const SDP_Field_Repeat_Time &field) { *this = field; }
+    ~SDP_Field_Repeat_Time() {}
+
+    // Virtual pure functions
+    SDP_Field_Type get_field_type() { return SDP_FIELD_REPEAT_TIME; }
+    bool decode(std::string &msg);
+    bool encode(std::string &msg);
+
+    void set_interval(std::string interval) { _interval = interval; }
+    std::string get_interval() { return _interval; }
+
+    void set_duration(std::string duration) { _duration = duration; }
+    std::string get_duration() { return _duration; }
+
+    void set_offsets(std::list<std::string> &offsets) { _offsets = offsets; }
+    std::list<std::string> &get_offsets() { return _offsets; }
+
+private:
+    std::string _interval;
+    std::string _duration;
+    std::list<std::string> _offsets;
+};
+
+//-------------------------------------------
