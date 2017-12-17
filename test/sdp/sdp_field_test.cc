@@ -47,6 +47,9 @@ bool SDP_Field_Test::init()
     if (!run<SDP_Field_Timing_Test>())
         return false;
 
+    if (!run<SDP_Field_Repeat_Time_Test>())
+        return false;
+
     std::cout << "SDP field test completed successfully\n";
     return true;
 }
@@ -561,6 +564,48 @@ SDP_Field_Timing_Test::SDP_Field_Timing_Test()
     field5._decode_success = true;
     field5._encode_success = true;
     _field_input_output.push_back(field5);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+SDP_Field_Repeat_Time_Test::SDP_Field_Repeat_Time_Test()
+{
+    SDP_Field_Input_Output field1;
+    field1._field_type     = SDP_FIELD_REPEAT_TIME;
+    field1._input          = "r=604800 3600 0 90000";
+    field1._output         = "r=604800 3600 0 90000\r\n";
+    field1._field_nb       = 1;
+    field1._decode_success = true;
+    field1._encode_success = true;
+    _field_input_output.push_back(field1);
+
+    SDP_Field_Input_Output field2;
+    field2._field_type     = SDP_FIELD_REPEAT_TIME;
+    field2._input          = "r=7d 1h 0 25h";
+    field2._output         = "r=7d 1h 0 25h\r\n";
+    field2._field_nb       = 1;
+    field2._decode_success = true;
+    field2._encode_success = true;
+    _field_input_output.push_back(field2);
+
+    SDP_Field_Input_Output field3;
+    field3._field_type     = SDP_FIELD_REPEAT_TIME;
+    field3._input          = "r=999999 999999 999999";
+    field3._output         = "r=999999 999999 999999\r\n";
+    field3._field_nb       = 1;
+    field3._decode_success = true;
+    field3._encode_success = true;
+    _field_input_output.push_back(field3);
+
+    SDP_Field_Input_Output field4;
+    field4._field_type     = SDP_FIELD_REPEAT_TIME;
+    field4._input          = "r=123 456 789 123 456 7890";
+    field4._output         = "r=123 456 789 123 456 7890\r\n";
+    field4._field_nb       = 1;
+    field4._decode_success = true;
+    field4._encode_success = true;
+    _field_input_output.push_back(field4);
 }
 
 //-------------------------------------------

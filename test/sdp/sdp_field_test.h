@@ -127,3 +127,11 @@ public:
 };
 
 //-------------------------------------------
+
+class SDP_Field_Repeat_Time_Test : public SDP_Field_Test
+{
+public:
+    SDP_Field_Repeat_Time_Test();
+};
+
+//-------------------------------------------
