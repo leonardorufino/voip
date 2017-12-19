@@ -67,6 +67,10 @@ SDP_Field *SDP_Field::create_field(SDP_Field_Type field_type, const SDP_Field *c
             field = (!copy) ? new SDP_Field_Repeat_Time()
                             : new SDP_Field_Repeat_Time(dynamic_cast<const SDP_Field_Repeat_Time &>(*copy));
             break;
+        case SDP_FIELD_TIME_ZONE:
+            field = (!copy) ? new SDP_Field_Time_Zone()
+                            : new SDP_Field_Time_Zone(dynamic_cast<const SDP_Field_Time_Zone &>(*copy));
+            break;
         default:
             break;
     }
@@ -567,6 +571,57 @@ bool SDP_Field_Repeat_Time::encode(std::string &msg)
     {
         msg += " ";
         msg += *it++;
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+bool SDP_Field_Time_Zone::decode(std::string &msg)
+{
+    std::string result;
+    bool matched;
+
+    do
+    {
+        if (!String_Functions::match(msg, " ", result))
+            return false;
+
+        if (result.empty())
+            return false;
+
+        _adjustments.push_back(result);
+
+        matched = String_Functions::match(msg, " ", result);
+
+        if (result.empty())
+            return false;
+
+        _offsets.push_back(result);
+    }while (matched);
+
+    return true;
+}
+
+//-------------------------------------------
+
+bool SDP_Field_Time_Zone::encode(std::string &msg)
+{
+    if ((_adjustments.empty()) || (_offsets.empty()) || (_adjustments.size() != _offsets.size()))
+        return false;
+
+    std::list<std::string>::const_iterator it1 = _adjustments.begin();
+    std::list<std::string>::const_iterator it2 = _offsets.begin();
+    while ((it1 != _adjustments.end()) && (it2 != _offsets.end()))
+    {
+        if (it1 != _adjustments.begin())
+            msg += " ";
+
+        msg += *it1++;
+        msg += " ";
+        msg += *it2++;
     }
 
     return true;

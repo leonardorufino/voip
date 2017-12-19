@@ -339,3 +339,28 @@ private:
 };
 
 //-------------------------------------------
+
+class SDP_Field_Time_Zone : public SDP_Field
+{
+public:
+    SDP_Field_Time_Zone() {}
+    SDP_Field_Time_Zone(const SDP_Field_Time_Zone &field) { *this = field; }
+    ~SDP_Field_Time_Zone() {}
+
+    // Virtual pure functions
+    SDP_Field_Type get_field_type() { return SDP_FIELD_TIME_ZONE; }
+    bool decode(std::string &msg);
+    bool encode(std::string &msg);
+
+    void set_adjustments(std::list<std::string> &adjustments) { _adjustments = adjustments; }
+    std::list<std::string> &get_adjustments() { return _adjustments; }
+
+    void set_offsets(std::list<std::string> &offsets) { _offsets = offsets; }
+    std::list<std::string> &get_offsets() { return _offsets; }
+
+private:
+    std::list<std::string> _adjustments;
+    std::list<std::string> _offsets;
+};
+
+//-------------------------------------------
