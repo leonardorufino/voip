@@ -135,3 +135,11 @@ public:
 };
 
 //-------------------------------------------
+
+class SDP_Field_Time_Zone_Test : public SDP_Field_Test
+{
+public:
+    SDP_Field_Time_Zone_Test();
+};
+
+//-------------------------------------------

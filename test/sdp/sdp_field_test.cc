@@ -50,6 +50,9 @@ bool SDP_Field_Test::init()
     if (!run<SDP_Field_Repeat_Time_Test>())
         return false;
 
+    if (!run<SDP_Field_Time_Zone_Test>())
+        return false;
+
     std::cout << "SDP field test completed successfully\n";
     return true;
 }
@@ -602,6 +605,48 @@ SDP_Field_Repeat_Time_Test::SDP_Field_Repeat_Time_Test()
     field4._field_type     = SDP_FIELD_REPEAT_TIME;
     field4._input          = "r=123 456 789 123 456 7890";
     field4._output         = "r=123 456 789 123 456 7890\r\n";
+    field4._field_nb       = 1;
+    field4._decode_success = true;
+    field4._encode_success = true;
+    _field_input_output.push_back(field4);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+SDP_Field_Time_Zone_Test::SDP_Field_Time_Zone_Test()
+{
+    SDP_Field_Input_Output field1;
+    field1._field_type     = SDP_FIELD_TIME_ZONE;
+    field1._input          = "z=2882844526 -1h 2898848070 0";
+    field1._output         = "z=2882844526 -1h 2898848070 0\r\n";
+    field1._field_nb       = 1;
+    field1._decode_success = true;
+    field1._encode_success = true;
+    _field_input_output.push_back(field1);
+
+    SDP_Field_Input_Output field2;
+    field2._field_type     = SDP_FIELD_TIME_ZONE;
+    field2._input          = "z=1288494000 -1h";
+    field2._output         = "z=1288494000 -1h\r\n";
+    field2._field_nb       = 1;
+    field2._decode_success = true;
+    field2._encode_success = true;
+    _field_input_output.push_back(field2);
+
+    SDP_Field_Input_Output field3;
+    field3._field_type     = SDP_FIELD_TIME_ZONE;
+    field3._input          = "z=999999999 9 999999999 9h 99999 999";
+    field3._output         = "z=999999999 9 999999999 9h 99999 999\r\n";
+    field3._field_nb       = 1;
+    field3._decode_success = true;
+    field3._encode_success = true;
+    _field_input_output.push_back(field3);
+
+    SDP_Field_Input_Output field4;
+    field4._field_type     = SDP_FIELD_TIME_ZONE;
+    field4._input          = "z=123456789 2d 5566778899 120m 987654321 600s";
+    field4._output         = "z=123456789 2d 5566778899 120m 987654321 600s\r\n";
     field4._field_nb       = 1;
     field4._decode_success = true;
     field4._encode_success = true;
