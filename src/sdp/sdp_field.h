@@ -364,3 +364,40 @@ private:
 };
 
 //-------------------------------------------
+
+class SDP_Field_Encryption_Key : public SDP_Field
+{
+public:
+    enum Method
+    {
+        METHOD_CLEAR,
+        METHOD_BASE64,
+        METHOD_URI,
+        METHOD_PROMPT,
+        METHOD_INVALID
+    };
+
+public:
+    SDP_Field_Encryption_Key() {}
+    SDP_Field_Encryption_Key(const SDP_Field_Encryption_Key &field) { *this = field; }
+    ~SDP_Field_Encryption_Key() {}
+
+    // Virtual pure functions
+    SDP_Field_Type get_field_type() { return SDP_FIELD_ENCRYPTION_KEY; }
+    bool decode(std::string &msg);
+    bool encode(std::string &msg);
+
+    void set_method(Method method);
+    void set_method(std::string method) { _method = method; }
+    Method get_method();
+    std::string get_method_str() { return _method; }
+
+    void set_key(std::string key) { _key = key; }
+    std::string get_key() { return _key; }
+
+private:
+    std::string _method;
+    std::string _key;
+};
+
+//-------------------------------------------

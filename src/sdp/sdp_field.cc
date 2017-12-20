@@ -71,6 +71,11 @@ SDP_Field *SDP_Field::create_field(SDP_Field_Type field_type, const SDP_Field *c
             field = (!copy) ? new SDP_Field_Time_Zone()
                             : new SDP_Field_Time_Zone(dynamic_cast<const SDP_Field_Time_Zone &>(*copy));
             break;
+        case SDP_FIELD_ENCRYPTION_KEY:
+            field = (!copy) ? new SDP_Field_Encryption_Key()
+                            : new SDP_Field_Encryption_Key(dynamic_cast<const SDP_Field_Encryption_Key &>(*copy));
+            break;
+
         default:
             break;
     }
@@ -625,6 +630,79 @@ bool SDP_Field_Time_Zone::encode(std::string &msg)
     }
 
     return true;
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+bool SDP_Field_Encryption_Key::decode(std::string &msg)
+{
+    std::string result;
+
+    bool matched = String_Functions::match(msg, ":", result);
+
+    if (result.empty())
+        return false;
+
+    _method = result;
+
+    if (matched)
+    {
+        if (msg.empty())
+            return false;
+
+        _key = msg;
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+
+bool SDP_Field_Encryption_Key::encode(std::string &msg)
+{
+    if (_method.empty())
+        return false;
+
+    msg += _method;
+
+    if (!_key.empty())
+    {
+        msg += ":";
+        msg += _key;
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+
+void SDP_Field_Encryption_Key::set_method(SDP_Field_Encryption_Key::Method method)
+{
+    switch (method)
+    {
+        case METHOD_CLEAR:      _method = "clear";      break;
+        case METHOD_BASE64:     _method = "base64";     break;
+        case METHOD_URI:        _method = "uri";        break;
+        case METHOD_PROMPT:     _method = "prompt";     break;
+        default:                                        break;
+    }
+}
+
+//-------------------------------------------
+
+SDP_Field_Encryption_Key::Method SDP_Field_Encryption_Key::get_method()
+{
+    if (_method == "clear")
+        return METHOD_CLEAR;
+    else if (_method == "base64")
+        return METHOD_BASE64;
+    else if (_method == "uri")
+        return METHOD_URI;
+    else if (_method == "prompt")
+        return METHOD_PROMPT;
+
+    return METHOD_INVALID;
 }
 
 //-------------------------------------------
