@@ -53,6 +53,9 @@ bool SDP_Field_Test::init()
     if (!run<SDP_Field_Time_Zone_Test>())
         return false;
 
+    if (!run<SDP_Field_Encryption_Key_Test>())
+        return false;
+
     std::cout << "SDP field test completed successfully\n";
     return true;
 }
@@ -647,6 +650,48 @@ SDP_Field_Time_Zone_Test::SDP_Field_Time_Zone_Test()
     field4._field_type     = SDP_FIELD_TIME_ZONE;
     field4._input          = "z=123456789 2d 5566778899 120m 987654321 600s";
     field4._output         = "z=123456789 2d 5566778899 120m 987654321 600s\r\n";
+    field4._field_nb       = 1;
+    field4._decode_success = true;
+    field4._encode_success = true;
+    _field_input_output.push_back(field4);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+SDP_Field_Encryption_Key_Test::SDP_Field_Encryption_Key_Test()
+{
+    SDP_Field_Input_Output field1;
+    field1._field_type     = SDP_FIELD_ENCRYPTION_KEY;
+    field1._input          = "k=clear:password";
+    field1._output         = "k=clear:password\r\n";
+    field1._field_nb       = 1;
+    field1._decode_success = true;
+    field1._encode_success = true;
+    _field_input_output.push_back(field1);
+
+    SDP_Field_Input_Output field2;
+    field2._field_type     = SDP_FIELD_ENCRYPTION_KEY;
+    field2._input          = "k=base64:cGFzc3dvcmQ=";
+    field2._output         = "k=base64:cGFzc3dvcmQ=\r\n";
+    field2._field_nb       = 1;
+    field2._decode_success = true;
+    field2._encode_success = true;
+    _field_input_output.push_back(field2);
+
+    SDP_Field_Input_Output field3;
+    field3._field_type     = SDP_FIELD_ENCRYPTION_KEY;
+    field3._input          = "k=uri:www.test.com";
+    field3._output         = "k=uri:www.test.com\r\n";
+    field3._field_nb       = 1;
+    field3._decode_success = true;
+    field3._encode_success = true;
+    _field_input_output.push_back(field3);
+
+    SDP_Field_Input_Output field4;
+    field4._field_type     = SDP_FIELD_ENCRYPTION_KEY;
+    field4._input          = "k=prompt";
+    field4._output         = "k=prompt\r\n";
     field4._field_nb       = 1;
     field4._decode_success = true;
     field4._encode_success = true;
