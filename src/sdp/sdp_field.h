@@ -401,3 +401,28 @@ private:
 };
 
 //-------------------------------------------
+
+class SDP_Field_Attribute : public SDP_Field
+{
+public:
+    SDP_Field_Attribute() {}
+    SDP_Field_Attribute(const SDP_Field_Attribute &field) { *this = field; }
+    ~SDP_Field_Attribute() {}
+
+    // Virtual pure functions
+    SDP_Field_Type get_field_type() { return SDP_FIELD_ATTRIBUTE; }
+    bool decode(std::string &msg);
+    bool encode(std::string &msg);
+
+    void set_attribute(std::string attribute) { _attribute = attribute; }
+    std::string get_attribute() { return _attribute; }
+
+    void set_value(std::string value) { _value = value; }
+    std::string get_value() { return _value; }
+
+private:
+    std::string _attribute;
+    std::string _value;
+};
+
+//-------------------------------------------

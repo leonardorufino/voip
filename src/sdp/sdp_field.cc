@@ -75,7 +75,10 @@ SDP_Field *SDP_Field::create_field(SDP_Field_Type field_type, const SDP_Field *c
             field = (!copy) ? new SDP_Field_Encryption_Key()
                             : new SDP_Field_Encryption_Key(dynamic_cast<const SDP_Field_Encryption_Key &>(*copy));
             break;
-
+        case SDP_FIELD_ATTRIBUTE:
+            field = (!copy) ? new SDP_Field_Attribute()
+                            : new SDP_Field_Attribute(dynamic_cast<const SDP_Field_Attribute &>(*copy));
+            break;
         default:
             break;
     }
@@ -703,6 +706,49 @@ SDP_Field_Encryption_Key::Method SDP_Field_Encryption_Key::get_method()
         return METHOD_PROMPT;
 
     return METHOD_INVALID;
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+bool SDP_Field_Attribute::decode(std::string &msg)
+{
+    std::string result;
+
+    bool matched = String_Functions::match(msg, ":", result);
+
+    if (result.empty())
+        return false;
+
+    _attribute = result;
+
+    if (matched)
+    {
+        if (msg.empty())
+            return false;
+
+        _value = msg;
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+
+bool SDP_Field_Attribute::encode(std::string &msg)
+{
+    if (_attribute.empty())
+        return false;
+
+    msg += _attribute;
+
+    if (!_value.empty())
+    {
+        msg += ":";
+        msg += _value;
+    }
+
+    return true;
 }
 
 //-------------------------------------------
