@@ -56,6 +56,9 @@ bool SDP_Field_Test::init()
     if (!run<SDP_Field_Encryption_Key_Test>())
         return false;
 
+    if (!run<SDP_Field_Attribute_Test>())
+        return false;
+
     std::cout << "SDP field test completed successfully\n";
     return true;
 }
@@ -696,6 +699,66 @@ SDP_Field_Encryption_Key_Test::SDP_Field_Encryption_Key_Test()
     field4._decode_success = true;
     field4._encode_success = true;
     _field_input_output.push_back(field4);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+SDP_Field_Attribute_Test::SDP_Field_Attribute_Test()
+{
+    SDP_Field_Input_Output field1;
+    field1._field_type     = SDP_FIELD_ATTRIBUTE;
+    field1._input          = "a=recvonly";
+    field1._output         = "a=recvonly\r\n";
+    field1._field_nb       = 1;
+    field1._decode_success = true;
+    field1._encode_success = true;
+    _field_input_output.push_back(field1);
+
+    SDP_Field_Input_Output field2;
+    field2._field_type     = SDP_FIELD_ATTRIBUTE;
+    field2._input          = "a=rtpmap:99 h263-1998/90000";
+    field2._output         = "a=rtpmap:99 h263-1998/90000\r\n";
+    field2._field_nb       = 1;
+    field2._decode_success = true;
+    field2._encode_success = true;
+    _field_input_output.push_back(field2);
+
+    SDP_Field_Input_Output field3;
+    field3._field_type     = SDP_FIELD_ATTRIBUTE;
+    field3._input          = "a=ptime:20";
+    field3._output         = "a=ptime:20\r\n";
+    field3._field_nb       = 1;
+    field3._decode_success = true;
+    field3._encode_success = true;
+    _field_input_output.push_back(field3);
+
+    SDP_Field_Input_Output field4;
+    field4._field_type     = SDP_FIELD_ATTRIBUTE;
+    field4._input          = "a=rtpmap:98 L16/16000/2";
+    field4._output         = "a=rtpmap:98 L16/16000/2\r\n";
+    field4._field_nb       = 1;
+    field4._decode_success = true;
+    field4._encode_success = true;
+    _field_input_output.push_back(field4);
+
+    SDP_Field_Input_Output field5;
+    field5._field_type     = SDP_FIELD_ATTRIBUTE;
+    field5._input          = "a=orient:landscape";
+    field5._output         = "a=orient:landscape\r\n";
+    field5._field_nb       = 1;
+    field5._decode_success = true;
+    field5._encode_success = true;
+    _field_input_output.push_back(field5);
+
+    SDP_Field_Input_Output field6;
+    field6._field_type     = SDP_FIELD_ATTRIBUTE;
+    field6._input          = "a=charset:ISO-8859-1";
+    field6._output         = "a=charset:ISO-8859-1\r\n";
+    field6._field_nb       = 1;
+    field6._decode_success = true;
+    field6._encode_success = true;
+    _field_input_output.push_back(field5);
 }
 
 //-------------------------------------------

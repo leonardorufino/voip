@@ -151,3 +151,11 @@ public:
 };
 
 //-------------------------------------------
+
+class SDP_Field_Attribute_Test : public SDP_Field_Test
+{
+public:
+    SDP_Field_Attribute_Test();
+};
+
+//-------------------------------------------
