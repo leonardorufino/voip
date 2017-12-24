@@ -426,3 +426,66 @@ private:
 };
 
 //-------------------------------------------
+
+class SDP_Field_Media_Description : public SDP_Field
+{
+public:
+    static const unsigned short INVALID_PORT = INVALID_UNSIGNED_SHORT;
+    static const unsigned short INVALID_NUMBER_PORTS = INVALID_UNSIGNED_SHORT;
+
+    enum Media
+    {
+        MEDIA_AUDIO,
+        MEDIA_VIDEO,
+        MEDIA_TEXT,
+        MEDIA_APPLICATION,
+        MEDIA_MESSAGE,
+        MEDIA_INVALID
+    };
+
+    enum Protocol
+    {
+        PROTOCOL_UDP,
+        PROTOCOL_RTP_AVP,
+        PROTOCOL_RTP_SAVP,
+        PROTOCOL_INVALID
+    };
+
+public:
+    SDP_Field_Media_Description() : _port(INVALID_PORT), _number_ports(INVALID_NUMBER_PORTS) {}
+    SDP_Field_Media_Description(const SDP_Field_Media_Description &field) { *this = field; }
+    ~SDP_Field_Media_Description() {}
+
+    // Virtual pure functions
+    SDP_Field_Type get_field_type() { return SDP_FIELD_MEDIA_DESCRIPTION; }
+    bool decode(std::string &msg);
+    bool encode(std::string &msg);
+
+    void set_media(Media media);
+    void set_media(std::string media) { _media = media; }
+    Media get_media();
+    std::string get_media_str() { return _media; }
+
+    void set_port(unsigned short port) { _port = port; }
+    unsigned short get_port() { return _port; }
+
+    void set_number_ports(unsigned short ports) { _number_ports = ports; }
+    unsigned short get_number_ports() { return _number_ports; }
+
+    void set_protocol(Protocol protocol);
+    void set_protocol(std::string protocol) { _protocol = protocol; }
+    Protocol get_protocol();
+    std::string get_protocol_str() { return _protocol; }
+
+    void set_formats(std::list<std::string> &formats) { _formats = formats; }
+    std::list<std::string> &get_formats() { return _formats; }
+
+private:
+    std::string _media;
+    unsigned short _port;
+    unsigned short _number_ports;
+    std::string _protocol;
+    std::list<std::string> _formats;
+};
+
+//-------------------------------------------

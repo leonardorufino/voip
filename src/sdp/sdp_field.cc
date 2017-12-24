@@ -79,6 +79,10 @@ SDP_Field *SDP_Field::create_field(SDP_Field_Type field_type, const SDP_Field *c
             field = (!copy) ? new SDP_Field_Attribute()
                             : new SDP_Field_Attribute(dynamic_cast<const SDP_Field_Attribute &>(*copy));
             break;
+        case SDP_FIELD_MEDIA_DESCRIPTION:
+            field = (!copy) ? new SDP_Field_Media_Description()
+                            : new SDP_Field_Media_Description(dynamic_cast<const SDP_Field_Media_Description &>(*copy));
+            break;
         default:
             break;
     }
@@ -749,6 +753,160 @@ bool SDP_Field_Attribute::encode(std::string &msg)
     }
 
     return true;
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+bool SDP_Field_Media_Description::decode(std::string &msg)
+{
+    std::string result;
+
+    if (!String_Functions::match(msg, " ", result))
+        return false;
+
+    if (result.empty())
+        return false;
+
+    _media = result;
+
+    if (!String_Functions::match(msg, " ", result))
+        return false;
+
+    if (result.empty())
+        return false;
+
+    std::string port;
+    bool has_slash = String_Functions::match(result, "/", port);
+
+    if (port.empty())
+        return false;
+
+    _port = String_Functions::str_to_us(port);
+    if (_port == INVALID_PORT)
+        return false;
+
+    if (has_slash)
+    {
+        if (result.empty())
+            return false;
+
+        _number_ports = String_Functions::str_to_us(result);
+        if (_port == INVALID_NUMBER_PORTS)
+            return false;
+    }
+
+    if (!String_Functions::match(msg, " ", result))
+        return false;
+
+    if (result.empty())
+        return false;
+
+    _protocol = result;
+
+    bool matched;
+
+    do
+    {
+        matched = String_Functions::match(msg, " ", result);
+
+        if (result.empty())
+            return false;
+
+        _formats.push_back(result);
+    }while (matched);
+
+    return true;
+}
+
+//-------------------------------------------
+
+bool SDP_Field_Media_Description::encode(std::string &msg)
+{
+    if ((_media.empty()) || (_port == INVALID_PORT) || (_protocol.empty()) || (_formats.empty()))
+        return false;
+
+    msg += _media;
+    msg += " ";
+    msg += std::to_string(_port);
+
+    if (_number_ports != INVALID_NUMBER_PORTS)
+    {
+        msg += "/";
+        msg += std::to_string(_number_ports);
+    }
+
+    msg += " ";
+    msg += _protocol;
+
+    std::list<std::string>::const_iterator it = _formats.begin();
+    while (it != _formats.end())
+    {
+        msg += " ";
+        msg += *it++;
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+
+void SDP_Field_Media_Description::set_media(SDP_Field_Media_Description::Media media)
+{
+    switch (media)
+    {
+        case MEDIA_AUDIO:           _media = "audio";           break;
+        case MEDIA_VIDEO:           _media = "video";           break;
+        case MEDIA_TEXT:            _media = "text";            break;
+        case MEDIA_APPLICATION:     _media = "application";     break;
+        case MEDIA_MESSAGE:         _media = "message";         break;
+        default:                                                break;
+    }
+}
+
+//-------------------------------------------
+
+SDP_Field_Media_Description::Media SDP_Field_Media_Description::get_media()
+{
+    if (_media == "audio")
+        return MEDIA_AUDIO;
+    else if (_media == "video")
+        return MEDIA_VIDEO;
+    else if (_media == "text")
+        return MEDIA_TEXT;
+    else if (_media == "application")
+        return MEDIA_APPLICATION;
+    else if (_media == "message")
+        return MEDIA_MESSAGE;
+
+    return MEDIA_INVALID;
+}
+
+//-------------------------------------------
+
+void SDP_Field_Media_Description::set_protocol(SDP_Field_Media_Description::Protocol protocol)
+{
+    switch (protocol)
+    {
+        case PROTOCOL_UDP:          _protocol = "udp";          break;
+        case PROTOCOL_RTP_AVP:      _protocol = "RTP/AVP";      break;
+        case PROTOCOL_RTP_SAVP:     _protocol = "RTP/SAVP";     break;
+        default:                                                break;
+    }
+}
+
+//-------------------------------------------
+
+SDP_Field_Media_Description::Protocol SDP_Field_Media_Description::get_protocol()
+{
+    if (_protocol == "udp")
+        return PROTOCOL_UDP;
+    else if (_protocol == "RTP/AVP")
+        return PROTOCOL_RTP_AVP;
+    else if (_protocol == "RTP/SAVP")
+        return PROTOCOL_RTP_SAVP;
+
+    return PROTOCOL_INVALID;
 }
 
 //-------------------------------------------
