@@ -136,6 +136,7 @@ SIP_Request *SIP_Transaction_Test::create_invite()
     str += "CSeq: 314159 INVITE\r\n";
     str += "Contact: <sip:alice@pc33.atlanta.com>\r\n";
     str += "Content-Length: 0\r\n";
+    str += "\r\n";
 
     SIP_Message *msg = SIP_Message::decode_msg(str);
     SIP_Request *request = dynamic_cast<SIP_Request *>(msg);
@@ -162,6 +163,7 @@ SIP_Request *SIP_Transaction_Test::create_ack()
     str += "CSeq: 314159 ACK\r\n";
     str += "Contact: <sip:alice@pc33.atlanta.com>\r\n";
     str += "Content-Length: 0\r\n";
+    str += "\r\n";
 
     SIP_Message *msg = SIP_Message::decode_msg(str);
     SIP_Request *request = dynamic_cast<SIP_Request *>(msg);
@@ -186,6 +188,7 @@ SIP_Response *SIP_Transaction_Test::create_invite_response_100()
     str += "Call-ID: a84b4c76e66710@pc33.atlanta.com\r\n";
     str += "CSeq: 314159 INVITE\r\n";
     str += "Content-Length: 0\r\n";
+    str += "\r\n";
 
     SIP_Message *msg = SIP_Message::decode_msg(str);
     SIP_Response *response = dynamic_cast<SIP_Response *>(msg);
@@ -210,6 +213,7 @@ SIP_Response *SIP_Transaction_Test::create_invite_response_180()
     str += "Call-ID: a84b4c76e66710@pc33.atlanta.com\r\n";
     str += "CSeq: 314159 INVITE\r\n";
     str += "Content-Length: 0\r\n";
+    str += "\r\n";
 
     SIP_Message *msg = SIP_Message::decode_msg(str);
     SIP_Response *response = dynamic_cast<SIP_Response *>(msg);
@@ -235,6 +239,7 @@ SIP_Response *SIP_Transaction_Test::create_invite_response_200()
     str += "CSeq: 314159 INVITE\r\n";
     str += "Contact: <sip:bob@192.0.2.4>\r\n";
     str += "Content-Length: 0\r\n";
+    str += "\r\n";
 
     SIP_Message *msg = SIP_Message::decode_msg(str);
     SIP_Response *response = dynamic_cast<SIP_Response *>(msg);
@@ -260,6 +265,7 @@ SIP_Response *SIP_Transaction_Test::create_invite_response_480()
     str += "CSeq: 314159 INVITE\r\n";
     str += "Contact: <sip:bob@192.0.2.4>\r\n";
     str += "Content-Length: 0\r\n";
+    str += "\r\n";
 
     SIP_Message *msg = SIP_Message::decode_msg(str);
     SIP_Response *response = dynamic_cast<SIP_Response *>(msg);
@@ -286,6 +292,7 @@ SIP_Request *SIP_Transaction_Test::create_bye()
     str += "Call-ID: a84b4c76e66710\r\n";
     str += "CSeq: 231 BYE\r\n";
     str += "Content-Length: 0\r\n";
+    str += "\r\n";
 
     SIP_Message *msg = SIP_Message::decode_msg(str);
     SIP_Request *request = dynamic_cast<SIP_Request *>(msg);
@@ -310,6 +317,7 @@ SIP_Response *SIP_Transaction_Test::create_bye_response_100()
     str += "Call-ID: a84b4c76e66710\r\n";
     str += "CSeq: 231 BYE\r\n";
     str += "Content-Length: 0\r\n";
+    str += "\r\n";
 
     SIP_Message *msg = SIP_Message::decode_msg(str);
     SIP_Response *response = dynamic_cast<SIP_Response *>(msg);
@@ -334,6 +342,7 @@ SIP_Response *SIP_Transaction_Test::create_bye_response_200()
     str += "Call-ID: a84b4c76e66710\r\n";
     str += "CSeq: 231 BYE\r\n";
     str += "Content-Length: 0\r\n";
+    str += "\r\n";
 
     SIP_Message *msg = SIP_Message::decode_msg(str);
     SIP_Response *response = dynamic_cast<SIP_Response *>(msg);
