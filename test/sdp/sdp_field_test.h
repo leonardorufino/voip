@@ -159,3 +159,11 @@ public:
 };
 
 //-------------------------------------------
+
+class SDP_Field_Media_Description_Test : public SDP_Field_Test
+{
+public:
+    SDP_Field_Media_Description_Test();
+};
+
+//-------------------------------------------

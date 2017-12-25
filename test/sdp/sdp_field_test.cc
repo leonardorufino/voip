@@ -59,6 +59,9 @@ bool SDP_Field_Test::init()
     if (!run<SDP_Field_Attribute_Test>())
         return false;
 
+    if (!run<SDP_Field_Media_Description_Test>())
+        return false;
+
     std::cout << "SDP field test completed successfully\n";
     return true;
 }
@@ -758,6 +761,57 @@ SDP_Field_Attribute_Test::SDP_Field_Attribute_Test()
     field6._field_nb       = 1;
     field6._decode_success = true;
     field6._encode_success = true;
+    _field_input_output.push_back(field5);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+SDP_Field_Media_Description_Test::SDP_Field_Media_Description_Test()
+{
+    SDP_Field_Input_Output field1;
+    field1._field_type     = SDP_FIELD_MEDIA_DESCRIPTION;
+    field1._input          = "m=video 49170/2 RTP/AVP 31";
+    field1._output         = "m=video 49170/2 RTP/AVP 31\r\n";
+    field1._field_nb       = 1;
+    field1._decode_success = true;
+    field1._encode_success = true;
+    _field_input_output.push_back(field1);
+
+    SDP_Field_Input_Output field2;
+    field2._field_type     = SDP_FIELD_MEDIA_DESCRIPTION;
+    field2._input          = "m=audio 65500 RTP/AVP 0";
+    field2._output         = "m=audio 65500 RTP/AVP 0\r\n";
+    field2._field_nb       = 1;
+    field2._decode_success = true;
+    field2._encode_success = true;
+    _field_input_output.push_back(field2);
+
+    SDP_Field_Input_Output field3;
+    field3._field_type     = SDP_FIELD_MEDIA_DESCRIPTION;
+    field3._input          = "m=video 51372 RTP/SAVP 99 100";
+    field3._output         = "m=video 51372 RTP/SAVP 99 100\r\n";
+    field3._field_nb       = 1;
+    field3._decode_success = true;
+    field3._encode_success = true;
+    _field_input_output.push_back(field3);
+
+    SDP_Field_Input_Output field4;
+    field4._field_type     = SDP_FIELD_MEDIA_DESCRIPTION;
+    field4._input          = "m=audio 49230 RTP/AVP 96 97 98";
+    field4._output         = "m=audio 49230 RTP/AVP 96 97 98\r\n";
+    field4._field_nb       = 1;
+    field4._decode_success = true;
+    field4._encode_success = true;
+    _field_input_output.push_back(field4);
+
+    SDP_Field_Input_Output field5;
+    field5._field_type     = SDP_FIELD_MEDIA_DESCRIPTION;
+    field5._input          = "m=audio 10000 udp 0";
+    field5._output         = "m=audio 10000 udp 0\r\n";
+    field5._field_nb       = 1;
+    field5._decode_success = true;
+    field5._encode_success = true;
     _field_input_output.push_back(field5);
 }
 
