@@ -159,6 +159,8 @@ SIP_Request *SIP_Call_Test::create_invite()
     if (_use_prack)
         str += "Supported: 100rel\r\n";
 
+    str += "\r\n";
+
     _invite_sequence = _client_sequence;
 
     SIP_Message *msg = SIP_Message::decode_msg(str);
@@ -184,6 +186,7 @@ SIP_Response *SIP_Call_Test::create_invite_response_100()
     str += "Call-ID: a84b4c76e66710@pc33.atlanta.com\r\n";
     str += "CSeq: " + std::to_string(_client_sequence) + " INVITE\r\n";
     str += "Content-Length: 0\r\n";
+    str += "\r\n";
 
     SIP_Message *msg = SIP_Message::decode_msg(str);
     SIP_Response *response = dynamic_cast<SIP_Response *>(msg);
@@ -216,6 +219,8 @@ SIP_Response *SIP_Call_Test::create_invite_response_180()
         str += "RSeq: " + std::to_string(++_prack_rseq) + "\r\n";
     }
 
+    str += "\r\n";
+
     SIP_Message *msg = SIP_Message::decode_msg(str);
     SIP_Response *response = dynamic_cast<SIP_Response *>(msg);
     if (!response)
@@ -247,6 +252,8 @@ SIP_Response *SIP_Call_Test::create_invite_response_183()
         str += "RSeq: " + std::to_string(++_prack_rseq) + "\r\n";
     }
 
+    str += "\r\n";
+
     SIP_Message *msg = SIP_Message::decode_msg(str);
     SIP_Response *response = dynamic_cast<SIP_Response *>(msg);
     if (!response)
@@ -271,6 +278,7 @@ SIP_Response *SIP_Call_Test::create_invite_response_200()
     str += "CSeq: " + std::to_string(_client_sequence) + " INVITE\r\n";
     str += "Contact: <sip:bob@192.0.2.4>\r\n";
     str += "Content-Length: 0\r\n";
+    str += "\r\n";
 
     SIP_Message *msg = SIP_Message::decode_msg(str);
     SIP_Response *response = dynamic_cast<SIP_Response *>(msg);
@@ -295,6 +303,7 @@ SIP_Response *SIP_Call_Test::create_invite_response_480()
     str += "Call-ID: a84b4c76e66710@pc33.atlanta.com\r\n";
     str += "CSeq: " + std::to_string(_client_sequence) + " INVITE\r\n";
     str += "Content-Length: 0\r\n";
+    str += "\r\n";
 
     SIP_Message *msg = SIP_Message::decode_msg(str);
     SIP_Response *response = dynamic_cast<SIP_Response *>(msg);
@@ -319,6 +328,7 @@ SIP_Response *SIP_Call_Test::create_invite_response_487()
     str += "Call-ID: a84b4c76e66710@pc33.atlanta.com\r\n";
     str += "CSeq: " + std::to_string(_client_sequence) + " INVITE\r\n";
     str += "Content-Length: 0\r\n";
+    str += "\r\n";
 
     SIP_Message *msg = SIP_Message::decode_msg(str);
     SIP_Response *response = dynamic_cast<SIP_Response *>(msg);
@@ -347,6 +357,7 @@ SIP_Request *SIP_Call_Test::create_ack()
     str += "CSeq: " + std::to_string(_invite_sequence) + " ACK\r\n";
     str += "Contact: <sip:alice@pc33.atlanta.com>\r\n";
     str += "Content-Length: 0\r\n";
+    str += "\r\n";
 
     SIP_Message *msg = SIP_Message::decode_msg(str);
     SIP_Request *request = dynamic_cast<SIP_Request *>(msg);
@@ -374,6 +385,7 @@ SIP_Request *SIP_Call_Test::create_client_bye()
     str += "Call-ID: a84b4c76e66710@pc33.atlanta.com\r\n";
     str += "CSeq: " + std::to_string(++_client_sequence) + " BYE\r\n";
     str += "Content-Length: 0\r\n";
+    str += "\r\n";
 
     SIP_Message *msg = SIP_Message::decode_msg(str);
     SIP_Request *request = dynamic_cast<SIP_Request *>(msg);
@@ -398,6 +410,7 @@ SIP_Response *SIP_Call_Test::create_server_bye_response_200()
     str += "Call-ID: a84b4c76e66710@pc33.atlanta.com\r\n";
     str += "CSeq: " + std::to_string(_client_sequence) + " BYE\r\n";
     str += "Content-Length: 0\r\n";
+    str += "\r\n";
 
     SIP_Message *msg = SIP_Message::decode_msg(str);
     SIP_Response *response = dynamic_cast<SIP_Response *>(msg);
@@ -425,6 +438,7 @@ SIP_Request *SIP_Call_Test::create_server_bye()
     str += "Call-ID: a84b4c76e66710@pc33.atlanta.com\r\n";
     str += "CSeq: " + std::to_string(++_server_sequence) + " BYE\r\n";
     str += "Content-Length: 0\r\n";
+    str += "\r\n";
 
     SIP_Message *msg = SIP_Message::decode_msg(str);
     SIP_Request *request = dynamic_cast<SIP_Request *>(msg);
@@ -449,6 +463,7 @@ SIP_Response *SIP_Call_Test::create_client_bye_response_200()
     str += "Call-ID: a84b4c76e66710@pc33.atlanta.com\r\n";
     str += "CSeq: " + std::to_string(_server_sequence) + " BYE\r\n";
     str += "Content-Length: 0\r\n";
+    str += "\r\n";
 
     SIP_Message *msg = SIP_Message::decode_msg(str);
     SIP_Response *response = dynamic_cast<SIP_Response *>(msg);
@@ -476,6 +491,7 @@ SIP_Request *SIP_Call_Test::create_client_update()
     str += "Call-ID: a84b4c76e66710@pc33.atlanta.com\r\n";
     str += "CSeq: " + std::to_string(++_client_sequence) + " UPDATE\r\n";
     str += "Content-Length: 0\r\n";
+    str += "\r\n";
 
     SIP_Message *msg = SIP_Message::decode_msg(str);
     SIP_Request *request = dynamic_cast<SIP_Request *>(msg);
@@ -500,6 +516,7 @@ SIP_Response *SIP_Call_Test::create_server_update_response_200()
     str += "Call-ID: a84b4c76e66710@pc33.atlanta.com\r\n";
     str += "CSeq: " + std::to_string(_client_sequence) + " UPDATE\r\n";
     str += "Content-Length: 0\r\n";
+    str += "\r\n";
 
     SIP_Message *msg = SIP_Message::decode_msg(str);
     SIP_Response *response = dynamic_cast<SIP_Response *>(msg);
@@ -527,6 +544,7 @@ SIP_Request *SIP_Call_Test::create_server_update()
     str += "Call-ID: a84b4c76e66710@pc33.atlanta.com\r\n";
     str += "CSeq: " + std::to_string(++_server_sequence) + " UPDATE\r\n";
     str += "Content-Length: 0\r\n";
+    str += "\r\n";
 
     SIP_Message *msg = SIP_Message::decode_msg(str);
     SIP_Request *request = dynamic_cast<SIP_Request *>(msg);
@@ -551,6 +569,7 @@ SIP_Response *SIP_Call_Test::create_client_update_response_200()
     str += "Call-ID: a84b4c76e66710@pc33.atlanta.com\r\n";
     str += "CSeq: " + std::to_string(_server_sequence) + " UPDATE\r\n";
     str += "Content-Length: 0\r\n";
+    str += "\r\n";
 
     SIP_Message *msg = SIP_Message::decode_msg(str);
     SIP_Response *response = dynamic_cast<SIP_Response *>(msg);
@@ -576,6 +595,7 @@ SIP_Request *SIP_Call_Test::create_cancel()
     str += "Call-ID: a84b4c76e66710@pc33.atlanta.com\r\n";
     str += "CSeq: " + std::to_string(_invite_sequence) + " CANCEL\r\n";
     str += "Content-Length: 0\r\n";
+    str += "\r\n";
 
     SIP_Message *msg = SIP_Message::decode_msg(str);
     SIP_Request *request = dynamic_cast<SIP_Request *>(msg);
@@ -600,6 +620,7 @@ SIP_Response *SIP_Call_Test::create_cancel_response_200()
     str += "Call-ID: a84b4c76e66710@pc33.atlanta.com\r\n";
     str += "CSeq: " + std::to_string(_invite_sequence) + " CANCEL\r\n";
     str += "Content-Length: 0\r\n";
+    str += "\r\n";
 
     SIP_Message *msg = SIP_Message::decode_msg(str);
     SIP_Response *response = dynamic_cast<SIP_Response *>(msg);
@@ -628,6 +649,7 @@ SIP_Request *SIP_Call_Test::create_prack()
     str += "CSeq: " + std::to_string(++_client_sequence) + " PRACK\r\n";
     str += "RAck: " + std::to_string(_prack_rseq) + " " + std::to_string(_invite_sequence) + " INVITE\r\n";
     str += "Content-Length: 0\r\n";
+    str += "\r\n";
 
     SIP_Message *msg = SIP_Message::decode_msg(str);
     SIP_Request *request = dynamic_cast<SIP_Request *>(msg);
@@ -652,6 +674,7 @@ SIP_Response *SIP_Call_Test::create_prack_response_200()
     str += "Call-ID: a84b4c76e66710@pc33.atlanta.com\r\n";
     str += "CSeq: " + std::to_string(_client_sequence) + " PRACK\r\n";
     str += "Content-Length: 0\r\n";
+    str += "\r\n";
 
     SIP_Message *msg = SIP_Message::decode_msg(str);
     SIP_Response *response = dynamic_cast<SIP_Response *>(msg);
@@ -679,6 +702,7 @@ SIP_Request *SIP_Call_Test::create_info()
     str += "Call-ID: a84b4c76e66710@pc33.atlanta.com\r\n";
     str += "CSeq: " + std::to_string(++_client_sequence) + " INFO\r\n";
     str += "Content-Length: 0\r\n";
+    str += "\r\n";
 
     SIP_Message *msg = SIP_Message::decode_msg(str);
     SIP_Request *request = dynamic_cast<SIP_Request *>(msg);
@@ -703,6 +727,7 @@ SIP_Response *SIP_Call_Test::create_info_response_200()
     str += "Call-ID: a84b4c76e66710@pc33.atlanta.com\r\n";
     str += "CSeq: " + std::to_string(_client_sequence) + " INFO\r\n";
     str += "Content-Length: 0\r\n";
+    str += "\r\n";
 
     SIP_Message *msg = SIP_Message::decode_msg(str);
     SIP_Response *response = dynamic_cast<SIP_Response *>(msg);
@@ -732,6 +757,7 @@ SIP_Request *SIP_Call_Test::create_register()
     str += "CSeq: " + std::to_string(++_client_sequence) + " REGISTER\r\n";
     str += "Contact: <sip:alice@pc33.atlanta.com>\r\n";
     str += "Content-Length: 0\r\n";
+    str += "\r\n";
 
     SIP_Message *msg = SIP_Message::decode_msg(str);
     SIP_Request *request = dynamic_cast<SIP_Request *>(msg);
@@ -756,6 +782,7 @@ SIP_Response *SIP_Call_Test::create_register_response_100()
     str += "Call-ID: a84b4c76e66710@pc33.atlanta.com\r\n";
     str += "CSeq: " + std::to_string(_client_sequence) + " REGISTER\r\n";
     str += "Content-Length: 0\r\n";
+    str += "\r\n";
 
     SIP_Message *msg = SIP_Message::decode_msg(str);
     SIP_Response *response = dynamic_cast<SIP_Response *>(msg);
@@ -782,6 +809,7 @@ SIP_Response *SIP_Call_Test::create_register_response_200()
     str += "CSeq: " + std::to_string(_client_sequence) + " REGISTER\r\n";
     str += "Contact: <sip:alice@pc33.atlanta.com>\r\n";
     str += "Content-Length: 0\r\n";
+    str += "\r\n";
 
     SIP_Message *msg = SIP_Message::decode_msg(str);
     SIP_Response *response = dynamic_cast<SIP_Response *>(msg);
@@ -806,6 +834,7 @@ SIP_Response *SIP_Call_Test::create_register_response_401()
     str += "Call-ID: a84b4c76e66710@pc33.atlanta.com\r\n";
     str += "CSeq: " + std::to_string(_client_sequence) + " REGISTER\r\n";
     str += "Content-Length: 0\r\n";
+    str += "\r\n";
 
     SIP_Message *msg = SIP_Message::decode_msg(str);
     SIP_Response *response = dynamic_cast<SIP_Response *>(msg);
@@ -833,6 +862,7 @@ SIP_Request *SIP_Call_Test::create_options()
     str += "Call-ID: a84b4c76e66710@pc33.atlanta.com\r\n";
     str += "CSeq: " + std::to_string(++_client_sequence) + " OPTIONS\r\n";
     str += "Content-Length: 0\r\n";
+    str += "\r\n";
 
     SIP_Message *msg = SIP_Message::decode_msg(str);
     SIP_Request *request = dynamic_cast<SIP_Request *>(msg);
@@ -857,6 +887,7 @@ SIP_Response *SIP_Call_Test::create_options_response_100()
     str += "Call-ID: a84b4c76e66710@pc33.atlanta.com\r\n";
     str += "CSeq: " + std::to_string(_client_sequence) + " OPTIONS\r\n";
     str += "Content-Length: 0\r\n";
+    str += "\r\n";
 
     SIP_Message *msg = SIP_Message::decode_msg(str);
     SIP_Response *response = dynamic_cast<SIP_Response *>(msg);
@@ -881,6 +912,7 @@ SIP_Response *SIP_Call_Test::create_options_response_200()
     str += "Call-ID: a84b4c76e66710@pc33.atlanta.com\r\n";
     str += "CSeq: " + std::to_string(_client_sequence) + " OPTIONS\r\n";
     str += "Content-Length: 0\r\n";
+    str += "\r\n";
 
     SIP_Message *msg = SIP_Message::decode_msg(str);
     SIP_Response *response = dynamic_cast<SIP_Response *>(msg);
