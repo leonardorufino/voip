@@ -117,8 +117,8 @@ public:
     static bool transport_connect_callback(void *data, SIP_Transport *transport, bool success);
     static bool transport_accept_callback(void *data, SIP_Transport *transport, SIP_Transport_TCP_Client *accepted,
                                           std::string address, unsigned short port);
-    static bool transport_receive_callback(void *data, SIP_Transport *transport, const char *buffer, int size,
-                                           std::string address, unsigned short port);
+    static bool transport_receive_callback(void *data, SIP_Transport *transport, SIP_Message *msg, std::string address,
+                                           unsigned short port);
 
     static Logger &get_logger() { return _logger; }
 

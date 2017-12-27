@@ -972,34 +972,28 @@ bool SIP_User_Agent::transport_accept_callback(void *data, SIP_Transport *transp
 
 //-------------------------------------------
 
-bool SIP_User_Agent::transport_receive_callback(void *data, SIP_Transport *transport, const char *buffer, int size,
-                                                std::string address, unsigned short port)
+bool SIP_User_Agent::transport_receive_callback(void *data, SIP_Transport *transport, SIP_Message *msg, std::string address,
+                                                unsigned short port)
 {
     SIP_User_Agent *user_agent = reinterpret_cast<SIP_User_Agent *>(data);
-    if ((!user_agent) || (!transport))
+    if ((!user_agent) || (!transport) || (!msg))
     {
         _logger.warning("Invalid transport receive callback parameters");
-        return false;
-    }
-
-    SIP_Message *msg = SIP_Message::decode_msg(buffer);
-    if (!msg)
-    {
-        _logger.warning("Failed in transport receive callback: decode message failed [%s]", user_agent->_id.to_string().c_str());
         return false;
     }
 
     SIP_Method_Type method = msg->get_message_type();
     SIP_Header_Via *header_via = dynamic_cast<SIP_Header_Via *>(msg->get_header(SIP_HEADER_VIA));
 
-    if ((!msg->get_header(SIP_HEADER_CALL_ID)) || (!msg->get_header(SIP_HEADER_CSEQ)) || (!msg->get_header(SIP_HEADER_FROM)) ||
-        (!msg->get_header(SIP_HEADER_TO)) || (!header_via))
+    if (!header_via)
     {
-        _logger.warning("Failed in transport receive callback: required headers not present (method=%d) [%s]",
+        _logger.warning("Failed in transport receive callback: Via header not present (method=%d) [%s]",
                         method, user_agent->_id.to_string().c_str());
-        delete msg;
         return false;
     }
+
+    if (header_via->get_host().get_address() != address)
+        header_via->set_received(address);
 
     _logger.trace("Message received (method=%d) [%s]", method, user_agent->_id.to_string().c_str());
 
@@ -1010,7 +1004,6 @@ bool SIP_User_Agent::transport_receive_callback(void *data, SIP_Transport *trans
         {
             _logger.warning("Failed in transport receive callback: invalid received SIP request (method=%d) [%s]",
                             method, user_agent->_id.to_string().c_str());
-            delete msg;
             return false;
         }
 
@@ -1018,23 +1011,17 @@ bool SIP_User_Agent::transport_receive_callback(void *data, SIP_Transport *trans
         {
             _logger.warning("Failed in transport receive callback: receive request failed (method=%d) [%s]",
                             method, user_agent->_id.to_string().c_str());
-            delete msg;
             return false;
         }
 
-        delete msg;
         return true;
     }else
     {
-        if (header_via->get_host().get_address() != address)
-            header_via->set_received(address);
-
         SIP_Response *response = dynamic_cast<SIP_Response *>(msg);
         if (!response)
         {
             _logger.warning("Failed in transport receive callback: invalid received SIP response (method=%d) [%s]",
                             method, user_agent->_id.to_string().c_str());
-            delete msg;
             return false;
         }
 
@@ -1042,11 +1029,9 @@ bool SIP_User_Agent::transport_receive_callback(void *data, SIP_Transport *trans
         {
             _logger.warning("Failed in transport receive callback: receive response failed (method=%d) [%s]",
                             method, user_agent->_id.to_string().c_str());
-            delete msg;
             return false;
         }
 
-        delete msg;
         return true;
     }
 }

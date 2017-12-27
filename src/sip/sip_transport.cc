@@ -178,6 +178,23 @@ bool SIP_Transport::send_message(const char *buffer, int size, std::string addre
 
 //-------------------------------------------
 
+bool SIP_Transport::receive_message(const char *buffer, int size, std::string address, unsigned short port)
+{
+    _logger.trace("Message received (address=%s, port=%d, size=%d) [%s]:\n%s", address.c_str(), port, size, _id.to_string().c_str(), buffer);
+
+    SIP_Message *msg = SIP_Message::decode_msg(buffer);
+    if (!msg)
+    {
+        _logger.warning("Failed to receive message: decode message failed (address=%s, port=%d, size=%d) [%s]",
+                        address.c_str(), port, size, _id.to_string().c_str());
+        return false;
+    }
+
+    return _receive_callback(_receive_callback_data, this, msg, address, port);
+}
+
+//-------------------------------------------
+
 bool SIP_Transport::socket_connect_callback(void *data, bool success)
 {
     SIP_Transport *transport = reinterpret_cast<SIP_Transport *>(data);
@@ -316,9 +333,7 @@ bool SIP_Transport::socket_receive_callback(void *data, const char *buffer, int 
             return false;
         }
 
-        _logger.trace("Message received (address=%s, port=%d, size=%d) [%s]:\n%s", address.c_str(),
-                      port, size, transport->_id.to_string().c_str(), buffer);
-        return transport->_receive_callback(transport->_receive_callback_data, transport, buffer, size, address, port);
+        return transport->receive_message(buffer, size, address, port);
 
     }catch (std::exception &e)
     {
@@ -388,6 +403,93 @@ bool SIP_Transport_TCP_Client::connect(std::string address, unsigned short port)
 
     _logger.trace("Transport connected [%s]", _id.to_string().c_str());
     return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Transport_TCP_Client::receive_message(const char *buffer, int size, std::string address, unsigned short port)
+{
+    if ((_receive_buffer_size + size) > RECEIVE_BUFFER_SIZE)
+    {
+        _logger.warning("Failed to receive message: invalid receive buffer size (buffer_size=%d, size=%d, max=%d) [%s]",
+                        _receive_buffer_size, size, RECEIVE_BUFFER_SIZE, _id.to_string().c_str());
+        return false;
+    }
+
+    memcpy(&_receive_buffer[_receive_buffer_size], buffer, size);
+    _receive_buffer_size += size;
+    _receive_buffer[_receive_buffer_size] = 0;
+
+    do
+    {
+        _logger.trace("Message received (address=%s, port=%d, size=%d) [%s]:\n%s", address.c_str(), port, size,
+                      _id.to_string().c_str(), _receive_buffer);
+
+        SIP_Message *msg = SIP_Message::decode_msg(_receive_buffer);
+        if (!msg)
+        {
+            _logger.trace("Received SIP message may not be complete (address=%s, port=%d, size=%d) [%s]",
+                          address.c_str(), port, size, _id.to_string().c_str());
+            return true;
+        }
+
+        char *ptr = strstr(_receive_buffer, "\r\n\r\n");
+        if (!ptr)
+        {
+            _logger.trace("Received SIP message is not complete: CRLF not found (address=%s, port=%d, size=%d) [%s]",
+                          address.c_str(), port, size, _id.to_string().c_str());
+            delete msg;
+            return true;
+        }
+
+        ptr += 4;
+        unsigned short length;
+
+        SIP_Header_Content_Length *content_length = dynamic_cast<SIP_Header_Content_Length *>(msg->get_header(SIP_HEADER_CONTENT_LENGTH));
+        if (content_length)
+            length = (unsigned short) ((ptr - _receive_buffer) + content_length->get_length());
+        else
+        {
+            _logger.warning("Failed to receive message: Content-Length header not present (address=%s, port=%d, size=%d) [%s]",
+                            address.c_str(), port, size, _id.to_string().c_str());
+
+            _receive_buffer_size = 0;
+            _receive_buffer[_receive_buffer_size] = 0;
+            delete msg;
+            return false;
+        }
+
+        if (length > _receive_buffer_size)
+        {
+            _logger.trace("Received SIP message is not complete (address=%s, port=%d, size=%d) [%s]", address.c_str(), port, size,
+                          _id.to_string().c_str());
+            delete msg;
+            return true;
+
+        }else if (length < _receive_buffer_size)
+        {
+            memcpy(&_receive_buffer[0], &_receive_buffer[length], _receive_buffer_size - length);
+            _receive_buffer_size -= length;
+            _receive_buffer[_receive_buffer_size] = 0;
+
+            if (!_receive_callback(_receive_callback_data, this, msg, address, port))
+            {
+                delete msg;
+                return false;
+            }
+        }else
+        {
+            _receive_buffer_size = 0;
+            _receive_buffer[_receive_buffer_size] = 0;
+
+            bool ret = _receive_callback(_receive_callback_data, this, msg, address, port);
+            delete msg;
+            return ret;
+        }
+
+        delete msg;
+
+    }while (true);
 }
 
 //-------------------------------------------
