@@ -29,7 +29,7 @@ bool SIP_Transport_Test::init()
         if (!run<SIP_Transport_UDP_Test>(family_ipv4, address_ipv4, port_ipv4))
             return false;
 
-        if (!run<SIP_Transport_TCP_Test>(family_ipv4, address_ipv4, port_ipv4))
+        if (!run<SIP_Transport_TCP_Complete_Test>(family_ipv4, address_ipv4, port_ipv4))
             return false;
 
         std::cout << "IPv4 SIP transport test completed successfully\n";
@@ -48,7 +48,7 @@ bool SIP_Transport_Test::init()
         if (!run<SIP_Transport_UDP_Test>(family_ipv6, address_ipv6, port_ipv6))
             return false;
 
-        if (!run<SIP_Transport_TCP_Test>(family_ipv6, address_ipv6, port_ipv6))
+        if (!run<SIP_Transport_TCP_Complete_Test>(family_ipv6, address_ipv6, port_ipv6))
             return false;
 
         std::cout << "IPv6 SIP transport test completed successfully\n";
@@ -92,9 +92,8 @@ void SIP_Transport_Test::thread(SIP_Transport_Test *test)
 //-------------------------------------------
 
 SIP_Transport_Test::SIP_Transport_Test() : _connected(false), _accepted_transport(NULL), _accepted_port(SIP_Transport::INVALID_PORT),
-    _received_size(0), _received_port(SIP_Transport::INVALID_PORT), _stop_thread(false)
+    _received_port(SIP_Transport::INVALID_PORT), _stop_thread(false)
 {
-    _received_buffer[0] = 0;
 }
 
 //-------------------------------------------
@@ -103,6 +102,10 @@ SIP_Transport_Test::~SIP_Transport_Test()
 {
     if (_accepted_transport)
         delete _accepted_transport;
+
+    std::list<SIP_Message *>::iterator it = _received_messages.begin();
+    while (it != _received_messages.end())
+        delete *it++;
 }
 
 //-------------------------------------------
@@ -120,6 +123,20 @@ bool SIP_Transport_Test::set_callbacks()
     transport->set_accept_callback(accept_callback, this);
     transport->set_receive_callback(receive_callback, this);
     return true;
+}
+
+//-------------------------------------------
+
+void SIP_Transport_Test::clear_callback_params()
+{
+    std::list<SIP_Message *>::iterator it = _received_messages.begin();
+    while (it != _received_messages.end())
+        delete *it++;
+
+    _received_messages.clear();
+
+    _received_address.clear();
+    _received_port = SIP_Transport::INVALID_PORT;
 }
 
 //-------------------------------------------
@@ -146,6 +163,7 @@ std::string SIP_Transport_Test::create_request()
     str += "Contact: <sip:alice@pc33.atlanta.com>\r\n";
     str += "User-Agent: ABC123\r\n";
     str += "Content-Length: 0\r\n";
+    str += "\r\n";
     return str;
 }
 
@@ -187,17 +205,22 @@ bool SIP_Transport_Test::accept_callback(void *data, SIP_Transport *transport, S
 
 //-------------------------------------------
 
-bool SIP_Transport_Test::receive_callback(void *data, SIP_Transport *transport, const char *buffer, int size, std::string address, unsigned short port)
+bool SIP_Transport_Test::receive_callback(void *data, SIP_Transport *transport, SIP_Message *msg, std::string address, unsigned short port)
 {
     SIP_Transport_Test *test = reinterpret_cast<SIP_Transport_Test *>(data);
-    if ((!test) || (!transport) || (!buffer) || (size < 0))
+    if ((!test) || (!transport) || (!msg))
     {
         std::cout << "SIP_Transport_Test::receive_callback -> Invalid parameters\n";
         return false;
     }
 
-    memcpy(test->_received_buffer, buffer, size);
-    test->_received_size = size;
+    switch (msg->get_message_type())
+    {
+        default:                    test->_received_messages.push_back(new SIP_Request(*dynamic_cast<SIP_Request *>(msg)));     break;
+        case SIP_RESPONSE:          test->_received_messages.push_back(new SIP_Response(*dynamic_cast<SIP_Response *>(msg)));   break;
+        case SIP_METHOD_INVALID:                                                                                                break;
+    }
+
     test->_received_address = address;
     test->_received_port = port;
     return true;
@@ -316,12 +339,9 @@ bool SIP_Transport_UDP_Test::run(Socket::Address_Family family, std::string addr
     if (!init(address, port))
         return false;
 
-    std::string request = create_request();
+    clear_callback_params();
 
-    _received_buffer[0] = 0;
-    _received_size = 0;
-    _received_address.clear();
-    _received_port = SIP_Transport::INVALID_PORT;
+    std::string request = create_request();
 
     if (!send_message(request.c_str(), (int) request.size(), address, port))
         return false;
@@ -330,17 +350,17 @@ bool SIP_Transport_UDP_Test::run(Socket::Address_Family family, std::string addr
 
     while ((Util_Functions::get_tick() - start) < MAX_WAIT_TIME)
     {
-        if (_received_size == (int) request.size())
+        if (_received_messages.size() == 1)
             break;
 
         Util_Functions::delay(DELAY);
     }
 
-    if (_received_size != (int) request.size())
+    if (_received_messages.size() != 1)
     {
-        std::cout << "SIP_Transport_UDP_Test::run -> Message not received:\n";
-        std::cout << std::setw(20) << "Expected: " << request.size() << "\n";
-        std::cout << std::setw(20) << "Received: " << _received_size << "\n";
+        std::cout << "SIP_Transport_UDP_Test::run -> Message not received\n";
+        std::cout << std::setw(20) << "Received: " << _received_messages.size() << "\n";
+        std::cout << std::setw(20) << "Expected: " << 1 << "\n";
         return false;
     }
 
@@ -351,12 +371,6 @@ bool SIP_Transport_UDP_Test::run(Socket::Address_Family family, std::string addr
         std::cout << std::setw(20) << "Local Port: " << port << "\n";
         std::cout << std::setw(20) << "Received Address: " << _received_address << "\n";
         std::cout << std::setw(20) << "Received Port: " << _received_port << "\n";
-        return false;
-    }
-
-    if (memcmp(request.c_str(), _received_buffer, request.size()) != 0)
-    {
-        std::cout << "SIP_Transport_UDP_Test::run -> Invalid received message\n";
         return false;
     }
 
@@ -486,14 +500,15 @@ bool SIP_Transport_TCP_Test::close()
 }
 
 //-------------------------------------------
+//-------------------------------------------
 
-bool SIP_Transport_TCP_Test::run(Socket::Address_Family family, std::string address, unsigned short port)
+bool SIP_Transport_TCP_Complete_Test::run(Socket::Address_Family family, std::string address, unsigned short port)
 {
-    std::cout << "SIP transport TCP test initialized\n";
+    std::cout << "SIP transport TCP complete test initialized\n";
 
     if ((!_transport_tcp_client) || (!_transport_tcp_server))
     {
-        std::cout << "SIP_Transport_TCP_Test::run -> Invalid transports\n";
+        std::cout << "SIP_Transport_TCP_Complete_Test::run -> Invalid transports\n";
         return false;
     }
 
@@ -530,7 +545,7 @@ bool SIP_Transport_TCP_Test::run(Socket::Address_Family family, std::string addr
 
     if (!_connected)
     {
-        std::cout << "SIP_Transport_TCP_Test::run -> Transport not connected\n";
+        std::cout << "SIP_Transport_TCP_Complete_Test::run -> Transport not connected\n";
         return false;
     }
 
@@ -546,13 +561,13 @@ bool SIP_Transport_TCP_Test::run(Socket::Address_Family family, std::string addr
 
     if (!_accepted_transport)
     {
-        std::cout << "SIP_Transport_TCP_Test::run -> Transport not accepted\n";
+        std::cout << "SIP_Transport_TCP_Complete_Test::run -> Transport not accepted\n";
         return false;
     }
 
     if (address != _accepted_address)
     {
-        std::cout << "SIP_Transport_TCP_Test::run -> Invalid accepted parameters:\n";
+        std::cout << "SIP_Transport_TCP_Complete_Test::run -> Invalid accepted parameters:\n";
         std::cout << std::setw(20) << "Local Address: " << address << "\n";
         std::cout << std::setw(20) << "Accepted Address: " << _accepted_address << "\n";
         return false;
@@ -562,12 +577,9 @@ bool SIP_Transport_TCP_Test::run(Socket::Address_Family family, std::string addr
     if (!set_callbacks())
         return false;
 
-    std::string request = create_request();
+    clear_callback_params();
 
-    _received_buffer[0] = 0;
-    _received_size = 0;
-    _received_address.clear();
-    _received_port = SIP_Transport::INVALID_PORT;
+    std::string request = create_request();
 
     if (!send_message(request.c_str(), (int) request.size(), address, port))
         return false;
@@ -576,30 +588,24 @@ bool SIP_Transport_TCP_Test::run(Socket::Address_Family family, std::string addr
 
     while ((Util_Functions::get_tick() - start) < MAX_WAIT_TIME)
     {
-        if (_received_size == (int) request.size())
+        if (_received_messages.size() == 1)
             break;
 
         Util_Functions::delay(DELAY);
     }
 
-    if (_received_size != (int) request.size())
+    if (_received_messages.size() != 1)
     {
-        std::cout << "SIP_Transport_TCP_Test::run -> Message not received:\n";
-        std::cout << std::setw(20) << "Expected: " << request.size() << "\n";
-        std::cout << std::setw(20) << "Received: " << _received_size << "\n";
-        return false;
-    }
-
-    if (memcmp(request.c_str(), _received_buffer, request.size()) != 0)
-    {
-        std::cout << "SIP_Transport_TCP_Test::run -> Invalid received message\n";
+        std::cout << "SIP_Transport_TCP_Complete_Test::run -> Message not received\n";
+        std::cout << std::setw(20) << "Received: " << _received_messages.size() << "\n";
+        std::cout << std::setw(20) << "Expected: " << 1 << "\n";
         return false;
     }
 
     if (!close())
         return false;
 
-    std::cout << "SIP transport TCP test completed successfully\n";
+    std::cout << "SIP transport TCP complete test completed successfully\n";
     return true;
 }
 

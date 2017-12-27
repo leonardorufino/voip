@@ -37,16 +37,16 @@ protected:
     virtual bool run(Socket::Address_Family family, std::string address, unsigned short port) = 0;
     virtual SIP_Transport *get_transport() = 0;
     virtual bool set_callbacks();
+    virtual void clear_callback_params();
 
     unsigned int get_next_transport_id();
 
     std::string create_request();
 
     static bool connect_callback(void *data, SIP_Transport *transport, bool success);
-    static bool accept_callback(void *data, SIP_Transport *transport, SIP_Transport_TCP_Client *accepted,
-                                std::string address, unsigned short port);
-    static bool receive_callback(void *data, SIP_Transport *transport, const char *buffer, int size,
-                                 std::string address, unsigned short port);
+    static bool accept_callback(void *data, SIP_Transport *transport, SIP_Transport_TCP_Client *accepted, std::string address,
+                                unsigned short port);
+    static bool receive_callback(void *data, SIP_Transport *transport, SIP_Message *msg, std::string address, unsigned short port);
 
     static bool get_network_addresses(std::list<Socket::Network_Address> &addresses);
     static bool check_network_address(Socket::Address_Family family, std::string address);
@@ -58,8 +58,7 @@ protected:
     std::string _accepted_address;
     unsigned short _accepted_port;
 
-    char _received_buffer[Socket_Control::RECEIVE_BUFFER_SIZE + 1];
-    int _received_size;
+    std::list<SIP_Message *> _received_messages;
     std::string _received_address;
     unsigned short _received_port;
 
@@ -105,7 +104,6 @@ public:
     bool send_message(const char *buffer, int size, std::string address, unsigned short port);
     bool close();
 
-    bool run(Socket::Address_Family family, std::string address, unsigned short port);
     SIP_Transport *get_transport() { return _current_transport; }
 
 protected:
@@ -113,6 +111,17 @@ protected:
     SIP_Transport_TCP_Server *_transport_tcp_server;
 
     SIP_Transport *_current_transport;
+};
+
+//-------------------------------------------
+
+class SIP_Transport_TCP_Complete_Test : public SIP_Transport_TCP_Test
+{
+public:
+    SIP_Transport_TCP_Complete_Test() {}
+    virtual ~SIP_Transport_TCP_Complete_Test() {}
+
+    bool run(Socket::Address_Family family, std::string address, unsigned short port);
 };
 
 //-------------------------------------------
