@@ -32,6 +32,9 @@ bool SIP_Transport_Test::init()
         if (!run<SIP_Transport_TCP_Complete_Test>(family_ipv4, address_ipv4, port_ipv4))
             return false;
 
+        if (!run<SIP_Transport_TCP_Fragment_Test>(family_ipv4, address_ipv4, port_ipv4))
+            return false;
+
         std::cout << "IPv4 SIP transport test completed successfully\n";
     }else
         std::cout << "IPv4 SIP transport test disabled\n";
@@ -49,6 +52,9 @@ bool SIP_Transport_Test::init()
             return false;
 
         if (!run<SIP_Transport_TCP_Complete_Test>(family_ipv6, address_ipv6, port_ipv6))
+            return false;
+
+        if (!run<SIP_Transport_TCP_Fragment_Test>(family_ipv6, address_ipv6, port_ipv6))
             return false;
 
         std::cout << "IPv6 SIP transport test completed successfully\n";
@@ -164,6 +170,62 @@ std::string SIP_Transport_Test::create_request()
     str += "User-Agent: ABC123\r\n";
     str += "Content-Length: 0\r\n";
     str += "\r\n";
+    return str;
+}
+
+//-------------------------------------------
+
+std::string SIP_Transport_Test::create_request(unsigned short fragment)
+{
+    std::string str;
+
+    switch (fragment)
+    {
+        case 0:
+            str  = "INVITE sip:bob@biloxi.com SIP/2.0\r\n";
+            str += "Via: SIP/2.0/UDP pc33.atlanta.com;branch=z9hG4bK776asdhds\r\n";
+            str += "Max-For";
+            break;
+
+        case 1:
+            str  = "wards: 70\r\n";
+            str += "To: Bob <sip:bob@biloxi.com>\r\n";
+            str += "From: Alice <sip:alice@atlanta.com>;tag=1928301774\r\n";
+            str += "Call-ID: a84b4c76e66710@pc33.atlanta.com\r\n";
+            str += "CSeq: 314";
+            break;
+
+        case 2:
+            str  = "159 INVITE\r\n";
+            str += "Contact: <sip:alice@pc33.atlanta.com>\r\n";
+            str += "User-Agent: ABC123\r\n";
+            str += "Content-Length: 0\r\n";
+            str += "\r\n";
+            str += "INFO sip:bob@192.0.2.4 SIP/2.0\r\n";
+            str += "Via: SIP/2.0/UDP pc33.atlanta.com;branch=z9hG4bK7abc\r\n";
+            str += "Max-Forwards: 70\r\n";
+            str += "To: Bob <sip:bob@biloxi.com>;tag=a6c85cf\r\n";
+            str += "From: Alice <sip:alice@atlanta.com>;tag=1928301774\r\n";
+            str += "Call-ID: a84b4c76e66710@pc33.atlanta.com\r\n";
+            str += "CSeq: 100 INFO\r\n";
+            str += "Content-Length: 0\r\n";
+            str += "\r\n";
+            str += "BYE sip:alice@pc33.atlanta.com SIP/2.0\r\n";
+            str += "Via: SIP/2.0/UDP 192.0.2.4;bra";
+            break;
+
+        case 3:
+            str  = "nch=z9hG4bK1234\r\n";
+            str += "Max-Forwards: 70\r\n";
+            str += "From: Bob <sip:bob@biloxi.com>;tag=a6c85cf\r\n";
+            str += "To: Alice <sip:alice@atlanta.com>;tag=1928301774\r\n";
+            str += "Call-ID: a84b4c76e66710@pc33.atlanta.com\r\n";
+            str += "CSeq: 999 BYE\r\n";
+            str += "Content-Length: 0\r\n";
+            str += "\r\n";
+            break;
+    }
+
     return str;
 }
 
@@ -606,6 +668,121 @@ bool SIP_Transport_TCP_Complete_Test::run(Socket::Address_Family family, std::st
         return false;
 
     std::cout << "SIP transport TCP complete test completed successfully\n";
+    return true;
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+bool SIP_Transport_TCP_Fragment_Test::run(Socket::Address_Family family, std::string address, unsigned short port)
+{
+    std::cout << "SIP transport TCP fragment test initialized\n";
+
+    if ((!_transport_tcp_client) || (!_transport_tcp_server))
+    {
+        std::cout << "SIP_Transport_TCP_Fragment_Test::run -> Invalid transports\n";
+        return false;
+    }
+
+    _current_transport = _transport_tcp_client;
+    if (!set_callbacks())
+        return false;
+
+    _current_transport = _transport_tcp_server;
+    if (!set_callbacks())
+        return false;
+
+    if (!init(address, port))
+        return false;
+
+    if (!listen(10))
+        return false;
+
+    unsigned long start = Util_Functions::get_tick();
+    _connected = false;
+    _accepted_transport = NULL;
+    _accepted_address = "";
+    _accepted_port = SIP_Transport::INVALID_PORT;
+
+    if (!connect(address, port))
+        return false;
+
+    while ((Util_Functions::get_tick() - start) < MAX_WAIT_TIME)
+    {
+        if (_connected)
+            break;
+
+        Util_Functions::delay(DELAY);
+    }
+
+    if (!_connected)
+    {
+        std::cout << "SIP_Transport_TCP_Fragment_Test::run -> Transport not connected\n";
+        return false;
+    }
+
+    start = Util_Functions::get_tick();
+
+    while ((Util_Functions::get_tick() - start) < MAX_WAIT_TIME)
+    {
+        if (_accepted_transport)
+            break;
+
+        Util_Functions::delay(DELAY);
+    }
+
+    if (!_accepted_transport)
+    {
+        std::cout << "SIP_Transport_TCP_Fragment_Test::run -> Transport not accepted\n";
+        return false;
+    }
+
+    if (address != _accepted_address)
+    {
+        std::cout << "SIP_Transport_TCP_Fragment_Test::run -> Invalid accepted parameters:\n";
+        std::cout << std::setw(20) << "Local Address: " << address << "\n";
+        std::cout << std::setw(20) << "Accepted Address: " << _accepted_address << "\n";
+        return false;
+    }
+
+    _current_transport = _accepted_transport;
+    if (!set_callbacks())
+        return false;
+
+    clear_callback_params();
+
+    for (unsigned short i = 0; i < 4; i++)
+    {
+        std::string request = create_request(i);
+
+        if (!send_message(request.c_str(), (int) request.size(), address, port))
+            return false;
+
+        Util_Functions::delay(500);
+    }
+
+    start = Util_Functions::get_tick();
+
+    while ((Util_Functions::get_tick() - start) < MAX_WAIT_TIME)
+    {
+        if (_received_messages.size() == 3)
+            break;
+
+        Util_Functions::delay(DELAY);
+    }
+
+    if (_received_messages.size() != 3)
+    {
+        std::cout << "SIP_Transport_TCP_Fragment_Test::run -> Message not received\n";
+        std::cout << std::setw(20) << "Received: " << _received_messages.size() << "\n";
+        std::cout << std::setw(20) << "Expected: " << 3 << "\n";
+        return false;
+    }
+
+    if (!close())
+        return false;
+
+    std::cout << "SIP transport TCP fragment test completed successfully\n";
     return true;
 }
 

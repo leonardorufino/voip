@@ -42,6 +42,7 @@ protected:
     unsigned int get_next_transport_id();
 
     std::string create_request();
+    std::string create_request(unsigned short fragment);
 
     static bool connect_callback(void *data, SIP_Transport *transport, bool success);
     static bool accept_callback(void *data, SIP_Transport *transport, SIP_Transport_TCP_Client *accepted, std::string address,
@@ -120,6 +121,17 @@ class SIP_Transport_TCP_Complete_Test : public SIP_Transport_TCP_Test
 public:
     SIP_Transport_TCP_Complete_Test() {}
     virtual ~SIP_Transport_TCP_Complete_Test() {}
+
+    bool run(Socket::Address_Family family, std::string address, unsigned short port);
+};
+
+//-------------------------------------------
+
+class SIP_Transport_TCP_Fragment_Test : public SIP_Transport_TCP_Test
+{
+public:
+    SIP_Transport_TCP_Fragment_Test() {}
+    virtual ~SIP_Transport_TCP_Fragment_Test() {}
 
     bool run(Socket::Address_Family family, std::string address, unsigned short port);
 };
