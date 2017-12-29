@@ -112,9 +112,11 @@ bool SIP_Message::decode_header(std::string &sip_msg)
     std::string line;
     while (true)
     {
-        bool ret = String_Functions::get_line(sip_msg, line);
-        if ((!ret) || (line.empty()))
-            return true;
+        if (!String_Functions::get_line(sip_msg, line))
+            return false;
+
+        if (line.empty())
+            break;
 
         sip_header_list headers;
 
