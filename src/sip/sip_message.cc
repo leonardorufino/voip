@@ -126,6 +126,13 @@ bool SIP_Message::decode_header(std::string &sip_msg)
         add_headers(headers);
     }
 
+    if ((!get_header(SIP_HEADER_CALL_ID)) || (!get_header(SIP_HEADER_CSEQ)) || (!get_header(SIP_HEADER_FROM)) ||
+        (!get_header(SIP_HEADER_TO)) || (!get_header(SIP_HEADER_VIA)))
+    {
+        _logger.warning("Failed to decode: required headers not present (method=%d)", get_message_type());
+        return false;
+    }
+
     return true;
 }
 
