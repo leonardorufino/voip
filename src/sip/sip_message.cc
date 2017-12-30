@@ -164,6 +164,15 @@ bool SIP_Message::encode(std::string &sip_msg)
 
 bool SIP_Message::encode_header(std::string &sip_msg, std::string &body_msg)
 {
+    SIP_Header_Content_Length *header_content_length = dynamic_cast<SIP_Header_Content_Length *>(get_header(SIP_HEADER_CONTENT_LENGTH));
+    if (!header_content_length)
+    {
+        header_content_length = new SIP_Header_Content_Length();
+        add_header(header_content_length);
+    }
+
+    header_content_length->set_length(body_msg.size());
+
     sip_header_map::const_iterator it = _headers.begin();
     while (it != _headers.end())
     {
