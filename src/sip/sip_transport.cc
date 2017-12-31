@@ -182,11 +182,12 @@ bool SIP_Transport::receive_message(const char *buffer, int size, std::string ad
 {
     _logger.trace("Message received (address=%s, port=%d, size=%d) [%s]:\n%s", address.c_str(), port, size, _id.to_string().c_str(), buffer);
 
-    SIP_Message *msg = SIP_Message::decode_msg(buffer);
+    unsigned short read = 0;
+    SIP_Message *msg = SIP_Message::decode_message(buffer, size, read);
     if (!msg)
     {
-        _logger.warning("Failed to receive message: decode message failed (address=%s, port=%d, size=%d) [%s]",
-                        address.c_str(), port, size, _id.to_string().c_str());
+        _logger.warning("Failed to receive message: decode message failed (address=%s, port=%d, size=%d, read=%d) [%s]",
+                        address.c_str(), port, size, read, _id.to_string().c_str());
         return false;
     }
 
@@ -422,54 +423,34 @@ bool SIP_Transport_TCP_Client::receive_message(const char *buffer, int size, std
 
     do
     {
-        _logger.trace("Message received (address=%s, port=%d, size=%d) [%s]:\n%s", address.c_str(), port, size,
+        _logger.trace("Message received (address=%s, port=%d, size=%d) [%s]:\n%s", address.c_str(), port, _receive_buffer_size,
                       _id.to_string().c_str(), _receive_buffer);
 
-        SIP_Message *msg = SIP_Message::decode_msg(_receive_buffer);
+        unsigned short read = 0;
+        SIP_Message *msg = SIP_Message::decode_message(_receive_buffer, _receive_buffer_size, read);
         if (!msg)
         {
-            _logger.trace("Received SIP message may not be complete (address=%s, port=%d, size=%d) [%s]",
-                          address.c_str(), port, size, _id.to_string().c_str());
-            return true;
+            if (read > 0)
+            {
+                _logger.warning("Failed to receive message: decode message failed (address=%s, port=%d, size=%d, read=%d) [%s]",
+                                address.c_str(), port, _receive_buffer_size, read, _id.to_string().c_str());
+
+                memcpy(&_receive_buffer[0], &_receive_buffer[read], _receive_buffer_size - read);
+                _receive_buffer_size -= read;
+                _receive_buffer[_receive_buffer_size] = 0;
+                return false;
+            }else
+            {
+                _logger.trace("Received SIP message may not be complete (address=%s, port=%d, size=%d, read=%d) [%s]",
+                              address.c_str(), port, _receive_buffer_size, read, _id.to_string().c_str());
+                return true;
+            }
         }
 
-        char *ptr = strstr(_receive_buffer, "\r\n\r\n");
-        if (!ptr)
+        if (read < _receive_buffer_size)
         {
-            _logger.trace("Received SIP message is not complete: CRLF not found (address=%s, port=%d, size=%d) [%s]",
-                          address.c_str(), port, size, _id.to_string().c_str());
-            delete msg;
-            return true;
-        }
-
-        ptr += 4;
-        unsigned short length;
-
-        SIP_Header_Content_Length *content_length = dynamic_cast<SIP_Header_Content_Length *>(msg->get_header(SIP_HEADER_CONTENT_LENGTH));
-        if (content_length)
-            length = (unsigned short) ((ptr - _receive_buffer) + content_length->get_length());
-        else
-        {
-            _logger.warning("Failed to receive message: Content-Length header not present (address=%s, port=%d, size=%d) [%s]",
-                            address.c_str(), port, size, _id.to_string().c_str());
-
-            _receive_buffer_size = 0;
-            _receive_buffer[_receive_buffer_size] = 0;
-            delete msg;
-            return false;
-        }
-
-        if (length > _receive_buffer_size)
-        {
-            _logger.trace("Received SIP message is not complete (address=%s, port=%d, size=%d) [%s]", address.c_str(), port, size,
-                          _id.to_string().c_str());
-            delete msg;
-            return true;
-
-        }else if (length < _receive_buffer_size)
-        {
-            memcpy(&_receive_buffer[0], &_receive_buffer[length], _receive_buffer_size - length);
-            _receive_buffer_size -= length;
+            memcpy(&_receive_buffer[0], &_receive_buffer[read], _receive_buffer_size - read);
+            _receive_buffer_size -= read;
             _receive_buffer[_receive_buffer_size] = 0;
 
             if (!_receive_callback(_receive_callback_data, this, msg, address, port))
@@ -477,6 +458,8 @@ bool SIP_Transport_TCP_Client::receive_message(const char *buffer, int size, std
                 delete msg;
                 return false;
             }
+
+            delete msg;
         }else
         {
             _receive_buffer_size = 0;
@@ -486,9 +469,6 @@ bool SIP_Transport_TCP_Client::receive_message(const char *buffer, int size, std
             delete msg;
             return ret;
         }
-
-        delete msg;
-
     }while (true);
 }
 
