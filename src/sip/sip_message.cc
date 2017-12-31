@@ -58,18 +58,31 @@ SIP_Message::~SIP_Message()
 
 //-------------------------------------------
 
-SIP_Message *SIP_Message::decode_msg(std::string sip_msg)
+SIP_Message *SIP_Message::decode_message(const char *msg, unsigned short size, unsigned short &read)
 {
-    String_Functions::remove_lws(sip_msg);
+    char type[20] = {0};
 
-    std::string msg;
-    String_Functions::match(sip_msg, " ", msg);
-    String_Functions::trim(msg);
+    const char *ptr = strchr(msg, ' ');
+    if ((!ptr) && (size < sizeof(type)))
+    {
+        _logger.trace("Message may not be complete: invalid method type");
+        read = 0;
+        return NULL;
 
-    SIP_Method_Type method = SIP_Functions::get_method_type(msg);
+    }else if ((!ptr) || ((ptr - msg) >= sizeof(type)))
+    {
+        _logger.warning("Failed to decode message: invalid method type");
+        read = size;
+        return NULL;
+    }
+
+    std::copy(msg, ptr, type);
+
+    SIP_Method_Type method = SIP_Functions::get_method_type(type);
     if (method == SIP_METHOD_INVALID)
     {
-        _logger.warning("Failed to decode message: invalid method (method=%s)", msg.c_str());
+        _logger.warning("Failed to decode message: invalid method (method=%s)", type);
+        read = size;
         return NULL;
     }
 
@@ -79,9 +92,8 @@ SIP_Message *SIP_Message::decode_msg(std::string sip_msg)
     else
         message = new SIP_Response();
 
-    if (!message->decode(sip_msg))
+    if (!message->decode(msg, size, read))
     {
-        _logger.warning("Failed to decode message: decode failed (method=%s)", msg.c_str());
         delete message;
         return NULL;
     }
@@ -91,29 +103,75 @@ SIP_Message *SIP_Message::decode_msg(std::string sip_msg)
 
 //-------------------------------------------
 
-bool SIP_Message::decode(std::string &sip_msg)
+bool SIP_Message::decode(const char *msg, unsigned short size, unsigned short &read)
 {
-    if (!decode_start_line(sip_msg))
+    const char *ptr = strstr(msg, "\r\n\r\n");
+    if (!ptr)
+    {
+        _logger.trace("SIP message is not complete: CRLF not found (size=%d)", size);
+        read = 0;
         return false;
+    }
 
-    if (!decode_header(sip_msg))
+    ptr += 4;
+
+    unsigned short headers_size = ptr - msg;
+    std::string headers;
+    headers.assign(msg, headers_size);
+
+    const char *body = ptr;
+    unsigned short body_size = size - headers_size;
+
+    String_Functions::remove_lws(headers);
+
+    if (!decode_start_line(headers))
+    {
+        read = size;
         return false;
+    }
 
-    if (!decode_body(sip_msg))
+    if (!decode_header(headers))
+    {
+        read = size;
         return false;
+    }
 
+    SIP_Header_Content_Length *content_length = dynamic_cast<SIP_Header_Content_Length *>(get_header(SIP_HEADER_CONTENT_LENGTH));
+    if (content_length)
+    {
+        unsigned short length = (unsigned short) content_length->get_length();
+        if (length > body_size)
+        {
+            _logger.trace("SIP body is not complete: Content-Length is bigger than message size (length=%d, size=%d)", length, size);
+            read = 0;
+            return false;
+        }
+
+        body_size = length;
+    }
+
+    if (!decode_body(body, body_size))
+    {
+        read = size;
+        return false;
+    }
+
+    read = headers_size + body_size;
     return true;
 }
 
 //-------------------------------------------
 
-bool SIP_Message::decode_header(std::string &sip_msg)
+bool SIP_Message::decode_header(std::string &headers)
 {
     std::string line;
     while (true)
     {
-        if (!String_Functions::get_line(sip_msg, line))
+        if (!String_Functions::get_line(headers, line))
+        {
+            _logger.warning("Failed to decode: get line failed (method=%d)", get_message_type());
             return false;
+        }
 
         if (line.empty())
             break;
@@ -138,9 +196,9 @@ bool SIP_Message::decode_header(std::string &sip_msg)
 
 //-------------------------------------------
 
-bool SIP_Message::decode_body(std::string &sip_msg)
+bool SIP_Message::decode_body(const char *body, unsigned short size)
 {
-    SIP_Header_Content_Type *content_type = (SIP_Header_Content_Type *) get_header(SIP_HEADER_CONTENT_TYPE);
+    SIP_Header_Content_Type *content_type = dynamic_cast<SIP_Header_Content_Type *>(get_header(SIP_HEADER_CONTENT_TYPE));
     if (content_type)
     {
         //TODO: Decode body
@@ -151,17 +209,17 @@ bool SIP_Message::decode_body(std::string &sip_msg)
 
 //-------------------------------------------
 
-bool SIP_Message::encode(std::string &sip_msg)
+bool SIP_Message::encode(std::string &msg)
 {
-    std::string body_msg;
+    std::string body;
 
-    if (!encode_start_line(sip_msg))
+    if (!encode_start_line(msg))
         return false;
 
-    if (!encode_body(body_msg))
+    if (!encode_body(body))
         return false;
 
-    if (!encode_header(sip_msg, body_msg))
+    if (!encode_header(msg, body))
         return false;
 
     return true;
@@ -169,7 +227,7 @@ bool SIP_Message::encode(std::string &sip_msg)
 
 //-------------------------------------------
 
-bool SIP_Message::encode_header(std::string &sip_msg, std::string &body_msg)
+bool SIP_Message::encode_header(std::string &msg, std::string &body)
 {
     SIP_Header_Content_Length *header_content_length = dynamic_cast<SIP_Header_Content_Length *>(get_header(SIP_HEADER_CONTENT_LENGTH));
     if (!header_content_length)
@@ -178,7 +236,7 @@ bool SIP_Message::encode_header(std::string &sip_msg, std::string &body_msg)
         add_header(header_content_length);
     }
 
-    header_content_length->set_length(body_msg.size());
+    header_content_length->set_length(body.size());
 
     sip_header_map::const_iterator it = _headers.begin();
     while (it != _headers.end())
@@ -186,18 +244,18 @@ bool SIP_Message::encode_header(std::string &sip_msg, std::string &body_msg)
         sip_header_list headers = it->second;
         it++;
 
-        if (!SIP_Header::encode_headers(sip_msg, headers))
+        if (!SIP_Header::encode_headers(msg, headers))
             return false;
     }
 
-    sip_msg += "\r\n";
-    sip_msg += body_msg;
+    msg += "\r\n";
+    msg += body;
     return true;
 }
 
 //-------------------------------------------
 
-bool SIP_Message::encode_body(std::string &sip_msg)
+bool SIP_Message::encode_body(std::string &msg)
 {
     //TODO: Encode body
     return true;
@@ -284,14 +342,21 @@ SIP_Request::SIP_Request(const SIP_Request &request) : SIP_Message(request)
 
 //-------------------------------------------
 
-bool SIP_Request::decode_start_line(std::string &sip_msg)
+bool SIP_Request::decode_start_line(std::string &msg)
 {
     std::string line;
-    String_Functions::get_line(sip_msg, line);
-
-    _method = get_message_type(); // The method was already decoded by SIP_Message::decode_msg
+    String_Functions::get_line(msg, line);
+    String_Functions::trim(line);
 
     std::string result;
+    if (!String_Functions::match(line, " ", result))
+    {
+        _logger.warning("Failed to decode start line: invalid method (method=%s)", line.c_str());
+        return false;
+    }
+
+    _method = get_message_type(); // The method was already decoded by SIP_Message::decode_message
+
     String_Functions::skip(line, " \t");
     if (!String_Functions::match(line, " ", result))
     {
@@ -302,7 +367,7 @@ bool SIP_Request::decode_start_line(std::string &sip_msg)
     if (!_request_uri.decode(result))
         return false;
 
-    String_Functions::trim(line);
+    String_Functions::skip(line, " \t");
     _sip_version = line;
     if ((_sip_version.empty()) || (_sip_version != SIP_VERSION))
     {
@@ -315,21 +380,21 @@ bool SIP_Request::decode_start_line(std::string &sip_msg)
 
 //-------------------------------------------
 
-bool SIP_Request::encode_start_line(std::string &sip_msg)
+bool SIP_Request::encode_start_line(std::string &msg)
 {
     std::string method = SIP_Functions::get_method_type(_method);
     if ((method.empty()) || (_sip_version.empty()))
         return false;
 
-    sip_msg += method;
-    sip_msg += " ";
+    msg += method;
+    msg += " ";
 
-    if (!_request_uri.encode(sip_msg))
+    if (!_request_uri.encode(msg))
         return false;
 
-    sip_msg += " ";
-    sip_msg += _sip_version;
-    sip_msg += "\r\n";
+    msg += " ";
+    msg += _sip_version;
+    msg += "\r\n";
     return true;
 }
 
@@ -399,14 +464,21 @@ SIP_Response::SIP_Response(unsigned short status_code, SIP_Request &request) : S
 
 //-------------------------------------------
 
-bool SIP_Response::decode_start_line(std::string &sip_msg)
+bool SIP_Response::decode_start_line(std::string &msg)
 {
     std::string line;
-    String_Functions::get_line(sip_msg, line);
-
-    _sip_version = SIP_VERSION; // The version was already decoded by SIP_Message::decode_msg
+    String_Functions::get_line(msg, line);
+    String_Functions::trim(line);
 
     std::string result;
+    if (!String_Functions::match(line, " ", result))
+    {
+        _logger.warning("Failed to decode start line: invalid SIP version (version=%s)", line.c_str());
+        return false;
+    }
+
+    _sip_version = SIP_VERSION; // The version was already decoded by SIP_Message::decode_message
+
     String_Functions::skip(line, " \t");
     if (!String_Functions::match(line, " ", result))
     {
@@ -421,24 +493,24 @@ bool SIP_Response::decode_start_line(std::string &sip_msg)
         return false;
     }
 
-    String_Functions::trim(line);
+    String_Functions::skip(line, " \t");
     _reason_phrase = line; //It can be empty!
     return true;
 }
 
 //-------------------------------------------
 
-bool SIP_Response::encode_start_line(std::string &sip_msg)
+bool SIP_Response::encode_start_line(std::string &msg)
 {
     if ((_sip_version.empty()) || (_status_code < 100) || (_status_code > 699))
         return false;
 
-    sip_msg += _sip_version;
-    sip_msg += " ";
-    sip_msg += std::to_string(_status_code);
-    sip_msg += " ";
-    sip_msg += _reason_phrase;
-    sip_msg += "\r\n";
+    msg += _sip_version;
+    msg += " ";
+    msg += std::to_string(_status_code);
+    msg += " ";
+    msg += _reason_phrase;
+    msg += "\r\n";
     return true;
 }
 

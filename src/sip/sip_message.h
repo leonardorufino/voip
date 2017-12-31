@@ -28,19 +28,19 @@ public:
     SIP_Message(const SIP_Message &message);
     virtual ~SIP_Message();
 
-    static SIP_Message *decode_msg(std::string sip_msg);
+    static SIP_Message *decode_message(const char *msg, unsigned short size, unsigned short &read);
 
     virtual SIP_Method_Type get_message_type() = 0;
 
-    bool decode(std::string &sip_msg);
-    virtual bool decode_start_line(std::string &sip_msg) = 0;
-    bool decode_header(std::string &sip_msg);
-    bool decode_body(std::string &sip_msg);
+    bool decode(const char *msg, unsigned short size, unsigned short &read);
+    virtual bool decode_start_line(std::string &msg) = 0;
+    bool decode_header(std::string &headers);
+    bool decode_body(const char *body, unsigned short size);
 
-    bool encode(std::string &sip_msg);
-    virtual bool encode_start_line(std::string &sip_msg) = 0;
-    bool encode_header(std::string &sip_msg, std::string &body_msg);
-    bool encode_body(std::string &sip_msg);
+    bool encode(std::string &msg);
+    virtual bool encode_start_line(std::string &msg) = 0;
+    bool encode_header(std::string &msg, std::string &body);
+    bool encode_body(std::string &msg);
 
     void add_header(SIP_Header *header);
     void add_headers(sip_header_list &headers);
@@ -65,8 +65,8 @@ public:
     ~SIP_Request() {}
 
     // Virtual pure functions
-    bool decode_start_line(std::string &sip_msg);
-    bool encode_start_line(std::string &sip_msg);
+    bool decode_start_line(std::string &msg);
+    bool encode_start_line(std::string &msg);
     SIP_Method_Type get_message_type() { return _method; }
 
     void set_method(SIP_Method_Type method) { _method = method; }
@@ -99,8 +99,8 @@ public:
     ~SIP_Response() {}
 
     // Virtual pure functions
-    bool decode_start_line(std::string &sip_msg);
-    bool encode_start_line(std::string &sip_msg);
+    bool decode_start_line(std::string &msg);
+    bool encode_start_line(std::string &msg);
     SIP_Method_Type get_message_type() { return SIP_RESPONSE; }
 
     void set_sip_version(std::string sip_version) { _sip_version = sip_version; }
