@@ -53,8 +53,9 @@ bool SIP_Message_Test::run()
         std::cout << "SIP message test initialized (type: " << message_input_output._method_type << ")\n";
 
         std::string input = message_input_output._input;
-        SIP_Message *message = SIP_Message::decode_msg(input);
-        if (!message)
+        unsigned short read = 0;
+        SIP_Message *message = SIP_Message::decode_message(input.c_str(), (unsigned short) input.size(), read);
+        if ((!message) || (read != input.size()))
         {
             std::cout << "SIP_Message_Test::run -> Failed to decode message:\n";
             std::cout << std::setw(12) << "Type: " << message_input_output._method_type << "\n";
