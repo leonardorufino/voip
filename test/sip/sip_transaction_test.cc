@@ -138,9 +138,10 @@ SIP_Request *SIP_Transaction_Test::create_invite()
     str += "Content-Length: 0\r\n";
     str += "\r\n";
 
-    SIP_Message *msg = SIP_Message::decode_msg(str);
+    unsigned short read = 0;
+    SIP_Message *msg = SIP_Message::decode_message(str.c_str(), (unsigned short) str.size(), read);
     SIP_Request *request = dynamic_cast<SIP_Request *>(msg);
-    if (!request)
+    if ((!request) || (read != str.size()))
     {
         std::cout << "SIP_Transaction_Test::create_invite -> Failed to decode message\n";
         return NULL;
@@ -165,9 +166,10 @@ SIP_Request *SIP_Transaction_Test::create_ack()
     str += "Content-Length: 0\r\n";
     str += "\r\n";
 
-    SIP_Message *msg = SIP_Message::decode_msg(str);
+    unsigned short read = 0;
+    SIP_Message *msg = SIP_Message::decode_message(str.c_str(), (unsigned short) str.size(), read);
     SIP_Request *request = dynamic_cast<SIP_Request *>(msg);
-    if (!request)
+    if ((!request) || (read != str.size()))
     {
         std::cout << "SIP_Transaction_Test::create_ack -> Failed to decode message\n";
         return NULL;
@@ -190,9 +192,10 @@ SIP_Response *SIP_Transaction_Test::create_invite_response_100()
     str += "Content-Length: 0\r\n";
     str += "\r\n";
 
-    SIP_Message *msg = SIP_Message::decode_msg(str);
+    unsigned short read = 0;
+    SIP_Message *msg = SIP_Message::decode_message(str.c_str(), (unsigned short) str.size(), read);
     SIP_Response *response = dynamic_cast<SIP_Response *>(msg);
-    if (!response)
+    if ((!response) || (read != str.size()))
     {
         std::cout << "SIP_Transaction_Test::create_invite_response_100 -> Failed to decode message\n";
         return NULL;
@@ -215,9 +218,10 @@ SIP_Response *SIP_Transaction_Test::create_invite_response_180()
     str += "Content-Length: 0\r\n";
     str += "\r\n";
 
-    SIP_Message *msg = SIP_Message::decode_msg(str);
+    unsigned short read = 0;
+    SIP_Message *msg = SIP_Message::decode_message(str.c_str(), (unsigned short) str.size(), read);
     SIP_Response *response = dynamic_cast<SIP_Response *>(msg);
-    if (!response)
+    if ((!response) || (read != str.size()))
     {
         std::cout << "SIP_Transaction_Test::create_invite_response_180 -> Failed to decode message\n";
         return NULL;
@@ -241,9 +245,10 @@ SIP_Response *SIP_Transaction_Test::create_invite_response_200()
     str += "Content-Length: 0\r\n";
     str += "\r\n";
 
-    SIP_Message *msg = SIP_Message::decode_msg(str);
+    unsigned short read = 0;
+    SIP_Message *msg = SIP_Message::decode_message(str.c_str(), (unsigned short) str.size(), read);
     SIP_Response *response = dynamic_cast<SIP_Response *>(msg);
-    if (!response)
+    if ((!response) || (read != str.size()))
     {
         std::cout << "SIP_Transaction_Test::create_invite_response_200 -> Failed to decode message\n";
         return NULL;
@@ -267,9 +272,10 @@ SIP_Response *SIP_Transaction_Test::create_invite_response_480()
     str += "Content-Length: 0\r\n";
     str += "\r\n";
 
-    SIP_Message *msg = SIP_Message::decode_msg(str);
+    unsigned short read = 0;
+    SIP_Message *msg = SIP_Message::decode_message(str.c_str(), (unsigned short) str.size(), read);
     SIP_Response *response = dynamic_cast<SIP_Response *>(msg);
-    if (!response)
+    if ((!response) || (read != str.size()))
     {
         std::cout << "SIP_Transaction_Test::create_invite_response_480 -> Failed to decode message\n";
         return NULL;
@@ -294,9 +300,10 @@ SIP_Request *SIP_Transaction_Test::create_bye()
     str += "Content-Length: 0\r\n";
     str += "\r\n";
 
-    SIP_Message *msg = SIP_Message::decode_msg(str);
+    unsigned short read = 0;
+    SIP_Message *msg = SIP_Message::decode_message(str.c_str(), (unsigned short) str.size(), read);
     SIP_Request *request = dynamic_cast<SIP_Request *>(msg);
-    if (!request)
+    if ((!request) || (read != str.size()))
     {
         std::cout << "SIP_Transaction_Test::create_bye -> Failed to decode message\n";
         return NULL;
@@ -319,9 +326,10 @@ SIP_Response *SIP_Transaction_Test::create_bye_response_100()
     str += "Content-Length: 0\r\n";
     str += "\r\n";
 
-    SIP_Message *msg = SIP_Message::decode_msg(str);
+    unsigned short read = 0;
+    SIP_Message *msg = SIP_Message::decode_message(str.c_str(), (unsigned short) str.size(), read);
     SIP_Response *response = dynamic_cast<SIP_Response *>(msg);
-    if (!response)
+    if ((!response) || (read != str.size()))
     {
         std::cout << "SIP_Transaction_Test::create_bye_response_100 -> Failed to decode message\n";
         return NULL;
@@ -344,9 +352,10 @@ SIP_Response *SIP_Transaction_Test::create_bye_response_200()
     str += "Content-Length: 0\r\n";
     str += "\r\n";
 
-    SIP_Message *msg = SIP_Message::decode_msg(str);
+    unsigned short read = 0;
+    SIP_Message *msg = SIP_Message::decode_message(str.c_str(), (unsigned short) str.size(), read);
     SIP_Response *response = dynamic_cast<SIP_Response *>(msg);
-    if (!response)
+    if ((!response) || (read != str.size()))
     {
         std::cout << "SIP_Transaction_Test::create_bye_response_200 -> Failed to decode message\n";
         return NULL;
