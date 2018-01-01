@@ -69,7 +69,7 @@ SIP_Message *SIP_Message::decode_message(const char *msg, unsigned short size, u
         read = 0;
         return NULL;
 
-    }else if ((!ptr) || ((ptr - msg) >= sizeof(type)))
+    }else if ((!ptr) || (((std::size_t) (ptr - msg)) >= sizeof(type)))
     {
         _logger.warning("Failed to decode message: invalid method type");
         read = size;
@@ -115,7 +115,7 @@ bool SIP_Message::decode(const char *msg, unsigned short size, unsigned short &r
 
     ptr += 4;
 
-    unsigned short headers_size = ptr - msg;
+    unsigned short headers_size = (unsigned short) (ptr - msg);
     std::string headers;
     headers.assign(msg, headers_size);
 
@@ -236,7 +236,7 @@ bool SIP_Message::encode_header(std::string &msg, std::string &body)
         add_header(header_content_length);
     }
 
-    header_content_length->set_length(body.size());
+    header_content_length->set_length((unsigned long) body.size());
 
     sip_header_map::const_iterator it = _headers.begin();
     while (it != _headers.end())
