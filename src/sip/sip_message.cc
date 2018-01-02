@@ -136,10 +136,10 @@ bool SIP_Message::decode(const char *msg, unsigned short size, unsigned short &r
         return false;
     }
 
-    SIP_Header_Content_Length *content_length = dynamic_cast<SIP_Header_Content_Length *>(get_header(SIP_HEADER_CONTENT_LENGTH));
-    if (content_length)
+    SIP_Header_Content_Length *header_content_length = dynamic_cast<SIP_Header_Content_Length *>(get_header(SIP_HEADER_CONTENT_LENGTH));
+    if (header_content_length)
     {
-        unsigned short length = (unsigned short) content_length->get_length();
+        unsigned short length = (unsigned short) header_content_length->get_length();
         if (length > body_size)
         {
             _logger.trace("SIP body is not complete: Content-Length is bigger than message size (length=%d, size=%d)", length, size);
@@ -162,12 +162,13 @@ bool SIP_Message::decode(const char *msg, unsigned short size, unsigned short &r
 
 //-------------------------------------------
 
-bool SIP_Message::decode_header(std::string &headers)
+bool SIP_Message::decode_header(std::string &msg)
 {
-    std::string line;
     while (true)
     {
-        if (!String_Functions::get_line(headers, line))
+        std::string line;
+
+        if (!String_Functions::get_line(msg, line))
         {
             _logger.warning("Failed to decode: get line failed (method=%d)", get_message_type());
             return false;
@@ -198,8 +199,8 @@ bool SIP_Message::decode_header(std::string &headers)
 
 bool SIP_Message::decode_body(const char *body, unsigned short size)
 {
-    SIP_Header_Content_Type *content_type = dynamic_cast<SIP_Header_Content_Type *>(get_header(SIP_HEADER_CONTENT_TYPE));
-    if (content_type)
+    SIP_Header_Content_Type *header_content_type = dynamic_cast<SIP_Header_Content_Type *>(get_header(SIP_HEADER_CONTENT_TYPE));
+    if (header_content_type)
     {
         //TODO: Decode body
     }
@@ -209,26 +210,18 @@ bool SIP_Message::decode_body(const char *body, unsigned short size)
 
 //-------------------------------------------
 
-bool SIP_Message::encode(std::string &msg)
+bool SIP_Message::encode(char *msg, unsigned short &size)
 {
-    std::string body;
+    std::string headers;
+    char *body = NULL;
+    unsigned short body_size = 0;
 
-    if (!encode_start_line(msg))
+    if (!encode_start_line(headers))
         return false;
 
-    if (!encode_body(body))
+    if (!encode_body(body, body_size))
         return false;
 
-    if (!encode_header(msg, body))
-        return false;
-
-    return true;
-}
-
-//-------------------------------------------
-
-bool SIP_Message::encode_header(std::string &msg, std::string &body)
-{
     SIP_Header_Content_Length *header_content_length = dynamic_cast<SIP_Header_Content_Length *>(get_header(SIP_HEADER_CONTENT_LENGTH));
     if (!header_content_length)
     {
@@ -236,8 +229,37 @@ bool SIP_Message::encode_header(std::string &msg, std::string &body)
         add_header(header_content_length);
     }
 
-    header_content_length->set_length((unsigned long) body.size());
+    header_content_length->set_length((unsigned long) body_size);
 
+    if (!encode_header(headers))
+        return false;
+
+    headers += "\r\n";
+
+    unsigned short total = (unsigned short) (headers.size() + body_size);
+    if (total >= size)
+    {
+        _logger.warning("Failed to encode: buffer size too small (size=%, header=%d, body=%d)", size, headers.size(), body_size);
+        return false;
+    }
+
+    memcpy(msg, headers.c_str(), headers.size());
+    size = (unsigned short) headers.size();
+
+    if (body_size > 0)
+    {
+        memcpy(&msg[size], body, body_size);
+        size += body_size;
+    }
+
+    msg[size] = 0;
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Message::encode_header(std::string &msg)
+{
     sip_header_map::const_iterator it = _headers.begin();
     while (it != _headers.end())
     {
@@ -248,16 +270,15 @@ bool SIP_Message::encode_header(std::string &msg, std::string &body)
             return false;
     }
 
-    msg += "\r\n";
-    msg += body;
     return true;
 }
 
 //-------------------------------------------
 
-bool SIP_Message::encode_body(std::string &msg)
+bool SIP_Message::encode_body(char *body, unsigned short &size)
 {
     //TODO: Encode body
+    size = 0;
     return true;
 }
 

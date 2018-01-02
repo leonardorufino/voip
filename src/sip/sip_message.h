@@ -34,13 +34,13 @@ public:
 
     bool decode(const char *msg, unsigned short size, unsigned short &read);
     virtual bool decode_start_line(std::string &msg) = 0;
-    bool decode_header(std::string &headers);
+    bool decode_header(std::string &msg);
     bool decode_body(const char *body, unsigned short size);
 
-    bool encode(std::string &msg);
+    bool encode(char *msg, unsigned short &size);
     virtual bool encode_start_line(std::string &msg) = 0;
-    bool encode_header(std::string &msg, std::string &body);
-    bool encode_body(std::string &msg);
+    bool encode_header(std::string &msg);
+    bool encode_body(char *body, unsigned short &size);
 
     void add_header(SIP_Header *header);
     void add_headers(sip_header_list &headers);
