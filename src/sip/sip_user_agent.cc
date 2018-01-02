@@ -496,6 +496,7 @@ SIP_User_Agent::~SIP_User_Agent()
 {
     clear_calls();
     clear_transports();
+    clear_pending_messages();
 }
 
 //-------------------------------------------
@@ -548,6 +549,7 @@ bool SIP_User_Agent::close()
 {
     clear_calls();
     clear_transports();
+    clear_pending_messages();
 
     _logger.trace("User agent closed [%s]", _id.to_string().c_str());
     return true;
@@ -729,6 +731,37 @@ void SIP_User_Agent::clear_transports()
 
 //-------------------------------------------
 
+void SIP_User_Agent::add_pending_message(SIP_Transport *transport, const char *message, unsigned short size)
+{
+    char *msg = new char[size + 1];
+    memcpy(msg, message, size);
+    msg[size] = 0;
+
+    std::pair<const char *, unsigned short> pending = std::make_pair(msg, size);
+    _pending_messages[transport].push_back(pending);
+}
+
+//-------------------------------------------
+
+void SIP_User_Agent::clear_pending_messages()
+{
+    std::map<SIP_Transport *, std::list<std::pair<const char *, unsigned short>>>::iterator it1 = _pending_messages.begin();
+    if (it1 != _pending_messages.end())
+    {
+        std::list<std::pair<const char *, unsigned short>> &messages = it1->second;
+        std::list<std::pair<const char *, unsigned short>>::iterator it2 = messages.begin();
+        while (it2 != messages.end())
+        {
+            const char *msg = it2->first;
+            delete msg;
+        }
+    }
+
+    _pending_messages.clear();
+}
+
+//-------------------------------------------
+
 bool SIP_User_Agent::send_message(SIP_Message *msg)
 {
     if (!msg)
@@ -742,7 +775,7 @@ bool SIP_User_Agent::send_message(SIP_Message *msg)
     SIP_Header_Via *header_via = dynamic_cast<SIP_Header_Via *>(msg->get_header(SIP_HEADER_VIA));
     if (!header_via)
     {
-        _logger.warning("Failed to send request: invalid Via header (method=%d) [%s]", method, _id.to_string().c_str());
+        _logger.warning("Failed to send message: invalid Via header (method=%d) [%s]", method, _id.to_string().c_str());
         return false;
     }
 
@@ -787,9 +820,13 @@ bool SIP_User_Agent::send_message(SIP_Message *msg)
         return false;
     }
 
-    std::string send_buffer;
-    msg->encode(send_buffer);
-    int size = (int) send_buffer.size();
+    unsigned short size = SEND_BUFFER_SIZE;
+    if (!msg->encode(_send_buffer, size))
+    {
+        _logger.warning("Failed to send message: encode message failed (method=%d, address=%s, port=%d, size=%d) [%s]",
+                        method, remote_address.c_str(), remote_port, size, _id.to_string().c_str());
+        return false;
+    }
 
     SIP_Transport *transport = get_transport(transport_type, remote_address, remote_port);
     if (!transport)
@@ -818,17 +855,14 @@ bool SIP_User_Agent::send_message(SIP_Message *msg)
                 return false;
             }
 
-            std::list<std::string> messages;
-            messages.push_back(send_buffer);
-
-            _pending_messages[tcp_client] = messages;
+            add_pending_message(tcp_client, _send_buffer, size);
 
             _logger.trace("Connecting TCP client transport: send message is pending (method=%d, address=%s, port=%d, size=%d) [%s]",
                           method, remote_address.c_str(), remote_port, size, _id.to_string().c_str());
             return true;
         }else
         {
-            _logger.warning("Failed to send request: transport not found (method=%d, transport=%d, address=%s, port=%d) [%s]",
+            _logger.warning("Failed to send message: transport not found (method=%d, transport=%d, address=%s, port=%d) [%s]",
                             method, transport_type, remote_address.c_str(), remote_port, _id.to_string().c_str());
             return false;
         }
@@ -837,17 +871,17 @@ bool SIP_User_Agent::send_message(SIP_Message *msg)
         SIP_Transport_TCP_Client *tcp_client = dynamic_cast<SIP_Transport_TCP_Client *>(transport);
         if ((tcp_client) && (!tcp_client->is_connected()))
         {
-            std::map<SIP_Transport *, std::list<std::string>>::iterator it = _pending_messages.find(tcp_client);
+            std::map<SIP_Transport *, std::list<std::pair<const char *, unsigned short>>>::iterator it = _pending_messages.find(tcp_client);
             if (it != _pending_messages.end())
             {
-                _pending_messages[tcp_client].push_back(send_buffer);
+                add_pending_message(tcp_client, _send_buffer, size);
 
                 _logger.trace("Waiting TCP client transport connection: send message is pending (method=%d, address=%s, port=%d, size=%d) [%s]",
                                 method, remote_address.c_str(), remote_port, size, _id.to_string().c_str());
                 return true;
             }else
             {
-                _logger.warning("Failed to send request: invalid TCP client transport state (method=%d, address=%s, port=%d) [%s]",
+                _logger.warning("Failed to send message: invalid TCP client transport state (method=%d, address=%s, port=%d) [%s]",
                                 method, remote_address.c_str(), remote_port, _id.to_string().c_str());
                 return false;
             }
@@ -857,7 +891,7 @@ bool SIP_User_Agent::send_message(SIP_Message *msg)
     _logger.trace("Sending message (method=%d, address=%s, port=%d, size=%d) [%s]", method, remote_address.c_str(),
                   remote_port, size, _id.to_string().c_str());
 
-    return transport->send_message(send_buffer.c_str(), size, remote_address, remote_port);
+    return transport->send_message(_send_buffer, (int) size, remote_address, remote_port);
 }
 
 //-------------------------------------------
@@ -916,26 +950,30 @@ bool SIP_User_Agent::transport_connect_callback(void *data, SIP_Transport *trans
 
     _logger.trace("Transport connect callback (success=%d) [%s]", success, user_agent->_id.to_string().c_str());
 
-    std::map<SIP_Transport *, std::list<std::string>>::iterator it = user_agent->_pending_messages.find(transport);
-    if (it != user_agent->_pending_messages.end())
+    std::map<SIP_Transport *, std::list<std::pair<const char *, unsigned short>>>::iterator it1 = user_agent->_pending_messages.find(transport);
+    if (it1 != user_agent->_pending_messages.end())
     {
-        if (success)
+        std::list<std::pair<const char *, unsigned short>> &messages = it1->second;
+        std::list<std::pair<const char *, unsigned short>>::iterator it2 = messages.begin();
+        while (it2 != messages.end())
         {
-            std::list<std::string> &messages = it->second;
-            std::list<std::string>::iterator it2 = messages.begin();
-            while (it2 != messages.end())
+            std::pair<const char *, unsigned short> &pending = *it2++;
+            const char *message = pending.first;
+
+            if (success)
             {
-                std::string &message = *it2++;
-                int size = (int) message.size();
+                int size = (int) pending.second;
 
                 _logger.trace("Sending pending message (size=%d) [%s]", size, user_agent->_id.to_string().c_str());
 
-                if (!transport->send_message(message.c_str(), size, transport_tcp->get_remote_address(), transport_tcp->get_remote_port()))
+                if (!transport->send_message(message, size, transport_tcp->get_remote_address(), transport_tcp->get_remote_port()))
                 {
                     _logger.warning("Failed in transport connect callback: send message failed (size=%d) [%s]",
                                     size, user_agent->_id.to_string().c_str());
                 }
             }
+
+            delete message;
         }
 
         user_agent->_pending_messages.erase(transport);

@@ -79,6 +79,7 @@ class SIP_User_Agent
 {
 public:
     static const unsigned int MAX_CALLS = 5000;
+    static const unsigned short SEND_BUFFER_SIZE = 5000;
 
 public:
     SIP_User_Agent(SIP_Object_ID id);
@@ -106,6 +107,9 @@ public:
     void add_transport(SIP_Transport *transport);
     void remove_transport(SIP_Transport *transport);
     void clear_transports();
+
+    void add_pending_message(SIP_Transport *transport, const char *message, unsigned short size);
+    void clear_pending_messages();
 
     bool send_message(SIP_Message *msg);
 
@@ -135,7 +139,9 @@ private:
 
     unsigned int _next_transport_id;
     std::list<SIP_Transport *> _transports;
-    std::map<SIP_Transport *, std::list<std::string>> _pending_messages;
+
+    char _send_buffer[SEND_BUFFER_SIZE + 1];
+    std::map<SIP_Transport *, std::list<std::pair<const char *, unsigned short>>> _pending_messages;
 
     static Logger _logger;
 };
