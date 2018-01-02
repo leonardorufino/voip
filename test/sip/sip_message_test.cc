@@ -76,8 +76,10 @@ bool SIP_Message_Test::run()
         delete message;
         message = NULL;
 
-        std::string output;
-        if (!copy->encode(output))
+        char output[1000] = {0};
+        unsigned short size = sizeof(output);
+
+        if (!copy->encode(output, size))
         {
             std::cout << "SIP_Message_Test::run -> Failed to encode message:\n";
             std::cout << std::setw(12) << "Type: " << message_input_output._method_type << "\n";
@@ -86,13 +88,13 @@ bool SIP_Message_Test::run()
             return false;
         }
 
-        if (output != message_input_output._output)
+        if (strcmp(output, message_input_output._output.c_str()) != 0)
         {
             std::cout << "SIP_Message_Test::run -> Invalid encoded message:\n";
             std::cout << std::setw(12) << "Type: " << message_input_output._method_type << "\n";
             std::cout << std::setw(12) << "Input: " << message_input_output._input.c_str() << "\n";
             std::cout << std::setw(12) << "Expected: " << message_input_output._output.c_str() << "\n";
-            std::cout << std::setw(12) << "Output: " << output.c_str() << "\n";
+            std::cout << std::setw(12) << "Output: " << output << "\n";
             delete copy;
             return false;
         }
