@@ -20,6 +20,7 @@ class Timer_Manager_Test
 {
 public:
     static const unsigned long THREAD_DELAY = 10;
+    static const unsigned long DELAY = 25;
 
 public:
     Timer_Manager_Test() : _stop_thread(false) {}

@@ -22,7 +22,7 @@ class SIP_Transport_Test
 public:
     static const unsigned long THREAD_DELAY = 10;
     static const unsigned long MAX_WAIT_TIME = 5000;
-    static const unsigned long DELAY = 500;
+    static const unsigned long DELAY = 25;
 
 public:
     static bool init();

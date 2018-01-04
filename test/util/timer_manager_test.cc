@@ -77,7 +77,7 @@ bool Timer_Manager_Stop_Test::run()
     unsigned long waited = 0;
 
     while ((_stop == 0) && ((waited = Util_Functions::get_tick() - _start) < _max_wait_time))
-        Util_Functions::delay(10);
+        Util_Functions::delay(DELAY);
 
     if (_stop != 0)
     {
@@ -121,7 +121,7 @@ bool Timer_Manager_Callback_Test::run()
     unsigned long waited = 0;
 
     while ((_stop == 0) && ((waited = Util_Functions::get_tick() - _start) < _max_wait_time))
-        Util_Functions::delay(10);
+        Util_Functions::delay(DELAY);
 
     if (waited >= _max_wait_time)
     {
@@ -190,7 +190,7 @@ bool Timer_Manager_Multiple_Timers_Test::run()
         unsigned long waited = 0;
 
         while ((_stop[i] == 0) && ((waited = Util_Functions::get_tick() - _start[i]) < _max_wait_time[i]))
-            Util_Functions::delay(10);
+            Util_Functions::delay(DELAY);
 
         if (waited >= _max_wait_time[i])
         {
