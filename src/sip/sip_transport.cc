@@ -180,6 +180,18 @@ bool SIP_Transport::send_message(const char *buffer, int size, std::string addre
 
 bool SIP_Transport::receive_message(const char *buffer, int size, std::string address, unsigned short port)
 {
+    while ((*buffer == '\r') || (*buffer == '\n'))
+    {
+        buffer++;
+        size--;
+    }
+
+    if ((!buffer) || (size <= 0))
+    {
+        _logger.trace("Empty message received (address=%s, port=%d, size=%d) [%s]", address.c_str(), port, size, _id.to_string().c_str());
+        return true;
+    }
+
     _logger.trace("Message received (address=%s, port=%d, size=%d) [%s]:\n%s", address.c_str(), port, size, _id.to_string().c_str(), buffer);
 
     unsigned short read = 0;
@@ -423,6 +435,25 @@ bool SIP_Transport_TCP_Client::receive_message(const char *buffer, int size, std
 
     do
     {
+        unsigned short counter = 0;
+
+        while ((_receive_buffer[counter] == '\r') || (_receive_buffer[counter] == '\n'))
+            counter++;
+
+        if (counter > 0)
+        {
+            memcpy(&_receive_buffer[0], &_receive_buffer[counter], _receive_buffer_size - counter);
+            _receive_buffer_size -= counter;
+            _receive_buffer[_receive_buffer_size] = 0;
+        }
+
+        if ((!_receive_buffer) || (_receive_buffer_size == 0))
+        {
+            _logger.trace("Empty message received (address=%s, port=%d, size=%d) [%s]", address.c_str(), port, _receive_buffer_size,
+                          _id.to_string().c_str());
+            return true;
+        }
+
         _logger.trace("Message received (address=%s, port=%d, size=%d) [%s]:\n%s", address.c_str(), port, _receive_buffer_size,
                       _id.to_string().c_str(), _receive_buffer);
 
