@@ -23,6 +23,8 @@ public:
     static const unsigned long THREAD_DELAY = 10;
     static const unsigned long MAX_WAIT_TIME = 5000;
     static const unsigned long DELAY = 25;
+    static const unsigned short REQUEST_SEGMENTS = 7;
+    static const unsigned short REQUEST_SEGMENTED_MESSAGES = 4;
 
 public:
     static bool init();
@@ -41,8 +43,8 @@ protected:
 
     unsigned int get_next_transport_id();
 
-    std::string create_request();
-    std::string create_request(unsigned short fragment);
+    std::string create_message();
+    std::string create_segmented_message(unsigned short segment);
 
     static bool connect_callback(void *data, SIP_Transport *transport, bool success);
     static bool accept_callback(void *data, SIP_Transport *transport, SIP_Transport_TCP_Client *accepted, std::string address,
@@ -127,11 +129,11 @@ public:
 
 //-------------------------------------------
 
-class SIP_Transport_TCP_Fragment_Test : public SIP_Transport_TCP_Test
+class SIP_Transport_TCP_Segment_Test : public SIP_Transport_TCP_Test
 {
 public:
-    SIP_Transport_TCP_Fragment_Test() {}
-    virtual ~SIP_Transport_TCP_Fragment_Test() {}
+    SIP_Transport_TCP_Segment_Test() {}
+    virtual ~SIP_Transport_TCP_Segment_Test() {}
 
     bool run(Socket::Address_Family family, std::string address, unsigned short port);
 };

@@ -32,7 +32,7 @@ bool SIP_Transport_Test::init()
         if (!run<SIP_Transport_TCP_Complete_Test>(family_ipv4, address_ipv4, port_ipv4))
             return false;
 
-        if (!run<SIP_Transport_TCP_Fragment_Test>(family_ipv4, address_ipv4, port_ipv4))
+        if (!run<SIP_Transport_TCP_Segment_Test>(family_ipv4, address_ipv4, port_ipv4))
             return false;
 
         std::cout << "IPv4 SIP transport test completed successfully\n";
@@ -54,7 +54,7 @@ bool SIP_Transport_Test::init()
         if (!run<SIP_Transport_TCP_Complete_Test>(family_ipv6, address_ipv6, port_ipv6))
             return false;
 
-        if (!run<SIP_Transport_TCP_Fragment_Test>(family_ipv6, address_ipv6, port_ipv6))
+        if (!run<SIP_Transport_TCP_Segment_Test>(family_ipv6, address_ipv6, port_ipv6))
             return false;
 
         std::cout << "IPv6 SIP transport test completed successfully\n";
@@ -156,7 +156,7 @@ unsigned int SIP_Transport_Test::get_next_transport_id()
 //-------------------------------------------
 //-------------------------------------------
 
-std::string SIP_Transport_Test::create_request()
+std::string SIP_Transport_Test::create_message()
 {
     std::string str;
     str  = "INVITE sip:bob@biloxi.com SIP/2.0\r\n";
@@ -175,11 +175,11 @@ std::string SIP_Transport_Test::create_request()
 
 //-------------------------------------------
 
-std::string SIP_Transport_Test::create_request(unsigned short fragment)
+std::string SIP_Transport_Test::create_segmented_message(unsigned short segment)
 {
     std::string str;
 
-    switch (fragment)
+    switch (segment)
     {
         case 0:
             str  = "INVITE sip:bob@biloxi.com SIP/2.0\r\n";
@@ -223,6 +223,33 @@ std::string SIP_Transport_Test::create_request(unsigned short fragment)
             str += "CSeq: 999 BYE\r\n";
             str += "Content-Length: 0\r\n";
             str += "\r\n";
+            str += "\r\n";
+            break;
+
+        case 4:
+            str += "\r\n";
+            str += "\r\n";
+            break;
+
+        case 5:
+            str  = "REGI";
+            break;
+
+        case 6:
+            str  = "STER sip:bob@192.0.2.4 SIP/2.0\r\n";
+            str += "Via: SIP/2.0/UDP pc33.atlanta.com;branch=z9hG4bKabc123\r\n";
+            str += "Max-Forwards: 70\r\n";
+            str += "To: Bob <sip:bob@biloxi.com>\r\n";
+            str += "From: Alice <sip:alice@atlanta.com>;tag=1928301774\r\n";
+            str += "Expires: 3600\r\n";
+            str += "Call-ID: a84b4c76e66710@pc33.atlanta.com\r\n";
+            str += "CSeq: 12345 REGISTER\r\n";
+            str += "Contact: <sip:alice@pc33.atlanta.com>\r\n";
+            str += "Content-Length: 0\r\n";
+            str += "\r\n";
+            break;
+
+        default:
             break;
     }
 
@@ -403,7 +430,7 @@ bool SIP_Transport_UDP_Test::run(Socket::Address_Family family, std::string addr
 
     clear_callback_params();
 
-    std::string request = create_request();
+    std::string request = create_message();
 
     if (!send_message(request.c_str(), (int) request.size(), address, port))
         return false;
@@ -641,7 +668,7 @@ bool SIP_Transport_TCP_Complete_Test::run(Socket::Address_Family family, std::st
 
     clear_callback_params();
 
-    std::string request = create_request();
+    std::string request = create_message();
 
     if (!send_message(request.c_str(), (int) request.size(), address, port))
         return false;
@@ -674,13 +701,13 @@ bool SIP_Transport_TCP_Complete_Test::run(Socket::Address_Family family, std::st
 //-------------------------------------------
 //-------------------------------------------
 
-bool SIP_Transport_TCP_Fragment_Test::run(Socket::Address_Family family, std::string address, unsigned short port)
+bool SIP_Transport_TCP_Segment_Test::run(Socket::Address_Family family, std::string address, unsigned short port)
 {
-    std::cout << "SIP transport TCP fragment test initialized\n";
+    std::cout << "SIP transport TCP segment test initialized\n";
 
     if ((!_transport_tcp_client) || (!_transport_tcp_server))
     {
-        std::cout << "SIP_Transport_TCP_Fragment_Test::run -> Invalid transports\n";
+        std::cout << "SIP_Transport_TCP_Segment_Test::run -> Invalid transports\n";
         return false;
     }
 
@@ -717,7 +744,7 @@ bool SIP_Transport_TCP_Fragment_Test::run(Socket::Address_Family family, std::st
 
     if (!_connected)
     {
-        std::cout << "SIP_Transport_TCP_Fragment_Test::run -> Transport not connected\n";
+        std::cout << "SIP_Transport_TCP_Segment_Test::run -> Transport not connected\n";
         return false;
     }
 
@@ -733,13 +760,13 @@ bool SIP_Transport_TCP_Fragment_Test::run(Socket::Address_Family family, std::st
 
     if (!_accepted_transport)
     {
-        std::cout << "SIP_Transport_TCP_Fragment_Test::run -> Transport not accepted\n";
+        std::cout << "SIP_Transport_TCP_Segment_Test::run -> Transport not accepted\n";
         return false;
     }
 
     if (address != _accepted_address)
     {
-        std::cout << "SIP_Transport_TCP_Fragment_Test::run -> Invalid accepted parameters:\n";
+        std::cout << "SIP_Transport_TCP_Segment_Test::run -> Invalid accepted parameters:\n";
         std::cout << std::setw(20) << "Local Address: " << address << "\n";
         std::cout << std::setw(20) << "Accepted Address: " << _accepted_address << "\n";
         return false;
@@ -751,9 +778,9 @@ bool SIP_Transport_TCP_Fragment_Test::run(Socket::Address_Family family, std::st
 
     clear_callback_params();
 
-    for (unsigned short i = 0; i < 4; i++)
+    for (unsigned short i = 0; i < REQUEST_SEGMENTS; i++)
     {
-        std::string request = create_request(i);
+        std::string request = create_segmented_message(i);
 
         if (!send_message(request.c_str(), (int) request.size(), address, port))
             return false;
@@ -765,24 +792,24 @@ bool SIP_Transport_TCP_Fragment_Test::run(Socket::Address_Family family, std::st
 
     while ((Util_Functions::get_tick() - start) < MAX_WAIT_TIME)
     {
-        if (_received_messages.size() == 3)
+        if (_received_messages.size() == REQUEST_SEGMENTED_MESSAGES)
             break;
 
         Util_Functions::delay(DELAY);
     }
 
-    if (_received_messages.size() != 3)
+    if (_received_messages.size() != REQUEST_SEGMENTED_MESSAGES)
     {
-        std::cout << "SIP_Transport_TCP_Fragment_Test::run -> Message not received\n";
+        std::cout << "SIP_Transport_TCP_Segment_Test::run -> Message not received\n";
         std::cout << std::setw(20) << "Received: " << _received_messages.size() << "\n";
-        std::cout << std::setw(20) << "Expected: " << 3 << "\n";
+        std::cout << std::setw(20) << "Expected: " << REQUEST_SEGMENTED_MESSAGES << "\n";
         return false;
     }
 
     if (!close())
         return false;
 
-    std::cout << "SIP transport TCP fragment test completed successfully\n";
+    std::cout << "SIP transport TCP segment test completed successfully\n";
     return true;
 }
 
