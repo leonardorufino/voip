@@ -629,6 +629,22 @@ void SIP_User_Agent::remove_call(SIP_Call *call)
 
 //-------------------------------------------
 
+void SIP_User_Agent::remove_closed_calls()
+{
+    std::list<SIP_Call *>::iterator it = _calls.begin();
+    while (it != _calls.end())
+    {
+        SIP_Call *call = *it++;
+        if (call->get_state() == SIP_Call::STATE_CLOSED)
+        {
+            _calls.remove(call);
+            delete call;
+        }
+    }
+}
+
+//-------------------------------------------
+
 void SIP_User_Agent::clear_calls()
 {
     std::list<SIP_Call *>::iterator it = _calls.begin();
@@ -892,6 +908,20 @@ bool SIP_User_Agent::send_message(SIP_Message *msg)
                   remote_port, size, _id.to_string().c_str());
 
     return transport->send_message(_send_buffer, (int) size, remote_address, remote_port);
+}
+
+//-------------------------------------------
+
+bool SIP_User_Agent::update()
+{
+    Timer_Manager &timer = Timer_Manager::instance();
+    timer.run();
+
+    Socket_Control &socket = Socket_Control::instance();
+    socket.run();
+
+    remove_closed_calls();
+    return true;
 }
 
 //-------------------------------------------

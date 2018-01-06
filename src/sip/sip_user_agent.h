@@ -17,6 +17,8 @@
 #include "sip_message.h"
 #include "sip_call.h"
 #include "sip_transport.h"
+#include "util/timer_manager.h"
+#include "util/socket.h"
 #include <list>
 #include <map>
 
@@ -100,6 +102,7 @@ public:
     SIP_Call *get_call(unsigned int id);
     void add_call(SIP_Call *call);
     void remove_call(SIP_Call *call);
+    void remove_closed_calls();
     void clear_calls();
     unsigned int get_free_call_id();
 
@@ -112,6 +115,8 @@ public:
     void clear_pending_messages();
 
     bool send_message(SIP_Message *msg);
+
+    bool update();
 
 public:
     static bool call_send_message_callback(void *data, SIP_Call *call, SIP_Message *msg);
