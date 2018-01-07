@@ -286,16 +286,12 @@ template<class T> bool SIP_User_Agent_Test::run(Socket::Address_Family family, s
 
 void SIP_User_Agent_Test::thread(SIP_User_Agent_Test *test)
 {
-    Timer_Manager &timer = Timer_Manager::instance();
-    Socket_Control &socket = Socket_Control::instance();
-
     while (!test->_stop_thread)
     {
         Util_Functions::delay(THREAD_DELAY);
 
         std::lock_guard<std::mutex> lock(test->_thread_mutex);
-        timer.run();
-        socket.run();
+        test->_user_agent->update();
     }
 }
 
@@ -1451,10 +1447,10 @@ bool SIP_User_Agent_Register_Reject_Test::run(Socket::Address_Family family, std
 
     call_id_2 = _call_id_callback;
 
-    if (!send_response(call_id_2, SIP_REQUEST_REGISTER, 401))
+    if (!send_response(call_id_2, SIP_REQUEST_REGISTER, 403))
         return false;
 
-    if (!receive_response(call_id_1, SIP_REQUEST_REGISTER, 401))
+    if (!receive_response(call_id_1, SIP_REQUEST_REGISTER, 403))
         return false;
 
     if (!close_user_agent())
