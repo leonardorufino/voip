@@ -1661,6 +1661,33 @@ private:
 
 //-------------------------------------------
 
+class SIP_Header_Unknown : public SIP_Header
+{
+public:
+    SIP_Header_Unknown() {}
+    SIP_Header_Unknown(const SIP_Header_Unknown &header) { *this = header; }
+    ~SIP_Header_Unknown() {}
+
+    // Virtual pure functions
+    SIP_Header_Type get_header_type() { return SIP_HEADER_UNKNOWN; }
+    Header_Separator decode_separator() { return HEADER_SEPARATOR_CRLF; }
+    Header_Separator encode_separator() { return HEADER_SEPARATOR_CRLF; }
+    bool decode(std::string &sip_msg);
+    bool encode(std::string &sip_msg);
+
+    void set_header(std::string header) { _header = header; }
+    std::string get_header() { return _header; }
+
+    void set_value(std::string value) { _value = value; }
+    std::string get_value() { return _value; }
+
+private:
+    std::string _header;
+    std::string _value;
+};
+
+//-------------------------------------------
+
 class SIP_Header_Unsupported : public SIP_Header
 {
 public:

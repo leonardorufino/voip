@@ -207,6 +207,10 @@ SIP_Header *SIP_Header::create_header(SIP_Header_Type header_type, const SIP_Hea
             header = (!copy) ? new SIP_Header_To()
                              : new SIP_Header_To(dynamic_cast<const SIP_Header_To &>(*copy));
             break;
+        case SIP_HEADER_UNKNOWN:
+            header = (!copy) ? new SIP_Header_Unknown()
+                             : new SIP_Header_Unknown(dynamic_cast<const SIP_Header_Unknown &>(*copy));
+            break;
         case SIP_HEADER_UNSUPPORTED:
             header = (!copy) ? new SIP_Header_Unsupported()
                              : new SIP_Header_Unsupported(dynamic_cast<const SIP_Header_Unsupported &>(*copy));
@@ -238,7 +242,9 @@ SIP_Header *SIP_Header::create_header(SIP_Header_Type header_type, const SIP_Hea
 
 bool SIP_Header::decode_headers(std::string &sip_msg, sip_header_list &headers)
 {
+    std::string line = sip_msg;
     std::string type;
+
     bool matched = String_Functions::match(sip_msg, ":", type);
     if (!matched)
     {
@@ -251,8 +257,8 @@ bool SIP_Header::decode_headers(std::string &sip_msg, sip_header_list &headers)
     SIP_Header_Type header_type = SIP_Functions::get_header_type(type);
     if (header_type == SIP_HEADER_INVALID)
     {
-        _logger.warning("Failed to decode headers: invalid header type (header=%s)", type.c_str());
-        return false;
+        header_type = SIP_HEADER_UNKNOWN;
+        sip_msg = line;
     }
 
     std::string result;
@@ -302,28 +308,45 @@ bool SIP_Header::encode_headers(std::string &sip_msg, sip_header_list &headers)
     while (it != headers.end())
     {
         SIP_Header *header = *it;
+        SIP_Header_Type header_type = header->get_header_type();
 
         if (it++ == headers.begin())
         {
-            SIP_Header_Type header_type = header->get_header_type();
-
-            type = SIP_Functions::get_header_type(header_type);
-            if (type.empty())
+            if (header_type != SIP_HEADER_UNKNOWN)
             {
-                _logger.warning("Failed to encode headers: invalid header type (header=%d)", header_type);
-                return false;
-            }
+                type = SIP_Functions::get_header_type(header_type);
 
-            sip_msg += type;
-            sip_msg += ": ";
+                if (type.empty())
+                {
+                    _logger.warning("Failed to encode headers: invalid header type (header=%d)", header_type);
+                    return false;
+                }
+
+                sip_msg += type;
+                sip_msg += ": ";
+            }
         }else
         {
             switch (header->encode_separator())
             {
-                case HEADER_SEPARATOR_NONE:     return false;
-                case HEADER_SEPARATOR_COMMA:    sip_msg += ", ";                    break;
-                case HEADER_SEPARATOR_CRLF:     sip_msg += "\r\n" + type + ": ";    break;
-                default:                                                            break;
+                case HEADER_SEPARATOR_NONE:
+                    return false;
+
+                case HEADER_SEPARATOR_COMMA:
+                    sip_msg += ", ";
+                    break;
+
+                case HEADER_SEPARATOR_CRLF:
+                    sip_msg += "\r\n";
+                    if (header_type != SIP_HEADER_UNKNOWN)
+                    {
+                        sip_msg += type;
+                        sip_msg += ": ";
+                    }
+                    break;
+
+                default:
+                    break;
             }
         }
 
@@ -3104,6 +3127,43 @@ bool SIP_Header_To::encode(std::string &sip_msg)
 void SIP_Header_To::set_random_tag()
 {
     _tag = String_Functions::random(20);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+bool SIP_Header_Unknown::decode(std::string &sip_msg)
+{
+    std::string result;
+
+    if (!String_Functions::match(sip_msg, ":", result))
+        return false;
+
+    String_Functions::trim(result);
+    if (result.empty())
+        return false;
+
+    _header = result;
+
+    String_Functions::trim(sip_msg);
+    if (sip_msg.empty())
+        return false;
+
+    _value = sip_msg;
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Unknown::encode(std::string &sip_msg)
+{
+    if ((_header.empty()) || (_value.empty()))
+        return false;
+
+    sip_msg += _header;
+    sip_msg += ": ";
+    sip_msg += _value;
+    return true;
 }
 
 //-------------------------------------------
