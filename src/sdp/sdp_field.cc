@@ -756,6 +756,78 @@ bool SDP_Field_Attribute::encode(std::string &msg)
 }
 
 //-------------------------------------------
+
+void SDP_Field_Attribute::set_attribute(SDP_Field_Attribute::Attribute attribute)
+{
+    switch (attribute)
+    {
+        case ATTRIBUTE_CAT:         _attribute = "cat";         break;
+        case ATTRIBUTE_KEYWDS:      _attribute = "keywds";      break;
+        case ATTRIBUTE_TOOL:        _attribute = "tool";        break;
+        case ATTRIBUTE_PTIME:       _attribute = "ptime";       break;
+        case ATTRIBUTE_MAXPTIME:    _attribute = "maxptime";    break;
+        case ATTRIBUTE_RTPMAP:      _attribute = "rtpmap";      break;
+        case ATTRIBUTE_RECVONLY:    _attribute = "recvonly";    break;
+        case ATTRIBUTE_SENDRECV:    _attribute = "sendrecv";    break;
+        case ATTRIBUTE_SENDONLY:    _attribute = "sendonly";    break;
+        case ATTRIBUTE_INACTIVE:    _attribute = "inactive";    break;
+        case ATTRIBUTE_ORIENT:      _attribute = "orient";      break;
+        case ATTRIBUTE_TYPE:        _attribute = "type";        break;
+        case ATTRIBUTE_CHARSET:     _attribute = "charset";     break;
+        case ATTRIBUTE_SDPLANG:     _attribute = "sdplang";     break;
+        case ATTRIBUTE_LANG:        _attribute = "lang";        break;
+        case ATTRIBUTE_FRAMERATE:   _attribute = "framerate";   break;
+        case ATTRIBUTE_QUALITY:     _attribute = "quality";     break;
+        case ATTRIBUTE_FMTP:        _attribute = "fmtp";        break;
+        default:                                                break;
+    }
+}
+
+//-------------------------------------------
+
+SDP_Field_Attribute::Attribute SDP_Field_Attribute::get_attribute()
+{
+    if (_attribute == "cat")
+        return ATTRIBUTE_CAT;
+    else if (_attribute == "keywds")
+        return ATTRIBUTE_KEYWDS;
+    else if (_attribute == "tool")
+        return ATTRIBUTE_TOOL;
+    else if (_attribute == "ptime")
+        return ATTRIBUTE_PTIME;
+    else if (_attribute == "maxptime")
+        return ATTRIBUTE_MAXPTIME;
+    else if (_attribute == "rtpmap")
+        return ATTRIBUTE_RTPMAP;
+    else if (_attribute == "recvonly")
+        return ATTRIBUTE_RECVONLY;
+    else if (_attribute == "sendrecv")
+        return ATTRIBUTE_SENDRECV;
+    else if (_attribute == "sendonly")
+        return ATTRIBUTE_SENDONLY;
+    else if (_attribute == "inactive")
+        return ATTRIBUTE_INACTIVE;
+    else if (_attribute == "orient")
+        return ATTRIBUTE_ORIENT;
+    else if (_attribute == "type")
+        return ATTRIBUTE_TYPE;
+    else if (_attribute == "charset")
+        return ATTRIBUTE_CHARSET;
+    else if (_attribute == "sdplang")
+        return ATTRIBUTE_SDPLANG;
+    else if (_attribute == "lang")
+        return ATTRIBUTE_LANG;
+    else if (_attribute == "framerate")
+        return ATTRIBUTE_FRAMERATE;
+    else if (_attribute == "quality")
+        return ATTRIBUTE_QUALITY;
+    else if (_attribute == "fmtp")
+        return ATTRIBUTE_FMTP;
+
+    return ATTRIBUTE_INVALID;
+}
+
+//-------------------------------------------
 //-------------------------------------------
 
 bool SDP_Field_Media_Description::decode(std::string &msg)

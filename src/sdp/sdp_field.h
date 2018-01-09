@@ -405,6 +405,30 @@ private:
 class SDP_Field_Attribute : public SDP_Field
 {
 public:
+    enum Attribute
+    {
+        ATTRIBUTE_CAT,
+        ATTRIBUTE_KEYWDS,
+        ATTRIBUTE_TOOL,
+        ATTRIBUTE_PTIME,
+        ATTRIBUTE_MAXPTIME,
+        ATTRIBUTE_RTPMAP,
+        ATTRIBUTE_RECVONLY,
+        ATTRIBUTE_SENDRECV,
+        ATTRIBUTE_SENDONLY,
+        ATTRIBUTE_INACTIVE,
+        ATTRIBUTE_ORIENT,
+        ATTRIBUTE_TYPE,
+        ATTRIBUTE_CHARSET,
+        ATTRIBUTE_SDPLANG,
+        ATTRIBUTE_LANG,
+        ATTRIBUTE_FRAMERATE,
+        ATTRIBUTE_QUALITY,
+        ATTRIBUTE_FMTP,
+        ATTRIBUTE_INVALID
+    };
+
+public:
     SDP_Field_Attribute() {}
     SDP_Field_Attribute(const SDP_Field_Attribute &field) { *this = field; }
     ~SDP_Field_Attribute() {}
@@ -414,8 +438,10 @@ public:
     bool decode(std::string &msg);
     bool encode(std::string &msg);
 
+    void set_attribute(Attribute attribute);
     void set_attribute(std::string attribute) { _attribute = attribute; }
-    std::string get_attribute() { return _attribute; }
+    Attribute get_attribute();
+    std::string get_attribute_str() { return _attribute; }
 
     void set_value(std::string value) { _value = value; }
     std::string get_value() { return _value; }
