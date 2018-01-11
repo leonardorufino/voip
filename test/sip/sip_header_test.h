@@ -416,6 +416,14 @@ public:
 
 //-------------------------------------------
 
+class SIP_Header_Unknown_Test : public SIP_Header_Test
+{
+public:
+    SIP_Header_Unknown_Test();
+};
+
+//-------------------------------------------
+
 class SIP_Header_Unsupported_Test : public SIP_Header_Test
 {
 public:

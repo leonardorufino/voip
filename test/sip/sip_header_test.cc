@@ -155,6 +155,9 @@ bool SIP_Header_Test::init()
     if (!run<SIP_Header_To_Test>())
         return false;
 
+    if (!run<SIP_Header_Unknown_Test>())
+        return false;
+
     if (!run<SIP_Header_Unsupported_Test>())
         return false;
 
@@ -2593,6 +2596,39 @@ SIP_Header_To_Test::SIP_Header_To_Test()
     hdr8._decode_success = true;
     hdr8._encode_success = true;
     _header_input_output.push_back(hdr8);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+SIP_Header_Unknown_Test::SIP_Header_Unknown_Test()
+{
+    SIP_Header_Input_Output hdr1;
+    hdr1._header_type    = SIP_HEADER_UNKNOWN;
+    hdr1._input          = "X-Header: abc def";
+    hdr1._output         = "X-Header: abc def\r\n";
+    hdr1._header_nb      = 1;
+    hdr1._decode_success = true;
+    hdr1._encode_success = true;
+    _header_input_output.push_back(hdr1);
+
+    SIP_Header_Input_Output hdr2;
+    hdr2._header_type    = SIP_HEADER_UNKNOWN;
+    hdr2._input          = "Newheader:123456  ";
+    hdr2._output         = "Newheader: 123456\r\n";
+    hdr2._header_nb      = 1;
+    hdr2._decode_success = true;
+    hdr2._encode_success = true;
+    _header_input_output.push_back(hdr2);
+
+    SIP_Header_Input_Output hdr3;
+    hdr3._header_type    = SIP_HEADER_UNKNOWN;
+    hdr3._input          = "Unknown: foo, bar, xyz";
+    hdr3._output         = "Unknown: foo, bar, xyz\r\n";
+    hdr3._header_nb      = 1;
+    hdr3._decode_success = true;
+    hdr3._encode_success = true;
+    _header_input_output.push_back(hdr3);
 }
 
 //-------------------------------------------
