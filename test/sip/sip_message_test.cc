@@ -156,6 +156,9 @@ SIP_Request_Test::SIP_Request_Test()
     msg1._input  += "Call-ID: a84b4c76e66710@pc33.atlanta.com\r\n";
     msg1._input  += "CSeq: 314159 INVITE\r\n";
     msg1._input  += "Contact: <sip:alice@pc33.atlanta.com>\r\n";
+    msg1._input  += "X-Header: xyz\r\n";
+    msg1._input  += "X-Header: foo, bar\r\n";
+    msg1._input  += "Unknown: test\r\n";
     msg1._input  += "Content-Type: application/sdp\r\n";
     msg1._input  += "Content-Length: 0\r\n";
     msg1._input  += "\r\n";
@@ -169,6 +172,9 @@ SIP_Request_Test::SIP_Request_Test()
     msg1._output += "From: Alice <sip:alice@atlanta.com>;tag=1928301774\r\n";
     msg1._output += "Max-Forwards: 70\r\n";
     msg1._output += "To: Bob <sip:bob@biloxi.com>\r\n";
+    msg1._output += "X-Header: xyz\r\n";
+    msg1._output += "X-Header: foo, bar\r\n";
+    msg1._output += "Unknown: test\r\n";
     msg1._output += "Via: SIP/2.0/UDP pc33.atlanta.com;branch=z9hG4bK776asdhds\r\n";
     msg1._output += "\r\n";
 
