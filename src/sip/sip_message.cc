@@ -47,30 +47,8 @@ SIP_Message::SIP_Message(const SIP_Message &message)
 
 SIP_Message::~SIP_Message()
 {
-    sip_header_map::const_iterator it1 = _headers.begin();
-    while (it1 != _headers.end())
-    {
-        sip_header_list headers = it1->second;
-        it1++;
-
-        sip_header_list::const_iterator it2 = headers.begin();
-        while (it2 != headers.end())
-        {
-            SIP_Header *header = *it2++;
-            delete header;
-        }
-    }
-
-    _headers.clear();
-
-    sip_body_list::const_iterator it3 = _bodies.begin();
-    while (it3 != _bodies.end())
-    {
-        SIP_Body *body = *it3++;
-        delete body;
-    }
-
-    _bodies.clear();
+    clear_headers();
+    clear_bodies();
 }
 
 //-------------------------------------------
@@ -197,7 +175,14 @@ bool SIP_Message::decode_header(std::string &msg)
         sip_header_list headers;
 
         if (!SIP_Header::decode_headers(line, headers))
+        {
+            sip_header_list::const_iterator it = headers.begin();
+            while (it != headers.end())
+                delete *it++;
+
+            headers.clear();
             return false;
+        }
 
         add_headers(headers);
     }
@@ -375,6 +360,27 @@ void SIP_Message::add_headers(sip_header_list &headers)
 
 //-------------------------------------------
 
+void SIP_Message::clear_headers()
+{
+    sip_header_map::const_iterator it1 = _headers.begin();
+    while (it1 != _headers.end())
+    {
+        const sip_header_list &headers = it1->second;
+        it1++;
+
+        sip_header_list::const_iterator it2 = headers.begin();
+        while (it2 != headers.end())
+        {
+            SIP_Header *header = *it2++;
+            delete header;
+        }
+    }
+
+    _headers.clear();
+}
+
+//-------------------------------------------
+
 SIP_Header *SIP_Message::get_header(SIP_Header_Type header_type, unsigned short pos)
 {
     if (_headers.count(header_type) == 0)
@@ -414,6 +420,20 @@ void SIP_Message::add_body(SIP_Body *body)
         return;
 
     _bodies.push_back(body);
+}
+
+//-------------------------------------------
+
+void SIP_Message::clear_bodies()
+{
+    sip_body_list::const_iterator it = _bodies.begin();
+    while (it != _bodies.end())
+    {
+        SIP_Body *body = *it++;
+        delete body;
+    }
+
+    _bodies.clear();
 }
 
 //-------------------------------------------
