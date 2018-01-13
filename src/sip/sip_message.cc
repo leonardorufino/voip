@@ -33,6 +33,14 @@ SIP_Message::SIP_Message(const SIP_Message &message)
             add_header(new_header);
         }
     }
+
+    sip_body_list::const_iterator it3 = message._bodies.begin();
+    while (it3 != message._bodies.end())
+    {
+        SIP_Body *body = *it3++;
+        SIP_Body *new_body = SIP_Body::create_body(body->get_body_type(), body);
+        add_body(new_body);
+    }
 }
 
 //-------------------------------------------
@@ -54,6 +62,15 @@ SIP_Message::~SIP_Message()
     }
 
     _headers.clear();
+
+    sip_body_list::const_iterator it3 = _bodies.begin();
+    while (it3 != _bodies.end())
+    {
+        SIP_Body *body = *it3++;
+        delete body;
+    }
+
+    _bodies.clear();
 }
 
 //-------------------------------------------
@@ -199,10 +216,29 @@ bool SIP_Message::decode_header(std::string &msg)
 
 bool SIP_Message::decode_body(const char *body, unsigned short size)
 {
+    if ((!body) || (size == 0))
+        return true;
+
     SIP_Header_Content_Type *header_content_type = dynamic_cast<SIP_Header_Content_Type *>(get_header(SIP_HEADER_CONTENT_TYPE));
     if (header_content_type)
     {
-        //TODO: Decode body
+        SIP_Body_Type type = SIP_BODY_UNKNOWN;
+
+        SIP_Body *sip_body = SIP_Body::create_body(type);
+        if (!sip_body)
+        {
+            _logger.warning("Failed to decode body: create body failed (method=%d)", get_message_type());
+            return false;
+        }
+
+        if (!sip_body->decode(body, size))
+        {
+            _logger.warning("Failed to decode body: decode failed (method=%d)", get_message_type());
+            delete sip_body;
+            return false;
+        }
+
+        add_body(sip_body);
     }
 
     return true;
@@ -213,8 +249,8 @@ bool SIP_Message::decode_body(const char *body, unsigned short size)
 bool SIP_Message::encode(char *msg, unsigned short &size)
 {
     std::string headers;
-    char *body = NULL;
-    unsigned short body_size = 0;
+    char *body = msg;
+    unsigned short body_size = size;
 
     if (!encode_start_line(headers))
         return false;
@@ -243,15 +279,12 @@ bool SIP_Message::encode(char *msg, unsigned short &size)
         return false;
     }
 
-    memcpy(msg, headers.c_str(), headers.size());
-    size = (unsigned short) headers.size();
-
     if (body_size > 0)
-    {
-        memcpy(&msg[size], body, body_size);
-        size += body_size;
-    }
+        memmove(&msg[headers.size()], body, body_size);
 
+    memcpy(msg, headers.c_str(), headers.size());
+
+    size = total;
     msg[size] = 0;
     return true;
 }
@@ -277,8 +310,30 @@ bool SIP_Message::encode_header(std::string &msg)
 
 bool SIP_Message::encode_body(char *body, unsigned short &size)
 {
-    //TODO: Encode body
-    size = 0;
+    if ((!body) || (size == 0))
+    {
+        _logger.warning("Failed to encode body: invalid parameters (method=%d)", get_message_type());
+        return false;
+    }
+
+    unsigned short total = 0;
+
+    sip_body_list::const_iterator it = _bodies.begin();
+    while (it != _bodies.end())
+    {
+        SIP_Body *sip_body = *it++;
+        unsigned short sz = size - total;
+
+        if (!sip_body->encode(body, sz))
+        {
+            _logger.warning("Failed to encode body: encode failed (method=%d)", get_message_type());
+            return false;
+        }
+
+        total += sz;
+    }
+
+    size = total;
     return true;
 }
 
@@ -349,6 +404,16 @@ unsigned short SIP_Message::get_header_size(SIP_Header_Type header_type)
 
     sip_header_list &headers = _headers.at(header_type);
     return (unsigned short) headers.size();
+}
+
+//-------------------------------------------
+
+void SIP_Message::add_body(SIP_Body *body)
+{
+    if (!body)
+        return;
+
+    _bodies.push_back(body);
 }
 
 //-------------------------------------------

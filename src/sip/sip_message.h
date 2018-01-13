@@ -13,6 +13,7 @@
 
 #include "sip_defs.h"
 #include "sip_header.h"
+#include "sip_body.h"
 #include "util/util_defs.h"
 #include "util/log_manager.h"
 #include <string>
@@ -20,6 +21,7 @@
 #include <list>
 
 typedef std::map<SIP_Header_Type, sip_header_list> sip_header_map;
+typedef std::list<SIP_Body *> sip_body_list;
 
 class SIP_Message
 {
@@ -48,8 +50,11 @@ public:
     SIP_Header *get_header(SIP_Header_Type header_type, unsigned short pos = 0);
     unsigned short get_header_size(SIP_Header_Type header_type);
 
+    void add_body(SIP_Body *body);
+
 private:
     sip_header_map _headers;
+    sip_body_list _bodies;
 
 protected:
     static Logger _logger;
