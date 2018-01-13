@@ -93,6 +93,12 @@ enum SIP_Header_Type
     SIP_HEADER_INVALID
 };
 
+enum SIP_Body_Type
+{
+    SIP_BODY_UNKNOWN,
+    SIP_BODY_INVALID
+};
+
 enum SIP_Transport_Type
 {
     SIP_TRANSPORT_UDP,
