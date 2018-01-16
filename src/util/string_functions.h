@@ -12,9 +12,8 @@
 #pragma once
 
 #include "util/util_defs.h"
+#include "util/util_functions.h"
 #include <string>
-#include <cstdlib>
-#include <ctime>
 
 class String_Functions
 {

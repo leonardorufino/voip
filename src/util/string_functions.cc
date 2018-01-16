@@ -300,18 +300,13 @@ std::string String_Functions::add_leading_zeros(unsigned long value, unsigned sh
 std::string String_Functions::random(unsigned short len)
 {
     static const char ALPHANUM[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-    static bool INITIALIZED = false;
-
-    if (!INITIALIZED)
-    {
-        srand((unsigned int) time(NULL));
-        INITIALIZED = true;
-    }
-
     std::string str;
 
     for (unsigned short i = 0; i < len; i++)
-        str += ALPHANUM[rand() % (sizeof(ALPHANUM) - 1)];
+    {
+        int value = Util_Functions::random();
+        str += ALPHANUM[value % (sizeof(ALPHANUM) - 1)];
+    }
 
     return str;
 }
