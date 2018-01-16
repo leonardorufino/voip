@@ -39,3 +39,18 @@ unsigned long Util_Functions::get_tick()
 }
 
 //-------------------------------------------
+
+int Util_Functions::random()
+{
+    static bool INITIALIZED = false;
+
+    if (!INITIALIZED)
+    {
+        srand((unsigned int) time(NULL));
+        INITIALIZED = true;
+    }
+
+    return rand();
+}
+
+//-------------------------------------------

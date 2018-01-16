@@ -15,13 +15,16 @@
     #include <winsock2.h>
     #include <windows.h>
 #else
-    #include <time.h>
     #include <unistd.h>
 #endif
+
+#include <cstdlib>
+#include <ctime>
 
 class Util_Functions
 {
 public:
     static void delay(unsigned int time);
     static unsigned long get_tick();
+    static int random();
 };
