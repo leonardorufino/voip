@@ -843,9 +843,9 @@ void SIP_Media_Range::set_subtype(SIP_Media_Range::Subtype subtype)
 
 SIP_Media_Range::Subtype SIP_Media_Range::get_subtype()
 {
-    if (_type == "sdp")
+    if (_subtype == "sdp")
         return SUBTYPE_APPLICATION_SDP;
-    else if (_type == "*")
+    else if (_subtype == "*")
         return SUBTYPE_ASTERISK;
 
     return SUBTYPE_INVALID;
