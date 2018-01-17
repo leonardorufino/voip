@@ -447,7 +447,7 @@ bool SIP_Transport_UDP_Test::run(Socket::Address_Family family, std::string addr
 
     if (_received_messages.size() != 1)
     {
-        std::cout << "SIP_Transport_UDP_Test::run -> Message not received\n";
+        std::cout << "SIP_Transport_UDP_Test::run -> Message not received:\n";
         std::cout << std::setw(20) << "Received: " << _received_messages.size() << "\n";
         std::cout << std::setw(20) << "Expected: " << 1 << "\n";
         return false;
@@ -685,7 +685,7 @@ bool SIP_Transport_TCP_Complete_Test::run(Socket::Address_Family family, std::st
 
     if (_received_messages.size() != 1)
     {
-        std::cout << "SIP_Transport_TCP_Complete_Test::run -> Message not received\n";
+        std::cout << "SIP_Transport_TCP_Complete_Test::run -> Message not received:\n";
         std::cout << std::setw(20) << "Received: " << _received_messages.size() << "\n";
         std::cout << std::setw(20) << "Expected: " << 1 << "\n";
         return false;
@@ -800,7 +800,7 @@ bool SIP_Transport_TCP_Segment_Test::run(Socket::Address_Family family, std::str
 
     if (_received_messages.size() != REQUEST_SEGMENTED_MESSAGES)
     {
-        std::cout << "SIP_Transport_TCP_Segment_Test::run -> Message not received\n";
+        std::cout << "SIP_Transport_TCP_Segment_Test::run -> Message not received:\n";
         std::cout << std::setw(20) << "Received: " << _received_messages.size() << "\n";
         std::cout << std::setw(20) << "Expected: " << REQUEST_SEGMENTED_MESSAGES << "\n";
         return false;
