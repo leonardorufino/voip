@@ -82,6 +82,7 @@ class SIP_User_Agent
 public:
     static const unsigned int MAX_CALLS = 5000;
     static const unsigned short SEND_BUFFER_SIZE = 5000;
+    static const unsigned short INVALID_PORT = INVALID_UNSIGNED_SHORT;
 
 public:
     SIP_User_Agent(SIP_Object_ID id);

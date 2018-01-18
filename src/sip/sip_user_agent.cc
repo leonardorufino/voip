@@ -486,7 +486,7 @@ bool SIP_User_Agent_Server::receive_request(SIP_Call *call, SIP_Request *request
 //-------------------------------------------
 
 SIP_User_Agent::SIP_User_Agent(SIP_Object_ID id) : _id(id), _user_agent_client(this), _user_agent_server(this),
-    _next_transport_id(0)
+    _port(INVALID_PORT), _next_transport_id(0)
 {
 }
 
@@ -798,7 +798,7 @@ bool SIP_User_Agent::send_message(SIP_Message *msg)
     SIP_Transport_Type transport_type = header_via->get_transport();
 
     std::string remote_address;
-    unsigned short remote_port = SIP_Transport::INVALID_PORT;
+    unsigned short remote_port = INVALID_PORT;
 
     if (method != SIP_RESPONSE)
     {
@@ -829,7 +829,7 @@ bool SIP_User_Agent::send_message(SIP_Message *msg)
         remote_port = header_via->get_port(); //TODO: get Via rport or SIP default
     }
 
-    if ((remote_address.empty()) || (remote_port == SIP_Transport::INVALID_PORT))
+    if ((remote_address.empty()) || (remote_port == INVALID_PORT))
     {
         _logger.warning("Failed to send message: invalid remote address (method=%d, address=%s, port=%d) [%s]",
                         method, remote_address.c_str(), remote_port, _id.to_string().c_str());
