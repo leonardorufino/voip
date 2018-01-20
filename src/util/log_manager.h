@@ -35,16 +35,17 @@ public:
 
     enum Log_Source
     {
-        LOG_TIMER           = 0x0001,
-        LOG_SOCKET          = 0x0002,
-        LOG_SIP_HEADER      = 0x0010,
-        LOG_SIP_MESSAGE     = 0x0020,
-        LOG_SIP_TRANSACTION = 0x0040,
-        LOG_SIP_TRANSPORT   = 0x0080,
-        LOG_SIP_DIALOG      = 0x0100,
-        LOG_SIP_CALL        = 0x0200,
-        LOG_SIP_USER_AGENT  = 0x0400,
-        LOG_SDP_FIELD       = 0x1000,
+        LOG_TIMER           = 0x00000001,
+        LOG_SOCKET          = 0x00000002,
+        LOG_SIP_HEADER      = 0x00000010,
+        LOG_SIP_MESSAGE     = 0x00000020,
+        LOG_SIP_TRANSACTION = 0x00000040,
+        LOG_SIP_TRANSPORT   = 0x00000080,
+        LOG_SIP_DIALOG      = 0x00000100,
+        LOG_SIP_CALL        = 0x00000200,
+        LOG_SIP_USER_AGENT  = 0x00000400,
+        LOG_SDP_FIELD       = 0x00001000,
+        LOG_SDP_DESCRIPTION = 0x00002000,
     };
 
     typedef bool (log_callback)(Log_Level level, Log_Source source, const std::string &msg);
@@ -76,7 +77,7 @@ public:
 
 private:
     unsigned char _level;
-    unsigned short _source;
+    unsigned int _source;
     log_callback *_callback;
 };
 

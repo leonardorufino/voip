@@ -18,7 +18,7 @@ Log_Manager::Log_Manager()
 {
     _level = LOG_ERROR | LOG_WARNING | LOG_INFO | LOG_TRACE;
     _source = LOG_TIMER | LOG_SOCKET | LOG_SIP_HEADER | LOG_SIP_MESSAGE | LOG_SIP_TRANSACTION | LOG_SIP_TRANSPORT |
-              LOG_SIP_DIALOG | LOG_SIP_CALL | LOG_SIP_USER_AGENT | LOG_SDP_FIELD;
+              LOG_SIP_DIALOG | LOG_SIP_CALL | LOG_SIP_USER_AGENT | LOG_SDP_FIELD | LOG_SDP_DESCRIPTION
     _callback = log_cout_callback;
 }
 
@@ -118,6 +118,7 @@ std::string Log_Manager::get_source(Log_Source source)
         case LOG_SIP_CALL:          return "SIP CAL";
         case LOG_SIP_USER_AGENT:    return "SIP UA ";
         case LOG_SDP_FIELD:         return "SDP FLD";
+        case LOG_SDP_DESCRIPTION:   return "SDP DSC";
         default:                    return "       ";
     }
 }
