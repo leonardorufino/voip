@@ -95,6 +95,7 @@ enum SIP_Header_Type
 
 enum SIP_Body_Type
 {
+    SIP_BODY_SDP,
     SIP_BODY_UNKNOWN,
     SIP_BODY_INVALID
 };
