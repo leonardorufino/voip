@@ -10,6 +10,7 @@
  */
 
 #include "sdp_field_test.h"
+#include "sdp_description_test.h"
 #include <iostream>
 
 //-------------------------------------------
@@ -21,6 +22,12 @@ int main()
     if (!SDP_Field_Test::init())
     {
         std::cout << "SDP field test FAILED!\n";
+        return 1;
+    }
+
+    if (!SDP_Description_Test::init())
+    {
+        std::cout << "SDP description test FAILED!\n";
         return 1;
     }
 
