@@ -10,6 +10,7 @@
  */
 
 #include "sip_body.h"
+#include "sdp/sdp_description.h"
 
 //-------------------------------------------
 
@@ -19,6 +20,10 @@ SIP_Body *SIP_Body::create_body(SIP_Body_Type body_type, const SIP_Body *copy)
 
     switch (body_type)
     {
+        case SIP_BODY_SDP:
+            body = (!copy) ? new SDP_Description()
+                           : new SDP_Description(dynamic_cast<const SDP_Description &>(*copy));
+            break;
         case SIP_BODY_UNKNOWN:
             body = (!copy) ? new SIP_Body_Unknown()
                            : new SIP_Body_Unknown(dynamic_cast<const SIP_Body_Unknown &>(*copy));
