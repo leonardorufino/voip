@@ -16,6 +16,7 @@
 #include "sip/sip_body.h"
 #include "util/log_manager.h"
 #include <string>
+#include <cstring>
 #include <map>
 #include <list>
 
@@ -29,7 +30,7 @@ class SDP_Description : public SIP_Body
 public:
     SDP_Description() : _session(NULL) {}
     SDP_Description(const SDP_Description &description);
-    virtual ~SDP_Description();
+    ~SDP_Description();
 
     // Virtual functions
     SIP_Body_Type get_body_type() { return SIP_BODY_SDP; }
@@ -58,7 +59,7 @@ class SDP_Description_Fields
 public:
     SDP_Description_Fields() {}
     SDP_Description_Fields(const SDP_Description_Fields &description);
-    ~SDP_Description_Fields();
+    virtual ~SDP_Description_Fields();
 
     virtual bool decode(std::string &msg);
     virtual bool encode(std::string &msg);

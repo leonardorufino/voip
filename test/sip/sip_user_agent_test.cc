@@ -320,7 +320,7 @@ bool SIP_User_Agent_Test::close_user_agent()
 
     if (!_user_agent->close())
     {
-        std::cout << "SIP_User_Agent_Invite_UDP_Test::close_user_agent -> Failed to close user agent\n";
+        std::cout << "SIP_User_Agent_Test::close_user_agent -> Failed to close user agent\n";
         return false;
     }
 

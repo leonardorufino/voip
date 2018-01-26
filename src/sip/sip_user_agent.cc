@@ -485,8 +485,8 @@ bool SIP_User_Agent_Server::receive_request(SIP_Call *call, SIP_Request *request
 //-------------------------------------------
 //-------------------------------------------
 
-SIP_User_Agent::SIP_User_Agent(SIP_Object_ID id) : _id(id), _user_agent_client(this), _user_agent_server(this),
-    _port(INVALID_PORT), _next_transport_id(0)
+SIP_User_Agent::SIP_User_Agent(SIP_Object_ID id) : _id(id), _port(INVALID_PORT), _user_agent_client(this), _user_agent_server(this),
+    _next_transport_id(0)
 {
 }
 

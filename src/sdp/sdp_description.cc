@@ -123,8 +123,6 @@ bool SDP_Description::decode(const char *msg, unsigned short size)
 bool SDP_Description::encode(char *msg, unsigned short &size)
 {
     std::string sdp;
-    char *body = msg;
-    unsigned short body_size = size;
 
     if (!_session)
     {
