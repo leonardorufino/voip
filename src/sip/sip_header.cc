@@ -232,6 +232,7 @@ SIP_Header *SIP_Header::create_header(SIP_Header_Type header_type, const SIP_Hea
                              : new SIP_Header_WWW_Authenticate(dynamic_cast<const SIP_Header_WWW_Authenticate &>(*copy));
             break;
         default:
+            _logger.warning("Failed to create header: invalid type (type=%d)", header_type);
             break;
     }
 
@@ -330,6 +331,7 @@ bool SIP_Header::encode_headers(std::string &sip_msg, sip_header_list &headers)
             switch (header->encode_separator())
             {
                 case HEADER_SEPARATOR_NONE:
+                    _logger.warning("Failed to encode headers: invalid separator (header=%d)", header->get_header_type());
                     return false;
 
                 case HEADER_SEPARATOR_COMMA:

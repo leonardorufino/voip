@@ -84,6 +84,7 @@ SDP_Field *SDP_Field::create_field(SDP_Field_Type field_type, const SDP_Field *c
                             : new SDP_Field_Media_Description(dynamic_cast<const SDP_Field_Media_Description &>(*copy));
             break;
         default:
+            _logger.warning("Failed to create field: invalid type (type=%d)", field_type);
             break;
     }
 
