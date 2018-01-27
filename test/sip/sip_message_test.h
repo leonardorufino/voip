@@ -19,6 +19,9 @@
 class SIP_Message_Test
 {
 public:
+    static const unsigned short MAX_MESSAGE_SIZE = 1000;
+
+public:
     SIP_Message_Test() {}
     virtual ~SIP_Message_Test() {}
 
