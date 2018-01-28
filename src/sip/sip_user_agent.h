@@ -47,6 +47,8 @@ private:
 
     receive_response_callback *_receive_response_callback;
     void *_receive_response_callback_data;
+
+    static Logger _logger;
 };
 
 //-------------------------------------------
@@ -73,6 +75,8 @@ private:
 
     receive_request_callback *_receive_request_callback;
     void *_receive_request_callback_data;
+
+    static Logger _logger;
 };
 
 //-------------------------------------------
@@ -129,8 +133,6 @@ public:
                                           std::string address, unsigned short port);
     static bool transport_receive_callback(void *data, SIP_Transport *transport, SIP_Message *msg, std::string address,
                                            unsigned short port);
-
-    static Logger &get_logger() { return _logger; }
 
 private:
     SIP_Object_ID _id;
