@@ -27,10 +27,11 @@ public:
 
     enum Log_Level
     {
-        LOG_ERROR   = 0x01,
-        LOG_WARNING = 0x02,
-        LOG_INFO    = 0x04,
-        LOG_TRACE   = 0x08
+        LOG_ERROR       = 0x01,
+        LOG_WARNING     = 0x02,
+        LOG_INFO        = 0x04,
+        LOG_TRACE       = 0x08,
+        LOG_LEVEL_ALL   = 0xFF
     };
 
     enum Log_Source
@@ -46,6 +47,7 @@ public:
         LOG_SIP_USER_AGENT  = 0x00000400,
         LOG_SDP_FIELD       = 0x00001000,
         LOG_SDP_DESCRIPTION = 0x00002000,
+        LOG_SOURCE_ALL      = 0xFFFFFFFF
     };
 
     typedef bool (log_callback)(Log_Level level, Log_Source source, const std::string &msg);
