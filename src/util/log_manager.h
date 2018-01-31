@@ -47,6 +47,7 @@ public:
         LOG_SIP_USER_AGENT  = 0x00000400,
         LOG_SDP_FIELD       = 0x00001000,
         LOG_SDP_DESCRIPTION = 0x00002000,
+        LOG_RTP_HEADER      = 0x00010000,
         LOG_SOURCE_ALL      = 0xFFFFFFFF
     };
 
