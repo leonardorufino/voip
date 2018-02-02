@@ -35,6 +35,12 @@ file(GLOB SIP_SOURCES "src/sip/*")
 add_library(sip STATIC ${SIP_SOURCES})
 target_link_libraries(sip sdp util)
 
+### RTP library ###
+message("Creating RTP library..")
+file(GLOB RTP_SOURCES "src/rtp/*")
+add_library(rtp STATIC ${RTP_SOURCES})
+target_link_libraries(rtp util)
+
 ### Util test ###
 message("Creating util test executable..")
 file(GLOB UTIL_TEST_SOURCES "test/util/*")
@@ -53,7 +59,14 @@ file(GLOB SIP_TEST_SOURCES "test/sip/*")
 add_executable(sip_test ${SIP_TEST_SOURCES})
 target_link_libraries(sip_test sip)
 
+### RTP test ###
+message("Creating RTP test executable..")
+file(GLOB RTP_TEST_SOURCES "test/rtp/*")
+add_executable(rtp_test ${RTP_TEST_SOURCES})
+target_link_libraries(rtp_test rtp)
+
 enable_testing()
 add_test(Util_Test ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/util_test)
 add_test(SDP_Test ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/sdp_test)
 add_test(SIP_Test ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/sip_test)
+add_test(RTP_Test ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/rtp_test)
