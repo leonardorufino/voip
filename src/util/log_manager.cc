@@ -110,6 +110,7 @@ std::string Log_Manager::get_source(Log_Source source)
         case LOG_TIMER:             return "TIMER  ";
         case LOG_SOCKET:            return "SOCKET ";
         case LOG_SIP_HEADER:        return "SIP HDR";
+        case LOG_SIP_BODY:          return "SIP BOD";
         case LOG_SIP_MESSAGE:       return "SIP MSG";
         case LOG_SIP_TRANSACTION:   return "SIP TRA";
         case LOG_SIP_TRANSPORT:     return "SIP TPT";
