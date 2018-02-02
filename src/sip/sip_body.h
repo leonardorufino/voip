@@ -12,6 +12,7 @@
 #pragma once
 
 #include "sip_defs.h"
+#include "util/log_manager.h"
 
 class SIP_Body
 {
@@ -25,6 +26,9 @@ public:
     virtual SIP_Body_Type get_body_type() = 0;
     virtual bool decode(const char *body, unsigned short size) = 0;
     virtual bool encode(char *body, unsigned short &size) = 0;
+
+protected:
+    static Logger _logger;
 };
 
 //-------------------------------------------

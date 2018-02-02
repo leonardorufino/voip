@@ -12,6 +12,8 @@
 #include "sip_body.h"
 #include "sdp/sdp_description.h"
 
+Logger SIP_Body::_logger(Log_Manager::LOG_SIP_BODY);
+
 //-------------------------------------------
 
 SIP_Body *SIP_Body::create_body(SIP_Body_Type body_type, const SIP_Body *copy)
@@ -29,6 +31,7 @@ SIP_Body *SIP_Body::create_body(SIP_Body_Type body_type, const SIP_Body *copy)
                            : new SIP_Body_Unknown(dynamic_cast<const SIP_Body_Unknown &>(*copy));
             break;
         default:
+            _logger.warning("Failed to create body: invalid type (type=%d)", body_type);
             break;
     }
 
@@ -59,7 +62,10 @@ SIP_Body_Unknown::~SIP_Body_Unknown()
 bool SIP_Body_Unknown::decode(const char *body, unsigned short size)
 {
     if ((!body) || (size == 0))
+    {
+        _logger.warning("Failed to decode: invalid parameters");
         return false;
+    }
 
     _size = size;
     _body = new char[_size + 1];
@@ -73,7 +79,10 @@ bool SIP_Body_Unknown::decode(const char *body, unsigned short size)
 bool SIP_Body_Unknown::encode(char *body, unsigned short &size)
 {
     if ((!body) || (size <= _size))
+    {
+        _logger.warning("Failed to encode: invalid parameters");
         return false;
+    }
 
     size = _size;
     memcpy(body, _body, size);
