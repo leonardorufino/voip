@@ -12,6 +12,7 @@
 #pragma once
 
 #include "rtp/rtp_header.h"
+#include <cstring>
 #include <list>
 #include <iomanip>
 
