@@ -25,7 +25,7 @@ The following tools must be installed in your system to compile and test the cod
 $ mkdir build
 $ cd build
 $ cmake -G "Unix Makefiles" ..
-$ make
+$ cmake --build .
 ```
 
 
@@ -35,36 +35,17 @@ $ make
 > mkdir build
 > cd build
 > cmake -G "Visual Studio 15 2017" ..
+> cmake --build .
 ```
-
-Open VoIP.sln and compile the projects.
 
 
 ### Running the tests
 
 After compiling the project, enter the build folder and type:
 
-
-#### Linux (GNU Make)
-
 ```
 $ ctest ..
 ```
-
-or
-
-```
-$ make test
-```
-
-
-#### Windows (Visual Studio 2017)
-
-```
-> ctest ..
-```
-
-or open VoIP.sln and execute the RUN_TESTS project.
 
 
 ## Authors
