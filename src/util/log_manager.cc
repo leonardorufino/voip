@@ -120,6 +120,7 @@ std::string Log_Manager::get_source(Log_Source source)
         case LOG_SDP_FIELD:         return "SDP FLD";
         case LOG_SDP_DESCRIPTION:   return "SDP DSC";
         case LOG_RTP_HEADER:        return "RTP HDR";
+        case LOG_RTP_PACKET:        return "RTP PKT";
         default:                    return "       ";
     }
 }
