@@ -10,6 +10,9 @@
  */
 
 #include "rtp_header_test.h"
+#include "rtp_packet_test.h"
+#include "rtp_transport_test.h"
+#include "rtp_session_test.h"
 #include <iostream>
 
 //-------------------------------------------
@@ -21,6 +24,12 @@ int main()
     if (!RTP_Header_Test::init())
     {
         std::cout << "RTP header test FAILED!\n";
+        return 1;
+    }
+
+    if (!RTP_Packet_Test::init())
+    {
+        std::cout << "RTP packet test FAILED!\n";
         return 1;
     }
 
