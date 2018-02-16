@@ -51,6 +51,7 @@ public:
         LOG_RTP_HEADER      = 0x00010000,
         LOG_RTP_PACKET      = 0x00020000,
         LOG_RTP_TRANSPORT   = 0x00040000,
+        LOG_RTP_SESSION     = 0x00080000,
         LOG_SOURCE_ALL      = 0xFFFFFFFF
     };
 
