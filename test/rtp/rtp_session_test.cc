@@ -49,6 +49,9 @@ bool RTP_Session_Test::init()
     {
         std::cout << "IPv4 RTP session test initialized\n";
 
+        if (!run<RTP_Session_UDP_Test>(family_ipv4, address_ipv4, port_ipv4, RTP_TRANSPORT_UDP))
+            return false;
+
         std::cout << "IPv4 RTP session test completed successfully\n";
     }else
         std::cout << "IPv4 RTP session test disabled\n";
@@ -61,6 +64,9 @@ bool RTP_Session_Test::init()
     if (check_network_address(family_ipv6, address_ipv6))
     {
         std::cout << "IPv6 RTP session test initialized\n";
+
+        if (!run<RTP_Session_UDP_Test>(family_ipv6, address_ipv6, port_ipv6, RTP_TRANSPORT_UDP))
+            return false;
 
         std::cout << "IPv6 RTP session test completed successfully\n";
     }else
@@ -259,6 +265,32 @@ bool RTP_Session_Test::check_network_address(Socket::Address_Family family, std:
     }
 
     return false;
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+bool RTP_Session_UDP_Test::run(Socket::Address_Family family, std::string address, unsigned short port, RTP_Transport_Type transport)
+{
+    std::cout << "RTP session call success test initialized\n";
+
+    if (!init_session(address, port, address, port, transport))
+        return false;
+
+    for (unsigned short i = 0; i < 5; i++)
+    {
+        if (!send_packet())
+            return false;
+
+        if (!receive_packet())
+            return false;
+    }
+
+    if (!close_session())
+        return false;
+
+    std::cout << "RTP session call success test completed successfully\n";
+    return true;
 }
 
 //-------------------------------------------

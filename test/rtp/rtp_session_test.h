@@ -65,3 +65,15 @@ private:
 };
 
 //-------------------------------------------
+//-------------------------------------------
+
+class RTP_Session_UDP_Test : public RTP_Session_Test
+{
+public:
+    RTP_Session_UDP_Test() {}
+    virtual ~RTP_Session_UDP_Test() {}
+
+    bool run(Socket::Address_Family family, std::string address, unsigned short port, RTP_Transport_Type transport);
+};
+
+//-------------------------------------------
