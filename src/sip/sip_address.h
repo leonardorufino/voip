@@ -71,18 +71,18 @@ public:
 
     void set_transport(SIP_Transport_Type transport);
     void set_transport(std::string transport) { _transport = transport; }
-    SIP_Transport_Type get_transport();
-    std::string get_transport_str() { return _transport; }
+    SIP_Transport_Type get_transport_enum();
+    std::string get_transport() { return _transport; }
 
     void set_user_param(User_Param user_param);
     void set_user_param(std::string user_param) { _user_param = user_param; }
-    User_Param get_user_param();
-    std::string get_user_param_str() { return _user_param; }
+    User_Param get_user_param_enum();
+    std::string get_user_param() { return _user_param; }
 
     void set_method(SIP_Method_Type method);
     void set_method(std::string method) { _method = method; }
-    SIP_Method_Type get_method();
-    std::string get_method_str() { return _method; }
+    SIP_Method_Type get_method_enum();
+    std::string get_method() { return _method; }
 
     void set_ttl(unsigned short ttl) { _ttl = ttl; }
     unsigned short get_ttl() { return _ttl; }
@@ -160,8 +160,8 @@ public:
 
     void set_scheme(Scheme scheme);
     void set_scheme(std::string scheme) { _scheme = scheme; }
-    Scheme get_scheme();
-    std::string get_scheme_str() { return _scheme; }
+    Scheme get_scheme_enum();
+    std::string get_scheme() { return _scheme; }
 
     void set_uri_angle_quote(bool quote) { _uri_angle_quote = quote; }
     bool get_uri_angle_quote() { return _uri_angle_quote; }

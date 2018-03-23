@@ -66,7 +66,7 @@ public:
     bool encode(std::string &sip_msg);
 
     void set_scheme(std::string scheme) { _scheme = scheme; }
-    std::string get_scheme_str() { return _scheme; }
+    std::string get_scheme() { return _scheme; }
 
     void set_realm(std::string realm) { _realm = realm; }
     std::string get_realm() { return _realm; }
@@ -84,7 +84,7 @@ public:
     std::string get_stale() { return _stale; }
 
     void set_algorithm(std::string algorithm) { _algorithm = algorithm; }
-    std::string get_algorithm_str() { return _algorithm; }
+    std::string get_algorithm() { return _algorithm; }
 
     void set_qop(std::string qop) { _qop = qop; }
     std::string get_qop() { return _qop; }
@@ -117,7 +117,7 @@ public:
     bool encode(std::string &sip_msg);
 
     void set_scheme(std::string scheme) { _scheme = scheme; }
-    std::string get_scheme_str() { return _scheme; }
+    std::string get_scheme() { return _scheme; }
 
     void set_username(std::string username) { _username = username; }
     std::string get_username() { return _username; }
@@ -135,7 +135,7 @@ public:
     std::string get_response() { return _response; }
 
     void set_algorithm(std::string algorithm) { _algorithm = algorithm; }
-    std::string get_algorithm_str() { return _algorithm; }
+    std::string get_algorithm() { return _algorithm; }
 
     void set_cnonce(std::string cnonce) { _cnonce = cnonce; }
     std::string get_cnonce() { return _cnonce; }
@@ -202,13 +202,13 @@ public:
 
     void set_type(Type type);
     void set_type(std::string type) { _type = type; }
-    Type get_type();
-    std::string get_type_str() { return _type; }
+    Type get_type_enum();
+    std::string get_type() { return _type; }
 
     void set_subtype(Subtype subtype);
     void set_subtype(std::string subtype) { _subtype = subtype; }
-    Subtype get_subtype();
-    std::string get_subtype_str() { return _subtype; }
+    Subtype get_subtype_enum();
+    std::string get_subtype() { return _subtype; }
 
     void set_q(std::string q) { _q = q; }
     std::string get_q() { return _q; }
@@ -244,8 +244,8 @@ public:
 
     void set_package(Package package);
     void set_package(std::string package) { _package = package; }
-    Package get_package();
-    std::string get_package_str() { return _package; }
+    Package get_package_enum();
+    std::string get_package() { return _package; }
 
     std::list<std::string> &get_templates() { return _templates; }
 
@@ -384,8 +384,8 @@ public:
 
     void set_method(SIP_Method_Type method);
     void set_method(std::string method) { _method = method; }
-    SIP_Method_Type get_method();
-    std::string get_method_str() { return _method; }
+    SIP_Method_Type get_method_enum();
+    std::string get_method() { return _method; }
 
 private:
     std::string _method;
@@ -532,8 +532,8 @@ public:
 
     void set_purpose(Purpose type);
     void set_purpose(std::string purpose) { _purpose = purpose; }
-    Purpose get_purpose();
-    std::string get_purpose_str() { return _purpose; }
+    Purpose get_purpose_enum();
+    std::string get_purpose() { return _purpose; }
 
     void set_parameters(std::list<std::string> &parameters) { _parameters = parameters; }
     std::list<std::string> &get_parameters() { return _parameters; }
@@ -621,13 +621,13 @@ public:
 
     void set_type(Type type);
     void set_type(std::string type) { _type = type; }
-    Type get_type();
-    std::string get_type_str() { return _type; }
+    Type get_type_enum();
+    std::string get_type() { return _type; }
 
     void set_handling(Handling handling);
     void set_handling(std::string handling) { _handling = handling; }
-    Handling get_handling();
-    std::string get_handling_str() { return _handling; }
+    Handling get_handling_enum();
+    std::string get_handling() { return _handling; }
 
     void set_parameters(std::list<std::string> &parameters) { _parameters = parameters; }
     std::list<std::string> &get_parameters() { return _parameters; }
@@ -756,8 +756,8 @@ public:
 
     void set_method(SIP_Method_Type method);
     void set_method(std::string method) { _method = method; }
-    SIP_Method_Type get_method();
-    std::string get_method_str() { return _method; }
+    SIP_Method_Type get_method_enum();
+    std::string get_method() { return _method; }
 
 private:
     unsigned long _sequence;
@@ -818,16 +818,16 @@ public:
 
     void set_weekday(Weekday weekday);
     void set_weekday(std::string weekday) { _weekday = weekday; }
-    Weekday get_weekday();
-    std::string get_weekday_str() { return _weekday; }
+    Weekday get_weekday_enum();
+    std::string get_weekday() { return _weekday; }
 
     void set_day(unsigned short day) { _day = day; }
     unsigned short get_day() { return _day; }
 
     void set_month(Month month);
     void set_month(std::string month) { _month = month; }
-    Month get_month();
-    std::string get_month_str() { return _month; }
+    Month get_month_enum();
+    std::string get_month() { return _month; }
 
     void set_year(unsigned short year) { _year = year; }
     unsigned short get_year() { return _year; }
@@ -1126,8 +1126,8 @@ public:
 
     void set_priority(Priority priority);
     void set_priority(std::string priority) { _priority = priority; }
-    Priority get_priority();
-    std::string get_priority_str() { return _priority; }
+    Priority get_priority_enum();
+    std::string get_priority() { return _priority; }
 
 private:
     std::string _priority;
@@ -1228,8 +1228,8 @@ public:
 
     void set_method(SIP_Method_Type method);
     void set_method(std::string method) { _method = method; }
-    SIP_Method_Type get_method();
-    std::string get_method_str() { return _method; }
+    SIP_Method_Type get_method_enum();
+    std::string get_method() { return _method; }
 
 private:
     unsigned long _rseq;
@@ -1552,13 +1552,13 @@ public:
 
     void set_state(State state);
     void set_state(std::string state) { _state = state; }
-    State get_state();
-    std::string get_state_str() { return _state; }
+    State get_state_enum();
+    std::string get_state() { return _state; }
 
     void set_reason(Reason reason);
     void set_reason(std::string reason) { _reason = reason; }
-    Reason get_reason();
-    std::string get_reason_str() { return _reason; }
+    Reason get_reason_enum();
+    std::string get_reason() { return _reason; }
 
     void set_expires(unsigned long expires) { _expires = expires; }
     unsigned long get_expires() { return _expires; }
@@ -1762,8 +1762,8 @@ public:
 
     void set_transport(SIP_Transport_Type transport);
     void set_transport(std::string transport) { _transport = transport; }
-    SIP_Transport_Type get_transport();
-    std::string get_transport_str() { return _transport; }
+    SIP_Transport_Type get_transport_enum();
+    std::string get_transport() { return _transport; }
 
     void set_host(const SIP_Host &host) { _host = host; }
     SIP_Host &get_host() { return _host; }

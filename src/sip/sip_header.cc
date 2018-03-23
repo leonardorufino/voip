@@ -807,7 +807,7 @@ void SIP_Media_Range::set_type(SIP_Media_Range::Type type)
 
 //-------------------------------------------
 
-SIP_Media_Range::Type SIP_Media_Range::get_type()
+SIP_Media_Range::Type SIP_Media_Range::get_type_enum()
 {
     if (_type == "text")
         return TYPE_TEXT;
@@ -843,7 +843,7 @@ void SIP_Media_Range::set_subtype(SIP_Media_Range::Subtype subtype)
 
 //-------------------------------------------
 
-SIP_Media_Range::Subtype SIP_Media_Range::get_subtype()
+SIP_Media_Range::Subtype SIP_Media_Range::get_subtype_enum()
 {
     if (_subtype == "sdp")
         return SUBTYPE_APPLICATION_SDP;
@@ -912,7 +912,7 @@ void SIP_Event_Type::set_package(SIP_Event_Type::Package package)
 
 //-------------------------------------------
 
-SIP_Event_Type::Package SIP_Event_Type::get_package()
+SIP_Event_Type::Package SIP_Event_Type::get_package_enum()
 {
     if (_package == "presence")
         return PACKAGE_PRESENCE;
@@ -939,7 +939,7 @@ bool SIP_Header_Accept::decode(std::string &sip_msg)
 
 bool SIP_Header_Accept::encode(std::string &sip_msg)
 {
-    if ((_media_range.get_type_str().empty()) && (_media_range.get_subtype_str().empty()))
+    if ((_media_range.get_type().empty()) && (_media_range.get_subtype().empty()))
     {
         // Accept header can be empty
         return true;
@@ -1142,7 +1142,7 @@ void SIP_Header_Allow::set_method(SIP_Method_Type method)
 
 //-------------------------------------------
 
-SIP_Method_Type SIP_Header_Allow::get_method()
+SIP_Method_Type SIP_Header_Allow::get_method_enum()
 {
     return SIP_Functions::get_method_type(_method);
 }
@@ -1395,7 +1395,7 @@ void SIP_Header_Call_Info::set_purpose(SIP_Header_Call_Info::Purpose purpose)
 
 //-------------------------------------------
 
-SIP_Header_Call_Info::Purpose SIP_Header_Call_Info::get_purpose()
+SIP_Header_Call_Info::Purpose SIP_Header_Call_Info::get_purpose_enum()
 {
     if (_purpose == "icon")
         return PURPOSE_ICON;
@@ -1565,7 +1565,7 @@ void SIP_Header_Content_Disposition::set_type(SIP_Header_Content_Disposition::Ty
 
 //-------------------------------------------
 
-SIP_Header_Content_Disposition::Type SIP_Header_Content_Disposition::get_type()
+SIP_Header_Content_Disposition::Type SIP_Header_Content_Disposition::get_type_enum()
 {
     if (_type == "render")
         return TYPE_RENDER;
@@ -1593,7 +1593,7 @@ void SIP_Header_Content_Disposition::set_handling(SIP_Header_Content_Disposition
 
 //-------------------------------------------
 
-SIP_Header_Content_Disposition::Handling SIP_Header_Content_Disposition::get_handling()
+SIP_Header_Content_Disposition::Handling SIP_Header_Content_Disposition::get_handling_enum()
 {
     if (_handling == "optional")
         return HANDLING_OPTIONAL;
@@ -1738,7 +1738,7 @@ void SIP_Header_CSeq::set_method(SIP_Method_Type method)
 
 //-------------------------------------------
 
-SIP_Method_Type SIP_Header_CSeq::get_method()
+SIP_Method_Type SIP_Header_CSeq::get_method_enum()
 {
     return SIP_Functions::get_method_type(_method);
 }
@@ -1895,7 +1895,7 @@ void SIP_Header_Date::set_weekday(SIP_Header_Date::Weekday weekday)
 
 //-------------------------------------------
 
-SIP_Header_Date::Weekday SIP_Header_Date::get_weekday()
+SIP_Header_Date::Weekday SIP_Header_Date::get_weekday_enum()
 {
     if (_weekday == "Mon")
         return WEEKDAY_MON;
@@ -1939,7 +1939,7 @@ void SIP_Header_Date::set_month(SIP_Header_Date::Month month)
 
 //-------------------------------------------
 
-SIP_Header_Date::Month SIP_Header_Date::get_month()
+SIP_Header_Date::Month SIP_Header_Date::get_month_enum()
 {
     if (_month == "Jan")
         return MONTH_JAN;
@@ -2326,7 +2326,7 @@ void SIP_Header_Priority::set_priority(SIP_Header_Priority::Priority priority)
 
 //-------------------------------------------
 
-SIP_Header_Priority::Priority SIP_Header_Priority::get_priority()
+SIP_Header_Priority::Priority SIP_Header_Priority::get_priority_enum()
 {
     if (_priority == "emergency")
         return PRIORITY_EMERGENCY;
@@ -2449,7 +2449,7 @@ void SIP_Header_RAck::set_method(SIP_Method_Type method)
 
 //-------------------------------------------
 
-SIP_Method_Type SIP_Header_RAck::get_method()
+SIP_Method_Type SIP_Header_RAck::get_method_enum()
 {
     return SIP_Functions::get_method_type(_method);
 }
@@ -2952,7 +2952,7 @@ void SIP_Header_Subscription_State::set_state(SIP_Header_Subscription_State::Sta
 
 //-------------------------------------------
 
-SIP_Header_Subscription_State::State SIP_Header_Subscription_State::get_state()
+SIP_Header_Subscription_State::State SIP_Header_Subscription_State::get_state_enum()
 {
     if (_state == "active")
         return STATE_ACTIVE;
@@ -2983,7 +2983,7 @@ void SIP_Header_Subscription_State::set_reason(SIP_Header_Subscription_State::Re
 
 //-------------------------------------------
 
-SIP_Header_Subscription_State::Reason SIP_Header_Subscription_State::get_reason()
+SIP_Header_Subscription_State::Reason SIP_Header_Subscription_State::get_reason_enum()
 {
     if (_reason == "deactivated")
         return REASON_DEACTIVATED;
@@ -3397,7 +3397,7 @@ void SIP_Header_Via::set_transport(SIP_Transport_Type transport)
 
 //-------------------------------------------
 
-SIP_Transport_Type SIP_Header_Via::get_transport()
+SIP_Transport_Type SIP_Header_Via::get_transport_enum()
 {
     return SIP_Functions::get_transport_type(_transport);
 }

@@ -70,8 +70,8 @@ bool SIP_Dialog::set_client_dialog(SIP_Request *request, SIP_Response *response)
         _invite_remote_sequence = SIP_Header_CSeq::INVALID_SEQUENCE;
     }
 
-    if ((_call_id.empty()) || (_local_uri.get_scheme_str().empty()) || (_local_tag.empty()) || (_remote_uri.get_scheme_str().empty()) ||
-        (_remote_target.get_scheme_str().empty()) || (_local_sequence == SIP_Header_CSeq::INVALID_SEQUENCE))
+    if ((_call_id.empty()) || (_local_uri.get_scheme().empty()) || (_local_tag.empty()) || (_remote_uri.get_scheme().empty()) ||
+        (_remote_target.get_scheme().empty()) || (_local_sequence == SIP_Header_CSeq::INVALID_SEQUENCE))
     {
         _logger.warning("Failed to set client dialog: invalid header values [%s]", _id.to_string().c_str());
         return false;
@@ -139,8 +139,8 @@ bool SIP_Dialog::set_server_dialog(SIP_Request *request, SIP_Response *response)
         _invite_remote_sequence = header_cseq->get_sequence();
     }
 
-    if ((_call_id.empty()) || (_local_uri.get_scheme_str().empty()) || (_local_tag.empty()) || (_remote_uri.get_scheme_str().empty()) ||
-        (_remote_target.get_scheme_str().empty()) || (_remote_sequence == SIP_Header_CSeq::INVALID_SEQUENCE))
+    if ((_call_id.empty()) || (_local_uri.get_scheme().empty()) || (_local_tag.empty()) || (_remote_uri.get_scheme().empty()) ||
+        (_remote_target.get_scheme().empty()) || (_remote_sequence == SIP_Header_CSeq::INVALID_SEQUENCE))
     {
         _logger.warning("Failed to set server dialog: invalid header values [%s]", _id.to_string().c_str());
         return false;

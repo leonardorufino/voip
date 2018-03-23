@@ -266,7 +266,7 @@ void SIP_URI::set_transport(SIP_Transport_Type transport)
 
 //-------------------------------------------
 
-SIP_Transport_Type SIP_URI::get_transport()
+SIP_Transport_Type SIP_URI::get_transport_enum()
 {
     return SIP_Functions::get_transport_type(_transport);
 }
@@ -285,7 +285,7 @@ void SIP_URI::set_user_param(SIP_URI::User_Param user_param)
 
 //-------------------------------------------
 
-SIP_URI::User_Param SIP_URI::get_user_param()
+SIP_URI::User_Param SIP_URI::get_user_param_enum()
 {
     if (_user_param == "phone")
         return USER_PARAM_PHONE;
@@ -304,7 +304,7 @@ void SIP_URI::set_method(SIP_Method_Type method)
 
 //-------------------------------------------
 
-SIP_Method_Type SIP_URI::get_method()
+SIP_Method_Type SIP_URI::get_method_enum()
 {
     return SIP_Functions::get_method_type(_method);
 }
@@ -386,7 +386,7 @@ bool SIP_Address::decode(std::string &sip_msg)
 
     _scheme = scheme;
 
-    switch (get_scheme())
+    switch (get_scheme_enum())
     {
         case SCHEME_SIP:
         case SCHEME_SIPS:
@@ -433,7 +433,7 @@ bool SIP_Address::encode(std::string &sip_msg)
     sip_msg += _scheme;
     sip_msg += ":";
 
-    switch (get_scheme())
+    switch (get_scheme_enum())
     {
         case SCHEME_SIP:
         case SCHEME_SIPS:
@@ -471,7 +471,7 @@ void SIP_Address::set_scheme(SIP_Address::Scheme scheme)
 
 //-------------------------------------------
 
-SIP_Address::Scheme SIP_Address::get_scheme()
+SIP_Address::Scheme SIP_Address::get_scheme_enum()
 {
     if (_scheme == "sip")
         return SCHEME_SIP;

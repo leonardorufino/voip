@@ -114,7 +114,7 @@ bool SIP_Transaction::match_transaction_response(SIP_Message *msg)
     }
 
     std::string saved_request_via_branch = saved_request_via->get_branch();
-    SIP_Method_Type saved_request_cseq_method = saved_request_cseq->get_method();
+    SIP_Method_Type saved_request_cseq_method = saved_request_cseq->get_method_enum();
 
     if ((saved_request_via_branch.empty()) || (saved_request_cseq_method == SIP_METHOD_INVALID))
     {
@@ -140,7 +140,7 @@ bool SIP_Transaction::match_transaction_response(SIP_Message *msg)
     }
 
     std::string response_via_branch = response_via->get_branch();
-    SIP_Method_Type response_cseq_method = response_cseq->get_method();
+    SIP_Method_Type response_cseq_method = response_cseq->get_method_enum();
 
     if ((response_via_branch.empty()) || (response_cseq_method == SIP_METHOD_INVALID))
     {

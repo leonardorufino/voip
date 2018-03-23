@@ -781,7 +781,7 @@ bool SIP_User_Agent::send_message(SIP_Message *msg)
         return false;
     }
 
-    SIP_Transport_Type transport_type = header_via->get_transport();
+    SIP_Transport_Type transport_type = header_via->get_transport_enum();
 
     std::string remote_address;
     unsigned short remote_port = INVALID_PORT;

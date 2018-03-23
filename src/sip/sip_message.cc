@@ -209,8 +209,8 @@ bool SIP_Message::decode_body(const char *body, unsigned short size)
     {
         SIP_Body_Type type = SIP_BODY_UNKNOWN;
 
-        if ((header_content_type->get_media_type().get_type() == SIP_Media_Range::TYPE_APPLICATION) &&
-            (header_content_type->get_media_type().get_subtype() == SIP_Media_Range::SUBTYPE_APPLICATION_SDP))
+        if ((header_content_type->get_media_type().get_type_enum() == SIP_Media_Range::TYPE_APPLICATION) &&
+            (header_content_type->get_media_type().get_subtype_enum() == SIP_Media_Range::SUBTYPE_APPLICATION_SDP))
             type = SIP_BODY_SDP;
 
         SIP_Body *sip_body = SIP_Body::create_body(type);

@@ -389,8 +389,8 @@ public:
 
     void set_method(Method method);
     void set_method(std::string method) { _method = method; }
-    Method get_method();
-    std::string get_method_str() { return _method; }
+    Method get_method_enum();
+    std::string get_method() { return _method; }
 
     void set_key(std::string key) { _key = key; }
     std::string get_key() { return _key; }
@@ -440,8 +440,8 @@ public:
 
     void set_attribute(Attribute attribute);
     void set_attribute(std::string attribute) { _attribute = attribute; }
-    Attribute get_attribute();
-    std::string get_attribute_str() { return _attribute; }
+    Attribute get_attribute_enum();
+    std::string get_attribute() { return _attribute; }
 
     void set_value(std::string value) { _value = value; }
     std::string get_value() { return _value; }
@@ -489,8 +489,8 @@ public:
 
     void set_media(Media media);
     void set_media(std::string media) { _media = media; }
-    Media get_media();
-    std::string get_media_str() { return _media; }
+    Media get_media_enum();
+    std::string get_media() { return _media; }
 
     void set_port(unsigned short port) { _port = port; }
     unsigned short get_port() { return _port; }
@@ -500,8 +500,8 @@ public:
 
     void set_protocol(Protocol protocol);
     void set_protocol(std::string protocol) { _protocol = protocol; }
-    Protocol get_protocol();
-    std::string get_protocol_str() { return _protocol; }
+    Protocol get_protocol_enum();
+    std::string get_protocol() { return _protocol; }
 
     void set_formats(std::list<std::string> &formats) { _formats = formats; }
     std::list<std::string> &get_formats() { return _formats; }

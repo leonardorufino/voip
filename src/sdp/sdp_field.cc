@@ -699,7 +699,7 @@ void SDP_Field_Encryption_Key::set_method(SDP_Field_Encryption_Key::Method metho
 
 //-------------------------------------------
 
-SDP_Field_Encryption_Key::Method SDP_Field_Encryption_Key::get_method()
+SDP_Field_Encryption_Key::Method SDP_Field_Encryption_Key::get_method_enum()
 {
     if (_method == "clear")
         return METHOD_CLEAR;
@@ -786,7 +786,7 @@ void SDP_Field_Attribute::set_attribute(SDP_Field_Attribute::Attribute attribute
 
 //-------------------------------------------
 
-SDP_Field_Attribute::Attribute SDP_Field_Attribute::get_attribute()
+SDP_Field_Attribute::Attribute SDP_Field_Attribute::get_attribute_enum()
 {
     if (_attribute == "cat")
         return ATTRIBUTE_CAT;
@@ -939,7 +939,7 @@ void SDP_Field_Media_Description::set_media(SDP_Field_Media_Description::Media m
 
 //-------------------------------------------
 
-SDP_Field_Media_Description::Media SDP_Field_Media_Description::get_media()
+SDP_Field_Media_Description::Media SDP_Field_Media_Description::get_media_enum()
 {
     if (_media == "audio")
         return MEDIA_AUDIO;
@@ -970,7 +970,7 @@ void SDP_Field_Media_Description::set_protocol(SDP_Field_Media_Description::Prot
 
 //-------------------------------------------
 
-SDP_Field_Media_Description::Protocol SDP_Field_Media_Description::get_protocol()
+SDP_Field_Media_Description::Protocol SDP_Field_Media_Description::get_protocol_enum()
 {
     if (_protocol == "udp")
         return PROTOCOL_UDP;
