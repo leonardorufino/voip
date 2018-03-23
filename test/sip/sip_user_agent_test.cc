@@ -286,11 +286,18 @@ template<class T> bool SIP_User_Agent_Test::run(Socket::Address_Family family, s
 
 void SIP_User_Agent_Test::thread(SIP_User_Agent_Test *test)
 {
+    Timer_Manager &timer = Timer_Manager::instance();
+    Socket_Control &socket = Socket_Control::instance();
+
     while (!test->_stop_thread)
     {
         Util_Functions::delay(THREAD_DELAY);
 
         std::lock_guard<std::mutex> lock(test->_thread_mutex);
+
+        timer.run();
+        socket.run();
+
         test->_user_agent->update();
     }
 }

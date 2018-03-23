@@ -900,12 +900,6 @@ bool SIP_User_Agent::send_message(SIP_Message *msg)
 
 bool SIP_User_Agent::update()
 {
-    Timer_Manager &timer = Timer_Manager::instance();
-    timer.run();
-
-    Socket_Control &socket = Socket_Control::instance();
-    socket.run();
-
     remove_closed_calls();
     return true;
 }
