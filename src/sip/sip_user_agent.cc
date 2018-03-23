@@ -183,7 +183,7 @@ bool SIP_User_Agent_Client::send_request(unsigned int call_id, SIP_Request *requ
 
             if (call_id >= SIP_User_Agent::MAX_CALLS)
             {
-                _logger.warning("Failed to send request: invalid call-id (call_id=%d, method=%d) [%s]",
+                _logger.warning("Failed to send request: invalid call id (call_id=%d, method=%d) [%s]",
                                 call_id, method, _user_agent->get_id().to_string().c_str());
                 return false;
             }
@@ -406,7 +406,7 @@ bool SIP_User_Agent_Server::receive_request(SIP_Request *request)
             unsigned int new_call_id = _user_agent->get_free_call_id();
             if (new_call_id == SIP_Object_ID::INVALID_CALL)
             {
-                _logger.warning("Failed to receive request: no free call-id (method=%d) [%s]",
+                _logger.warning("Failed to receive request: no free call id (method=%d) [%s]",
                                 method, _user_agent->get_id().to_string().c_str());
                 return false;
             }
