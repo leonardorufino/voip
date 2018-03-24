@@ -223,8 +223,10 @@ public:
     static const unsigned long SELECT_TIMEOUT = 0; // Milliseconds
     static const unsigned short RECEIVE_BUFFER_SIZE = 5000;
 
-public:
+private:
     Socket_Control() {}
+
+public:
     ~Socket_Control() {}
 
     static Socket_Control &instance();

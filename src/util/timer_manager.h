@@ -58,8 +58,10 @@ private:
 
 class Timer_Manager
 {
-public:
+private:
     Timer_Manager() : _last_tick(0), _flag(false) {}
+
+public:
     ~Timer_Manager() {}
 
     static Timer_Manager &instance();

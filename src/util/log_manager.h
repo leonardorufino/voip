@@ -57,8 +57,10 @@ public:
 
     typedef bool (log_callback)(Log_Level level, Log_Source source, const std::string &msg);
 
-public:
+private:
     Log_Manager();
+
+public:
     ~Log_Manager() {}
 
     static Log_Manager &instance();
