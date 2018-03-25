@@ -117,6 +117,7 @@ std::string Log_Manager::get_source(Log_Source source)
         case LOG_SIP_DIALOG:        return "SIP DLG";
         case LOG_SIP_CALL:          return "SIP CAL";
         case LOG_SIP_USER_AGENT:    return "SIP UA ";
+        case LOG_SIP_MANAGER:       return "SIP MNG";
         case LOG_SDP_FIELD:         return "SDP FLD";
         case LOG_SDP_DESCRIPTION:   return "SDP DSC";
         case LOG_RTP_HEADER:        return "RTP HDR";

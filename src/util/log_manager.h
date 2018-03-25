@@ -46,12 +46,13 @@ public:
         LOG_SIP_DIALOG      = 0x00000200,
         LOG_SIP_CALL        = 0x00000400,
         LOG_SIP_USER_AGENT  = 0x00000800,
-        LOG_SDP_FIELD       = 0x00001000,
-        LOG_SDP_DESCRIPTION = 0x00002000,
-        LOG_RTP_HEADER      = 0x00010000,
-        LOG_RTP_PACKET      = 0x00020000,
-        LOG_RTP_TRANSPORT   = 0x00040000,
-        LOG_RTP_SESSION     = 0x00080000,
+        LOG_SIP_MANAGER     = 0x00001000,
+        LOG_SDP_FIELD       = 0x00010000,
+        LOG_SDP_DESCRIPTION = 0x00020000,
+        LOG_RTP_HEADER      = 0x00100000,
+        LOG_RTP_PACKET      = 0x00200000,
+        LOG_RTP_TRANSPORT   = 0x00400000,
+        LOG_RTP_SESSION     = 0x00800000,
         LOG_SOURCE_ALL      = 0xFFFFFFFF
     };
 
