@@ -95,6 +95,7 @@ public:
     bool init(std::string address, unsigned short port);
     bool close();
 
+    unsigned int get_user_agent_id() { return _id._user_agent; }
     SIP_Object_ID get_id() { return _id; }
 
     std::string get_address() { return _address; }
