@@ -15,6 +15,7 @@
 #include "sip_transport_test.h"
 #include "sip_call_test.h"
 #include "sip_user_agent_test.h"
+#include "sip_manager_test.h"
 #include <iostream>
 
 //-------------------------------------------
@@ -56,6 +57,12 @@ int main()
     if (!SIP_User_Agent_Test::init())
     {
         std::cout << "SIP user agent test FAILED!\n";
+        return 1;
+    }
+
+    if (!SIP_Manager_Test::init())
+    {
+        std::cout << "SIP manager test FAILED!\n";
         return 1;
     }
 
