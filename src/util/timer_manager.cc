@@ -13,6 +13,7 @@
 #include "util_functions.h"
 
 Logger Timer::_logger(Log_Manager::LOG_TIMER);
+Timer_Manager *Timer_Manager::_instance = NULL;
 
 //-------------------------------------------
 
@@ -81,8 +82,18 @@ bool Timer::operator==(const Timer &other)
 
 Timer_Manager &Timer_Manager::instance()
 {
-    static Timer_Manager manager;
-    return manager;
+    if (_instance == NULL)
+        _instance = new Timer_Manager();
+
+    return *_instance;
+}
+
+//-------------------------------------------
+
+void Timer_Manager::destroy()
+{
+    delete _instance;
+    _instance = NULL;
 }
 
 //-------------------------------------------

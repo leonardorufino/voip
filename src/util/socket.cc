@@ -13,6 +13,7 @@
 #include "util_functions.h"
 
 Logger Socket::_logger(Log_Manager::LOG_SOCKET);
+Socket_Control *Socket_Control::_instance = NULL;
 
 //-------------------------------------------
 
@@ -1143,8 +1144,18 @@ bool Socket_TCP_Server::create(Address_Family family)
 
 Socket_Control &Socket_Control::instance()
 {
-    static Socket_Control control;
-    return control;
+    if (_instance == NULL)
+        _instance = new Socket_Control();
+
+    return *_instance;
+}
+
+//-------------------------------------------
+
+void Socket_Control::destroy()
+{
+    delete _instance;
+    _instance = NULL;
 }
 
 //-------------------------------------------

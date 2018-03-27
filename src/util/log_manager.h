@@ -60,11 +60,11 @@ public:
 
 private:
     Log_Manager();
-
-public:
     ~Log_Manager() {}
 
+public:
     static Log_Manager &instance();
+    static void destroy();
 
     void set_level(unsigned char level) { _level = level; }
     void set_source(unsigned short source) { _source = source; }
@@ -89,6 +89,8 @@ private:
     unsigned char _level;
     unsigned int _source;
     log_callback *_callback;
+
+    static Log_Manager *_instance;
 };
 
 //-------------------------------------------

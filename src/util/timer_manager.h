@@ -60,11 +60,11 @@ class Timer_Manager
 {
 private:
     Timer_Manager() : _last_tick(0), _flag(false) {}
-
-public:
     ~Timer_Manager() {}
 
+public:
     static Timer_Manager &instance();
+    static void destroy();
 
     timer_id_t start_timer(unsigned long time, void *data, Timer::timer_callback *callback);
     void *stop_timer(timer_id_t timer_id);
@@ -80,6 +80,8 @@ private:
 
     unsigned long _last_tick;
     bool _flag;
+
+    static Timer_Manager *_instance;
 };
 
 //-------------------------------------------

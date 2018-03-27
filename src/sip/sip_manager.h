@@ -28,11 +28,11 @@ public:
 
 private:
     SIP_Manager();
-
-public:
     ~SIP_Manager();
 
+public:
     static SIP_Manager &instance();
+    static void destroy();
 
     void set_receive_request_callback(receive_request_callback *callback, void *data);
     void set_receive_response_callback(receive_response_callback *callback, void *data);
@@ -68,5 +68,6 @@ private:
 
     std::list<SIP_User_Agent *> _user_agents;
 
+    static SIP_Manager *_instance;
     static Logger _logger;
 };

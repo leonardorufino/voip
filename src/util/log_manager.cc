@@ -12,6 +12,8 @@
 #include "log_manager.h"
 #include "util_functions.h"
 
+Log_Manager *Log_Manager::_instance = NULL;
+
 //-------------------------------------------
 
 Log_Manager::Log_Manager()
@@ -25,8 +27,18 @@ Log_Manager::Log_Manager()
 
 Log_Manager &Log_Manager::instance()
 {
-    static Log_Manager manager;
-    return manager;
+    if (_instance == NULL)
+        _instance = new Log_Manager();
+
+    return *_instance;
+}
+
+//-------------------------------------------
+
+void Log_Manager::destroy()
+{
+    delete _instance;
+    _instance = NULL;
 }
 
 //-------------------------------------------

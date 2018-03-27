@@ -11,6 +11,7 @@
 
 #include "sip_manager.h"
 
+SIP_Manager *SIP_Manager::_instance = NULL;
 Logger SIP_Manager::_logger(Log_Manager::LOG_SIP_MANAGER);
 
 //-------------------------------------------
@@ -31,8 +32,21 @@ SIP_Manager::~SIP_Manager()
 
 SIP_Manager &SIP_Manager::instance()
 {
-    static SIP_Manager manager;
-    return manager;
+    if (_instance == NULL)
+        _instance = new SIP_Manager();
+
+    return *_instance;
+}
+
+//-------------------------------------------
+
+void SIP_Manager::destroy()
+{
+    delete _instance;
+    _instance = NULL;
+
+    Timer_Manager::destroy();
+    Socket_Control::destroy();
 }
 
 //-------------------------------------------

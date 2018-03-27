@@ -225,11 +225,11 @@ public:
 
 private:
     Socket_Control() {}
-
-public:
     ~Socket_Control() {}
 
+public:
     static Socket_Control &instance();
+    static void destroy();
 
     bool add_socket(Socket &socket);
     bool remove_socket(Socket &socket);
@@ -241,6 +241,8 @@ protected:
     std::recursive_mutex _socket_list_mutex;
 
     char _receive_buffer[RECEIVE_BUFFER_SIZE + 1];
+
+    static Socket_Control *_instance;
 };
 
 //-------------------------------------------
