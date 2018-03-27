@@ -13,6 +13,7 @@
 
 #include "sip/sip_manager.h"
 #include "util/util_functions.h"
+#include <list>
 #include <iomanip>
 #include <thread>
 #include <mutex>

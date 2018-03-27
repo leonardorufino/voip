@@ -136,6 +136,8 @@ void Socket_Test::thread(Socket_Test *test)
         socket.run();
         Util_Functions::delay(THREAD_DELAY);
     }
+
+    Socket_Control::destroy();
 }
 
 //-------------------------------------------

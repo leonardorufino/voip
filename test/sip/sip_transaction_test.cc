@@ -79,6 +79,8 @@ void SIP_Transaction_Test::thread(SIP_Transaction_Test *test)
         std::lock_guard<std::mutex> lock(test->_thread_mutex);
         timer.run();
     }
+
+    Timer_Manager::destroy();
 }
 
 //-------------------------------------------

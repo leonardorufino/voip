@@ -122,6 +122,8 @@ void SIP_Call_Test::thread(SIP_Call_Test *test)
         std::lock_guard<std::mutex> lock(test->_thread_mutex);
         timer.run();
     }
+
+    Timer_Manager::destroy();
 }
 
 //-------------------------------------------

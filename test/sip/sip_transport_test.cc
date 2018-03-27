@@ -92,6 +92,8 @@ void SIP_Transport_Test::thread(SIP_Transport_Test *test)
         std::lock_guard<std::mutex> lock(test->_thread_mutex);
         socket.run();
     }
+
+    Socket_Control::destroy();
 }
 
 //-------------------------------------------

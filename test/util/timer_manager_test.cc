@@ -56,6 +56,8 @@ void Timer_Manager_Test::thread(Timer_Manager_Test *test)
         timer.run();
         Util_Functions::delay(THREAD_DELAY);
     }
+
+    Timer_Manager::destroy();
 }
 
 //-------------------------------------------

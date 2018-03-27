@@ -14,6 +14,7 @@
 #include "sip/sip_user_agent.h"
 #include "sip/sip_call.h"
 #include "util/util_functions.h"
+#include <list>
 #include <iomanip>
 #include <thread>
 #include <mutex>

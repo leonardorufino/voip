@@ -104,6 +104,8 @@ void RTP_Session_Test::thread(RTP_Session_Test *test)
         std::lock_guard<std::mutex> lock(test->_thread_mutex);
         socket.run();
     }
+
+    Socket_Control::destroy();
 }
 
 //-------------------------------------------

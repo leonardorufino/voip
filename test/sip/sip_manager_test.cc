@@ -94,15 +94,17 @@ template<class T> bool SIP_Manager_Test::run(Socket::Address_Family family, std:
 
 void SIP_Manager_Test::thread(SIP_Manager_Test *test)
 {
+    SIP_Manager &manager = SIP_Manager::instance();
+
     while (!test->_stop_thread)
     {
         Util_Functions::delay(THREAD_DELAY);
 
         std::lock_guard<std::mutex> lock(test->_thread_mutex);
-
-        SIP_Manager &manager = SIP_Manager::instance();
         manager.update();
     }
+
+    SIP_Manager::destroy();
 }
 
 //-------------------------------------------

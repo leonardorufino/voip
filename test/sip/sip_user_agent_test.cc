@@ -300,6 +300,9 @@ void SIP_User_Agent_Test::thread(SIP_User_Agent_Test *test)
 
         test->_user_agent->update();
     }
+
+    Timer_Manager::destroy();
+    Socket_Control::destroy();
 }
 
 //-------------------------------------------
