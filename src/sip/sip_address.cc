@@ -13,6 +13,75 @@
 #include "sip_functions.h"
 #include "util/string_functions.h"
 
+Logger SIP_Parameter_List::_logger(Log_Manager::LOG_SIP_ADDRESS);
+
+//-------------------------------------------
+
+bool SIP_Parameter_List::add_parameter(std::string parameter, unsigned short pos)
+{
+    if (parameter.empty())
+    {
+        _logger.warning("Failed to add parameter: invalid parameter");
+        return false;
+    }
+
+    unsigned short count = 0;
+
+    std::list<std::string>::const_iterator it = _parameters.begin();
+    while (it != _parameters.end())
+    {
+        if (count++ == pos)
+            break;
+
+        it++;
+    }
+
+    _parameters.insert(it, parameter);
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Parameter_List::remove_parameter(unsigned short pos)
+{
+    unsigned short count = 0;
+
+    std::list<std::string>::const_iterator it = _parameters.begin();
+    while (it != _parameters.end())
+    {
+        if (count++ == pos)
+        {
+            _parameters.erase(it);
+            return true;
+        }
+
+        it++;
+    }
+
+    _logger.warning("Failed to remove parameter: invalid position (pos=%d, count=%d)", pos, count);
+    return false;
+}
+
+//-------------------------------------------
+
+std::string SIP_Parameter_List::get_parameter(unsigned short pos)
+{
+    unsigned short count = 0;
+
+    std::list<std::string>::const_iterator it = _parameters.begin();
+    while (it != _parameters.end())
+    {
+        if (count++ == pos)
+            return *it;
+
+        it++;
+    }
+
+    _logger.warning("Failed to get parameter: invalid position (pos=%d, count=%d)", pos, count);
+    return "";
+}
+
+//-------------------------------------------
 //-------------------------------------------
 
 bool SIP_Host::decode(std::string &sip_msg)

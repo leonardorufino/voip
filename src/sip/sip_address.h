@@ -17,6 +17,31 @@
 #include <string>
 #include <list>
 
+class SIP_Parameter_List
+{
+public:
+    SIP_Parameter_List() {}
+    SIP_Parameter_List(const SIP_Parameter_List &value) { *this = value; }
+    ~SIP_Parameter_List() {}
+
+    bool query(QueryCommand cmd, const std::string &query, std::string &result);
+
+    void set_parameters(std::list<std::string> &parameters) { _parameters = parameters; }
+    bool add_parameter(std::string parameter, unsigned short pos = 0xFFFF);
+    bool remove_parameter(unsigned short pos);
+    void clear_parameters() { _parameters.clear(); }
+    std::list<std::string> &get_parameters() { return _parameters; }
+    std::string get_parameter(unsigned short pos = 0);
+    unsigned short get_parameter_size() { return (unsigned short) _parameters.size(); }
+
+private:
+    std::list<std::string> _parameters;
+
+    static Logger _logger;
+};
+
+//-------------------------------------------
+
 class SIP_Host
 {
 public:
