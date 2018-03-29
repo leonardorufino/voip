@@ -110,20 +110,22 @@ public:
     ~SIP_Response() {}
 
     // Virtual pure functions
+    SIP_Method_Type get_message_type() { return SIP_RESPONSE; }
     bool decode_start_line(std::string &msg);
     bool encode_start_line(std::string &msg);
-    SIP_Method_Type get_message_type() { return SIP_RESPONSE; }
+
+    void set_status_line(const std::string sip_version, unsigned short status_code, const std::string reason_phrase);
 
     void set_sip_version(std::string sip_version) { _sip_version = sip_version; }
     std::string get_sip_version() { return _sip_version; }
 
     void set_status_code(unsigned short status_code) { _status_code = status_code; }
+    bool set_status_code(std::string status_code);
     unsigned short get_status_code() { return _status_code; }
+    bool get_status_code(std::string &status_code);
 
-    void set_reason_phraseip_version(std::string reason_phrase) { _reason_phrase = reason_phrase; }
+    void set_reason_phrase(std::string reason_phrase) { _reason_phrase = reason_phrase; }
     std::string get_reason_phrase() { return _reason_phrase; }
-
-    void set_status_line(const std::string sip_version, unsigned short status_code, const std::string reason_phrase);
 
 private:
     std::string _sip_version;

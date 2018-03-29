@@ -683,10 +683,9 @@ bool SIP_Response::decode_start_line(std::string &msg)
         return false;
     }
 
-    _status_code = String_Functions::str_to_us(result);
-    if ((_status_code < 100) || (_status_code > 699))
+    if (!set_status_code(result))
     {
-        _logger.warning("Failed to decode start line: invalid status code value (status_code=%d)", _status_code);
+        _logger.warning("Failed to decode start line: set status code failed (status_code=%s)", result.c_str());
         return false;
     }
 
@@ -718,6 +717,40 @@ void SIP_Response::set_status_line(std::string sip_version, unsigned short statu
     _sip_version = sip_version;
     _status_code = status_code;
     _reason_phrase = reason_phrase;
+}
+
+//-------------------------------------------
+
+bool SIP_Response::set_status_code(std::string status_code)
+{
+    _status_code = String_Functions::str_to_us(status_code);
+    if (_status_code == INVALID_STATUS_CODE)
+    {
+        _logger.warning("Failed to set status code: str to us failed (status_code=%s)", status_code.c_str());
+        return false;
+    }
+
+    if ((_status_code < 100) || (_status_code > 699))
+    {
+        _logger.warning("Failed to set status code: invalid status code value (status_code=%d)", _status_code);
+        return false;
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Response::get_status_code(std::string &status_code)
+{
+    if (_status_code == INVALID_STATUS_CODE)
+    {
+        _logger.warning("Failed to get status code: invalid status code");
+        return false;
+    }
+
+    status_code = std::to_string(_status_code);
+    return true;
 }
 
 //-------------------------------------------
