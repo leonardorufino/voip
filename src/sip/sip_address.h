@@ -114,7 +114,9 @@ public:
     std::string get_method() { return _method; }
 
     void set_ttl(unsigned short ttl) { _ttl = ttl; }
+    bool set_ttl(std::string ttl);
     unsigned short get_ttl() { return _ttl; }
+    bool get_ttl(std::string &ttl);
 
     void set_maddr(const SIP_Host &maddr) { _maddr = maddr; }
     SIP_Host &get_maddr() { return _maddr; }
@@ -201,7 +203,10 @@ public:
     void set_uri_angle_quote(bool quote) { _uri_angle_quote = quote; }
     bool get_uri_angle_quote() { return _uri_angle_quote; }
 
+    void set_sip_uri(const SIP_URI &uri) { _sip_uri = uri; }
     SIP_URI &get_sip_uri() { return _sip_uri; }
+
+    void set_absolute_uri(const SIP_Absolute_URI &uri) { _absolute_uri = uri; }
     SIP_Absolute_URI &get_absolute_uri() { return _absolute_uri; }
 
 private:

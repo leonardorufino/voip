@@ -217,8 +217,7 @@ bool SIP_URI::decode(std::string &sip_msg)
             if (ttl.empty())
                 return false;
 
-            _ttl = String_Functions::str_to_us(ttl);
-            if (_ttl == INVALID_TTL)
+            if (!set_ttl(ttl))
                 return false;
 
         }else if (String_Functions::start_with(param, "maddr="))
@@ -409,6 +408,34 @@ void SIP_URI::set_method(SIP_Method_Type method)
 SIP_Method_Type SIP_URI::get_method_enum()
 {
     return SIP_Functions::get_method_type(_method);
+}
+
+//-------------------------------------------
+
+bool SIP_URI::set_ttl(std::string ttl)
+{
+    _ttl = String_Functions::str_to_us(ttl);
+    if (_ttl == INVALID_TTL)
+    {
+        _logger.warning("Failed to set ttl: str to us failed (ttl=%s)", ttl.c_str());
+        return false;
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_URI::get_ttl(std::string &ttl)
+{
+    if (_ttl == INVALID_TTL)
+    {
+        _logger.warning("Failed to get ttl: invalid ttl");
+        return false;
+    }
+
+    ttl = std::to_string(_ttl);
+    return true;
 }
 
 //-------------------------------------------
