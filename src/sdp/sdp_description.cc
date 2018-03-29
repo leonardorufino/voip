@@ -342,7 +342,7 @@ SDP_Field *SDP_Description_Fields::get_field(SDP_Field_Type field_type, unsigned
     if (_fields.count(field_type) == 0)
         return NULL;
 
-    unsigned int count = 0;
+    unsigned short count = 0;
 
     sdp_field_list &fields = _fields.at(field_type);
     sdp_field_list::const_iterator it = fields.begin();
