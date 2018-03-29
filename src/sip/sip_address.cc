@@ -14,6 +14,10 @@
 #include "util/string_functions.h"
 
 Logger SIP_Parameter_List::_logger(Log_Manager::LOG_SIP_ADDRESS);
+Logger SIP_Host::_logger(Log_Manager::LOG_SIP_ADDRESS);
+Logger SIP_URI::_logger(Log_Manager::LOG_SIP_ADDRESS);
+Logger SIP_Absolute_URI::_logger(Log_Manager::LOG_SIP_ADDRESS);
+Logger SIP_Address::_logger(Log_Manager::LOG_SIP_ADDRESS);
 
 //-------------------------------------------
 
@@ -165,8 +169,7 @@ bool SIP_URI::decode(std::string &sip_msg)
             return false;
 
         String_Functions::trim(user_host);
-        _port = String_Functions::str_to_us(user_host);
-        if (_port == INVALID_PORT)
+        if (!set_port(user_host))
             return false;
     }else
     {
@@ -325,6 +328,34 @@ bool SIP_URI::encode(std::string &sip_msg)
         sip_msg += *it_headers++;
     }
 
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_URI::set_port(std::string port)
+{
+    _port = String_Functions::str_to_us(port);
+    if (_port == INVALID_PORT)
+    {
+        _logger.warning("Failed to set port: str to us failed (port=%s)", port.c_str());
+        return false;
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_URI::get_port(std::string &port)
+{
+    if (_port == INVALID_PORT)
+    {
+        _logger.warning("Failed to get port: invalid port");
+        return false;
+    }
+
+    port = std::to_string(_port);
     return true;
 }
 

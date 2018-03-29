@@ -57,6 +57,8 @@ public:
 
 private:
     std::string _address;
+
+    static Logger _logger;
 };
 
 //-------------------------------------------
@@ -92,7 +94,9 @@ public:
     SIP_Host &get_host() { return _host; }
 
     void set_port(unsigned short port) { _port = port; }
+    bool set_port(std::string port);
     unsigned short get_port() { return _port; }
+    bool get_port(std::string &port);
 
     void set_transport(SIP_Transport_Type transport);
     void set_transport(std::string transport) { _transport = transport; }
@@ -138,6 +142,8 @@ private:
     bool _lr;
     SIP_Parameter_List _parameters;
     SIP_Parameter_List _headers;
+
+    static Logger _logger;
 };
 
 //-------------------------------------------
@@ -157,6 +163,8 @@ public:
 
 private:
     std::string _address;
+
+    static Logger _logger;
 };
 
 //-------------------------------------------
@@ -204,6 +212,8 @@ private:
     bool _uri_angle_quote;
     SIP_URI _sip_uri;
     SIP_Absolute_URI _absolute_uri;
+
+    static Logger _logger;
 };
 
 //-------------------------------------------
