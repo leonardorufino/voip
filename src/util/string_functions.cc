@@ -210,6 +210,9 @@ void String_Functions::skip(std::string &str, const std::string skip)
 
 unsigned short String_Functions::str_to_us(const std::string str)
 {
+    if (str.empty())
+        return INVALID_UNSIGNED_SHORT;
+
     unsigned short value = 0;
 
     for (unsigned short i = 0; i < (unsigned short) str.size(); i++)
@@ -236,6 +239,9 @@ unsigned short String_Functions::str_to_us(const std::string str)
 
 unsigned long String_Functions::str_to_ul(const std::string str)
 {
+    if (str.empty())
+        return INVALID_UNSIGNED_LONG;
+
     unsigned long value = 0;
 
     for (unsigned short i = 0; i < (unsigned short) str.size(); i++)
@@ -262,6 +268,9 @@ unsigned long String_Functions::str_to_ul(const std::string str)
 
 unsigned long long String_Functions::str_to_ull(const std::string str)
 {
+    if (str.empty())
+        return INVALID_UNSIGNED_LONG_LONG;
+
     unsigned long long value = 0;
 
     for (unsigned short i = 0; i < (unsigned short) str.size(); i++)
