@@ -328,31 +328,50 @@ bool SIP_Message::encode_body(char *body, unsigned short &size)
 
 //-------------------------------------------
 
-void SIP_Message::add_header(SIP_Header *header)
+bool SIP_Message::add_header(SIP_Header *header, unsigned short pos)
 {
     if (!header)
-        return;
+    {
+        _logger.warning("Failed to add header: invalid header");
+        return false;
+    }
 
     SIP_Header_Type header_type = header->get_header_type();
 
     if (_headers.count(header_type) > 0)
     {
+        unsigned short count = 0;
+
         sip_header_list &headers = _headers.at(header_type);
-        headers.push_back(header);
+        sip_header_list::iterator it = headers.begin();
+        while (it != headers.end())
+        {
+            if (count++ == pos)
+                break;
+
+            it++;
+        }
+
+        headers.insert(it, header);
     }else
     {
         sip_header_list headers;
         headers.push_back(header);
         _headers[header_type] = headers;
     }
+
+    return true;
 }
 
 //-------------------------------------------
 
-void SIP_Message::add_headers(sip_header_list &headers)
+bool SIP_Message::add_headers(sip_header_list &headers)
 {
     if (headers.empty())
-        return;
+    {
+        _logger.warning("Failed to add headers: invalid headers");
+        return false;
+    }
 
     sip_header_list::const_iterator it = headers.begin();
     while (it != headers.end())
@@ -360,6 +379,37 @@ void SIP_Message::add_headers(sip_header_list &headers)
         SIP_Header *header = *it++;
         add_header(header);
     }
+
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Message::remove_header(SIP_Header_Type header_type, unsigned short pos)
+{
+    if (_headers.count(header_type) == 0)
+    {
+        _logger.warning("Failed to remove header: invalid header type (type=%d)", header_type);
+        return false;
+    }
+
+    unsigned short count = 0;
+
+    sip_header_list &headers = _headers.at(header_type);
+    sip_header_list::iterator it = headers.begin();
+    while (it != headers.end())
+    {
+        if (count++ == pos)
+        {
+            headers.erase(it);
+            return true;
+        }
+
+        it++;
+    }
+
+    _logger.warning("Failed to remove header: invalid position (type=%d, pos=%d, count=%d)", header_type, pos, count);
+    return false;
 }
 
 //-------------------------------------------
@@ -388,20 +438,24 @@ void SIP_Message::clear_headers()
 SIP_Header *SIP_Message::get_header(SIP_Header_Type header_type, unsigned short pos)
 {
     if (_headers.count(header_type) == 0)
+    {
+        //_logger.warning("Failed to get header: invalid header type (type=%d)", header_type);
         return NULL;
+    }
 
-    unsigned int count = 0;
+    unsigned short count = 0;
 
     sip_header_list &headers = _headers.at(header_type);
     sip_header_list::const_iterator it = headers.begin();
     while (it != headers.end())
     {
-        SIP_Header *header = *it++;
-
         if (count++ == pos)
-            return header;
+            return *it;
+
+        it++;
     }
 
+    _logger.warning("Failed to get header: invalid position (type=%d, pos=%d, count=%d)", header_type, pos, count);
     return NULL;
 }
 

@@ -44,8 +44,9 @@ public:
     bool encode_header(std::string &msg);
     bool encode_body(char *body, unsigned short &size);
 
-    void add_header(SIP_Header *header);
-    void add_headers(sip_header_list &headers);
+    bool add_header(SIP_Header *header, unsigned short pos = 0xFFFF);
+    bool add_headers(sip_header_list &headers);
+    bool remove_header(SIP_Header_Type header_type, unsigned short pos);
     void clear_headers();
     SIP_Header *get_header(SIP_Header_Type header_type, unsigned short pos = 0);
     unsigned short get_header_size(SIP_Header_Type header_type);
