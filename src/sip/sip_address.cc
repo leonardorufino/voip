@@ -231,7 +231,7 @@ bool SIP_URI::decode(std::string &sip_msg)
         }else if (param == "lr")
             _lr = true;
         else
-            _parameters.push_back(param);
+            _parameters.add_parameter(param);
     }
 
     while (has_headers)
@@ -239,7 +239,7 @@ bool SIP_URI::decode(std::string &sip_msg)
         std::string header;
         has_headers = String_Functions::match(sip_msg, "&", header);
         String_Functions::trim(header);
-        _headers.push_back(header);
+        _headers.add_parameter(header);
     }
 
     return true;
@@ -305,17 +305,19 @@ bool SIP_URI::encode(std::string &sip_msg)
     if (_lr)
         sip_msg += ";lr";
 
-    std::list<std::string>::const_iterator it_params = _parameters.begin();
-    while (it_params != _parameters.end())
+    std::list<std::string> &parameters = _parameters.get_parameters();
+    std::list<std::string>::const_iterator it_params = parameters.begin();
+    while (it_params != parameters.end())
     {
         sip_msg += ";";
         sip_msg += *it_params++;
     }
 
-    std::list<std::string>::const_iterator it_headers = _headers.begin();
-    while (it_headers != _headers.end())
+    std::list<std::string> &headers = _headers.get_parameters();
+    std::list<std::string>::const_iterator it_headers = headers.begin();
+    while (it_headers != headers.end())
     {
-        if (it_headers == _headers.begin())
+        if (it_headers == headers.begin())
             sip_msg += "?";
         else
             sip_msg += "&";

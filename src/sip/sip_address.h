@@ -118,9 +118,11 @@ public:
     void set_lr(bool lr) { _lr = lr; }
     bool is_lr() { return _lr; }
 
-    std::list<std::string> &get_parameters() { return _parameters; }
+    void set_parameters(const SIP_Parameter_List &parameters) { _parameters = parameters; }
+    SIP_Parameter_List &get_parameters() { return _parameters; }
 
-    std::list<std::string> &get_headers() { return _headers; }
+    void set_headers(const SIP_Parameter_List &headers) { _headers = headers; }
+    SIP_Parameter_List &get_headers() { return _headers; }
 
 private:
     std::string _user;
@@ -134,8 +136,8 @@ private:
     unsigned short _ttl;
     SIP_Host _maddr;
     bool _lr;
-    std::list<std::string> _parameters;
-    std::list<std::string> _headers;
+    SIP_Parameter_List _parameters;
+    SIP_Parameter_List _headers;
 };
 
 //-------------------------------------------
