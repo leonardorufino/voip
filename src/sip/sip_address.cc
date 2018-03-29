@@ -31,7 +31,7 @@ bool SIP_Parameter_List::add_parameter(std::string parameter, unsigned short pos
 
     unsigned short count = 0;
 
-    std::list<std::string>::const_iterator it = _parameters.begin();
+    std::list<std::string>::iterator it = _parameters.begin();
     while (it != _parameters.end())
     {
         if (count++ == pos)
@@ -50,7 +50,7 @@ bool SIP_Parameter_List::remove_parameter(unsigned short pos)
 {
     unsigned short count = 0;
 
-    std::list<std::string>::const_iterator it = _parameters.begin();
+    std::list<std::string>::iterator it = _parameters.begin();
     while (it != _parameters.end())
     {
         if (count++ == pos)

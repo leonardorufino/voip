@@ -24,8 +24,6 @@ public:
     SIP_Parameter_List(const SIP_Parameter_List &value) { *this = value; }
     ~SIP_Parameter_List() {}
 
-    bool query(QueryCommand cmd, const std::string &query, std::string &result);
-
     void set_parameters(std::list<std::string> &parameters) { _parameters = parameters; }
     bool add_parameter(std::string parameter, unsigned short pos = 0xFFFF);
     bool remove_parameter(unsigned short pos);
