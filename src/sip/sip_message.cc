@@ -497,6 +497,16 @@ void SIP_Message::clear_bodies()
 //-------------------------------------------
 //-------------------------------------------
 
+SIP_Request::SIP_Request(SIP_Method_Type method)
+{
+    set_method(method);
+    _request_uri.set_display_name_double_quote(false);
+    _request_uri.set_uri_angle_quote(false);
+    _sip_version = SIP_VERSION;
+}
+
+//-------------------------------------------
+
 SIP_Request::SIP_Request(const SIP_Request &request) : SIP_Message(request)
 {
     _method = request._method;
@@ -519,7 +529,7 @@ bool SIP_Request::decode_start_line(std::string &msg)
         return false;
     }
 
-    _method = get_message_type(); // The method was already decoded by SIP_Message::decode_message
+    // The method was already decoded by SIP_Message::decode_message
 
     String_Functions::skip(line, " \t");
     if (!String_Functions::match(line, " ", result))
@@ -546,11 +556,10 @@ bool SIP_Request::decode_start_line(std::string &msg)
 
 bool SIP_Request::encode_start_line(std::string &msg)
 {
-    std::string method = SIP_Functions::get_method_type(_method);
-    if ((method.empty()) || (_sip_version.empty()))
+    if ((_method.empty()) || (_sip_version.empty()))
         return false;
 
-    msg += method;
+    msg += _method;
     msg += " ";
 
     if (!_request_uri.encode(msg))
@@ -564,11 +573,35 @@ bool SIP_Request::encode_start_line(std::string &msg)
 
 //-------------------------------------------
 
-void SIP_Request::set_request_line(SIP_Method_Type msg_type, const SIP_Address &request_uri, std::string sip_version)
+void SIP_Request::set_request_line(SIP_Method_Type method, const SIP_Address &request_uri, std::string sip_version)
 {
-    _method = msg_type;
-    _request_uri = request_uri;
+    set_method(method);
+    set_request_uri(request_uri);
     _sip_version = sip_version;
+}
+
+//-------------------------------------------
+
+void SIP_Request::set_method(SIP_Method_Type method)
+{
+    _method = SIP_Functions::get_method_type(method);
+}
+
+//-------------------------------------------
+
+SIP_Method_Type SIP_Request::get_method_enum()
+{
+    return SIP_Functions::get_method_type(_method);
+}
+
+//-------------------------------------------
+
+void SIP_Request::set_request_uri(const SIP_Address &request_uri)
+{
+    _request_uri = request_uri;
+    _request_uri.set_display_name_double_quote(false);
+    _request_uri.set_display_name("");
+    _request_uri.set_uri_angle_quote(false);
 }
 
 //-------------------------------------------

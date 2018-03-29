@@ -67,26 +67,30 @@ protected:
 class SIP_Request : public SIP_Message
 {
 public:
-    SIP_Request(SIP_Method_Type method_type) : _method(method_type) {}
+    SIP_Request(SIP_Method_Type method);
     SIP_Request(const SIP_Request &request);
     ~SIP_Request() {}
 
     // Virtual pure functions
+    SIP_Method_Type get_message_type() { return get_method_enum(); }
     bool decode_start_line(std::string &msg);
     bool encode_start_line(std::string &msg);
-    SIP_Method_Type get_message_type() { return _method; }
 
-    void set_method(SIP_Method_Type method) { _method = method; }
+    void set_request_line(SIP_Method_Type method, const SIP_Address &request_uri, std::string sip_version);
 
+    void set_method(SIP_Method_Type method);
+    void set_method(std::string method) { _method = method; }
+    SIP_Method_Type get_method_enum();
+    std::string get_method() { return _method; }
+
+    void set_request_uri(const SIP_Address &request_uri);
     SIP_Address &get_request_uri() { return _request_uri; }
 
     void set_sip_version(std::string sip_version) { _sip_version = sip_version; }
     std::string get_sip_version() { return _sip_version; }
 
-    void set_request_line(SIP_Method_Type msg_type, const SIP_Address &request_uri, std::string sip_version);
-
 private:
-    SIP_Method_Type _method;
+    std::string _method;
     SIP_Address _request_uri;
     std::string _sip_version;
 };
