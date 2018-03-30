@@ -607,15 +607,13 @@ bool SDP_Field_Timing::decode(std::string &msg)
     if (result.empty())
         return false;
 
-    _start = String_Functions::str_to_ull(result);
-    if (_start == INVALID_TIME)
+    if (!set_start(result))
         return false;
 
     if (msg.empty())
         return false;
 
-    _stop = String_Functions::str_to_ull(msg);
-    if (_stop == INVALID_TIME)
+    if (!set_stop(msg))
         return false;
 
     return true;
@@ -631,6 +629,62 @@ bool SDP_Field_Timing::encode(std::string &msg)
     msg += std::to_string(_start);
     msg += " ";
     msg += std::to_string(_stop);
+    return true;
+}
+
+//-------------------------------------------
+
+bool SDP_Field_Timing::set_start(std::string start)
+{
+    _start = String_Functions::str_to_ull(start);
+    if (_start == INVALID_TIME)
+    {
+        _logger.warning("Failed to set start: str to ull failed (start=%s)", start.c_str());
+        return false;
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+
+bool SDP_Field_Timing::get_start(std::string &start)
+{
+    if (_start == INVALID_TIME)
+    {
+        _logger.warning("Failed to get start: invalid start");
+        return false;
+    }
+
+    start = std::to_string(_start);
+    return true;
+}
+
+//-------------------------------------------
+
+bool SDP_Field_Timing::set_stop(std::string stop)
+{
+    _stop = String_Functions::str_to_ull(stop);
+    if (_stop == INVALID_TIME)
+    {
+        _logger.warning("Failed to set stop: str to ull failed (stop=%s)", stop.c_str());
+        return false;
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+
+bool SDP_Field_Timing::get_stop(std::string &stop)
+{
+    if (_stop == INVALID_TIME)
+    {
+        _logger.warning("Failed to get stop: invalid stop");
+        return false;
+    }
+
+    stop = std::to_string(_stop);
     return true;
 }
 

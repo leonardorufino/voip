@@ -307,10 +307,14 @@ public:
     bool encode(std::string &msg);
 
     void set_start(unsigned long long start) { _start = start; }
+    bool set_start(std::string start);
     unsigned long long get_start() { return _start; }
+    bool get_start(std::string &start);
 
     void set_stop(unsigned long long stop) { _stop = stop; }
+    bool set_stop(std::string stop);
     unsigned long long get_stop() { return _stop; }
+    bool get_stop(std::string &stop);
 
 private:
     unsigned long long _start;
