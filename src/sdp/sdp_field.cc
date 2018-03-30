@@ -1016,8 +1016,7 @@ bool SDP_Field_Media_Description::decode(std::string &msg)
     if (port.empty())
         return false;
 
-    _port = String_Functions::str_to_us(port);
-    if (_port == INVALID_PORT)
+    if (!set_port(port))
         return false;
 
     if (has_slash)
@@ -1025,8 +1024,7 @@ bool SDP_Field_Media_Description::decode(std::string &msg)
         if (result.empty())
             return false;
 
-        _number_ports = String_Functions::str_to_us(result);
-        if (_port == INVALID_NUMBER_PORTS)
+        if (!set_number_ports(result))
             return false;
     }
 
@@ -1114,6 +1112,62 @@ SDP_Field_Media_Description::Media SDP_Field_Media_Description::get_media_enum()
         return MEDIA_MESSAGE;
 
     return MEDIA_INVALID;
+}
+
+//-------------------------------------------
+
+bool SDP_Field_Media_Description::set_port(std::string port)
+{
+    _port = String_Functions::str_to_us(port);
+    if (_port == INVALID_PORT)
+    {
+        _logger.warning("Failed to set port: str to us failed (port=%s)", port.c_str());
+        return false;
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+
+bool SDP_Field_Media_Description::get_port(std::string &port)
+{
+    if (_port == INVALID_PORT)
+    {
+        _logger.warning("Failed to get port: invalid port");
+        return false;
+    }
+
+    port = std::to_string(_port);
+    return true;
+}
+
+//-------------------------------------------
+
+bool SDP_Field_Media_Description::set_number_ports(std::string ports)
+{
+    _number_ports = String_Functions::str_to_us(ports);
+    if (_number_ports == INVALID_NUMBER_PORTS)
+    {
+        _logger.warning("Failed to set number ports: str to us failed (ports=%s)", ports.c_str());
+        return false;
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+
+bool SDP_Field_Media_Description::get_number_ports(std::string &ports)
+{
+    if (_number_ports == INVALID_NUMBER_PORTS)
+    {
+        _logger.warning("Failed to get number ports: invalid ports");
+        return false;
+    }
+
+    ports = std::to_string(_number_ports);
+    return true;
 }
 
 //-------------------------------------------

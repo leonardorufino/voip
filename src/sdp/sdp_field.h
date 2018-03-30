@@ -505,10 +505,14 @@ public:
     std::string get_media() { return _media; }
 
     void set_port(unsigned short port) { _port = port; }
+    bool set_port(std::string port);
     unsigned short get_port() { return _port; }
+    bool get_port(std::string &port);
 
     void set_number_ports(unsigned short ports) { _number_ports = ports; }
+    bool set_number_ports(std::string ports);
     unsigned short get_number_ports() { return _number_ports; }
+    bool get_number_ports(std::string &ports);
 
     void set_protocol(Protocol protocol);
     void set_protocol(std::string protocol) { _protocol = protocol; }
