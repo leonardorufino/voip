@@ -17,49 +17,49 @@ bool SDP_Field_Test::init()
 {
     std::cout << "SDP field test initialized\n";
 
-    if (!run<SDP_Field_Protocol_Version_Test>())
+    if (!run<SDP_Field_Protocol_Version_Decode_Encode_Test>())
         return false;
 
-    if (!run<SDP_Field_Origin_Test>())
+    if (!run<SDP_Field_Origin_Decode_Encode_Test>())
         return false;
 
-    if (!run<SDP_Field_Session_Name_Test>())
+    if (!run<SDP_Field_Session_Name_Decode_Encode_Test>())
         return false;
 
-    if (!run<SDP_Field_Session_Information_Test>())
+    if (!run<SDP_Field_Session_Information_Decode_Encode_Test>())
         return false;
 
-    if (!run<SDP_Field_URI_Test>())
+    if (!run<SDP_Field_URI_Decode_Encode_Test>())
         return false;
 
-    if (!run<SDP_Field_Email_Address_Test>())
+    if (!run<SDP_Field_Email_Address_Decode_Encode_Test>())
         return false;
 
-    if (!run<SDP_Field_Phone_Number_Test>())
+    if (!run<SDP_Field_Phone_Number_Decode_Encode_Test>())
         return false;
 
-    if (!run<SDP_Field_Connection_Data_Test>())
+    if (!run<SDP_Field_Connection_Data_Decode_Encode_Test>())
         return false;
 
-    if (!run<SDP_Field_Bandwidth_Test>())
+    if (!run<SDP_Field_Bandwidth_Decode_Encode_Test>())
         return false;
 
-    if (!run<SDP_Field_Timing_Test>())
+    if (!run<SDP_Field_Timing_Decode_Encode_Test>())
         return false;
 
-    if (!run<SDP_Field_Repeat_Time_Test>())
+    if (!run<SDP_Field_Repeat_Time_Decode_Encode_Test>())
         return false;
 
-    if (!run<SDP_Field_Time_Zone_Test>())
+    if (!run<SDP_Field_Time_Zone_Decode_Encode_Test>())
         return false;
 
-    if (!run<SDP_Field_Encryption_Key_Test>())
+    if (!run<SDP_Field_Encryption_Key_Decode_Encode_Test>())
         return false;
 
-    if (!run<SDP_Field_Attribute_Test>())
+    if (!run<SDP_Field_Attribute_Decode_Encode_Test>())
         return false;
 
-    if (!run<SDP_Field_Media_Description_Test>())
+    if (!run<SDP_Field_Media_Description_Decode_Encode_Test>())
         return false;
 
     std::cout << "SDP field test completed successfully\n";
@@ -78,7 +78,7 @@ template<class T> bool SDP_Field_Test::run()
 
 //-------------------------------------------
 
-bool SDP_Field_Test::run()
+bool SDP_Field_Decode_Encode_Test::run()
 {
     std::list<SDP_Field_Input_Output>::const_iterator it = _field_input_output.begin();
     while (it != _field_input_output.end())
@@ -94,7 +94,7 @@ bool SDP_Field_Test::run()
 
         if (field_input_output._decode_success != decode)
         {
-            std::cout << "SDP_Field_Test::run -> Failed to decode fields:\n";
+            std::cout << "SDP_Field_Decode_Encode_Test::run -> Failed to decode fields:\n";
             std::cout << std::setw(12) << "Type: " << field_input_output._field_type << "\n";
             std::cout << std::setw(12) << "Input: " << field_input_output._input.c_str() << "\n";
             std::cout << std::setw(12) << "Expected: " << (field_input_output._decode_success ? "true" : "false") << "\n";
@@ -111,7 +111,7 @@ bool SDP_Field_Test::run()
 
         if (field_input_output._field_nb != (unsigned short) fields.size())
         {
-            std::cout << "SDP_Field_Test::run -> Invalid size of fields:\n";
+            std::cout << "SDP_Field_Decode_Encode_Test::run -> Invalid size of fields:\n";
             std::cout << std::setw(12) << "Type: " << field_input_output._field_type << "\n";
             std::cout << std::setw(12) << "Input: " << field_input_output._input.c_str() << "\n";
             std::cout << std::setw(12) << "Expected: " << field_input_output._field_nb << "\n";
@@ -125,7 +125,7 @@ bool SDP_Field_Test::run()
             SDP_Field *field = *it2++;
             if (field->get_field_type() != field_input_output._field_type)
             {
-                std::cout << "SDP_Field_Test::run -> Invalid decoded field type:\n";
+                std::cout << "SDP_Field_Decode_Encode_Test::run -> Invalid decoded field type:\n";
                 std::cout << std::setw(12) << "Type: " << field_input_output._field_type << "\n";
                 std::cout << std::setw(12) << "Input: " << field_input_output._input.c_str() << "\n";
                 std::cout << std::setw(12) << "Result: " << field->get_field_type() << "\n";
@@ -136,7 +136,7 @@ bool SDP_Field_Test::run()
         sdp_field_list copy;
         if (!copy_fields(fields, copy))
         {
-            std::cout << "SDP_Field_Test::run -> Failed to copy fields:\n";
+            std::cout << "SDP_Field_Decode_Encode_Test::run -> Failed to copy fields:\n";
             std::cout << std::setw(12) << "Type: " << field_input_output._field_type << "\n";
             std::cout << std::setw(12) << "Input: " << field_input_output._input.c_str() << "\n";
             return false;
@@ -149,7 +149,7 @@ bool SDP_Field_Test::run()
 
         if (field_input_output._encode_success != encode)
         {
-            std::cout << "SDP_Field_Test::run -> Failed to encode fields:\n";
+            std::cout << "SDP_Field_Decode_Encode_Test::run -> Failed to encode fields:\n";
             std::cout << std::setw(12) << "Type: " << field_input_output._field_type << "\n";
             std::cout << std::setw(12) << "Input: " << field_input_output._input.c_str() << "\n";
             std::cout << std::setw(12) << "Expected: " << (field_input_output._encode_success ? "true" : "false") << "\n";
@@ -166,7 +166,7 @@ bool SDP_Field_Test::run()
 
         if (output != field_input_output._output)
         {
-            std::cout << "SDP_Field_Test::run -> Invalid encoded field:\n";
+            std::cout << "SDP_Field_Decode_Encode_Test::run -> Invalid encoded field:\n";
             std::cout << std::setw(12) << "Type: " << field_input_output._field_type << "\n";
             std::cout << std::setw(12) << "Input: " << field_input_output._input.c_str() << "\n";
             std::cout << std::setw(12) << "Expected: " << field_input_output._output.c_str() << "\n";
@@ -184,7 +184,7 @@ bool SDP_Field_Test::run()
 
 //-------------------------------------------
 
-bool SDP_Field_Test::copy_fields(sdp_field_list &fields, sdp_field_list &copy)
+bool SDP_Field_Decode_Encode_Test::copy_fields(sdp_field_list &fields, sdp_field_list &copy)
 {
     sdp_field_list::const_iterator it = fields.begin();
     while (it != fields.end())
@@ -203,7 +203,7 @@ bool SDP_Field_Test::copy_fields(sdp_field_list &fields, sdp_field_list &copy)
 
 //-------------------------------------------
 
-void SDP_Field_Test::clear(sdp_field_list &fields)
+void SDP_Field_Decode_Encode_Test::clear(sdp_field_list &fields)
 {
     sdp_field_list::const_iterator it = fields.begin();
     while (it != fields.end())
@@ -215,7 +215,7 @@ void SDP_Field_Test::clear(sdp_field_list &fields)
 //-------------------------------------------
 //-------------------------------------------
 
-SDP_Field_Protocol_Version_Test::SDP_Field_Protocol_Version_Test()
+SDP_Field_Protocol_Version_Decode_Encode_Test::SDP_Field_Protocol_Version_Decode_Encode_Test()
 {
     SDP_Field_Input_Output field1;
     field1._field_type     = SDP_FIELD_PROTOCOL_VERSION;
@@ -248,7 +248,7 @@ SDP_Field_Protocol_Version_Test::SDP_Field_Protocol_Version_Test()
 //-------------------------------------------
 //-------------------------------------------
 
-SDP_Field_Origin_Test::SDP_Field_Origin_Test()
+SDP_Field_Origin_Decode_Encode_Test::SDP_Field_Origin_Decode_Encode_Test()
 {
     SDP_Field_Input_Output field1;
     field1._field_type     = SDP_FIELD_ORIGIN;
@@ -281,7 +281,7 @@ SDP_Field_Origin_Test::SDP_Field_Origin_Test()
 //-------------------------------------------
 //-------------------------------------------
 
-SDP_Field_Session_Name_Test::SDP_Field_Session_Name_Test()
+SDP_Field_Session_Name_Decode_Encode_Test::SDP_Field_Session_Name_Decode_Encode_Test()
 {
     SDP_Field_Input_Output field1;
     field1._field_type     = SDP_FIELD_SESSION_NAME;
@@ -314,7 +314,7 @@ SDP_Field_Session_Name_Test::SDP_Field_Session_Name_Test()
 //-------------------------------------------
 //-------------------------------------------
 
-SDP_Field_Session_Information_Test::SDP_Field_Session_Information_Test()
+SDP_Field_Session_Information_Decode_Encode_Test::SDP_Field_Session_Information_Decode_Encode_Test()
 {
     SDP_Field_Input_Output field1;
     field1._field_type     = SDP_FIELD_SESSION_INFORMATION;
@@ -347,7 +347,7 @@ SDP_Field_Session_Information_Test::SDP_Field_Session_Information_Test()
 //-------------------------------------------
 //-------------------------------------------
 
-SDP_Field_URI_Test::SDP_Field_URI_Test()
+SDP_Field_URI_Decode_Encode_Test::SDP_Field_URI_Decode_Encode_Test()
 {
     SDP_Field_Input_Output field1;
     field1._field_type     = SDP_FIELD_URI;
@@ -380,7 +380,7 @@ SDP_Field_URI_Test::SDP_Field_URI_Test()
 //-------------------------------------------
 //-------------------------------------------
 
-SDP_Field_Email_Address_Test::SDP_Field_Email_Address_Test()
+SDP_Field_Email_Address_Decode_Encode_Test::SDP_Field_Email_Address_Decode_Encode_Test()
 {
     SDP_Field_Input_Output field1;
     field1._field_type     = SDP_FIELD_EMAIL_ADDRESS;
@@ -413,7 +413,7 @@ SDP_Field_Email_Address_Test::SDP_Field_Email_Address_Test()
 //-------------------------------------------
 //-------------------------------------------
 
-SDP_Field_Phone_Number_Test::SDP_Field_Phone_Number_Test()
+SDP_Field_Phone_Number_Decode_Encode_Test::SDP_Field_Phone_Number_Decode_Encode_Test()
 {
     SDP_Field_Input_Output field1;
     field1._field_type     = SDP_FIELD_PHONE_NUMBER;
@@ -446,7 +446,7 @@ SDP_Field_Phone_Number_Test::SDP_Field_Phone_Number_Test()
 //-------------------------------------------
 //-------------------------------------------
 
-SDP_Field_Connection_Data_Test::SDP_Field_Connection_Data_Test()
+SDP_Field_Connection_Data_Decode_Encode_Test::SDP_Field_Connection_Data_Decode_Encode_Test()
 {
     SDP_Field_Input_Output field1;
     field1._field_type     = SDP_FIELD_CONNECTION_DATA;
@@ -497,7 +497,7 @@ SDP_Field_Connection_Data_Test::SDP_Field_Connection_Data_Test()
 //-------------------------------------------
 //-------------------------------------------
 
-SDP_Field_Bandwidth_Test::SDP_Field_Bandwidth_Test()
+SDP_Field_Bandwidth_Decode_Encode_Test::SDP_Field_Bandwidth_Decode_Encode_Test()
 {
     SDP_Field_Input_Output field1;
     field1._field_type     = SDP_FIELD_BANDWIDTH;
@@ -530,7 +530,7 @@ SDP_Field_Bandwidth_Test::SDP_Field_Bandwidth_Test()
 //-------------------------------------------
 //-------------------------------------------
 
-SDP_Field_Timing_Test::SDP_Field_Timing_Test()
+SDP_Field_Timing_Decode_Encode_Test::SDP_Field_Timing_Decode_Encode_Test()
 {
     SDP_Field_Input_Output field1;
     field1._field_type     = SDP_FIELD_TIMING;
@@ -581,7 +581,7 @@ SDP_Field_Timing_Test::SDP_Field_Timing_Test()
 //-------------------------------------------
 //-------------------------------------------
 
-SDP_Field_Repeat_Time_Test::SDP_Field_Repeat_Time_Test()
+SDP_Field_Repeat_Time_Decode_Encode_Test::SDP_Field_Repeat_Time_Decode_Encode_Test()
 {
     SDP_Field_Input_Output field1;
     field1._field_type     = SDP_FIELD_REPEAT_TIME;
@@ -623,7 +623,7 @@ SDP_Field_Repeat_Time_Test::SDP_Field_Repeat_Time_Test()
 //-------------------------------------------
 //-------------------------------------------
 
-SDP_Field_Time_Zone_Test::SDP_Field_Time_Zone_Test()
+SDP_Field_Time_Zone_Decode_Encode_Test::SDP_Field_Time_Zone_Decode_Encode_Test()
 {
     SDP_Field_Input_Output field1;
     field1._field_type     = SDP_FIELD_TIME_ZONE;
@@ -665,7 +665,7 @@ SDP_Field_Time_Zone_Test::SDP_Field_Time_Zone_Test()
 //-------------------------------------------
 //-------------------------------------------
 
-SDP_Field_Encryption_Key_Test::SDP_Field_Encryption_Key_Test()
+SDP_Field_Encryption_Key_Decode_Encode_Test::SDP_Field_Encryption_Key_Decode_Encode_Test()
 {
     SDP_Field_Input_Output field1;
     field1._field_type     = SDP_FIELD_ENCRYPTION_KEY;
@@ -707,7 +707,7 @@ SDP_Field_Encryption_Key_Test::SDP_Field_Encryption_Key_Test()
 //-------------------------------------------
 //-------------------------------------------
 
-SDP_Field_Attribute_Test::SDP_Field_Attribute_Test()
+SDP_Field_Attribute_Decode_Encode_Test::SDP_Field_Attribute_Decode_Encode_Test()
 {
     SDP_Field_Input_Output field1;
     field1._field_type     = SDP_FIELD_ATTRIBUTE;
@@ -767,7 +767,7 @@ SDP_Field_Attribute_Test::SDP_Field_Attribute_Test()
 //-------------------------------------------
 //-------------------------------------------
 
-SDP_Field_Media_Description_Test::SDP_Field_Media_Description_Test()
+SDP_Field_Media_Description_Decode_Encode_Test::SDP_Field_Media_Description_Decode_Encode_Test()
 {
     SDP_Field_Input_Output field1;
     field1._field_type     = SDP_FIELD_MEDIA_DESCRIPTION;

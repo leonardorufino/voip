@@ -23,10 +23,19 @@ public:
 
     static bool init();
     template<class T> static bool run();
+};
 
-protected:
+//-------------------------------------------
+
+class SDP_Field_Decode_Encode_Test
+{
+public:
+    SDP_Field_Decode_Encode_Test() {}
+    virtual ~SDP_Field_Decode_Encode_Test() {}
+
     bool run();
 
+protected:
     bool copy_fields(sdp_field_list &fields, sdp_field_list &copy);
     void clear(sdp_field_list &fields);
 
@@ -48,122 +57,122 @@ protected:
 //-------------------------------------------
 //-------------------------------------------
 
-class SDP_Field_Protocol_Version_Test : public SDP_Field_Test
+class SDP_Field_Protocol_Version_Decode_Encode_Test : public SDP_Field_Decode_Encode_Test
 {
 public:
-    SDP_Field_Protocol_Version_Test();
+    SDP_Field_Protocol_Version_Decode_Encode_Test();
 };
 
 //-------------------------------------------
 
-class SDP_Field_Origin_Test : public SDP_Field_Test
+class SDP_Field_Origin_Decode_Encode_Test : public SDP_Field_Decode_Encode_Test
 {
 public:
-    SDP_Field_Origin_Test();
+    SDP_Field_Origin_Decode_Encode_Test();
 };
 
 //-------------------------------------------
 
-class SDP_Field_Session_Name_Test : public SDP_Field_Test
+class SDP_Field_Session_Name_Decode_Encode_Test : public SDP_Field_Decode_Encode_Test
 {
 public:
-    SDP_Field_Session_Name_Test();
+    SDP_Field_Session_Name_Decode_Encode_Test();
 };
 
 //-------------------------------------------
 
-class SDP_Field_Session_Information_Test : public SDP_Field_Test
+class SDP_Field_Session_Information_Decode_Encode_Test : public SDP_Field_Decode_Encode_Test
 {
 public:
-    SDP_Field_Session_Information_Test();
+    SDP_Field_Session_Information_Decode_Encode_Test();
 };
 
 //-------------------------------------------
 
-class SDP_Field_URI_Test : public SDP_Field_Test
+class SDP_Field_URI_Decode_Encode_Test : public SDP_Field_Decode_Encode_Test
 {
 public:
-    SDP_Field_URI_Test();
+    SDP_Field_URI_Decode_Encode_Test();
 };
 
 //-------------------------------------------
 
-class SDP_Field_Email_Address_Test : public SDP_Field_Test
+class SDP_Field_Email_Address_Decode_Encode_Test : public SDP_Field_Decode_Encode_Test
 {
 public:
-    SDP_Field_Email_Address_Test();
+    SDP_Field_Email_Address_Decode_Encode_Test();
 };
 
 //-------------------------------------------
 
-class SDP_Field_Phone_Number_Test : public SDP_Field_Test
+class SDP_Field_Phone_Number_Decode_Encode_Test : public SDP_Field_Decode_Encode_Test
 {
 public:
-    SDP_Field_Phone_Number_Test();
+    SDP_Field_Phone_Number_Decode_Encode_Test();
 };
 
 //-------------------------------------------
 
-class SDP_Field_Connection_Data_Test : public SDP_Field_Test
+class SDP_Field_Connection_Data_Decode_Encode_Test : public SDP_Field_Decode_Encode_Test
 {
 public:
-    SDP_Field_Connection_Data_Test();
+    SDP_Field_Connection_Data_Decode_Encode_Test();
 };
 
 //-------------------------------------------
 
-class SDP_Field_Bandwidth_Test : public SDP_Field_Test
+class SDP_Field_Bandwidth_Decode_Encode_Test : public SDP_Field_Decode_Encode_Test
 {
 public:
-    SDP_Field_Bandwidth_Test();
+    SDP_Field_Bandwidth_Decode_Encode_Test();
 };
 
 //-------------------------------------------
 
-class SDP_Field_Timing_Test : public SDP_Field_Test
+class SDP_Field_Timing_Decode_Encode_Test : public SDP_Field_Decode_Encode_Test
 {
 public:
-    SDP_Field_Timing_Test();
+    SDP_Field_Timing_Decode_Encode_Test();
 };
 
 //-------------------------------------------
 
-class SDP_Field_Repeat_Time_Test : public SDP_Field_Test
+class SDP_Field_Repeat_Time_Decode_Encode_Test : public SDP_Field_Decode_Encode_Test
 {
 public:
-    SDP_Field_Repeat_Time_Test();
+    SDP_Field_Repeat_Time_Decode_Encode_Test();
 };
 
 //-------------------------------------------
 
-class SDP_Field_Time_Zone_Test : public SDP_Field_Test
+class SDP_Field_Time_Zone_Decode_Encode_Test : public SDP_Field_Decode_Encode_Test
 {
 public:
-    SDP_Field_Time_Zone_Test();
+    SDP_Field_Time_Zone_Decode_Encode_Test();
 };
 
 //-------------------------------------------
 
-class SDP_Field_Encryption_Key_Test : public SDP_Field_Test
+class SDP_Field_Encryption_Key_Decode_Encode_Test : public SDP_Field_Decode_Encode_Test
 {
 public:
-    SDP_Field_Encryption_Key_Test();
+    SDP_Field_Encryption_Key_Decode_Encode_Test();
 };
 
 //-------------------------------------------
 
-class SDP_Field_Attribute_Test : public SDP_Field_Test
+class SDP_Field_Attribute_Decode_Encode_Test : public SDP_Field_Decode_Encode_Test
 {
 public:
-    SDP_Field_Attribute_Test();
+    SDP_Field_Attribute_Decode_Encode_Test();
 };
 
 //-------------------------------------------
 
-class SDP_Field_Media_Description_Test : public SDP_Field_Test
+class SDP_Field_Media_Description_Decode_Encode_Test : public SDP_Field_Decode_Encode_Test
 {
 public:
-    SDP_Field_Media_Description_Test();
+    SDP_Field_Media_Description_Decode_Encode_Test();
 };
 
 //-------------------------------------------
