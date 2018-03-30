@@ -424,8 +424,7 @@ bool SDP_Field_Connection_Data::decode(std::string &msg)
 
         if (_address_type != "IP6")
         {
-            _ttl = String_Functions::str_to_us(result);
-            if (_ttl == INVALID_TTL)
+            if (!set_ttl(result))
                 return false;
 
             if (has_slash)
@@ -433,14 +432,12 @@ bool SDP_Field_Connection_Data::decode(std::string &msg)
                 if (msg.empty())
                     return false;
 
-                _number_addresses = String_Functions::str_to_us(msg);
-                if (_number_addresses == INVALID_NUMBER_ADDRESSES)
+                if (!set_number_addresses(msg))
                     return false;
             }
         }else
         {
-            _number_addresses = String_Functions::str_to_us(result);
-            if (_number_addresses == INVALID_NUMBER_ADDRESSES)
+            if (!set_number_addresses(result))
                 return false;
         }
     }
@@ -473,6 +470,62 @@ bool SDP_Field_Connection_Data::encode(std::string &msg)
         msg += std::to_string(_number_addresses);
     }
 
+    return true;
+}
+
+//-------------------------------------------
+
+bool SDP_Field_Connection_Data::set_ttl(std::string ttl)
+{
+    _ttl = String_Functions::str_to_us(ttl);
+    if (_ttl == INVALID_TTL)
+    {
+        _logger.warning("Failed to set ttl: str to us failed (ttl=%s)", ttl.c_str());
+        return false;
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+
+bool SDP_Field_Connection_Data::get_ttl(std::string &ttl)
+{
+    if (_ttl == INVALID_TTL)
+    {
+        _logger.warning("Failed to get ttl: invalid ttl");
+        return false;
+    }
+
+    ttl = std::to_string(_ttl);
+    return true;
+}
+
+//-------------------------------------------
+
+bool SDP_Field_Connection_Data::set_number_addresses(std::string addresses)
+{
+    _number_addresses = String_Functions::str_to_us(address);
+    if (_number_addresses == INVALID_NUMBER_ADDRESSES)
+    {
+        _logger.warning("Failed to set number addresses: str to us failed (addresses=%s)", address.c_str());
+        return false;
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+
+bool SDP_Field_Connection_Data::get_number_addresses(std::string &addresses)
+{
+    if (_number_addresses == INVALID_NUMBER_ADDRESSES)
+    {
+        _logger.warning("Failed to get number addresses: invalid address");
+        return false;
+    }
+
+    addresses = std::to_string(_number_addresses);
     return true;
 }
 

@@ -242,10 +242,14 @@ public:
     std::string get_connection_address() { return _connection_address; }
 
     void set_ttl(unsigned short ttl) { _ttl = ttl; }
+    bool set_ttl(std::string ttl);
     unsigned short get_ttl() { return _ttl; }
+    bool get_ttl(std::string &ttl);
 
     void set_number_addresses(unsigned short addresses) { _number_addresses = addresses; }
+    bool set_number_addresses(std::string addresses);
     unsigned short get_number_addresses() { return _number_addresses; }
+    bool get_number_addresses(std::string &addresses);
 
 private:
     std::string _network_type;
