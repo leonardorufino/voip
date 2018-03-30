@@ -505,10 +505,10 @@ bool SDP_Field_Connection_Data::get_ttl(std::string &ttl)
 
 bool SDP_Field_Connection_Data::set_number_addresses(std::string addresses)
 {
-    _number_addresses = String_Functions::str_to_us(address);
+    _number_addresses = String_Functions::str_to_us(addresses);
     if (_number_addresses == INVALID_NUMBER_ADDRESSES)
     {
-        _logger.warning("Failed to set number addresses: str to us failed (addresses=%s)", address.c_str());
+        _logger.warning("Failed to set number addresses: str to us failed (addresses=%s)", addresses.c_str());
         return false;
     }
 
@@ -547,8 +547,7 @@ bool SDP_Field_Bandwidth::decode(std::string &msg)
     if (msg.empty())
         return false;
 
-    _bandwidth = String_Functions::str_to_ul(msg);
-    if (_bandwidth == INVALID_BANDWIDTH)
+    if (!set_bandwidth(msg))
         return false;
 
     return true;
@@ -564,6 +563,34 @@ bool SDP_Field_Bandwidth::encode(std::string &msg)
     msg += _type;
     msg += ":";
     msg += std::to_string(_bandwidth);
+    return true;
+}
+
+//-------------------------------------------
+
+bool SDP_Field_Bandwidth::set_bandwidth(std::string bandwidth)
+{
+    _bandwidth = String_Functions::str_to_ul(bandwidth);
+    if (_bandwidth == INVALID_BANDWIDTH)
+    {
+        _logger.warning("Failed to set bandwidth: str to ul failed (bandwidth=%s)", bandwidth.c_str());
+        return false;
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+
+bool SDP_Field_Bandwidth::get_bandwidth(std::string &bandwidth)
+{
+    if (_bandwidth == INVALID_BANDWIDTH)
+    {
+        _logger.warning("Failed to get bandwidth: invalid bandwidth");
+        return false;
+    }
+
+    bandwidth = std::to_string(_bandwidth);
     return true;
 }
 

@@ -280,7 +280,9 @@ public:
     std::string get_type() { return _type; }
 
     void set_bandwidth(unsigned long bandwidth) { _bandwidth = bandwidth; }
+    bool set_bandwidth(std::string bandwidth);
     unsigned long get_bandwidth() { return _bandwidth; }
+    bool get_bandwidth(std::string &bandwidth);
 
 private:
     std::string _type;
