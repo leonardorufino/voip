@@ -173,8 +173,7 @@ bool SDP_Field_Protocol_Version::decode(std::string &msg)
     if (msg.empty())
         return false;
 
-    _version = String_Functions::str_to_us(msg);
-    if (_version == INVALID_VERSION)
+    if (!set_version(msg))
         return false;
 
     return true;
@@ -188,6 +187,34 @@ bool SDP_Field_Protocol_Version::encode(std::string &msg)
         return false;
 
     msg += std::to_string(_version);
+    return true;
+}
+
+//-------------------------------------------
+
+bool SDP_Field_Protocol_Version::set_version(std::string version)
+{
+    _version = String_Functions::str_to_us(version);
+    if (_version == INVALID_VERSION)
+    {
+        _logger.warning("Failed to set version: str to us failed (version=%s)", version.c_str());
+        return false;
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+
+bool SDP_Field_Protocol_Version::get_version(std::string &version)
+{
+    if (_version == INVALID_VERSION)
+    {
+        _logger.warning("Failed to get version: invalid version");
+        return false;
+    }
+
+    version = std::to_string(_version);
     return true;
 }
 

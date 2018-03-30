@@ -60,7 +60,9 @@ public:
     bool encode(std::string &msg);
 
     void set_version(unsigned short version) { _version = version; }
+    bool set_version(std::string version);
     unsigned short get_version() { return _version; }
+    bool get_version(std::string &version);
 
 private:
     unsigned short _version;
