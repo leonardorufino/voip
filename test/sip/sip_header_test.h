@@ -23,10 +23,19 @@ public:
 
     static bool init();
     template<class T> static bool run();
+};
 
-protected:
+//-------------------------------------------
+
+class SIP_Header_Decode_Encode_Test
+{
+public:
+    SIP_Header_Decode_Encode_Test() {}
+    virtual ~SIP_Header_Decode_Encode_Test() {}
+
     bool run();
 
+protected:
     bool copy_headers(sip_header_list &headers, sip_header_list &copy);
     void clear(sip_header_list &headers);
 
@@ -47,419 +56,420 @@ protected:
 
 //-------------------------------------------
 //-------------------------------------------
+//-------------------------------------------
 
-class SIP_Header_Accept_Test : public SIP_Header_Test
+class SIP_Header_Accept_Decode_Encode_Test : public SIP_Header_Decode_Encode_Test
 {
 public:
-    SIP_Header_Accept_Test();
+    SIP_Header_Accept_Decode_Encode_Test();
 };
 
 //-------------------------------------------
 
-class SIP_Header_Accept_Encoding_Test : public SIP_Header_Test
+class SIP_Header_Accept_Encoding_Decode_Encode_Test : public SIP_Header_Decode_Encode_Test
 {
 public:
-    SIP_Header_Accept_Encoding_Test();
+    SIP_Header_Accept_Encoding_Decode_Encode_Test();
 };
 
 //-------------------------------------------
 
-class SIP_Header_Accept_Language_Test : public SIP_Header_Test
+class SIP_Header_Accept_Language_Decode_Encode_Test : public SIP_Header_Decode_Encode_Test
 {
 public:
-    SIP_Header_Accept_Language_Test();
+    SIP_Header_Accept_Language_Decode_Encode_Test();
 };
 
 //-------------------------------------------
 
-class SIP_Header_Alert_Info_Test : public SIP_Header_Test
+class SIP_Header_Alert_Info_Decode_Encode_Test : public SIP_Header_Decode_Encode_Test
 {
 public:
-    SIP_Header_Alert_Info_Test();
+    SIP_Header_Alert_Info_Decode_Encode_Test();
 };
 
 //-------------------------------------------
 
-class SIP_Header_Allow_Test : public SIP_Header_Test
+class SIP_Header_Allow_Decode_Encode_Test : public SIP_Header_Decode_Encode_Test
 {
 public:
-    SIP_Header_Allow_Test();
+    SIP_Header_Allow_Decode_Encode_Test();
 };
 
 //-------------------------------------------
 
-class SIP_Header_Allow_Events_Test : public SIP_Header_Test
+class SIP_Header_Allow_Events_Decode_Encode_Test : public SIP_Header_Decode_Encode_Test
 {
 public:
-    SIP_Header_Allow_Events_Test();
+    SIP_Header_Allow_Events_Decode_Encode_Test();
 };
 
 //-------------------------------------------
 
-class SIP_Header_Authentication_Info_Test : public SIP_Header_Test
+class SIP_Header_Authentication_Info_Decode_Encode_Test : public SIP_Header_Decode_Encode_Test
 {
 public:
-    SIP_Header_Authentication_Info_Test();
+    SIP_Header_Authentication_Info_Decode_Encode_Test();
 };
 
 //-------------------------------------------
 
-class SIP_Header_Authorization_Test : public SIP_Header_Test
+class SIP_Header_Authorization_Decode_Encode_Test : public SIP_Header_Decode_Encode_Test
 {
 public:
-    SIP_Header_Authorization_Test();
+    SIP_Header_Authorization_Decode_Encode_Test();
 };
 
 //-------------------------------------------
 
-class SIP_Header_Call_ID_Test : public SIP_Header_Test
+class SIP_Header_Call_ID_Decode_Encode_Test : public SIP_Header_Decode_Encode_Test
 {
 public:
-    SIP_Header_Call_ID_Test();
+    SIP_Header_Call_ID_Decode_Encode_Test();
 };
 
 //-------------------------------------------
 
-class SIP_Header_Call_Info_Test : public SIP_Header_Test
+class SIP_Header_Call_Info_Decode_Encode_Test : public SIP_Header_Decode_Encode_Test
 {
 public:
-    SIP_Header_Call_Info_Test();
+    SIP_Header_Call_Info_Decode_Encode_Test();
 };
 
 //-------------------------------------------
 
-class SIP_Header_Contact_Test : public SIP_Header_Test
+class SIP_Header_Contact_Decode_Encode_Test : public SIP_Header_Decode_Encode_Test
 {
 public:
-    SIP_Header_Contact_Test();
+    SIP_Header_Contact_Decode_Encode_Test();
 };
 
 //-------------------------------------------
 
-class SIP_Header_Content_Disposition_Test : public SIP_Header_Test
+class SIP_Header_Content_Disposition_Decode_Encode_Test : public SIP_Header_Decode_Encode_Test
 {
 public:
-    SIP_Header_Content_Disposition_Test();
+    SIP_Header_Content_Disposition_Decode_Encode_Test();
 };
 
 //-------------------------------------------
 
-class SIP_Header_Content_Encoding_Test : public SIP_Header_Test
+class SIP_Header_Content_Encoding_Decode_Encode_Test : public SIP_Header_Decode_Encode_Test
 {
 public:
-    SIP_Header_Content_Encoding_Test();
+    SIP_Header_Content_Encoding_Decode_Encode_Test();
 };
 
 //-------------------------------------------
 
-class SIP_Header_Content_Language_Test : public SIP_Header_Test
+class SIP_Header_Content_Language_Decode_Encode_Test : public SIP_Header_Decode_Encode_Test
 {
 public:
-    SIP_Header_Content_Language_Test();
+    SIP_Header_Content_Language_Decode_Encode_Test();
 };
 
 //-------------------------------------------
 
-class SIP_Header_Content_Length_Test : public SIP_Header_Test
+class SIP_Header_Content_Length_Decode_Encode_Test : public SIP_Header_Decode_Encode_Test
 {
 public:
-    SIP_Header_Content_Length_Test();
+    SIP_Header_Content_Length_Decode_Encode_Test();
 };
 
 //-------------------------------------------
 
-class SIP_Header_Content_Type_Test : public SIP_Header_Test
+class SIP_Header_Content_Type_Decode_Encode_Test : public SIP_Header_Decode_Encode_Test
 {
 public:
-    SIP_Header_Content_Type_Test();
+    SIP_Header_Content_Type_Decode_Encode_Test();
 };
 
 //-------------------------------------------
 
-class SIP_Header_CSeq_Test : public SIP_Header_Test
+class SIP_Header_CSeq_Decode_Encode_Test : public SIP_Header_Decode_Encode_Test
 {
 public:
-    SIP_Header_CSeq_Test();
+    SIP_Header_CSeq_Decode_Encode_Test();
 };
 
 //-------------------------------------------
 
-class SIP_Header_Date_Test : public SIP_Header_Test
+class SIP_Header_Date_Decode_Encode_Test : public SIP_Header_Decode_Encode_Test
 {
 public:
-    SIP_Header_Date_Test();
+    SIP_Header_Date_Decode_Encode_Test();
 };
 
 //-------------------------------------------
 
-class SIP_Header_Error_Info_Test : public SIP_Header_Test
+class SIP_Header_Error_Info_Decode_Encode_Test : public SIP_Header_Decode_Encode_Test
 {
 public:
-    SIP_Header_Error_Info_Test();
+    SIP_Header_Error_Info_Decode_Encode_Test();
 };
 
 //-------------------------------------------
 
-class SIP_Header_Event_Test : public SIP_Header_Test
+class SIP_Header_Event_Decode_Encode_Test : public SIP_Header_Decode_Encode_Test
 {
 public:
-    SIP_Header_Event_Test();
+    SIP_Header_Event_Decode_Encode_Test();
 };
 
 //-------------------------------------------
 
-class SIP_Header_Expires_Test : public SIP_Header_Test
+class SIP_Header_Expires_Decode_Encode_Test : public SIP_Header_Decode_Encode_Test
 {
 public:
-    SIP_Header_Expires_Test();
+    SIP_Header_Expires_Decode_Encode_Test();
 };
 
 //-------------------------------------------
 
-class SIP_Header_From_Test : public SIP_Header_Test
+class SIP_Header_From_Decode_Encode_Test : public SIP_Header_Decode_Encode_Test
 {
 public:
-    SIP_Header_From_Test();
+    SIP_Header_From_Decode_Encode_Test();
 };
 
 //-------------------------------------------
 
-class SIP_Header_In_Reply_To_Test : public SIP_Header_Test
+class SIP_Header_In_Reply_To_Decode_Encode_Test : public SIP_Header_Decode_Encode_Test
 {
 public:
-    SIP_Header_In_Reply_To_Test();
+    SIP_Header_In_Reply_To_Decode_Encode_Test();
 };
 
 //-------------------------------------------
 
-class SIP_Header_Max_Forwards_Test : public SIP_Header_Test
+class SIP_Header_Max_Forwards_Decode_Encode_Test : public SIP_Header_Decode_Encode_Test
 {
 public:
-    SIP_Header_Max_Forwards_Test();
+    SIP_Header_Max_Forwards_Decode_Encode_Test();
 };
 
 //-------------------------------------------
 
-class SIP_Header_Mime_Version_Test : public SIP_Header_Test
+class SIP_Header_Mime_Version_Decode_Encode_Test : public SIP_Header_Decode_Encode_Test
 {
 public:
-    SIP_Header_Mime_Version_Test();
+    SIP_Header_Mime_Version_Decode_Encode_Test();
 };
 
 //-------------------------------------------
 
-class SIP_Header_Min_Expires_Test : public SIP_Header_Test
+class SIP_Header_Min_Expires_Decode_Encode_Test : public SIP_Header_Decode_Encode_Test
 {
 public:
-    SIP_Header_Min_Expires_Test();
+    SIP_Header_Min_Expires_Decode_Encode_Test();
 };
 
 //-------------------------------------------
 
-class SIP_Header_Organization_Test : public SIP_Header_Test
+class SIP_Header_Organization_Decode_Encode_Test : public SIP_Header_Decode_Encode_Test
 {
 public:
-    SIP_Header_Organization_Test();
+    SIP_Header_Organization_Decode_Encode_Test();
 };
 
 //-------------------------------------------
 
-class SIP_Header_Priority_Test : public SIP_Header_Test
+class SIP_Header_Priority_Decode_Encode_Test : public SIP_Header_Decode_Encode_Test
 {
 public:
-    SIP_Header_Priority_Test();
+    SIP_Header_Priority_Decode_Encode_Test();
 };
 
 //-------------------------------------------
 
-class SIP_Header_Proxy_Authenticate_Test : public SIP_Header_Test
+class SIP_Header_Proxy_Authenticate_Decode_Encode_Test : public SIP_Header_Decode_Encode_Test
 {
 public:
-    SIP_Header_Proxy_Authenticate_Test();
+    SIP_Header_Proxy_Authenticate_Decode_Encode_Test();
 };
 
 //-------------------------------------------
 
-class SIP_Header_Proxy_Authorization_Test : public SIP_Header_Test
+class SIP_Header_Proxy_Authorization_Decode_Encode_Test : public SIP_Header_Decode_Encode_Test
 {
 public:
-    SIP_Header_Proxy_Authorization_Test();
+    SIP_Header_Proxy_Authorization_Decode_Encode_Test();
 };
 
 //-------------------------------------------
 
-class SIP_Header_Proxy_Require_Test : public SIP_Header_Test
+class SIP_Header_Proxy_Require_Decode_Encode_Test : public SIP_Header_Decode_Encode_Test
 {
 public:
-    SIP_Header_Proxy_Require_Test();
+    SIP_Header_Proxy_Require_Decode_Encode_Test();
 };
 
 //-------------------------------------------
 
-class SIP_Header_RAck_Test : public SIP_Header_Test
+class SIP_Header_RAck_Decode_Encode_Test : public SIP_Header_Decode_Encode_Test
 {
 public:
-    SIP_Header_RAck_Test();
+    SIP_Header_RAck_Decode_Encode_Test();
 };
 
 //-------------------------------------------
 
-class SIP_Header_Record_Route_Test : public SIP_Header_Test
+class SIP_Header_Record_Route_Decode_Encode_Test : public SIP_Header_Decode_Encode_Test
 {
 public:
-    SIP_Header_Record_Route_Test();
+    SIP_Header_Record_Route_Decode_Encode_Test();
 };
 
 //-------------------------------------------
 
-class SIP_Header_Refer_To_Test : public SIP_Header_Test
+class SIP_Header_Refer_To_Decode_Encode_Test : public SIP_Header_Decode_Encode_Test
 {
 public:
-    SIP_Header_Refer_To_Test();
+    SIP_Header_Refer_To_Decode_Encode_Test();
 };
 
 //-------------------------------------------
 
-class SIP_Header_Referred_By_Test : public SIP_Header_Test
+class SIP_Header_Referred_By_Decode_Encode_Test : public SIP_Header_Decode_Encode_Test
 {
 public:
-    SIP_Header_Referred_By_Test();
+    SIP_Header_Referred_By_Decode_Encode_Test();
 };
 
 //-------------------------------------------
 
-class SIP_Header_Reply_To_Test : public SIP_Header_Test
+class SIP_Header_Reply_To_Decode_Encode_Test : public SIP_Header_Decode_Encode_Test
 {
 public:
-    SIP_Header_Reply_To_Test();
+    SIP_Header_Reply_To_Decode_Encode_Test();
 };
 
 //-------------------------------------------
 
-class SIP_Header_Require_Test : public SIP_Header_Test
+class SIP_Header_Require_Decode_Encode_Test : public SIP_Header_Decode_Encode_Test
 {
 public:
-    SIP_Header_Require_Test();
+    SIP_Header_Require_Decode_Encode_Test();
 };
 
 //-------------------------------------------
 
-class SIP_Header_Retry_After_Test : public SIP_Header_Test
+class SIP_Header_Retry_After_Decode_Encode_Test : public SIP_Header_Decode_Encode_Test
 {
 public:
-    SIP_Header_Retry_After_Test();
+    SIP_Header_Retry_After_Decode_Encode_Test();
 };
 
 //-------------------------------------------
 
-class SIP_Header_Route_Test : public SIP_Header_Test
+class SIP_Header_Route_Decode_Encode_Test : public SIP_Header_Decode_Encode_Test
 {
 public:
-    SIP_Header_Route_Test();
+    SIP_Header_Route_Decode_Encode_Test();
 };
 
 //-------------------------------------------
 
-class SIP_Header_RSeq_Test : public SIP_Header_Test
+class SIP_Header_RSeq_Decode_Encode_Test : public SIP_Header_Decode_Encode_Test
 {
 public:
-    SIP_Header_RSeq_Test();
+    SIP_Header_RSeq_Decode_Encode_Test();
 };
 
 //-------------------------------------------
 
-class SIP_Header_Server_Test : public SIP_Header_Test
+class SIP_Header_Server_Decode_Encode_Test : public SIP_Header_Decode_Encode_Test
 {
 public:
-    SIP_Header_Server_Test();
+    SIP_Header_Server_Decode_Encode_Test();
 };
 
 //-------------------------------------------
 
-class SIP_Header_Subject_Test : public SIP_Header_Test
+class SIP_Header_Subject_Decode_Encode_Test : public SIP_Header_Decode_Encode_Test
 {
 public:
-    SIP_Header_Subject_Test();
+    SIP_Header_Subject_Decode_Encode_Test();
 };
 
 //-------------------------------------------
 
-class SIP_Header_Subscription_State_Test : public SIP_Header_Test
+class SIP_Header_Subscription_State_Decode_Encode_Test : public SIP_Header_Decode_Encode_Test
 {
 public:
-    SIP_Header_Subscription_State_Test();
+    SIP_Header_Subscription_State_Decode_Encode_Test();
 };
 
 //-------------------------------------------
 
-class SIP_Header_Supported_Test : public SIP_Header_Test
+class SIP_Header_Supported_Decode_Encode_Test : public SIP_Header_Decode_Encode_Test
 {
 public:
-    SIP_Header_Supported_Test();
+    SIP_Header_Supported_Decode_Encode_Test();
 };
 
 //-------------------------------------------
 
-class SIP_Header_Timestamp_Test : public SIP_Header_Test
+class SIP_Header_Timestamp_Decode_Encode_Test : public SIP_Header_Decode_Encode_Test
 {
 public:
-    SIP_Header_Timestamp_Test();
+    SIP_Header_Timestamp_Decode_Encode_Test();
 };
 
 //-------------------------------------------
 
-class SIP_Header_To_Test : public SIP_Header_Test
+class SIP_Header_To_Decode_Encode_Test : public SIP_Header_Decode_Encode_Test
 {
 public:
-    SIP_Header_To_Test();
+    SIP_Header_To_Decode_Encode_Test();
 };
 
 //-------------------------------------------
 
-class SIP_Header_Unknown_Test : public SIP_Header_Test
+class SIP_Header_Unknown_Decode_Encode_Test : public SIP_Header_Decode_Encode_Test
 {
 public:
-    SIP_Header_Unknown_Test();
+    SIP_Header_Unknown_Decode_Encode_Test();
 };
 
 //-------------------------------------------
 
-class SIP_Header_Unsupported_Test : public SIP_Header_Test
+class SIP_Header_Unsupported_Decode_Encode_Test : public SIP_Header_Decode_Encode_Test
 {
 public:
-    SIP_Header_Unsupported_Test();
+    SIP_Header_Unsupported_Decode_Encode_Test();
 };
 
 //-------------------------------------------
 
-class SIP_Header_User_Agent_Test : public SIP_Header_Test
+class SIP_Header_User_Agent_Decode_Encode_Test : public SIP_Header_Decode_Encode_Test
 {
 public:
-    SIP_Header_User_Agent_Test();
+    SIP_Header_User_Agent_Decode_Encode_Test();
 };
 
 //-------------------------------------------
 
-class SIP_Header_Via_Test : public SIP_Header_Test
+class SIP_Header_Via_Decode_Encode_Test : public SIP_Header_Decode_Encode_Test
 {
 public:
-    SIP_Header_Via_Test();
+    SIP_Header_Via_Decode_Encode_Test();
 };
 
 //-------------------------------------------
 
-class SIP_Header_Warning_Test : public SIP_Header_Test
+class SIP_Header_Warning_Decode_Encode_Test : public SIP_Header_Decode_Encode_Test
 {
 public:
-    SIP_Header_Warning_Test();
+    SIP_Header_Warning_Decode_Encode_Test();
 };
 
 //-------------------------------------------
 
-class SIP_Header_WWW_Authenticate_Test : public SIP_Header_Test
+class SIP_Header_WWW_Authenticate_Decode_Encode_Test : public SIP_Header_Decode_Encode_Test
 {
 public:
-    SIP_Header_WWW_Authenticate_Test();
+    SIP_Header_WWW_Authenticate_Decode_Encode_Test();
 };
 
 //-------------------------------------------

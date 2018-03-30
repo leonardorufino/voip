@@ -17,160 +17,160 @@ bool SIP_Header_Test::init()
 {
     std::cout << "SIP header test initialized\n";
 
-    if (!run<SIP_Header_Accept_Test>())
+    if (!run<SIP_Header_Accept_Decode_Encode_Test>())
         return false;
 
-    if (!run<SIP_Header_Accept_Encoding_Test>())
+    if (!run<SIP_Header_Accept_Encoding_Decode_Encode_Test>())
         return false;
 
-    if (!run<SIP_Header_Accept_Language_Test>())
+    if (!run<SIP_Header_Accept_Language_Decode_Encode_Test>())
         return false;
 
-    if (!run<SIP_Header_Alert_Info_Test>())
+    if (!run<SIP_Header_Alert_Info_Decode_Encode_Test>())
         return false;
 
-    if (!run<SIP_Header_Allow_Test>())
+    if (!run<SIP_Header_Allow_Decode_Encode_Test>())
         return false;
 
-    if (!run<SIP_Header_Allow_Events_Test>())
+    if (!run<SIP_Header_Allow_Events_Decode_Encode_Test>())
         return false;
 
-    if (!run<SIP_Header_Authentication_Info_Test>())
+    if (!run<SIP_Header_Authentication_Info_Decode_Encode_Test>())
         return false;
 
-    if (!run<SIP_Header_Authorization_Test>())
+    if (!run<SIP_Header_Authorization_Decode_Encode_Test>())
         return false;
 
-    if (!run<SIP_Header_Call_ID_Test>())
+    if (!run<SIP_Header_Call_ID_Decode_Encode_Test>())
         return false;
 
-    if (!run<SIP_Header_Call_Info_Test>())
+    if (!run<SIP_Header_Call_Info_Decode_Encode_Test>())
         return false;
 
-    if (!run<SIP_Header_Contact_Test>())
+    if (!run<SIP_Header_Contact_Decode_Encode_Test>())
         return false;
 
-    if (!run<SIP_Header_Content_Disposition_Test>())
+    if (!run<SIP_Header_Content_Disposition_Decode_Encode_Test>())
         return false;
 
-    if (!run<SIP_Header_Content_Encoding_Test>())
+    if (!run<SIP_Header_Content_Encoding_Decode_Encode_Test>())
         return false;
 
-    if (!run<SIP_Header_Content_Language_Test>())
+    if (!run<SIP_Header_Content_Language_Decode_Encode_Test>())
         return false;
 
-    if (!run<SIP_Header_Content_Length_Test>())
+    if (!run<SIP_Header_Content_Length_Decode_Encode_Test>())
         return false;
 
-    if (!run<SIP_Header_Content_Type_Test>())
+    if (!run<SIP_Header_Content_Type_Decode_Encode_Test>())
         return false;
 
-    if (!run<SIP_Header_CSeq_Test>())
+    if (!run<SIP_Header_CSeq_Decode_Encode_Test>())
         return false;
 
-    if (!run<SIP_Header_Date_Test>())
+    if (!run<SIP_Header_Date_Decode_Encode_Test>())
         return false;
 
-    if (!run<SIP_Header_Error_Info_Test>())
+    if (!run<SIP_Header_Error_Info_Decode_Encode_Test>())
         return false;
 
-    if (!run<SIP_Header_Event_Test>())
+    if (!run<SIP_Header_Event_Decode_Encode_Test>())
         return false;
 
-    if (!run<SIP_Header_Expires_Test>())
+    if (!run<SIP_Header_Expires_Decode_Encode_Test>())
         return false;
 
-    if (!run<SIP_Header_From_Test>())
+    if (!run<SIP_Header_From_Decode_Encode_Test>())
         return false;
 
-    if (!run<SIP_Header_In_Reply_To_Test>())
+    if (!run<SIP_Header_In_Reply_To_Decode_Encode_Test>())
         return false;
 
-    if (!run<SIP_Header_Max_Forwards_Test>())
+    if (!run<SIP_Header_Max_Forwards_Decode_Encode_Test>())
         return false;
 
-    if (!run<SIP_Header_Mime_Version_Test>())
+    if (!run<SIP_Header_Mime_Version_Decode_Encode_Test>())
         return false;
 
-    if (!run<SIP_Header_Min_Expires_Test>())
+    if (!run<SIP_Header_Min_Expires_Decode_Encode_Test>())
         return false;
 
-    if (!run<SIP_Header_Organization_Test>())
+    if (!run<SIP_Header_Organization_Decode_Encode_Test>())
         return false;
 
-    if (!run<SIP_Header_Priority_Test>())
+    if (!run<SIP_Header_Priority_Decode_Encode_Test>())
         return false;
 
-    if (!run<SIP_Header_Proxy_Authenticate_Test>())
+    if (!run<SIP_Header_Proxy_Authenticate_Decode_Encode_Test>())
         return false;
 
-    if (!run<SIP_Header_Proxy_Authorization_Test>())
+    if (!run<SIP_Header_Proxy_Authorization_Decode_Encode_Test>())
         return false;
 
-    if (!run<SIP_Header_Proxy_Require_Test>())
+    if (!run<SIP_Header_Proxy_Require_Decode_Encode_Test>())
         return false;
 
-    if (!run<SIP_Header_RAck_Test>())
+    if (!run<SIP_Header_RAck_Decode_Encode_Test>())
         return false;
 
-    if (!run<SIP_Header_Record_Route_Test>())
+    if (!run<SIP_Header_Record_Route_Decode_Encode_Test>())
         return false;
 
-    if (!run<SIP_Header_Refer_To_Test>())
+    if (!run<SIP_Header_Refer_To_Decode_Encode_Test>())
         return false;
 
-    if (!run<SIP_Header_Referred_By_Test>())
+    if (!run<SIP_Header_Referred_By_Decode_Encode_Test>())
         return false;
 
-    if (!run<SIP_Header_Reply_To_Test>())
+    if (!run<SIP_Header_Reply_To_Decode_Encode_Test>())
         return false;
 
-    if (!run<SIP_Header_Require_Test>())
+    if (!run<SIP_Header_Require_Decode_Encode_Test>())
         return false;
 
-    if (!run<SIP_Header_Retry_After_Test>())
+    if (!run<SIP_Header_Retry_After_Decode_Encode_Test>())
         return false;
 
-    if (!run<SIP_Header_Route_Test>())
+    if (!run<SIP_Header_Route_Decode_Encode_Test>())
         return false;
 
-    if (!run<SIP_Header_RSeq_Test>())
+    if (!run<SIP_Header_RSeq_Decode_Encode_Test>())
         return false;
 
-    if (!run<SIP_Header_Server_Test>())
+    if (!run<SIP_Header_Server_Decode_Encode_Test>())
         return false;
 
-    if (!run<SIP_Header_Subject_Test>())
+    if (!run<SIP_Header_Subject_Decode_Encode_Test>())
         return false;
 
-    if (!run<SIP_Header_Subscription_State_Test>())
+    if (!run<SIP_Header_Subscription_State_Decode_Encode_Test>())
         return false;
 
-    if (!run<SIP_Header_Supported_Test>())
+    if (!run<SIP_Header_Supported_Decode_Encode_Test>())
         return false;
 
-    if (!run<SIP_Header_Timestamp_Test>())
+    if (!run<SIP_Header_Timestamp_Decode_Encode_Test>())
         return false;
 
-    if (!run<SIP_Header_To_Test>())
+    if (!run<SIP_Header_To_Decode_Encode_Test>())
         return false;
 
-    if (!run<SIP_Header_Unknown_Test>())
+    if (!run<SIP_Header_Unknown_Decode_Encode_Test>())
         return false;
 
-    if (!run<SIP_Header_Unsupported_Test>())
+    if (!run<SIP_Header_Unsupported_Decode_Encode_Test>())
         return false;
 
-    if (!run<SIP_Header_User_Agent_Test>())
+    if (!run<SIP_Header_User_Agent_Decode_Encode_Test>())
         return false;
 
-    if (!run<SIP_Header_Via_Test>())
+    if (!run<SIP_Header_Via_Decode_Encode_Test>())
         return false;
 
-    if (!run<SIP_Header_Warning_Test>())
+    if (!run<SIP_Header_Warning_Decode_Encode_Test>())
         return false;
 
-    if (!run<SIP_Header_WWW_Authenticate_Test>())
+    if (!run<SIP_Header_WWW_Authenticate_Decode_Encode_Test>())
         return false;
 
     std::cout << "SIP header test completed successfully\n";
@@ -188,15 +188,16 @@ template<class T> bool SIP_Header_Test::run()
 }
 
 //-------------------------------------------
+//-------------------------------------------
 
-bool SIP_Header_Test::run()
+bool SIP_Header_Decode_Encode_Test::run()
 {
     std::list<SIP_Header_Input_Output>::const_iterator it = _header_input_output.begin();
     while (it != _header_input_output.end())
     {
         SIP_Header_Input_Output header_input_output = *it++;
 
-        std::cout << "SIP header test initialized (type: " << header_input_output._header_type << ")\n";
+        std::cout << "SIP header decode encode test initialized (type: " << header_input_output._header_type << ")\n";
 
         sip_header_list headers;
 
@@ -205,7 +206,7 @@ bool SIP_Header_Test::run()
 
         if (header_input_output._decode_success != decode)
         {
-            std::cout << "SIP_Header_Test::run -> Failed to decode headers:\n";
+            std::cout << "SIP_Header_Decode_Encode_Test::run -> Failed to decode headers:\n";
             std::cout << std::setw(12) << "Type: " << header_input_output._header_type << "\n";
             std::cout << std::setw(12) << "Input: " << header_input_output._input.c_str() << "\n";
             std::cout << std::setw(12) << "Expected: " << (header_input_output._decode_success ? "true" : "false") << "\n";
@@ -215,18 +216,19 @@ bool SIP_Header_Test::run()
 
         if (!decode)
         {
+            std::cout << "SIP header decode encode test completed successfully (type: " << header_input_output._header_type << ")\n";
             clear(headers);
-            std::cout << "SIP header test completed successfully (type: " << header_input_output._header_type << ")\n";
             continue;
         }
 
         if (header_input_output._header_nb != (unsigned short) headers.size())
         {
-            std::cout << "SIP_Header_Test::run -> Invalid size of headers:\n";
+            std::cout << "SIP_Header_Decode_Encode_Test::run -> Invalid size of headers:\n";
             std::cout << std::setw(12) << "Type: " << header_input_output._header_type << "\n";
             std::cout << std::setw(12) << "Input: " << header_input_output._input.c_str() << "\n";
             std::cout << std::setw(12) << "Expected: " << header_input_output._header_nb << "\n";
             std::cout << std::setw(12) << "Size: " << headers.size() << "\n";
+            clear(headers);
             return false;
         }
 
@@ -236,10 +238,11 @@ bool SIP_Header_Test::run()
             SIP_Header *header = *it2++;
             if (header->get_header_type() != header_input_output._header_type)
             {
-                std::cout << "SIP_Header_Test::run -> Invalid decoded header type:\n";
+                std::cout << "SIP_Header_Decode_Encode_Test::run -> Invalid decoded header type:\n";
                 std::cout << std::setw(12) << "Type: " << header_input_output._header_type << "\n";
                 std::cout << std::setw(12) << "Input: " << header_input_output._input.c_str() << "\n";
                 std::cout << std::setw(12) << "Result: " << header->get_header_type() << "\n";
+                clear(headers);
                 return false;
             }
         }
@@ -247,9 +250,10 @@ bool SIP_Header_Test::run()
         sip_header_list copy;
         if (!copy_headers(headers, copy))
         {
-            std::cout << "SIP_Header_Test::run -> Failed to copy headers:\n";
+            std::cout << "SIP_Header_Decode_Encode_Test::run -> Failed to copy headers:\n";
             std::cout << std::setw(12) << "Type: " << header_input_output._header_type << "\n";
             std::cout << std::setw(12) << "Input: " << header_input_output._input.c_str() << "\n";
+            clear(headers);
             return false;
         }
 
@@ -260,34 +264,36 @@ bool SIP_Header_Test::run()
 
         if (header_input_output._encode_success != encode)
         {
-            std::cout << "SIP_Header_Test::run -> Failed to encode headers:\n";
+            std::cout << "SIP_Header_Decode_Encode_Test::run -> Failed to encode headers:\n";
             std::cout << std::setw(12) << "Type: " << header_input_output._header_type << "\n";
             std::cout << std::setw(12) << "Input: " << header_input_output._input.c_str() << "\n";
             std::cout << std::setw(12) << "Expected: " << (header_input_output._encode_success ? "true" : "false") << "\n";
             std::cout << std::setw(12) << "Success: " << (encode ? "true" : "false") << "\n";
+            clear(copy);
             return false;
         }
 
         if (!encode)
         {
+            std::cout << "SIP header decode encode test completed successfully (type: " << header_input_output._header_type << ")\n";
             clear(copy);
-            std::cout << "SIP header test completed successfully (type: " << header_input_output._header_type << ")\n";
             continue;
         }
 
         if (output != header_input_output._output)
         {
-            std::cout << "SIP_Header_Test::run -> Invalid encoded header:\n";
+            std::cout << "SIP_Header_Decode_Encode_Test::run -> Invalid encoded header:\n";
             std::cout << std::setw(12) << "Type: " << header_input_output._header_type << "\n";
             std::cout << std::setw(12) << "Input: " << header_input_output._input.c_str() << "\n";
             std::cout << std::setw(12) << "Expected: " << header_input_output._output.c_str() << "\n";
             std::cout << std::setw(12) << "Output: " << output.c_str() << "\n";
+            clear(copy);
             return false;
         }
 
         clear(copy);
 
-        std::cout << "SIP header test completed successfully (type: " << header_input_output._header_type << ")\n";
+        std::cout << "SIP header decode encode test completed successfully (type: " << header_input_output._header_type << ")\n";
     }
 
     return true;
@@ -295,7 +301,7 @@ bool SIP_Header_Test::run()
 
 //-------------------------------------------
 
-bool SIP_Header_Test::copy_headers(sip_header_list &headers, sip_header_list &copy)
+bool SIP_Header_Decode_Encode_Test::copy_headers(sip_header_list &headers, sip_header_list &copy)
 {
     sip_header_list::const_iterator it = headers.begin();
     while (it != headers.end())
@@ -314,7 +320,7 @@ bool SIP_Header_Test::copy_headers(sip_header_list &headers, sip_header_list &co
 
 //-------------------------------------------
 
-void SIP_Header_Test::clear(sip_header_list &headers)
+void SIP_Header_Decode_Encode_Test::clear(sip_header_list &headers)
 {
     sip_header_list::const_iterator it = headers.begin();
     while (it != headers.end())
@@ -326,7 +332,7 @@ void SIP_Header_Test::clear(sip_header_list &headers)
 //-------------------------------------------
 //-------------------------------------------
 
-SIP_Header_Accept_Test::SIP_Header_Accept_Test()
+SIP_Header_Accept_Decode_Encode_Test::SIP_Header_Accept_Decode_Encode_Test()
 {
     SIP_Header_Input_Output hdr1;
     hdr1._header_type    = SIP_HEADER_ACCEPT;
@@ -368,7 +374,7 @@ SIP_Header_Accept_Test::SIP_Header_Accept_Test()
 //-------------------------------------------
 //-------------------------------------------
 
-SIP_Header_Accept_Encoding_Test::SIP_Header_Accept_Encoding_Test()
+SIP_Header_Accept_Encoding_Decode_Encode_Test::SIP_Header_Accept_Encoding_Decode_Encode_Test()
 {
     SIP_Header_Input_Output hdr1;
     hdr1._header_type    = SIP_HEADER_ACCEPT_ENCODING;
@@ -419,7 +425,7 @@ SIP_Header_Accept_Encoding_Test::SIP_Header_Accept_Encoding_Test()
 //-------------------------------------------
 //-------------------------------------------
 
-SIP_Header_Accept_Language_Test::SIP_Header_Accept_Language_Test()
+SIP_Header_Accept_Language_Decode_Encode_Test::SIP_Header_Accept_Language_Decode_Encode_Test()
 {
     SIP_Header_Input_Output hdr1;
     hdr1._header_type    = SIP_HEADER_ACCEPT_LANGUAGE;
@@ -461,7 +467,7 @@ SIP_Header_Accept_Language_Test::SIP_Header_Accept_Language_Test()
 //-------------------------------------------
 //-------------------------------------------
 
-SIP_Header_Alert_Info_Test::SIP_Header_Alert_Info_Test()
+SIP_Header_Alert_Info_Decode_Encode_Test::SIP_Header_Alert_Info_Decode_Encode_Test()
 {
     SIP_Header_Input_Output hdr1;
     hdr1._header_type    = SIP_HEADER_ALERT_INFO;
@@ -494,7 +500,7 @@ SIP_Header_Alert_Info_Test::SIP_Header_Alert_Info_Test()
 //-------------------------------------------
 //-------------------------------------------
 
-SIP_Header_Allow_Test::SIP_Header_Allow_Test()
+SIP_Header_Allow_Decode_Encode_Test::SIP_Header_Allow_Decode_Encode_Test()
 {
     SIP_Header_Input_Output hdr1;
     hdr1._header_type    = SIP_HEADER_ALLOW;
@@ -536,7 +542,7 @@ SIP_Header_Allow_Test::SIP_Header_Allow_Test()
 //-------------------------------------------
 //-------------------------------------------
 
-SIP_Header_Allow_Events_Test::SIP_Header_Allow_Events_Test()
+SIP_Header_Allow_Events_Decode_Encode_Test::SIP_Header_Allow_Events_Decode_Encode_Test()
 {
     SIP_Header_Input_Output hdr1;
     hdr1._header_type    = SIP_HEADER_ALLOW_EVENTS;
@@ -569,7 +575,7 @@ SIP_Header_Allow_Events_Test::SIP_Header_Allow_Events_Test()
 //-------------------------------------------
 //-------------------------------------------
 
-SIP_Header_Authentication_Info_Test::SIP_Header_Authentication_Info_Test()
+SIP_Header_Authentication_Info_Decode_Encode_Test::SIP_Header_Authentication_Info_Decode_Encode_Test()
 {
     SIP_Header_Input_Output hdr1;
     hdr1._header_type    = SIP_HEADER_AUTHENTICATION_INFO;
@@ -604,7 +610,7 @@ SIP_Header_Authentication_Info_Test::SIP_Header_Authentication_Info_Test()
 //-------------------------------------------
 //-------------------------------------------
 
-SIP_Header_Authorization_Test::SIP_Header_Authorization_Test()
+SIP_Header_Authorization_Decode_Encode_Test::SIP_Header_Authorization_Decode_Encode_Test()
 {
     SIP_Header_Input_Output hdr1;
     hdr1._header_type    = SIP_HEADER_AUTHORIZATION;
@@ -680,7 +686,7 @@ SIP_Header_Authorization_Test::SIP_Header_Authorization_Test()
 //-------------------------------------------
 //-------------------------------------------
 
-SIP_Header_Call_ID_Test::SIP_Header_Call_ID_Test()
+SIP_Header_Call_ID_Decode_Encode_Test::SIP_Header_Call_ID_Decode_Encode_Test()
 {
     SIP_Header_Input_Output hdr1;
     hdr1._header_type    = SIP_HEADER_CALL_ID;
@@ -731,7 +737,7 @@ SIP_Header_Call_ID_Test::SIP_Header_Call_ID_Test()
 //-------------------------------------------
 //-------------------------------------------
 
-SIP_Header_Call_Info_Test::SIP_Header_Call_Info_Test()
+SIP_Header_Call_Info_Decode_Encode_Test::SIP_Header_Call_Info_Decode_Encode_Test()
 {
     SIP_Header_Input_Output hdr1;
     hdr1._header_type    = SIP_HEADER_CALL_INFO;
@@ -766,7 +772,7 @@ SIP_Header_Call_Info_Test::SIP_Header_Call_Info_Test()
 //-------------------------------------------
 //-------------------------------------------
 
-SIP_Header_Contact_Test::SIP_Header_Contact_Test()
+SIP_Header_Contact_Decode_Encode_Test::SIP_Header_Contact_Decode_Encode_Test()
 {
     SIP_Header_Input_Output hdr1;
     hdr1._header_type    = SIP_HEADER_CONTACT;
@@ -850,7 +856,7 @@ SIP_Header_Contact_Test::SIP_Header_Contact_Test()
 //-------------------------------------------
 //-------------------------------------------
 
-SIP_Header_Content_Disposition_Test::SIP_Header_Content_Disposition_Test()
+SIP_Header_Content_Disposition_Decode_Encode_Test::SIP_Header_Content_Disposition_Decode_Encode_Test()
 {
     SIP_Header_Input_Output hdr1;
     hdr1._header_type    = SIP_HEADER_CONTENT_DISPOSITION;
@@ -892,7 +898,7 @@ SIP_Header_Content_Disposition_Test::SIP_Header_Content_Disposition_Test()
 //-------------------------------------------
 //-------------------------------------------
 
-SIP_Header_Content_Encoding_Test::SIP_Header_Content_Encoding_Test()
+SIP_Header_Content_Encoding_Decode_Encode_Test::SIP_Header_Content_Encoding_Decode_Encode_Test()
 {
     SIP_Header_Input_Output hdr1;
     hdr1._header_type    = SIP_HEADER_CONTENT_ENCODING;
@@ -943,7 +949,7 @@ SIP_Header_Content_Encoding_Test::SIP_Header_Content_Encoding_Test()
 //-------------------------------------------
 //-------------------------------------------
 
-SIP_Header_Content_Language_Test::SIP_Header_Content_Language_Test()
+SIP_Header_Content_Language_Decode_Encode_Test::SIP_Header_Content_Language_Decode_Encode_Test()
 {
     SIP_Header_Input_Output hdr1;
     hdr1._header_type    = SIP_HEADER_CONTENT_LANGUAGE;
@@ -976,7 +982,7 @@ SIP_Header_Content_Language_Test::SIP_Header_Content_Language_Test()
 //-------------------------------------------
 //-------------------------------------------
 
-SIP_Header_Content_Length_Test::SIP_Header_Content_Length_Test()
+SIP_Header_Content_Length_Decode_Encode_Test::SIP_Header_Content_Length_Decode_Encode_Test()
 {
     SIP_Header_Input_Output hdr1;
     hdr1._header_type    = SIP_HEADER_CONTENT_LENGTH;
@@ -1063,7 +1069,7 @@ SIP_Header_Content_Length_Test::SIP_Header_Content_Length_Test()
 //-------------------------------------------
 //-------------------------------------------
 
-SIP_Header_Content_Type_Test::SIP_Header_Content_Type_Test()
+SIP_Header_Content_Type_Decode_Encode_Test::SIP_Header_Content_Type_Decode_Encode_Test()
 {
     SIP_Header_Input_Output hdr1;
     hdr1._header_type    = SIP_HEADER_CONTENT_TYPE;
@@ -1096,7 +1102,7 @@ SIP_Header_Content_Type_Test::SIP_Header_Content_Type_Test()
 //-------------------------------------------
 //-------------------------------------------
 
-SIP_Header_CSeq_Test::SIP_Header_CSeq_Test()
+SIP_Header_CSeq_Decode_Encode_Test::SIP_Header_CSeq_Decode_Encode_Test()
 {
     SIP_Header_Input_Output hdr1;
     hdr1._header_type    = SIP_HEADER_CSEQ;
@@ -1138,7 +1144,7 @@ SIP_Header_CSeq_Test::SIP_Header_CSeq_Test()
 //-------------------------------------------
 //-------------------------------------------
 
-SIP_Header_Date_Test::SIP_Header_Date_Test()
+SIP_Header_Date_Decode_Encode_Test::SIP_Header_Date_Decode_Encode_Test()
 {
     SIP_Header_Input_Output hdr1;
     hdr1._header_type    = SIP_HEADER_DATE;
@@ -1180,7 +1186,7 @@ SIP_Header_Date_Test::SIP_Header_Date_Test()
 //-------------------------------------------
 //-------------------------------------------
 
-SIP_Header_Error_Info_Test::SIP_Header_Error_Info_Test()
+SIP_Header_Error_Info_Decode_Encode_Test::SIP_Header_Error_Info_Decode_Encode_Test()
 {
     SIP_Header_Input_Output hdr1;
     hdr1._header_type    = SIP_HEADER_ERROR_INFO;
@@ -1215,7 +1221,7 @@ SIP_Header_Error_Info_Test::SIP_Header_Error_Info_Test()
 //-------------------------------------------
 //-------------------------------------------
 
-SIP_Header_Event_Test::SIP_Header_Event_Test()
+SIP_Header_Event_Decode_Encode_Test::SIP_Header_Event_Decode_Encode_Test()
 {
     SIP_Header_Input_Output hdr1;
     hdr1._header_type    = SIP_HEADER_EVENT;
@@ -1248,7 +1254,7 @@ SIP_Header_Event_Test::SIP_Header_Event_Test()
 //-------------------------------------------
 //-------------------------------------------
 
-SIP_Header_Expires_Test::SIP_Header_Expires_Test()
+SIP_Header_Expires_Decode_Encode_Test::SIP_Header_Expires_Decode_Encode_Test()
 {
     SIP_Header_Input_Output hdr1;
     hdr1._header_type    = SIP_HEADER_EXPIRES;
@@ -1290,7 +1296,7 @@ SIP_Header_Expires_Test::SIP_Header_Expires_Test()
 //-------------------------------------------
 //-------------------------------------------
 
-SIP_Header_From_Test::SIP_Header_From_Test()
+SIP_Header_From_Decode_Encode_Test::SIP_Header_From_Decode_Encode_Test()
 {
     SIP_Header_Input_Output hdr1;
     hdr1._header_type    = SIP_HEADER_FROM;
@@ -1377,7 +1383,7 @@ SIP_Header_From_Test::SIP_Header_From_Test()
 //-------------------------------------------
 //-------------------------------------------
 
-SIP_Header_In_Reply_To_Test::SIP_Header_In_Reply_To_Test()
+SIP_Header_In_Reply_To_Decode_Encode_Test::SIP_Header_In_Reply_To_Decode_Encode_Test()
 {
     SIP_Header_Input_Output hdr1;
     hdr1._header_type    = SIP_HEADER_IN_REPLY_TO;
@@ -1410,7 +1416,7 @@ SIP_Header_In_Reply_To_Test::SIP_Header_In_Reply_To_Test()
 //-------------------------------------------
 //-------------------------------------------
 
-SIP_Header_Max_Forwards_Test::SIP_Header_Max_Forwards_Test()
+SIP_Header_Max_Forwards_Decode_Encode_Test::SIP_Header_Max_Forwards_Decode_Encode_Test()
 {
     SIP_Header_Input_Output hdr1;
     hdr1._header_type    = SIP_HEADER_MAX_FORWARDS;
@@ -1479,7 +1485,7 @@ SIP_Header_Max_Forwards_Test::SIP_Header_Max_Forwards_Test()
 //-------------------------------------------
 //-------------------------------------------
 
-SIP_Header_Mime_Version_Test::SIP_Header_Mime_Version_Test()
+SIP_Header_Mime_Version_Decode_Encode_Test::SIP_Header_Mime_Version_Decode_Encode_Test()
 {
     SIP_Header_Input_Output hdr1;
     hdr1._header_type    = SIP_HEADER_MIME_VERSION;
@@ -1512,7 +1518,7 @@ SIP_Header_Mime_Version_Test::SIP_Header_Mime_Version_Test()
 //-------------------------------------------
 //-------------------------------------------
 
-SIP_Header_Min_Expires_Test::SIP_Header_Min_Expires_Test()
+SIP_Header_Min_Expires_Decode_Encode_Test::SIP_Header_Min_Expires_Decode_Encode_Test()
 {
     SIP_Header_Input_Output hdr1;
     hdr1._header_type    = SIP_HEADER_MIN_EXPIRES;
@@ -1563,7 +1569,7 @@ SIP_Header_Min_Expires_Test::SIP_Header_Min_Expires_Test()
 //-------------------------------------------
 //-------------------------------------------
 
-SIP_Header_Organization_Test::SIP_Header_Organization_Test()
+SIP_Header_Organization_Decode_Encode_Test::SIP_Header_Organization_Decode_Encode_Test()
 {
     SIP_Header_Input_Output hdr1;
     hdr1._header_type    = SIP_HEADER_ORGANIZATION;
@@ -1605,7 +1611,7 @@ SIP_Header_Organization_Test::SIP_Header_Organization_Test()
 //-------------------------------------------
 //-------------------------------------------
 
-SIP_Header_Priority_Test::SIP_Header_Priority_Test()
+SIP_Header_Priority_Decode_Encode_Test::SIP_Header_Priority_Decode_Encode_Test()
 {
     SIP_Header_Input_Output hdr1;
     hdr1._header_type    = SIP_HEADER_PRIORITY;
@@ -1647,7 +1653,7 @@ SIP_Header_Priority_Test::SIP_Header_Priority_Test()
 //-------------------------------------------
 //-------------------------------------------
 
-SIP_Header_Proxy_Authenticate_Test::SIP_Header_Proxy_Authenticate_Test()
+SIP_Header_Proxy_Authenticate_Decode_Encode_Test::SIP_Header_Proxy_Authenticate_Decode_Encode_Test()
 {
     SIP_Header_Input_Output hdr1;
     hdr1._header_type    = SIP_HEADER_PROXY_AUTHENTICATE;
@@ -1717,7 +1723,7 @@ SIP_Header_Proxy_Authenticate_Test::SIP_Header_Proxy_Authenticate_Test()
 //-------------------------------------------
 //-------------------------------------------
 
-SIP_Header_Proxy_Authorization_Test::SIP_Header_Proxy_Authorization_Test()
+SIP_Header_Proxy_Authorization_Decode_Encode_Test::SIP_Header_Proxy_Authorization_Decode_Encode_Test()
 {
     SIP_Header_Input_Output hdr1;
     hdr1._header_type    = SIP_HEADER_PROXY_AUTHORIZATION;
@@ -1793,7 +1799,7 @@ SIP_Header_Proxy_Authorization_Test::SIP_Header_Proxy_Authorization_Test()
 //-------------------------------------------
 //-------------------------------------------
 
-SIP_Header_Proxy_Require_Test::SIP_Header_Proxy_Require_Test()
+SIP_Header_Proxy_Require_Decode_Encode_Test::SIP_Header_Proxy_Require_Decode_Encode_Test()
 {
     SIP_Header_Input_Output hdr1;
     hdr1._header_type    = SIP_HEADER_PROXY_REQUIRE;
@@ -1826,7 +1832,7 @@ SIP_Header_Proxy_Require_Test::SIP_Header_Proxy_Require_Test()
 //-------------------------------------------
 //-------------------------------------------
 
-SIP_Header_RAck_Test::SIP_Header_RAck_Test()
+SIP_Header_RAck_Decode_Encode_Test::SIP_Header_RAck_Decode_Encode_Test()
 {
     SIP_Header_Input_Output hdr1;
     hdr1._header_type    = SIP_HEADER_RACK;
@@ -1859,7 +1865,7 @@ SIP_Header_RAck_Test::SIP_Header_RAck_Test()
 //-------------------------------------------
 //-------------------------------------------
 
-SIP_Header_Record_Route_Test::SIP_Header_Record_Route_Test()
+SIP_Header_Record_Route_Decode_Encode_Test::SIP_Header_Record_Route_Decode_Encode_Test()
 {
     SIP_Header_Input_Output hdr1;
     hdr1._header_type    = SIP_HEADER_RECORD_ROUTE;
@@ -1905,7 +1911,7 @@ SIP_Header_Record_Route_Test::SIP_Header_Record_Route_Test()
 //-------------------------------------------
 //-------------------------------------------
 
-SIP_Header_Refer_To_Test::SIP_Header_Refer_To_Test()
+SIP_Header_Refer_To_Decode_Encode_Test::SIP_Header_Refer_To_Decode_Encode_Test()
 {
     SIP_Header_Input_Output hdr1;
     hdr1._header_type    = SIP_HEADER_REFER_TO;
@@ -1987,7 +1993,7 @@ SIP_Header_Refer_To_Test::SIP_Header_Refer_To_Test()
 //-------------------------------------------
 //-------------------------------------------
 
-SIP_Header_Referred_By_Test::SIP_Header_Referred_By_Test()
+SIP_Header_Referred_By_Decode_Encode_Test::SIP_Header_Referred_By_Decode_Encode_Test()
 {
     SIP_Header_Input_Output hdr1;
     hdr1._header_type    = SIP_HEADER_REFERRED_BY;
@@ -2065,7 +2071,7 @@ SIP_Header_Referred_By_Test::SIP_Header_Referred_By_Test()
 //-------------------------------------------
 //-------------------------------------------
 
-SIP_Header_Reply_To_Test::SIP_Header_Reply_To_Test()
+SIP_Header_Reply_To_Decode_Encode_Test::SIP_Header_Reply_To_Decode_Encode_Test()
 {
     SIP_Header_Input_Output hdr1;
     hdr1._header_type    = SIP_HEADER_REPLY_TO;
@@ -2107,7 +2113,7 @@ SIP_Header_Reply_To_Test::SIP_Header_Reply_To_Test()
 //-------------------------------------------
 //-------------------------------------------
 
-SIP_Header_Require_Test::SIP_Header_Require_Test()
+SIP_Header_Require_Decode_Encode_Test::SIP_Header_Require_Decode_Encode_Test()
 {
     SIP_Header_Input_Output hdr1;
     hdr1._header_type    = SIP_HEADER_REQUIRE;
@@ -2149,7 +2155,7 @@ SIP_Header_Require_Test::SIP_Header_Require_Test()
 //-------------------------------------------
 //-------------------------------------------
 
-SIP_Header_Retry_After_Test::SIP_Header_Retry_After_Test()
+SIP_Header_Retry_After_Decode_Encode_Test::SIP_Header_Retry_After_Decode_Encode_Test()
 {
     SIP_Header_Input_Output hdr1;
     hdr1._header_type    = SIP_HEADER_RETRY_AFTER;
@@ -2191,7 +2197,7 @@ SIP_Header_Retry_After_Test::SIP_Header_Retry_After_Test()
 //-------------------------------------------
 //-------------------------------------------
 
-SIP_Header_Route_Test::SIP_Header_Route_Test()
+SIP_Header_Route_Decode_Encode_Test::SIP_Header_Route_Decode_Encode_Test()
 {
     SIP_Header_Input_Output hdr1;
     hdr1._header_type    = SIP_HEADER_ROUTE;
@@ -2251,7 +2257,7 @@ SIP_Header_Route_Test::SIP_Header_Route_Test()
 //-------------------------------------------
 //-------------------------------------------
 
-SIP_Header_RSeq_Test::SIP_Header_RSeq_Test()
+SIP_Header_RSeq_Decode_Encode_Test::SIP_Header_RSeq_Decode_Encode_Test()
 {
     SIP_Header_Input_Output hdr1;
     hdr1._header_type    = SIP_HEADER_RSEQ;
@@ -2284,7 +2290,7 @@ SIP_Header_RSeq_Test::SIP_Header_RSeq_Test()
 //-------------------------------------------
 //-------------------------------------------
 
-SIP_Header_Server_Test::SIP_Header_Server_Test()
+SIP_Header_Server_Decode_Encode_Test::SIP_Header_Server_Decode_Encode_Test()
 {
     SIP_Header_Input_Output hdr1;
     hdr1._header_type    = SIP_HEADER_SERVER;
@@ -2317,7 +2323,7 @@ SIP_Header_Server_Test::SIP_Header_Server_Test()
 //-------------------------------------------
 //-------------------------------------------
 
-SIP_Header_Subject_Test::SIP_Header_Subject_Test()
+SIP_Header_Subject_Decode_Encode_Test::SIP_Header_Subject_Decode_Encode_Test()
 {
     SIP_Header_Input_Output hdr1;
     hdr1._header_type    = SIP_HEADER_SUBJECT;
@@ -2359,7 +2365,7 @@ SIP_Header_Subject_Test::SIP_Header_Subject_Test()
 //-------------------------------------------
 //-------------------------------------------
 
-SIP_Header_Subscription_State_Test::SIP_Header_Subscription_State_Test()
+SIP_Header_Subscription_State_Decode_Encode_Test::SIP_Header_Subscription_State_Decode_Encode_Test()
 {
     SIP_Header_Input_Output hdr1;
     hdr1._header_type    = SIP_HEADER_SUBSCRIPTION_STATE;
@@ -2419,7 +2425,7 @@ SIP_Header_Subscription_State_Test::SIP_Header_Subscription_State_Test()
 //-------------------------------------------
 //-------------------------------------------
 
-SIP_Header_Supported_Test::SIP_Header_Supported_Test()
+SIP_Header_Supported_Decode_Encode_Test::SIP_Header_Supported_Decode_Encode_Test()
 {
     SIP_Header_Input_Output hdr1;
     hdr1._header_type    = SIP_HEADER_SUPPORTED;
@@ -2470,7 +2476,7 @@ SIP_Header_Supported_Test::SIP_Header_Supported_Test()
 //-------------------------------------------
 //-------------------------------------------
 
-SIP_Header_Timestamp_Test::SIP_Header_Timestamp_Test()
+SIP_Header_Timestamp_Decode_Encode_Test::SIP_Header_Timestamp_Decode_Encode_Test()
 {
     SIP_Header_Input_Output hdr1;
     hdr1._header_type    = SIP_HEADER_TIMESTAMP;
@@ -2521,7 +2527,7 @@ SIP_Header_Timestamp_Test::SIP_Header_Timestamp_Test()
 //-------------------------------------------
 //-------------------------------------------
 
-SIP_Header_To_Test::SIP_Header_To_Test()
+SIP_Header_To_Decode_Encode_Test::SIP_Header_To_Decode_Encode_Test()
 {
     SIP_Header_Input_Output hdr1;
     hdr1._header_type    = SIP_HEADER_TO;
@@ -2601,7 +2607,7 @@ SIP_Header_To_Test::SIP_Header_To_Test()
 //-------------------------------------------
 //-------------------------------------------
 
-SIP_Header_Unknown_Test::SIP_Header_Unknown_Test()
+SIP_Header_Unknown_Decode_Encode_Test::SIP_Header_Unknown_Decode_Encode_Test()
 {
     SIP_Header_Input_Output hdr1;
     hdr1._header_type    = SIP_HEADER_UNKNOWN;
@@ -2634,7 +2640,7 @@ SIP_Header_Unknown_Test::SIP_Header_Unknown_Test()
 //-------------------------------------------
 //-------------------------------------------
 
-SIP_Header_Unsupported_Test::SIP_Header_Unsupported_Test()
+SIP_Header_Unsupported_Decode_Encode_Test::SIP_Header_Unsupported_Decode_Encode_Test()
 {
     SIP_Header_Input_Output hdr1;
     hdr1._header_type    = SIP_HEADER_UNSUPPORTED;
@@ -2667,7 +2673,7 @@ SIP_Header_Unsupported_Test::SIP_Header_Unsupported_Test()
 //-------------------------------------------
 //-------------------------------------------
 
-SIP_Header_User_Agent_Test::SIP_Header_User_Agent_Test()
+SIP_Header_User_Agent_Decode_Encode_Test::SIP_Header_User_Agent_Decode_Encode_Test()
 {
     SIP_Header_Input_Output hdr1;
     hdr1._header_type    = SIP_HEADER_USER_AGENT;
@@ -2700,7 +2706,7 @@ SIP_Header_User_Agent_Test::SIP_Header_User_Agent_Test()
 //-------------------------------------------
 //-------------------------------------------
 
-SIP_Header_Via_Test::SIP_Header_Via_Test()
+SIP_Header_Via_Decode_Encode_Test::SIP_Header_Via_Decode_Encode_Test()
 {
     SIP_Header_Input_Output hdr1;
     hdr1._header_type    = SIP_HEADER_VIA;
@@ -2782,7 +2788,7 @@ SIP_Header_Via_Test::SIP_Header_Via_Test()
 //-------------------------------------------
 //-------------------------------------------
 
-SIP_Header_Warning_Test::SIP_Header_Warning_Test()
+SIP_Header_Warning_Decode_Encode_Test::SIP_Header_Warning_Decode_Encode_Test()
 {
     SIP_Header_Input_Output hdr1;
     hdr1._header_type    = SIP_HEADER_WARNING;
@@ -2817,7 +2823,7 @@ SIP_Header_Warning_Test::SIP_Header_Warning_Test()
 //-------------------------------------------
 //-------------------------------------------
 
-SIP_Header_WWW_Authenticate_Test::SIP_Header_WWW_Authenticate_Test()
+SIP_Header_WWW_Authenticate_Decode_Encode_Test::SIP_Header_WWW_Authenticate_Decode_Encode_Test()
 {
     SIP_Header_Input_Output hdr1;
     hdr1._header_type    = SIP_HEADER_WWW_AUTHENTICATE;
