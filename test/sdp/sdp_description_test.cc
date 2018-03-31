@@ -18,13 +18,13 @@ bool SDP_Description_Test::init()
 {
     std::cout << "SDP description test initialized\n";
 
-    if (!run<SDP_Description_Session_Test>())
+    if (!run<SDP_Description_Session_Decode_Encode_Test>())
         return false;
 
-    if (!run<SDP_Description_Media_Test>())
+    if (!run<SDP_Description_Media_Decode_Encode_Test>())
         return false;
 
-    if (!run<SDP_Description_Complete_Test>())
+    if (!run<SDP_Description_Complete_Decode_Encode_Test>())
         return false;
 
     std::cout << "SDP description test completed successfully\n";
@@ -42,8 +42,9 @@ template<class T> bool SDP_Description_Test::run()
 }
 
 //-------------------------------------------
+//-------------------------------------------
 
-bool SDP_Description_Test::run()
+bool SDP_Description_Decode_Encode_Test::run()
 {
     std::list<SDP_Description_Input_Output>::const_iterator it = _description_input_output.begin();
     while (it != _description_input_output.end())
@@ -60,7 +61,7 @@ bool SDP_Description_Test::run()
 //-------------------------------------------
 //-------------------------------------------
 
-SDP_Description_Session_Test::SDP_Description_Session_Test()
+SDP_Description_Session_Decode_Encode_Test::SDP_Description_Session_Decode_Encode_Test()
 {
     SDP_Description_Input_Output msg1;
 
@@ -141,16 +142,16 @@ SDP_Description_Session_Test::SDP_Description_Session_Test()
 
 //-------------------------------------------
 
-bool SDP_Description_Session_Test::execute(SDP_Description_Input_Output &description_input_output)
+bool SDP_Description_Session_Decode_Encode_Test::execute(SDP_Description_Input_Output &description_input_output)
 {
-    std::cout << "SDP description session test initialized\n";
+    std::cout << "SDP description session decode encode test initialized\n";
 
     std::string input = description_input_output._input;
 
     SDP_Description_Session *description = new SDP_Description_Session();
     if (!description->decode(input))
     {
-        std::cout << "SDP_Description_Session_Test::execute -> Failed to decode description:\n";
+        std::cout << "SDP_Description_Session_Decode_Encode_Test::execute -> Failed to decode description:\n";
         std::cout << std::setw(12) << "Input: " << description_input_output._input.c_str() << "\n";
         delete description;
         return false;
@@ -164,7 +165,7 @@ bool SDP_Description_Session_Test::execute(SDP_Description_Input_Output &descrip
 
     if (!copy->encode(output))
     {
-        std::cout << "SDP_Description_Session_Test::execute -> Failed to encode description:\n";
+        std::cout << "SDP_Description_Session_Decode_Encode_Test::execute -> Failed to encode description:\n";
         std::cout << std::setw(12) << "Input: " << description_input_output._input.c_str() << "\n";
         delete copy;
         return false;
@@ -172,7 +173,7 @@ bool SDP_Description_Session_Test::execute(SDP_Description_Input_Output &descrip
 
     if (output != description_input_output._output)
     {
-        std::cout << "SDP_Description_Session_Test::execute -> Invalid encoded description:\n";
+        std::cout << "SDP_Description_Session_Decode_Encode_Test::execute -> Invalid encoded description:\n";
         std::cout << std::setw(12) << "Input: " << description_input_output._input.c_str() << "\n";
         std::cout << std::setw(12) << "Expected: " << description_input_output._output.c_str() << "\n";
         std::cout << std::setw(12) << "Output: " << output.c_str() << "\n";
@@ -183,14 +184,14 @@ bool SDP_Description_Session_Test::execute(SDP_Description_Input_Output &descrip
     delete copy;
     copy = NULL;
 
-    std::cout << "SDP description session test completed successfully\n";
+    std::cout << "SDP description session decode encode test completed successfully\n";
     return true;
 }
 
 //-------------------------------------------
 //-------------------------------------------
 
-SDP_Description_Media_Test::SDP_Description_Media_Test()
+SDP_Description_Media_Decode_Encode_Test::SDP_Description_Media_Decode_Encode_Test()
 {
     SDP_Description_Input_Output msg1;
 
@@ -245,16 +246,16 @@ SDP_Description_Media_Test::SDP_Description_Media_Test()
 
 //-------------------------------------------
 
-bool SDP_Description_Media_Test::execute(SDP_Description_Input_Output &description_input_output)
+bool SDP_Description_Media_Decode_Encode_Test::execute(SDP_Description_Input_Output &description_input_output)
 {
-    std::cout << "SDP description media test initialized\n";
+    std::cout << "SDP description media decode encode test initialized\n";
 
     std::string input = description_input_output._input;
 
     SDP_Description_Media *description = new SDP_Description_Media();
     if (!description->decode(input))
     {
-        std::cout << "SDP_Description_Media_Test::execute -> Failed to decode description:\n";
+        std::cout << "SDP_Description_Media_Decode_Encode_Test::execute -> Failed to decode description:\n";
         std::cout << std::setw(12) << "Input: " << description_input_output._input.c_str() << "\n";
         delete description;
         return false;
@@ -268,7 +269,7 @@ bool SDP_Description_Media_Test::execute(SDP_Description_Input_Output &descripti
 
     if (!copy->encode(output))
     {
-        std::cout << "SDP_Description_Media_Test::execute -> Failed to encode description:\n";
+        std::cout << "SDP_Description_Media_Decode_Encode_Test::execute -> Failed to encode description:\n";
         std::cout << std::setw(12) << "Input: " << description_input_output._input.c_str() << "\n";
         delete copy;
         return false;
@@ -276,7 +277,7 @@ bool SDP_Description_Media_Test::execute(SDP_Description_Input_Output &descripti
 
     if (output != description_input_output._output)
     {
-        std::cout << "SDP_Description_Media_Test::execute -> Invalid encoded description:\n";
+        std::cout << "SDP_Description_Media_Decode_Encode_Test::execute -> Invalid encoded description:\n";
         std::cout << std::setw(12) << "Input: " << description_input_output._input.c_str() << "\n";
         std::cout << std::setw(12) << "Expected: " << description_input_output._output.c_str() << "\n";
         std::cout << std::setw(12) << "Output: " << output.c_str() << "\n";
@@ -287,14 +288,14 @@ bool SDP_Description_Media_Test::execute(SDP_Description_Input_Output &descripti
     delete copy;
     copy = NULL;
 
-    std::cout << "SDP description media test completed successfully\n";
+    std::cout << "SDP description media decode encode test completed successfully\n";
     return true;
 }
 
 //-------------------------------------------
 //-------------------------------------------
 
-SDP_Description_Complete_Test::SDP_Description_Complete_Test()
+SDP_Description_Complete_Decode_Encode_Test::SDP_Description_Complete_Decode_Encode_Test()
 {
     SDP_Description_Input_Output msg1;
 
@@ -373,16 +374,16 @@ SDP_Description_Complete_Test::SDP_Description_Complete_Test()
 
 //-------------------------------------------
 
-bool SDP_Description_Complete_Test::execute(SDP_Description_Input_Output &description_input_output)
+bool SDP_Description_Complete_Decode_Encode_Test::execute(SDP_Description_Input_Output &description_input_output)
 {
-    std::cout << "SDP description complete test initialized\n";
+    std::cout << "SDP description complete decode encode test initialized\n";
 
     std::string input = description_input_output._input;
 
     SDP_Description *description = new SDP_Description();
     if (!description->decode(input.c_str(), (unsigned short) input.size()))
     {
-        std::cout << "SDP_Description_Complete_Test::execute -> Failed to decode description:\n";
+        std::cout << "SDP_Description_Complete_Decode_Encode_Test::execute -> Failed to decode description:\n";
         std::cout << std::setw(12) << "Input: " << description_input_output._input.c_str() << "\n";
         delete description;
         return false;
@@ -397,7 +398,7 @@ bool SDP_Description_Complete_Test::execute(SDP_Description_Input_Output &descri
 
     if (!copy->encode(output, size))
     {
-        std::cout << "SDP_Description_Complete_Test::execute -> Failed to encode description:\n";
+        std::cout << "SDP_Description_Complete_Decode_Encode_Test::execute -> Failed to encode description:\n";
         std::cout << std::setw(12) << "Input: " << description_input_output._input.c_str() << "\n";
         delete copy;
         return false;
@@ -405,7 +406,7 @@ bool SDP_Description_Complete_Test::execute(SDP_Description_Input_Output &descri
 
     if (strcmp(output, description_input_output._output.c_str()) != 0)
     {
-        std::cout << "SDP_Description_Complete_Test::execute -> Invalid encoded description:\n";
+        std::cout << "SDP_Description_Complete_Decode_Encode_Test::execute -> Invalid encoded description:\n";
         std::cout << std::setw(12) << "Input: " << description_input_output._input.c_str() << "\n";
         std::cout << std::setw(12) << "Expected: " << description_input_output._output.c_str() << "\n";
         std::cout << std::setw(12) << "Output: " << output << "\n";
@@ -416,7 +417,7 @@ bool SDP_Description_Complete_Test::execute(SDP_Description_Input_Output &descri
     delete copy;
     copy = NULL;
 
-    std::cout << "SDP description complete test completed successfully\n";
+    std::cout << "SDP description complete decode encode test completed successfully\n";
     return true;
 }
 

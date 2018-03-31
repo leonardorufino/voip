@@ -18,6 +18,18 @@
 class SDP_Description_Test
 {
 public:
+    SDP_Description_Test() {}
+    virtual ~SDP_Description_Test() {}
+
+    static bool init();
+    template<class T> static bool run();
+};
+
+//-------------------------------------------
+
+class SDP_Description_Decode_Encode_Test
+{
+public:
     static const unsigned short MAX_DESCRIPTION_SIZE = 1000;
 
 protected:
@@ -29,14 +41,12 @@ protected:
     };
 
 public:
-    SDP_Description_Test() {}
-    virtual ~SDP_Description_Test() {}
+    SDP_Description_Decode_Encode_Test() {}
+    virtual ~SDP_Description_Decode_Encode_Test() {}
 
-    static bool init();
-    template<class T> static bool run();
+    bool run();
 
 protected:
-    bool run();
     virtual bool execute(SDP_Description_Input_Output &description_input_output) = 0;
 
 protected:
@@ -46,31 +56,34 @@ protected:
 //-------------------------------------------
 //-------------------------------------------
 
-class SDP_Description_Session_Test : public SDP_Description_Test
+class SDP_Description_Session_Decode_Encode_Test : public SDP_Description_Decode_Encode_Test
 {
 public:
-    SDP_Description_Session_Test();
+    SDP_Description_Session_Decode_Encode_Test();
 
+protected:
     bool execute(SDP_Description_Input_Output &description_input_output);
 };
 
 //-------------------------------------------
 
-class SDP_Description_Media_Test : public SDP_Description_Test
+class SDP_Description_Media_Decode_Encode_Test : public SDP_Description_Decode_Encode_Test
 {
 public:
-    SDP_Description_Media_Test();
+    SDP_Description_Media_Decode_Encode_Test();
 
+protected:
     bool execute(SDP_Description_Input_Output &description_input_output);
 };
 
 //-------------------------------------------
 
-class SDP_Description_Complete_Test : public SDP_Description_Test
+class SDP_Description_Complete_Decode_Encode_Test : public SDP_Description_Decode_Encode_Test
 {
 public:
-    SDP_Description_Complete_Test();
+    SDP_Description_Complete_Decode_Encode_Test();
 
+protected:
     bool execute(SDP_Description_Input_Output &description_input_output);
 };
 
