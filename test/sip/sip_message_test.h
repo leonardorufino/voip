@@ -19,18 +19,27 @@
 class SIP_Message_Test
 {
 public:
-    static const unsigned short MAX_MESSAGE_SIZE = 1000;
-
-public:
     SIP_Message_Test() {}
     virtual ~SIP_Message_Test() {}
 
     static bool init();
     template<class T> static bool run();
+};
 
-protected:
+//-------------------------------------------
+
+class SIP_Message_Decode_Encode_Test
+{
+public:
+    static const unsigned short MAX_MESSAGE_SIZE = 1000;
+
+public:
+    SIP_Message_Decode_Encode_Test() {}
+    virtual ~SIP_Message_Decode_Encode_Test() {}
+
     bool run();
 
+protected:
     SIP_Message *copy_message(SIP_Message &message, bool response_answer);
 
 protected:
@@ -49,26 +58,26 @@ protected:
 //-------------------------------------------
 //-------------------------------------------
 
-class SIP_Request_Test : public SIP_Message_Test
+class SIP_Request_Decode_Encode_Test : public SIP_Message_Decode_Encode_Test
 {
 public:
-    SIP_Request_Test();
+    SIP_Request_Decode_Encode_Test();
 };
 
 //-------------------------------------------
 
-class SIP_Response_Test : public SIP_Message_Test
+class SIP_Response_Decode_Encode_Test : public SIP_Message_Decode_Encode_Test
 {
 public:
-    SIP_Response_Test();
+    SIP_Response_Decode_Encode_Test();
 };
 
 //-------------------------------------------
 
-class SIP_Response_Answer_Test : public SIP_Message_Test
+class SIP_Response_Answer_Decode_Encode_Test : public SIP_Message_Decode_Encode_Test
 {
 public:
-    SIP_Response_Answer_Test();
+    SIP_Response_Answer_Decode_Encode_Test();
 };
 
 //-------------------------------------------

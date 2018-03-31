@@ -18,13 +18,13 @@ bool SIP_Message_Test::init()
 {
     std::cout << "SIP message test initialized\n";
 
-    if (!run<SIP_Request_Test>())
+    if (!run<SIP_Request_Decode_Encode_Test>())
         return false;
 
-    if (!run<SIP_Response_Test>())
+    if (!run<SIP_Response_Decode_Encode_Test>())
         return false;
 
-    if (!run<SIP_Response_Answer_Test>())
+    if (!run<SIP_Response_Answer_Decode_Encode_Test>())
         return false;
 
     std::cout << "SIP message test completed successfully\n";
@@ -43,21 +43,21 @@ template<class T> bool SIP_Message_Test::run()
 
 //-------------------------------------------
 
-bool SIP_Message_Test::run()
+bool SIP_Message_Decode_Encode_Test::run()
 {
     std::list<SIP_Message_Input_Output>::const_iterator it = _message_input_output.begin();
     while (it != _message_input_output.end())
     {
         SIP_Message_Input_Output message_input_output = *it++;
 
-        std::cout << "SIP message test initialized (type: " << message_input_output._method_type << ")\n";
+        std::cout << "SIP message decode encode test initialized (type: " << message_input_output._method_type << ")\n";
 
         std::string input = message_input_output._input;
         unsigned short read = 0;
         SIP_Message *message = SIP_Message::decode_message(input.c_str(), (unsigned short) input.size(), read);
         if (!message)
         {
-            std::cout << "SIP_Message_Test::run -> Failed to decode message:\n";
+            std::cout << "SIP_Message_Decode_Encode_Test::run -> Failed to decode message:\n";
             std::cout << std::setw(12) << "Type: " << message_input_output._method_type << "\n";
             std::cout << std::setw(12) << "Input: " << message_input_output._input.c_str() << "\n";
             return false;
@@ -65,7 +65,7 @@ bool SIP_Message_Test::run()
 
         if (read != input.size())
         {
-            std::cout << "SIP_Message_Test::run -> Invalid decoded message size:\n";
+            std::cout << "SIP_Message_Decode_Encode_Test::run -> Invalid decoded message size:\n";
             std::cout << std::setw(12) << "Type: " << message_input_output._method_type << "\n";
             std::cout << std::setw(12) << "Input: " << message_input_output._input.c_str() << "\n";
             std::cout << std::setw(12) << "Expected: " << input.size() << "\n";
@@ -77,7 +77,7 @@ bool SIP_Message_Test::run()
         SIP_Message *copy = copy_message(*message, message_input_output._response_answer);
         if (!copy)
         {
-            std::cout << "SIP_Message_Test::run -> Failed to copy message:\n";
+            std::cout << "SIP_Message_Decode_Encode_Test::run -> Failed to copy message:\n";
             std::cout << std::setw(12) << "Type: " << message_input_output._method_type << "\n";
             std::cout << std::setw(12) << "Input: " << message_input_output._input.c_str() << "\n";
             delete message;
@@ -92,7 +92,7 @@ bool SIP_Message_Test::run()
 
         if (!copy->encode(output, size))
         {
-            std::cout << "SIP_Message_Test::run -> Failed to encode message:\n";
+            std::cout << "SIP_Message_Decode_Encode_Test::run -> Failed to encode message:\n";
             std::cout << std::setw(12) << "Type: " << message_input_output._method_type << "\n";
             std::cout << std::setw(12) << "Input: " << message_input_output._input.c_str() << "\n";
             delete copy;
@@ -101,7 +101,7 @@ bool SIP_Message_Test::run()
 
         if (strcmp(output, message_input_output._output.c_str()) != 0)
         {
-            std::cout << "SIP_Message_Test::run -> Invalid encoded message:\n";
+            std::cout << "SIP_Message_Decode_Encode_Test::run -> Invalid encoded message:\n";
             std::cout << std::setw(12) << "Type: " << message_input_output._method_type << "\n";
             std::cout << std::setw(12) << "Input: " << message_input_output._input.c_str() << "\n";
             std::cout << std::setw(12) << "Expected: " << message_input_output._output.c_str() << "\n";
@@ -113,7 +113,7 @@ bool SIP_Message_Test::run()
         delete copy;
         copy = NULL;
 
-        std::cout << "SIP message test completed successfully (type: " << message_input_output._method_type << ")\n";
+        std::cout << "SIP message decode encode test completed successfully (type: " << message_input_output._method_type << ")\n";
     }
 
     return true;
@@ -121,7 +121,7 @@ bool SIP_Message_Test::run()
 
 //-------------------------------------------
 
-SIP_Message *SIP_Message_Test::copy_message(SIP_Message &message, bool response_answer)
+SIP_Message *SIP_Message_Decode_Encode_Test::copy_message(SIP_Message &message, bool response_answer)
 {
     SIP_Message *copy = NULL;
 
@@ -154,7 +154,7 @@ SIP_Message *SIP_Message_Test::copy_message(SIP_Message &message, bool response_
 //-------------------------------------------
 //-------------------------------------------
 
-SIP_Request_Test::SIP_Request_Test()
+SIP_Request_Decode_Encode_Test::SIP_Request_Decode_Encode_Test()
 {
     SIP_Message_Input_Output msg1;
     msg1._method_type = SIP_REQUEST_INVITE;
@@ -284,7 +284,7 @@ SIP_Request_Test::SIP_Request_Test()
 //-------------------------------------------
 //-------------------------------------------
 
-SIP_Response_Test::SIP_Response_Test()
+SIP_Response_Decode_Encode_Test::SIP_Response_Decode_Encode_Test()
 {
     SIP_Message_Input_Output msg1;
     msg1._method_type = SIP_RESPONSE;
@@ -366,7 +366,7 @@ SIP_Response_Test::SIP_Response_Test()
 //-------------------------------------------
 //-------------------------------------------
 
-SIP_Response_Answer_Test::SIP_Response_Answer_Test()
+SIP_Response_Answer_Decode_Encode_Test::SIP_Response_Answer_Decode_Encode_Test()
 {
     SIP_Message_Input_Output msg1;
     msg1._method_type = SIP_REQUEST_INVITE;
