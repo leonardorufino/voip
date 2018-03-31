@@ -12,6 +12,7 @@
 #include "sip_address.h"
 #include "sip_functions.h"
 #include "util/string_functions.h"
+#include "util/query.h"
 
 Logger SIP_Host::_logger(Log_Manager::LOG_SIP_ADDRESS);
 Logger SIP_URI::_logger(Log_Manager::LOG_SIP_ADDRESS);
@@ -52,6 +53,35 @@ bool SIP_Host::encode(std::string &sip_msg)
         sip_msg += _address;
 
     return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Host::query(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    if (query.empty())
+    {
+        _logger.warning("Failed to query: invalid query (cmd=%d)", cmd);
+        return false;
+    }
+
+    Query query_type(query);
+    if (query_type._command == "Address")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_address(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_address();
+            return true;
+        }
+    }
+
+    _logger.warning("Failed to query: invalid query (cmd=%d, query=%s)", cmd, query.c_str());
+    return false;
 }
 
 //-------------------------------------------
@@ -264,6 +294,159 @@ bool SIP_URI::encode(std::string &sip_msg)
 
 //-------------------------------------------
 
+bool SIP_URI::query(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    if (query.empty())
+    {
+        _logger.warning("Failed to query: invalid query (cmd=%d)", cmd);
+        return false;
+    }
+
+    Query query_type(query);
+    if (query_type._command == "User")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_user(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_user();
+            return true;
+        }
+    }else if (query_type._command == "Password")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_password(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_password();
+            return true;
+        }
+    }else if (query_type._command == "Host")
+    {
+        return _host.query(cmd, query_type._remaining, result);
+
+    }else if (query_type._command == "Port")
+    {
+        if (cmd == QUERY_SET)
+        {
+            if (!set_port(query_type._remaining))
+            {
+                _logger.warning("Failed to query: set port failed (cmd=%d, query=%s)", cmd, query.c_str());
+                return false;
+            }
+
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            std::string port;
+            if (!get_port(port))
+            {
+                _logger.warning("Failed to query: get port failed (cmd=%d, query=%s)", cmd, query.c_str());
+                return false;
+            }
+
+            result = port;
+            return true;
+        }
+    }else if (query_type._command == "Transport")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_transport(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_transport();
+            return true;
+        }
+    }else if (query_type._command == "User-Param")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_user_param(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_user_param();
+            return true;
+        }
+    }else if (query_type._command == "Method")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_method(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_method();
+            return true;
+        }
+    }else if (query_type._command == "TTL")
+    {
+        if (cmd == QUERY_SET)
+        {
+            if (!set_ttl(query_type._remaining))
+            {
+                _logger.warning("Failed to query: set ttl failed (cmd=%d, query=%s)", cmd, query.c_str());
+                return false;
+            }
+
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            std::string ttl;
+            if (!get_ttl(ttl))
+            {
+                _logger.warning("Failed to query: get ttl failed (cmd=%d, query=%s)", cmd, query.c_str());
+                return false;
+            }
+
+            result = ttl;
+            return true;
+        }
+    }else if (query_type._command == "Multicast-Address")
+    {
+        return _maddr.query(cmd, query_type._remaining, result);
+
+    }else if (query_type._command == "LR")
+    {
+        if (cmd == QUERY_SET)
+        {
+            bool lr = (query_type._remaining == "True") ? true : false;
+            set_lr(lr);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = is_lr() ? "True" : "False";
+            return true;
+        }
+    }else if (query_type._command == "Parameters")
+    {
+        return _parameters.query(cmd, query_type._remaining, result);
+
+    }else if (query_type._command == "Headers")
+    {
+        return _headers.query(cmd, query_type._remaining, result);
+    }
+
+    _logger.warning("Failed to query: invalid query (cmd=%d, query=%s)", cmd, query.c_str());
+    return false;
+}
+
+//-------------------------------------------
+
 bool SIP_URI::set_port(std::string port)
 {
     _port = String_Functions::str_to_us(port);
@@ -395,6 +578,35 @@ bool SIP_Absolute_URI::encode(std::string &sip_msg)
 }
 
 //-------------------------------------------
+
+bool SIP_Absolute_URI::query(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    if (query.empty())
+    {
+        _logger.warning("Failed to query: invalid query (cmd=%d)", cmd);
+        return false;
+    }
+
+    Query query_type(query);
+    if (query_type._command == "Address")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_address(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_address();
+            return true;
+        }
+    }
+
+    _logger.warning("Failed to query: invalid query (cmd=%d, query=%s)", cmd, query.c_str());
+    return false;
+}
+
+//-------------------------------------------
 //-------------------------------------------
 
 bool SIP_Address::decode(std::string &sip_msg)
@@ -516,6 +728,80 @@ bool SIP_Address::encode(std::string &sip_msg)
         sip_msg += ">";
 
     return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Address::query(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    if (query.empty())
+    {
+        _logger.warning("Failed to query: invalid query (cmd=%d)", cmd);
+        return false;
+    }
+
+    Query query_type(query);
+    if (query_type._command == "Display-Name-Double-Quote")
+    {
+        if (cmd == QUERY_SET)
+        {
+            bool quote = (query_type._remaining == "True") ? true : false;
+            set_display_name_double_quote(quote);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_display_name_double_quote() ? "True" : "False";
+            return true;
+        }
+    }else if (query_type._command == "Display-Name")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_display_name(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_display_name();
+            return true;
+        }
+    }else if (query_type._command == "Scheme")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_scheme(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_scheme();
+            return true;
+        }
+    }else if (query_type._command == "URI-Angle-Quote")
+    {
+        if (cmd == QUERY_SET)
+        {
+            bool quote = (query_type._remaining == "True") ? true : false;
+            set_uri_angle_quote(quote);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_uri_angle_quote() ? "True" : "False";
+            return true;
+        }
+    }else if (query_type._command == "SIP-URI")
+    {
+        return _sip_uri.query(cmd, query_type._remaining, result);
+
+    }else if (query_type._command == "Absolute-URI")
+    {
+        return _absolute_uri.query(cmd, query_type._remaining, result);
+    }
+
+    _logger.warning("Failed to query: invalid query (cmd=%d, query=%s)", cmd, query.c_str());
+    return false;
 }
 
 //-------------------------------------------

@@ -28,6 +28,7 @@ public:
 
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
+    bool query(QueryCommand cmd, const std::string &query, std::string &result);
 
     void set_address(std::string address) { _address = address; }
     std::string get_address() { return _address; }
@@ -60,6 +61,7 @@ public:
 
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
+    bool query(QueryCommand cmd, const std::string &query, std::string &result);
 
     void set_user(std::string user) { _user = user; }
     std::string get_user() { return _user; }
@@ -136,6 +138,7 @@ public:
 
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
+    bool query(QueryCommand cmd, const std::string &query, std::string &result);
 
     void set_address(std::string address) { _address = address; }
     std::string get_address() { return _address; }
@@ -165,6 +168,7 @@ public:
 
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
+    bool query(QueryCommand cmd, const std::string &query, std::string &result);
 
     void set_display_name_double_quote(bool quote) { _display_name_double_quote = quote; }
     bool get_display_name_double_quote() { return _display_name_double_quote; }
