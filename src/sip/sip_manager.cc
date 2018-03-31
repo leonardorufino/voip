@@ -12,6 +12,7 @@
 #include "sip_manager.h"
 
 SIP_Manager *SIP_Manager::_instance = NULL;
+std::mutex SIP_Manager::_instance_mutex;
 Logger SIP_Manager::_logger(Log_Manager::LOG_SIP_MANAGER);
 
 //-------------------------------------------
@@ -32,6 +33,8 @@ SIP_Manager::~SIP_Manager()
 
 SIP_Manager &SIP_Manager::instance()
 {
+    std::lock_guard<std::mutex> lock(_instance_mutex);
+
     if (_instance == NULL)
         _instance = new SIP_Manager();
 
@@ -42,6 +45,8 @@ SIP_Manager &SIP_Manager::instance()
 
 void SIP_Manager::destroy()
 {
+    std::lock_guard<std::mutex> lock(_instance_mutex);
+
     delete _instance;
     _instance = NULL;
 

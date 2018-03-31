@@ -16,6 +16,7 @@
 #include "sip_user_agent.h"
 #include <list>
 #include <map>
+#include <mutex>
 
 class SIP_Manager
 {
@@ -69,5 +70,7 @@ private:
     std::list<SIP_User_Agent *> _user_agents;
 
     static SIP_Manager *_instance;
+    static std::mutex _instance_mutex;
+
     static Logger _logger;
 };

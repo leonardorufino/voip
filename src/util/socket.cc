@@ -14,6 +14,7 @@
 
 Logger Socket::_logger(Log_Manager::LOG_SOCKET);
 Socket_Control *Socket_Control::_instance = NULL;
+std::mutex Socket_Control::_instance_mutex;
 
 //-------------------------------------------
 
@@ -1144,6 +1145,8 @@ bool Socket_TCP_Server::create(Address_Family family)
 
 Socket_Control &Socket_Control::instance()
 {
+    std::lock_guard<std::mutex> lock(_instance_mutex);
+
     if (_instance == NULL)
         _instance = new Socket_Control();
 
@@ -1154,6 +1157,8 @@ Socket_Control &Socket_Control::instance()
 
 void Socket_Control::destroy()
 {
+    std::lock_guard<std::mutex> lock(_instance_mutex);
+
     delete _instance;
     _instance = NULL;
 }

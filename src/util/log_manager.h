@@ -92,6 +92,7 @@ private:
     log_callback *_callback;
 
     static Log_Manager *_instance;
+    static std::mutex _instance_mutex;
 };
 
 //-------------------------------------------

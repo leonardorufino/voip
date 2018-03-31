@@ -15,6 +15,7 @@
 #include <string>
 #include <cstring>
 #include <list>
+#include <mutex>
 #include <thread>
 
 #ifdef WIN32
@@ -243,6 +244,7 @@ protected:
     char _receive_buffer[RECEIVE_BUFFER_SIZE + 1];
 
     static Socket_Control *_instance;
+    static std::mutex _instance_mutex;
 };
 
 //-------------------------------------------

@@ -82,6 +82,7 @@ private:
     bool _flag;
 
     static Timer_Manager *_instance;
+    static std::mutex _instance_mutex;
 };
 
 //-------------------------------------------

@@ -14,6 +14,7 @@
 
 Logger Timer::_logger(Log_Manager::LOG_TIMER);
 Timer_Manager *Timer_Manager::_instance = NULL;
+std::mutex Timer_Manager::_instance_mutex;
 
 //-------------------------------------------
 
@@ -82,6 +83,8 @@ bool Timer::operator==(const Timer &other)
 
 Timer_Manager &Timer_Manager::instance()
 {
+    std::lock_guard<std::mutex> lock(_instance_mutex);
+
     if (_instance == NULL)
         _instance = new Timer_Manager();
 
@@ -92,6 +95,8 @@ Timer_Manager &Timer_Manager::instance()
 
 void Timer_Manager::destroy()
 {
+    std::lock_guard<std::mutex> lock(_instance_mutex);
+
     delete _instance;
     _instance = NULL;
 }

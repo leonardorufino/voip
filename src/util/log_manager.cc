@@ -13,6 +13,7 @@
 #include "util_functions.h"
 
 Log_Manager *Log_Manager::_instance = NULL;
+std::mutex Log_Manager::_instance_mutex;
 
 //-------------------------------------------
 
@@ -27,6 +28,8 @@ Log_Manager::Log_Manager()
 
 Log_Manager &Log_Manager::instance()
 {
+    std::lock_guard<std::mutex> lock(_instance_mutex);
+
     if (_instance == NULL)
         _instance = new Log_Manager();
 
@@ -37,6 +40,8 @@ Log_Manager &Log_Manager::instance()
 
 void Log_Manager::destroy()
 {
+    std::lock_guard<std::mutex> lock(_instance_mutex);
+
     delete _instance;
     _instance = NULL;
 }
