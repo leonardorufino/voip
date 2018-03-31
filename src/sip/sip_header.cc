@@ -12,8 +12,13 @@
 #include "sip_header.h"
 #include "sip_functions.h"
 #include "util/string_functions.h"
+#include "util/query.h"
 
 Logger SIP_Header::_logger(Log_Manager::LOG_SIP_HEADER);
+Logger SIP_Challenge::_logger(Log_Manager::LOG_SIP_HEADER);
+Logger SIP_Credential::_logger(Log_Manager::LOG_SIP_HEADER);
+Logger SIP_Media_Range::_logger(Log_Manager::LOG_SIP_HEADER);
+Logger SIP_Event_Type::_logger(Log_Manager::LOG_SIP_HEADER);
 
 //-------------------------------------------
 
@@ -364,6 +369,19 @@ bool SIP_Header::encode_headers(std::string &sip_msg, sip_header_list &headers)
 }
 
 //-------------------------------------------
+
+bool SIP_Header::query(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    if (query.empty())
+    {
+        _logger.warning("Failed to query: invalid query (cmd=%d)", cmd);
+        return false;
+    }
+
+    return query_header(cmd, query, result);
+}
+
+//-------------------------------------------
 //-------------------------------------------
 
 bool SIP_Challenge::decode(std::string &sip_msg)
@@ -435,7 +453,7 @@ bool SIP_Challenge::decode(std::string &sip_msg)
             if (_qop.empty())
                 return false;
         }else
-            _parameters.push_back(result);
+            _parameters.add_parameter(result);
     }
 
     return true;
@@ -508,8 +526,9 @@ bool SIP_Challenge::encode(std::string &sip_msg)
         first_param = false;
     }
 
-    std::list<std::string>::const_iterator it = _parameters.begin();
-    while (it != _parameters.end())
+    std::list<std::string> &parameters = _parameters.get_parameters();
+    std::list<std::string>::const_iterator it = parameters.begin();
+    while (it != parameters.end())
     {
         sip_msg += (first_param) ? " " : ", ";
         sip_msg += *it++;
@@ -517,6 +536,116 @@ bool SIP_Challenge::encode(std::string &sip_msg)
     }
 
     return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Challenge::query(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    Query query_type(query);
+    if (query_type._command == "Scheme")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_scheme(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_scheme();
+            return true;
+        }
+    }else if (query_type._command == "Realm")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_realm(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_realm();
+            return true;
+        }
+    }else if (query_type._command == "Domain")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_domain(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_domain();
+            return true;
+        }
+    }else if (query_type._command == "Nonce")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_nonce(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_nonce();
+            return true;
+        }
+    }else if (query_type._command == "Opaque")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_opaque(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_opaque();
+            return true;
+        }
+    }else if (query_type._command == "Stale")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_stale(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_stale();
+            return true;
+        }
+    }else if (query_type._command == "Algorithm")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_algorithm(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_algorithm();
+            return true;
+        }
+    }else if (query_type._command == "QoP")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_qop(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_qop();
+            return true;
+        }
+    }else if (query_type._command == "Parameters")
+    {
+        return _parameters.query(cmd, query_type._remaining, result);
+    }
+
+    _logger.warning("Failed to query: invalid query (cmd=%d, query=%s)", cmd, query.c_str());
+    return false;
 }
 
 //-------------------------------------------
@@ -612,7 +741,7 @@ bool SIP_Credential::decode(std::string &sip_msg)
             if (_nonce_count.empty())
                 return false;
         }else
-            _parameters.push_back(result);
+            _parameters.add_parameter(result);
     }
 
     return true;
@@ -709,8 +838,9 @@ bool SIP_Credential::encode(std::string &sip_msg)
         first_param = false;
     }
 
-    std::list<std::string>::const_iterator it = _parameters.begin();
-    while (it != _parameters.end())
+    std::list<std::string> &parameters = _parameters.get_parameters();
+    std::list<std::string>::const_iterator it = parameters.begin();
+    while (it != parameters.end())
     {
         sip_msg += (first_param) ? " " : ", ";
         sip_msg += *it++;
@@ -718,6 +848,152 @@ bool SIP_Credential::encode(std::string &sip_msg)
     }
 
     return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Credential::query(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    Query query_type(query);
+    if (query_type._command == "Scheme")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_scheme(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_scheme();
+            return true;
+        }
+    }else if (query_type._command == "Username")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_username(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_username();
+            return true;
+        }
+    }else if (query_type._command == "Realm")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_realm(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_realm();
+            return true;
+        }
+    }else if (query_type._command == "Nonce")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_nonce(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_nonce();
+            return true;
+        }
+    }else if (query_type._command == "URI")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_uri(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_uri();
+            return true;
+        }
+    }else if (query_type._command == "Response")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_response(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_response();
+            return true;
+        }
+    }else if (query_type._command == "Algorithm")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_algorithm(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_algorithm();
+            return true;
+        }
+    }else if (query_type._command == "CNonce")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_cnonce(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_cnonce();
+            return true;
+        }
+    }else if (query_type._command == "Opaque")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_opaque(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_opaque();
+            return true;
+        }
+    }else if (query_type._command == "QoP")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_qop(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_qop();
+            return true;
+        }
+    }else if (query_type._command == "Nonce-Count")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_nonce_count(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_nonce_count();
+            return true;
+        }
+    }else if (query_type._command == "Parameters")
+    {
+        return _parameters.query(cmd, query_type._remaining, result);
+    }
+
+    _logger.warning("Failed to query: invalid query (cmd=%d, query=%s)", cmd, query.c_str());
+    return false;
 }
 
 //-------------------------------------------
@@ -754,7 +1030,7 @@ bool SIP_Media_Range::decode(std::string &sip_msg)
             if (_q.empty())
                 return false;
         }else
-            _parameters.push_back(result);
+            _parameters.add_parameter(result);
     }
 
     return true;
@@ -777,14 +1053,65 @@ bool SIP_Media_Range::encode(std::string &sip_msg)
         sip_msg += _q;
     }
 
-    std::list<std::string>::const_iterator it = _parameters.begin();
-    while (it != _parameters.end())
+    std::list<std::string> &parameters = _parameters.get_parameters();
+    std::list<std::string>::const_iterator it = parameters.begin();
+    while (it != parameters.end())
     {
         sip_msg += ";";
         sip_msg += *it++;
     }
 
     return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Media_Range::query(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    Query query_type(query);
+    if (query_type._command == "Type")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_type(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_type();
+            return true;
+        }
+    }else if (query_type._command == "Subtype")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_subtype(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_subtype();
+            return true;
+        }
+    }else if (query_type._command == "Q")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_q(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_q();
+            return true;
+        }
+    }else if (query_type._command == "Parameters")
+    {
+        return _parameters.query(cmd, query_type._remaining, result);
+    }
+
+    _logger.warning("Failed to query: invalid query (cmd=%d, query=%s)", cmd, query.c_str());
+    return false;
 }
 
 //-------------------------------------------
@@ -874,7 +1201,7 @@ bool SIP_Event_Type::decode(std::string &sip_msg)
         if (result.empty())
             return false;
 
-        _templates.push_back(result);
+        _templates.add_parameter(result);
     }
 
     return true;
@@ -889,14 +1216,41 @@ bool SIP_Event_Type::encode(std::string &sip_msg)
 
     sip_msg += _package;
 
-    std::list<std::string>::const_iterator it = _templates.begin();
-    while (it != _templates.end())
+    std::list<std::string> &templates = _templates.get_parameters();
+    std::list<std::string>::const_iterator it = templates.begin();
+    while (it != templates.end())
     {
         sip_msg += ".";
         sip_msg += *it++;
     }
 
     return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Event_Type::query(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    Query query_type(query);
+    if (query_type._command == "Package")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_package(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_package();
+            return true;
+        }
+    }else if (query_type._command == "Templates")
+    {
+        return _templates.query(cmd, query_type._remaining, result);
+    }
+
+    _logger.warning("Failed to query: invalid query (cmd=%d, query=%s)", cmd, query.c_str());
+    return false;
 }
 
 //-------------------------------------------
@@ -952,6 +1306,18 @@ bool SIP_Header_Accept::encode(std::string &sip_msg)
 }
 
 //-------------------------------------------
+
+bool SIP_Header_Accept::query_header(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    Query query_type(query);
+    if (query_type._command == "Media-Range")
+        return _media_range.query(cmd, query_type._remaining, result);
+
+    _logger.warning("Failed to query: invalid query (cmd=%d, query=%s)", cmd, query.c_str());
+    return false;
+}
+
+//-------------------------------------------
 //-------------------------------------------
 
 bool SIP_Header_Accept_Encoding::decode(std::string &sip_msg)
@@ -976,7 +1342,7 @@ bool SIP_Header_Accept_Encoding::decode(std::string &sip_msg)
             if (_q.empty())
                 return false;
         }else
-            _parameters.push_back(result);
+            _parameters.add_parameter(result);
     }
 
     return true;
@@ -1000,14 +1366,53 @@ bool SIP_Header_Accept_Encoding::encode(std::string &sip_msg)
         sip_msg += _q;
     }
 
-    std::list<std::string>::const_iterator it = _parameters.begin();
-    while (it != _parameters.end())
+    std::list<std::string> &parameters = _parameters.get_parameters();
+    std::list<std::string>::const_iterator it = parameters.begin();
+    while (it != parameters.end())
     {
         sip_msg += ";";
         sip_msg += *it++;
     }
 
     return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Accept_Encoding::query_header(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    Query query_type(query);
+    if (query_type._command == "Coding")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_coding(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_coding();
+            return true;
+        }
+    }else if (query_type._command == "Q")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_q(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_q();
+            return true;
+        }
+    }else if (query_type._command == "Parameters")
+    {
+        return _parameters.query(cmd, query_type._remaining, result);
+    }
+
+    _logger.warning("Failed to query: invalid query (cmd=%d, query=%s)", cmd, query.c_str());
+    return false;
 }
 
 //-------------------------------------------
@@ -1035,7 +1440,7 @@ bool SIP_Header_Accept_Language::decode(std::string &sip_msg)
             if (_q.empty())
                 return false;
         }else
-            _parameters.push_back(result);
+            _parameters.add_parameter(result);
     }
 
     return true;
@@ -1059,14 +1464,53 @@ bool SIP_Header_Accept_Language::encode(std::string &sip_msg)
         sip_msg += _q;
     }
 
-    std::list<std::string>::const_iterator it = _parameters.begin();
-    while (it != _parameters.end())
+    std::list<std::string> &parameters = _parameters.get_parameters();
+    std::list<std::string>::const_iterator it = parameters.begin();
+    while (it != parameters.end())
     {
         sip_msg += ";";
         sip_msg += *it++;
     }
 
     return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Accept_Language::query_header(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    Query query_type(query);
+    if (query_type._command == "Language")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_language(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_language();
+            return true;
+        }
+    }else if (query_type._command == "Q")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_q(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_q();
+            return true;
+        }
+    }else if (query_type._command == "Parameters")
+    {
+        return _parameters.query(cmd, query_type._remaining, result);
+    }
+
+    _logger.warning("Failed to query: invalid query (cmd=%d, query=%s)", cmd, query.c_str());
+    return false;
 }
 
 //-------------------------------------------
@@ -1084,7 +1528,7 @@ bool SIP_Header_Alert_Info::decode(std::string &sip_msg)
     {
         matched = String_Functions::match(sip_msg, ";", result);
         String_Functions::trim(result);
-        _parameters.push_back(result);
+        _parameters.add_parameter(result);
     }
 
     return true;
@@ -1097,14 +1541,33 @@ bool SIP_Header_Alert_Info::encode(std::string &sip_msg)
     if (!_address.encode(sip_msg))
         return false;
 
-    std::list<std::string>::const_iterator it = _parameters.begin();
-    while (it != _parameters.end())
+    std::list<std::string> &parameters = _parameters.get_parameters();
+    std::list<std::string>::const_iterator it = parameters.begin();
+    while (it != parameters.end())
     {
         sip_msg += ";";
         sip_msg += *it++;
     }
 
     return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Alert_Info::query_header(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    Query query_type(query);
+    if (query_type._command == "Address")
+    {
+        return _address.query(cmd, query_type._remaining, result);
+
+    }else if (query_type._command == "Parameters")
+    {
+        return _parameters.query(cmd, query_type._remaining, result);
+    }
+
+    _logger.warning("Failed to query: invalid query (cmd=%d, query=%s)", cmd, query.c_str());
+    return false;
 }
 
 //-------------------------------------------
@@ -1135,6 +1598,29 @@ bool SIP_Header_Allow::encode(std::string &sip_msg)
 
 //-------------------------------------------
 
+bool SIP_Header_Allow::query_header(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    Query query_type(query);
+    if (query_type._command == "Method")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_method(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_method();
+            return true;
+        }
+    }
+
+    _logger.warning("Failed to query: invalid query (cmd=%d, query=%s)", cmd, query.c_str());
+    return false;
+}
+
+//-------------------------------------------
+
 void SIP_Header_Allow::set_method(SIP_Method_Type method)
 {
     _method = SIP_Functions::get_method_type(method);
@@ -1160,6 +1646,18 @@ bool SIP_Header_Allow_Events::decode(std::string &sip_msg)
 bool SIP_Header_Allow_Events::encode(std::string &sip_msg)
 {
     return _event_type.encode(sip_msg);
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Allow_Events::query_header(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    Query query_type(query);
+    if (query_type._command == "Event-Type")
+        return _event_type.query(cmd, query_type._remaining, result);
+
+    _logger.warning("Failed to query: invalid query (cmd=%d, query=%s)", cmd, query.c_str());
+    return false;
 }
 
 //-------------------------------------------
@@ -1212,7 +1710,7 @@ bool SIP_Header_Authentication_Info::decode(std::string &sip_msg)
             if (_nonce_count.empty())
                 return false;
         }else
-            _parameters.push_back(result);
+            _parameters.add_parameter(result);
 
     }while (matched);
 
@@ -1265,8 +1763,9 @@ bool SIP_Header_Authentication_Info::encode(std::string &sip_msg)
         first_param = false;
     }
 
-    std::list<std::string>::const_iterator it = _parameters.begin();
-    while (it != _parameters.end())
+    std::list<std::string> &parameters = _parameters.get_parameters();
+    std::list<std::string>::const_iterator it = parameters.begin();
+    while (it != parameters.end())
     {
         sip_msg += (first_param) ? "" : ", ";
         sip_msg += *it++;
@@ -1274,6 +1773,80 @@ bool SIP_Header_Authentication_Info::encode(std::string &sip_msg)
     }
 
     return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Authentication_Info::query_header(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    Query query_type(query);
+    if (query_type._command == "Next-Nonce")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_next_nonce(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_next_nonce();
+            return true;
+        }
+    }else if (query_type._command == "QoP")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_qop(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_qop();
+            return true;
+        }
+    }else if (query_type._command == "Response")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_response(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_response();
+            return true;
+        }
+    }else if (query_type._command == "CNonce")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_cnonce(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_cnonce();
+            return true;
+        }
+    }else if (query_type._command == "Nonce-Count")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_nonce_count(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_nonce_count();
+            return true;
+        }
+    }else if (query_type._command == "Parameters")
+    {
+        return _parameters.query(cmd, query_type._remaining, result);
+    }
+
+    _logger.warning("Failed to query: invalid query (cmd=%d, query=%s)", cmd, query.c_str());
+    return false;
 }
 
 //-------------------------------------------
@@ -1289,6 +1862,20 @@ bool SIP_Header_Authorization::decode(std::string &sip_msg)
 bool SIP_Header_Authorization::encode(std::string &sip_msg)
 {
     return _credential.encode(sip_msg);
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Authorization::query_header(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    Query query_type(query);
+    if (query_type._command == "Credential")
+    {
+        return _credential.query(cmd, query_type._remaining, result);
+    }
+
+    _logger.warning("Failed to query: invalid query (cmd=%d, query=%s)", cmd, query.c_str());
+    return false;
 }
 
 //-------------------------------------------
@@ -1313,6 +1900,29 @@ bool SIP_Header_Call_ID::encode(std::string &sip_msg)
 
     sip_msg += _call_id;
     return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Call_ID::query_header(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    Query query_type(query);
+    if (query_type._command == "Call-ID")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_call_id(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_call_id();
+            return true;
+        }
+    }
+
+    _logger.warning("Failed to query: invalid query (cmd=%d, query=%s)", cmd, query.c_str());
+    return false;
 }
 
 //-------------------------------------------
@@ -1351,7 +1961,7 @@ bool SIP_Header_Call_Info::decode(std::string &sip_msg)
             if (_purpose.empty())
                 return false;
         }else
-            _parameters.push_back(result);
+            _parameters.add_parameter(result);
     }
 
     return true;
@@ -1370,14 +1980,45 @@ bool SIP_Header_Call_Info::encode(std::string &sip_msg)
         sip_msg += _purpose;
     }
 
-    std::list<std::string>::const_iterator it = _parameters.begin();
-    while (it != _parameters.end())
+    std::list<std::string> &parameters = _parameters.get_parameters();
+    std::list<std::string>::const_iterator it = parameters.begin();
+    while (it != parameters.end())
     {
         sip_msg += ";";
         sip_msg += *it++;
     }
 
     return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Call_Info::query_header(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    Query query_type(query);
+    if (query_type._command == "Address")
+    {
+        return _address.query(cmd, query_type._remaining, result);
+
+    }else if (query_type._command == "Purpose")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_purpose(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_purpose();
+            return true;
+        }
+    }else if (query_type._command == "Parameters")
+    {
+        return _parameters.query(cmd, query_type._remaining, result);
+    }
+
+    _logger.warning("Failed to query: invalid query (cmd=%d, query=%s)", cmd, query.c_str());
+    return false;
 }
 
 //-------------------------------------------
@@ -1440,8 +2081,7 @@ bool SIP_Header_Contact::decode(std::string &sip_msg)
             if (exp.empty())
                 return false;
 
-            _expires = String_Functions::str_to_ul(exp);
-            if (_expires == INVALID_EXPIRES)
+            if (!set_expires(exp))
                 return false;
 
         }else if (String_Functions::start_with(result, "q="))
@@ -1451,7 +2091,7 @@ bool SIP_Header_Contact::decode(std::string &sip_msg)
             if (_q.empty())
                 return false;
         }else
-            _parameters.push_back(result);
+            _parameters.add_parameter(result);
     }
 
     return true;
@@ -1482,13 +2122,109 @@ bool SIP_Header_Contact::encode(std::string &sip_msg)
         sip_msg += _q;
     }
 
-    std::list<std::string>::const_iterator it = _parameters.begin();
-    while (it != _parameters.end())
+    std::list<std::string> &parameters = _parameters.get_parameters();
+    std::list<std::string>::const_iterator it = parameters.begin();
+    while (it != parameters.end())
     {
         sip_msg += ";";
         sip_msg += *it++;
     }
 
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Contact::query_header(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    Query query_type(query);
+    if (query_type._command == "Star")
+    {
+        if (cmd == QUERY_SET)
+        {
+            bool star = (query_type._remaining == "True") ? true : false;
+            set_star(star);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = is_star() ? "True" : "False";
+            return true;
+        }
+    }else if (query_type._command == "Address")
+    {
+        return _address.query(cmd, query_type._remaining, result);
+
+    }else if (query_type._command == "Expires")
+    {
+        if (cmd == QUERY_SET)
+        {
+            if (!set_expires(query_type._remaining))
+            {
+                _logger.warning("Failed to query: set expires failed (cmd=%d, query=%s)", cmd, query.c_str());
+                return false;
+            }
+
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            std::string expires;
+            if (!get_expires(expires))
+            {
+                _logger.warning("Failed to query: get expires failed (cmd=%d, query=%s)", cmd, query.c_str());
+                return false;
+            }
+
+            result = expires;
+            return true;
+        }
+    }else if (query_type._command == "Q")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_q(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_q();
+            return true;
+        }
+    }else if (query_type._command == "Parameters")
+    {
+        return _parameters.query(cmd, query_type._remaining, result);
+    }
+
+    _logger.warning("Failed to query: invalid query (cmd=%d, query=%s)", cmd, query.c_str());
+    return false;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Contact::set_expires(std::string expires)
+{
+    _expires = String_Functions::str_to_ul(expires);
+    if (_expires == INVALID_EXPIRES)
+    {
+        _logger.warning("Failed to set expires: str to ul failed (expires=%s)", expires.c_str());
+        return false;
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Contact::get_expires(std::string &expires)
+{
+    if (_expires == INVALID_EXPIRES)
+    {
+        _logger.warning("Failed to get expires: invalid expires");
+        return false;
+    }
+
+    expires = std::to_string(_expires);
     return true;
 }
 
@@ -1518,7 +2254,7 @@ bool SIP_Header_Content_Disposition::decode(std::string &sip_msg)
             if (_handling.empty())
                 return false;
         }else
-            _parameters.push_back(result);
+            _parameters.add_parameter(result);
     }
 
     return true;
@@ -1539,14 +2275,53 @@ bool SIP_Header_Content_Disposition::encode(std::string &sip_msg)
         sip_msg += _handling;
     }
 
-    std::list<std::string>::const_iterator it = _parameters.begin();
-    while (it != _parameters.end())
+    std::list<std::string> &parameters = _parameters.get_parameters();
+    std::list<std::string>::const_iterator it = parameters.begin();
+    while (it != parameters.end())
     {
         sip_msg += ";";
         sip_msg += *it++;
     }
 
     return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Content_Disposition::query_header(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    Query query_type(query);
+    if (query_type._command == "Type")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_type(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_type();
+            return true;
+        }
+    }else if (query_type._command == "Handling")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_handling(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_handling();
+            return true;
+        }
+    }else if (query_type._command == "Parameters")
+    {
+        return _parameters.query(cmd, query_type._remaining, result);
+    }
+
+    _logger.warning("Failed to query: invalid query (cmd=%d, query=%s)", cmd, query.c_str());
+    return false;
 }
 
 //-------------------------------------------
@@ -1628,6 +2403,29 @@ bool SIP_Header_Content_Encoding::encode(std::string &sip_msg)
 }
 
 //-------------------------------------------
+
+bool SIP_Header_Content_Encoding::query_header(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    Query query_type(query);
+    if (query_type._command == "Coding")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_coding(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_coding();
+            return true;
+        }
+    }
+
+    _logger.warning("Failed to query: invalid query (cmd=%d, query=%s)", cmd, query.c_str());
+    return false;
+}
+
+//-------------------------------------------
 //-------------------------------------------
 
 bool SIP_Header_Content_Language::decode(std::string &sip_msg)
@@ -1652,6 +2450,29 @@ bool SIP_Header_Content_Language::encode(std::string &sip_msg)
 }
 
 //-------------------------------------------
+
+bool SIP_Header_Content_Language::query_header(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    Query query_type(query);
+    if (query_type._command == "Language")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_language(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_language();
+            return true;
+        }
+    }
+
+    _logger.warning("Failed to query: invalid query (cmd=%d, query=%s)", cmd, query.c_str());
+    return false;
+}
+
+//-------------------------------------------
 //-------------------------------------------
 
 bool SIP_Header_Content_Length::decode(std::string &sip_msg)
@@ -1660,8 +2481,7 @@ bool SIP_Header_Content_Length::decode(std::string &sip_msg)
     if (sip_msg.empty())
         return false;
 
-    _length = String_Functions::str_to_ul(sip_msg);
-    if (_length == INVALID_LENGTH)
+    if (!set_length(sip_msg))
         return false;
 
     return true;
@@ -1675,6 +2495,69 @@ bool SIP_Header_Content_Length::encode(std::string &sip_msg)
         return false;
 
     sip_msg += std::to_string(_length);
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Content_Length::query_header(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    Query query_type(query);
+    if (query_type._command == "Length")
+    {
+        if (cmd == QUERY_SET)
+        {
+            if (!set_length(query_type._remaining))
+            {
+                _logger.warning("Failed to query: set length failed (cmd=%d, query=%s)", cmd, query.c_str());
+                return false;
+            }
+
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            std::string length;
+            if (!get_length(length))
+            {
+                _logger.warning("Failed to query: get length failed (cmd=%d, query=%s)", cmd, query.c_str());
+                return false;
+            }
+
+            result = length;
+            return true;
+        }
+    }
+
+    _logger.warning("Failed to query: invalid query (cmd=%d, query=%s)", cmd, query.c_str());
+    return false;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Content_Length::set_length(std::string length)
+{
+    _length = String_Functions::str_to_ul(length);
+    if (_length == INVALID_LENGTH)
+    {
+        _logger.warning("Failed to set length: str to ul failed (length=%s)", length.c_str());
+        return false;
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Content_Length::get_length(std::string &length)
+{
+    if (_length == INVALID_LENGTH)
+    {
+        _logger.warning("Failed to get length: invalid length");
+        return false;
+    }
+
+    length = std::to_string(_length);
     return true;
 }
 
@@ -1694,6 +2577,18 @@ bool SIP_Header_Content_Type::encode(std::string &sip_msg)
 }
 
 //-------------------------------------------
+
+bool SIP_Header_Content_Type::query_header(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    Query query_type(query);
+    if (query_type._command == "Media-Type")
+        return _media_type.query(cmd, query_type._remaining, result);
+
+    _logger.warning("Failed to query: invalid query (cmd=%d, query=%s)", cmd, query.c_str());
+    return false;
+}
+
+//-------------------------------------------
 //-------------------------------------------
 
 bool SIP_Header_CSeq::decode(std::string &sip_msg)
@@ -1704,8 +2599,7 @@ bool SIP_Header_CSeq::decode(std::string &sip_msg)
     if (!String_Functions::match(sip_msg, " \t", result))
         return false;
 
-    _sequence = String_Functions::str_to_ul(result);
-    if (_sequence == INVALID_SEQUENCE)
+    if (!set_sequence(result))
         return false;
 
     String_Functions::trim(sip_msg);
@@ -1726,6 +2620,81 @@ bool SIP_Header_CSeq::encode(std::string &sip_msg)
     sip_msg += std::to_string(_sequence);
     sip_msg += " ";
     sip_msg += _method;
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_CSeq::query_header(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    Query query_type(query);
+    if (query_type._command == "Sequence")
+    {
+        if (cmd == QUERY_SET)
+        {
+            if (!set_sequence(query_type._remaining))
+            {
+                _logger.warning("Failed to query: set sequence failed (cmd=%d, query=%s)", cmd, query.c_str());
+                return false;
+            }
+
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            std::string sequence;
+            if (!get_sequence(sequence))
+            {
+                _logger.warning("Failed to query: get sequence failed (cmd=%d, query=%s)", cmd, query.c_str());
+                return false;
+            }
+
+            result = sequence;
+            return true;
+        }
+    }else if (query_type._command == "Method")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_method(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_method();
+            return true;
+        }
+    }
+
+    _logger.warning("Failed to query: invalid query (cmd=%d, query=%s)", cmd, query.c_str());
+    return false;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_CSeq::set_sequence(std::string sequence)
+{
+    _sequence = String_Functions::str_to_ul(sequence);
+    if (_sequence == INVALID_SEQUENCE)
+    {
+        _logger.warning("Failed to set sequence: str to ul failed (sequence=%s)", sequence.c_str());
+        return false;
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_CSeq::get_sequence(std::string &sequence)
+{
+    if (_sequence == INVALID_SEQUENCE)
+    {
+        _logger.warning("Failed to get sequence: invalid sequence");
+        return false;
+    }
+
+    sequence = std::to_string(_sequence);
     return true;
 }
 
@@ -1779,8 +2748,7 @@ bool SIP_Header_Date::decode(std::string &sip_msg)
     if (result.empty())
         return false;
 
-    _day = String_Functions::str_to_us(result);
-    if (_day == INVALID_DAY)
+    if (!set_day(result))
         return false;
 
     String_Functions::trim(sip_msg);
@@ -1801,8 +2769,7 @@ bool SIP_Header_Date::decode(std::string &sip_msg)
     if (result.empty())
         return false;
 
-    _year = String_Functions::str_to_us(result);
-    if (_year == INVALID_YEAR)
+    if (!set_year(result))
         return false;
 
     String_Functions::trim(sip_msg);
@@ -1813,8 +2780,7 @@ bool SIP_Header_Date::decode(std::string &sip_msg)
     if (result.empty())
         return false;
 
-    _hour = String_Functions::str_to_us(result);
-    if (_hour == INVALID_HOUR)
+    if (!set_hour(result))
         return false;
 
     String_Functions::trim(sip_msg);
@@ -1825,8 +2791,7 @@ bool SIP_Header_Date::decode(std::string &sip_msg)
     if (result.empty())
         return false;
 
-    _minute = String_Functions::str_to_us(result);
-    if (_minute == INVALID_MINUTE)
+    if (!set_minute(result))
         return false;
 
     String_Functions::trim(sip_msg);
@@ -1837,8 +2802,7 @@ bool SIP_Header_Date::decode(std::string &sip_msg)
     if (result.empty())
         return false;
 
-    _second = String_Functions::str_to_us(result);
-    if (_second == INVALID_SECOND)
+    if (!set_second(result))
         return false;
 
     String_Functions::trim(sip_msg);
@@ -1878,6 +2842,173 @@ bool SIP_Header_Date::encode(std::string &sip_msg)
 
 //-------------------------------------------
 
+bool SIP_Header_Date::query_header(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    Query query_type(query);
+    if (query_type._command == "Weekday")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_weekday(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_weekday();
+            return true;
+        }
+    }else if (query_type._command == "Day")
+    {
+        if (cmd == QUERY_SET)
+        {
+            if (!set_day(query_type._remaining))
+            {
+                _logger.warning("Failed to query: set day failed (cmd=%d, query=%s)", cmd, query.c_str());
+                return false;
+            }
+
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            std::string day;
+            if (!get_day(day))
+            {
+                _logger.warning("Failed to query: get day failed (cmd=%d, query=%s)", cmd, query.c_str());
+                return false;
+            }
+
+            result = day;
+            return true;
+        }
+    }else if (query_type._command == "Month")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_month(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_month();
+            return true;
+        }
+    }else if (query_type._command == "Year")
+    {
+        if (cmd == QUERY_SET)
+        {
+            if (!set_year(query_type._remaining))
+            {
+                _logger.warning("Failed to query: set year failed (cmd=%d, query=%s)", cmd, query.c_str());
+                return false;
+            }
+
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            std::string year;
+            if (!get_year(year))
+            {
+                _logger.warning("Failed to query: get year failed (cmd=%d, query=%s)", cmd, query.c_str());
+                return false;
+            }
+
+            result = year;
+            return true;
+        }
+    }else if (query_type._command == "Hour")
+    {
+        if (cmd == QUERY_SET)
+        {
+            if (!set_hour(query_type._remaining))
+            {
+                _logger.warning("Failed to query: set hour failed (cmd=%d, query=%s)", cmd, query.c_str());
+                return false;
+            }
+
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            std::string hour;
+            if (!get_hour(hour))
+            {
+                _logger.warning("Failed to query: get hour failed (cmd=%d, query=%s)", cmd, query.c_str());
+                return false;
+            }
+
+            result = hour;
+            return true;
+        }
+    }else if (query_type._command == "Minute")
+    {
+        if (cmd == QUERY_SET)
+        {
+            if (!set_minute(query_type._remaining))
+            {
+                _logger.warning("Failed to query: set minute failed (cmd=%d, query=%s)", cmd, query.c_str());
+                return false;
+            }
+
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            std::string minute;
+            if (!get_minute(minute))
+            {
+                _logger.warning("Failed to query: get minute failed (cmd=%d, query=%s)", cmd, query.c_str());
+                return false;
+            }
+
+            result = minute;
+            return true;
+        }
+    }else if (query_type._command == "Second")
+    {
+        if (cmd == QUERY_SET)
+        {
+            if (!set_second(query_type._remaining))
+            {
+                _logger.warning("Failed to query: set second failed (cmd=%d, query=%s)", cmd, query.c_str());
+                return false;
+            }
+
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            std::string second;
+            if (!get_second(second))
+            {
+                _logger.warning("Failed to query: get second failed (cmd=%d, query=%s)", cmd, query.c_str());
+                return false;
+            }
+
+            result = second;
+            return true;
+        }
+    }else if (query_type._command == "Time-Zone")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_time_zone(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_time_zone();
+            return true;
+        }
+    }
+
+    _logger.warning("Failed to query: invalid query (cmd=%d, query=%s)", cmd, query.c_str());
+    return false;
+}
+
+//-------------------------------------------
+
 void SIP_Header_Date::set_weekday(SIP_Header_Date::Weekday weekday)
 {
     switch (weekday)
@@ -1913,6 +3044,34 @@ SIP_Header_Date::Weekday SIP_Header_Date::get_weekday_enum()
         return WEEKDAY_SUN;
 
     return WEEKDAY_INVALID;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Date::set_day(std::string day)
+{
+    _day = String_Functions::str_to_us(day);
+    if (_day == INVALID_DAY)
+    {
+        _logger.warning("Failed to set day: str to us failed (day=%s)", day.c_str());
+        return false;
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Date::get_day(std::string &day)
+{
+    if (_day == INVALID_DAY)
+    {
+        _logger.warning("Failed to get day: invalid day");
+        return false;
+    }
+
+    day = std::to_string(_day);
+    return true;
 }
 
 //-------------------------------------------
@@ -1970,6 +3129,118 @@ SIP_Header_Date::Month SIP_Header_Date::get_month_enum()
 }
 
 //-------------------------------------------
+
+bool SIP_Header_Date::set_year(std::string year)
+{
+    _year = String_Functions::str_to_us(year);
+    if (_year == INVALID_YEAR)
+    {
+        _logger.warning("Failed to set year: str to us failed (year=%s)", year.c_str());
+        return false;
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Date::get_year(std::string &year)
+{
+    if (_year == INVALID_YEAR)
+    {
+        _logger.warning("Failed to get year: invalid year");
+        return false;
+    }
+
+    year = std::to_string(_year);
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Date::set_hour(std::string hour)
+{
+    _hour = String_Functions::str_to_us(hour);
+    if (_hour == INVALID_HOUR)
+    {
+        _logger.warning("Failed to set hour: str to us failed (hour=%s)", hour.c_str());
+        return false;
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Date::get_hour(std::string &hour)
+{
+    if (_hour == INVALID_HOUR)
+    {
+        _logger.warning("Failed to get hour: invalid hour");
+        return false;
+    }
+
+    hour = std::to_string(_hour);
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Date::set_minute(std::string minute)
+{
+    _minute = String_Functions::str_to_us(minute);
+    if (_minute == INVALID_MINUTE)
+    {
+        _logger.warning("Failed to set minute: str to us failed (minute=%s)", minute.c_str());
+        return false;
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Date::get_minute(std::string &minute)
+{
+    if (_minute == INVALID_MINUTE)
+    {
+        _logger.warning("Failed to get minute: invalid minute");
+        return false;
+    }
+
+    minute = std::to_string(_minute);
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Date::set_second(std::string second)
+{
+    _second = String_Functions::str_to_us(second);
+    if (_second == INVALID_SECOND)
+    {
+        _logger.warning("Failed to set second: str to us failed (second=%s)", second.c_str());
+        return false;
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Date::get_second(std::string &second)
+{
+    if (_second == INVALID_SECOND)
+    {
+        _logger.warning("Failed to get second: invalid second");
+        return false;
+    }
+
+    second = std::to_string(_second);
+    return true;
+}
+
+//-------------------------------------------
 //-------------------------------------------
 
 bool SIP_Header_Error_Info::decode(std::string &sip_msg)
@@ -1984,7 +3255,7 @@ bool SIP_Header_Error_Info::decode(std::string &sip_msg)
     {
         matched = String_Functions::match(sip_msg, ";", result);
         String_Functions::trim(result);
-        _parameters.push_back(result);
+        _parameters.add_parameter(result);
     }
 
     return true;
@@ -1997,14 +3268,33 @@ bool SIP_Header_Error_Info::encode(std::string &sip_msg)
     if (!_address.encode(sip_msg))
         return false;
 
-    std::list<std::string>::const_iterator it = _parameters.begin();
-    while (it != _parameters.end())
+    std::list<std::string> &parameters = _parameters.get_parameters();
+    std::list<std::string>::const_iterator it = parameters.begin();
+    while (it != parameters.end())
     {
         sip_msg += ";";
         sip_msg += *it++;
     }
 
     return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Error_Info::query_header(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    Query query_type(query);
+    if (query_type._command == "Address")
+    {
+        return _address.query(cmd, query_type._remaining, result);
+
+    }else if (query_type._command == "Parameters")
+    {
+        return _parameters.query(cmd, query_type._remaining, result);
+    }
+
+    _logger.warning("Failed to query: invalid query (cmd=%d, query=%s)", cmd, query.c_str());
+    return false;
 }
 
 //-------------------------------------------
@@ -2030,7 +3320,7 @@ bool SIP_Header_Event::decode(std::string &sip_msg)
             if (_id.empty())
                 return false;
         }else
-            _parameters.push_back(result);
+            _parameters.add_parameter(result);
     }
 
     return true;
@@ -2049,8 +3339,9 @@ bool SIP_Header_Event::encode(std::string &sip_msg)
         sip_msg += _id;
     }
 
-    std::list<std::string>::const_iterator it = _parameters.begin();
-    while (it != _parameters.end())
+    std::list<std::string> &parameters = _parameters.get_parameters();
+    std::list<std::string>::const_iterator it = parameters.begin();
+    while (it != parameters.end())
     {
         sip_msg += ";";
         sip_msg += *it++;
@@ -2060,14 +3351,43 @@ bool SIP_Header_Event::encode(std::string &sip_msg)
 }
 
 //-------------------------------------------
+
+bool SIP_Header_Event::query_header(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    Query query_type(query);
+    if (query_type._command == "Event-Type")
+    {
+        return _event_type.query(cmd, query_type._remaining, result);
+
+    }else if (query_type._command == "ID")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_id(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_id();
+            return true;
+        }
+    }else if (query_type._command == "Parameters")
+    {
+        return _parameters.query(cmd, query_type._remaining, result);
+    }
+
+    _logger.warning("Failed to query: invalid query (cmd=%d, query=%s)", cmd, query.c_str());
+    return false;
+}
+
+//-------------------------------------------
 //-------------------------------------------
 
 bool SIP_Header_Expires::decode(std::string &sip_msg)
 {
     String_Functions::trim(sip_msg);
 
-    _expires = String_Functions::str_to_ul(sip_msg);
-    if (_expires == INVALID_EXPIRES)
+    if (!set_expires(sip_msg))
         return false;
 
     return true;
@@ -2081,6 +3401,69 @@ bool SIP_Header_Expires::encode(std::string &sip_msg)
         return false;
 
     sip_msg += std::to_string(_expires);
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Expires::query_header(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    Query query_type(query);
+    if (query_type._command == "Expires")
+    {
+        if (cmd == QUERY_SET)
+        {
+            if (!set_expires(query_type._remaining))
+            {
+                _logger.warning("Failed to query: set expires failed (cmd=%d, query=%s)", cmd, query.c_str());
+                return false;
+            }
+
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            std::string expires;
+            if (!get_expires(expires))
+            {
+                _logger.warning("Failed to query: get expires failed (cmd=%d, query=%s)", cmd, query.c_str());
+                return false;
+            }
+
+            result = expires;
+            return true;
+        }
+    }
+
+    _logger.warning("Failed to query: invalid query (cmd=%d, query=%s)", cmd, query.c_str());
+    return false;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Expires::set_expires(std::string expires)
+{
+    _expires = String_Functions::str_to_ul(expires);
+    if (_expires == INVALID_EXPIRES)
+    {
+        _logger.warning("Failed to set expires: str to ul failed (expires=%s)", expires.c_str());
+        return false;
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Expires::get_expires(std::string &expires)
+{
+    if (_expires == INVALID_EXPIRES)
+    {
+        _logger.warning("Failed to get expires: invalid expires");
+        return false;
+    }
+
+    expires = std::to_string(_expires);
     return true;
 }
 
@@ -2107,7 +3490,7 @@ bool SIP_Header_From::decode(std::string &sip_msg)
             if (_tag.empty())
                 return false;
         }else
-            _parameters.push_back(result);
+            _parameters.add_parameter(result);
     }
 
     return true;
@@ -2126,14 +3509,45 @@ bool SIP_Header_From::encode(std::string &sip_msg)
         sip_msg += _tag;
     }
 
-    std::list<std::string>::const_iterator it = _parameters.begin();
-    while (it != _parameters.end())
+    std::list<std::string> &parameters = _parameters.get_parameters();
+    std::list<std::string>::const_iterator it = parameters.begin();
+    while (it != parameters.end())
     {
         sip_msg += ";";
         sip_msg += *it++;
     }
 
     return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_From::query_header(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    Query query_type(query);
+    if (query_type._command == "Address")
+    {
+        return _address.query(cmd, query_type._remaining, result);
+
+    }else if (query_type._command == "Tag")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_tag(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_tag();
+            return true;
+        }
+    }else if (query_type._command == "Parameters")
+    {
+        return _parameters.query(cmd, query_type._remaining, result);
+    }
+
+    _logger.warning("Failed to query: invalid query (cmd=%d, query=%s)", cmd, query.c_str());
+    return false;
 }
 
 //-------------------------------------------
@@ -2168,14 +3582,36 @@ bool SIP_Header_In_Reply_To::encode(std::string &sip_msg)
 }
 
 //-------------------------------------------
+
+bool SIP_Header_In_Reply_To::query_header(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    Query query_type(query);
+    if (query_type._command == "Call-ID")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_call_id(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_call_id();
+            return true;
+        }
+    }
+
+    _logger.warning("Failed to query: invalid query (cmd=%d, query=%s)", cmd, query.c_str());
+    return false;
+}
+
+//-------------------------------------------
 //-------------------------------------------
 
 bool SIP_Header_Max_Forwards::decode(std::string &sip_msg)
 {
     String_Functions::trim(sip_msg);
 
-    _max_forwards = String_Functions::str_to_us(sip_msg);
-    if (_max_forwards == INVALID_MAX_FORWARDS)
+    if (!set_max_forwards(sip_msg))
         return false;
 
     return true;
@@ -2189,6 +3625,69 @@ bool SIP_Header_Max_Forwards::encode(std::string &sip_msg)
         return false;
 
     sip_msg += std::to_string(_max_forwards);
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Max_Forwards::query_header(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    Query query_type(query);
+    if (query_type._command == "Max-Forwards")
+    {
+        if (cmd == QUERY_SET)
+        {
+            if (!set_max_forwards(query_type._remaining))
+            {
+                _logger.warning("Failed to query: set max forwards failed (cmd=%d, query=%s)", cmd, query.c_str());
+                return false;
+            }
+
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            std::string max_forwards;
+            if (!get_max_forwards(max_forwards))
+            {
+                _logger.warning("Failed to query: get max forwards failed (cmd=%d, query=%s)", cmd, query.c_str());
+                return false;
+            }
+
+            result = max_forwards;
+            return true;
+        }
+    }
+
+    _logger.warning("Failed to query: invalid query (cmd=%d, query=%s)", cmd, query.c_str());
+    return false;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Max_Forwards::set_max_forwards(std::string max_forwards)
+{
+    _max_forwards = String_Functions::str_to_us(max_forwards);
+    if (_max_forwards == INVALID_MAX_FORWARDS)
+    {
+        _logger.warning("Failed to set max forwards: str to us failed (max_forwards=%s)", max_forwards.c_str());
+        return false;
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Max_Forwards::get_max_forwards(std::string &max_forwards)
+{
+    if (_max_forwards == INVALID_MAX_FORWARDS)
+    {
+        _logger.warning("Failed to get max forwards: invalid max forwards");
+        return false;
+    }
+
+    max_forwards = std::to_string(_max_forwards);
     return true;
 }
 
@@ -2207,16 +3706,14 @@ bool SIP_Header_Mime_Version::decode(std::string &sip_msg)
     if (result.empty())
         return false;
 
-    _major_version = String_Functions::str_to_ul(result);
-    if (_major_version == INVALID_MIME_VERSION)
+    if (!set_major_version(result))
         return false;
 
     String_Functions::trim(sip_msg);
     if (sip_msg.empty())
         return false;
 
-    _minor_version = String_Functions::str_to_ul(sip_msg);
-    if (_minor_version == INVALID_MIME_VERSION)
+    if (!set_minor_version(sip_msg))
         return false;
 
     return true;
@@ -2236,14 +3733,128 @@ bool SIP_Header_Mime_Version::encode(std::string &sip_msg)
 }
 
 //-------------------------------------------
+
+bool SIP_Header_Mime_Version::query_header(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    Query query_type(query);
+    if (query_type._command == "Major-Version")
+    {
+        if (cmd == QUERY_SET)
+        {
+            if (!set_major_version(query_type._remaining))
+            {
+                _logger.warning("Failed to query: set major_version failed (cmd=%d, query=%s)", cmd, query.c_str());
+                return false;
+            }
+
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            std::string major_version;
+            if (!get_major_version(major_version))
+            {
+                _logger.warning("Failed to query: get major version failed (cmd=%d, query=%s)", cmd, query.c_str());
+                return false;
+            }
+
+            result = major_version;
+            return true;
+        }
+    }else if (query_type._command == "Minor-Version")
+    {
+        if (cmd == QUERY_SET)
+        {
+            if (!set_minor_version(query_type._remaining))
+            {
+                _logger.warning("Failed to query: set minor_version failed (cmd=%d, query=%s)", cmd, query.c_str());
+                return false;
+            }
+
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            std::string minor_version;
+            if (!get_minor_version(minor_version))
+            {
+                _logger.warning("Failed to query: get minor version failed (cmd=%d, query=%s)", cmd, query.c_str());
+                return false;
+            }
+
+            result = minor_version;
+            return true;
+        }
+    }
+
+    _logger.warning("Failed to query: invalid query (cmd=%d, query=%s)", cmd, query.c_str());
+    return false;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Mime_Version::set_major_version(std::string major_version)
+{
+    _major_version = String_Functions::str_to_ul(major_version);
+    if (_major_version == INVALID_MIME_VERSION)
+    {
+        _logger.warning("Failed to set major version: str to ul failed (major_version=%s)", major_version.c_str());
+        return false;
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Mime_Version::get_major_version(std::string &major_version)
+{
+    if (_major_version == INVALID_MIME_VERSION)
+    {
+        _logger.warning("Failed to get major version: invalid major version");
+        return false;
+    }
+
+    major_version = std::to_string(_major_version);
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Mime_Version::set_minor_version(std::string minor_version)
+{
+    _minor_version = String_Functions::str_to_ul(minor_version);
+    if (_minor_version == INVALID_MIME_VERSION)
+    {
+        _logger.warning("Failed to set minor version: str to ul failed (minor_version=%s)", minor_version.c_str());
+        return false;
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Mime_Version::get_minor_version(std::string &minor_version)
+{
+    if (_minor_version == INVALID_MIME_VERSION)
+    {
+        _logger.warning("Failed to get minor version: invalid minor version");
+        return false;
+    }
+
+    minor_version = std::to_string(_minor_version);
+    return true;
+}
+
+//-------------------------------------------
 //-------------------------------------------
 
 bool SIP_Header_Min_Expires::decode(std::string &sip_msg)
 {
     String_Functions::trim(sip_msg);
 
-    _min_expires = String_Functions::str_to_ul(sip_msg);
-    if (_min_expires == INVALID_MIN_EXPIRES)
+    if (!set_min_expires(sip_msg))
         return false;
 
     return true;
@@ -2257,6 +3868,69 @@ bool SIP_Header_Min_Expires::encode(std::string &sip_msg)
         return false;
 
     sip_msg += std::to_string(_min_expires);
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Min_Expires::query_header(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    Query query_type(query);
+    if (query_type._command == "Min-Expires")
+    {
+        if (cmd == QUERY_SET)
+        {
+            if (!set_min_expires(query_type._remaining))
+            {
+                _logger.warning("Failed to query: set min expires failed (cmd=%d, query=%s)", cmd, query.c_str());
+                return false;
+            }
+
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            std::string min_expires;
+            if (!get_min_expires(min_expires))
+            {
+                _logger.warning("Failed to query: get min expires failed (cmd=%d, query=%s)", cmd, query.c_str());
+                return false;
+            }
+
+            result = min_expires;
+            return true;
+        }
+    }
+
+    _logger.warning("Failed to query: invalid query (cmd=%d, query=%s)", cmd, query.c_str());
+    return false;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Min_Expires::set_min_expires(std::string min_expires)
+{
+    _min_expires = String_Functions::str_to_ul(min_expires);
+    if (_min_expires == INVALID_MIN_EXPIRES)
+    {
+        _logger.warning("Failed to set min expires: str to ul failed (min_expires=%s)", min_expires.c_str());
+        return false;
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Min_Expires::get_min_expires(std::string &min_expires)
+{
+    if (_min_expires == INVALID_MIN_EXPIRES)
+    {
+        _logger.warning("Failed to get min expires: invalid min expires");
+        return false;
+    }
+
+    min_expires = std::to_string(_min_expires);
     return true;
 }
 
@@ -2287,6 +3961,29 @@ bool SIP_Header_Organization::encode(std::string &sip_msg)
 }
 
 //-------------------------------------------
+
+bool SIP_Header_Organization::query_header(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    Query query_type(query);
+    if (query_type._command == "Organization")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_organization(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_organization();
+            return true;
+        }
+    }
+
+    _logger.warning("Failed to query: invalid query (cmd=%d, query=%s)", cmd, query.c_str());
+    return false;
+}
+
+//-------------------------------------------
 //-------------------------------------------
 
 bool SIP_Header_Priority::decode(std::string &sip_msg)
@@ -2308,6 +4005,29 @@ bool SIP_Header_Priority::encode(std::string &sip_msg)
 
     sip_msg += _priority;
     return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Priority::query_header(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    Query query_type(query);
+    if (query_type._command == "Priority")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_priority(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_priority();
+            return true;
+        }
+    }
+
+    _logger.warning("Failed to query: invalid query (cmd=%d, query=%s)", cmd, query.c_str());
+    return false;
 }
 
 //-------------------------------------------
@@ -2356,6 +4076,20 @@ bool SIP_Header_Proxy_Authenticate::encode(std::string &sip_msg)
 }
 
 //-------------------------------------------
+
+bool SIP_Header_Proxy_Authenticate::query_header(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    Query query_type(query);
+    if (query_type._command == "Challenge")
+    {
+        return _challenge.query(cmd, query_type._remaining, result);
+    }
+
+    _logger.warning("Failed to query: invalid query (cmd=%d, query=%s)", cmd, query.c_str());
+    return false;
+}
+
+//-------------------------------------------
 //-------------------------------------------
 
 bool SIP_Header_Proxy_Authorization::decode(std::string &sip_msg)
@@ -2368,6 +4102,20 @@ bool SIP_Header_Proxy_Authorization::decode(std::string &sip_msg)
 bool SIP_Header_Proxy_Authorization::encode(std::string &sip_msg)
 {
     return _credential.encode(sip_msg);
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Proxy_Authorization::query_header(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    Query query_type(query);
+    if (query_type._command == "Credential")
+    {
+        return _credential.query(cmd, query_type._remaining, result);
+    }
+
+    _logger.warning("Failed to query: invalid query (cmd=%d, query=%s)", cmd, query.c_str());
+    return false;
 }
 
 //-------------------------------------------
@@ -2395,6 +4143,29 @@ bool SIP_Header_Proxy_Require::encode(std::string &sip_msg)
 }
 
 //-------------------------------------------
+
+bool SIP_Header_Proxy_Require::query_header(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    Query query_type(query);
+    if (query_type._command == "Option-Tag")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_option_tag(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_option_tag();
+            return true;
+        }
+    }
+
+    _logger.warning("Failed to query: invalid query (cmd=%d, query=%s)", cmd, query.c_str());
+    return false;
+}
+
+//-------------------------------------------
 //-------------------------------------------
 
 bool SIP_Header_RAck::decode(std::string &sip_msg)
@@ -2405,16 +4176,14 @@ bool SIP_Header_RAck::decode(std::string &sip_msg)
     if (!String_Functions::match(sip_msg, " \t", result))
         return false;
 
-    _rseq = String_Functions::str_to_ul(result);
-    if (_rseq == INVALID_RSEQ)
+    if (!set_rseq(result))
         return false;
 
     String_Functions::trim(sip_msg);
     if (!String_Functions::match(sip_msg, " \t", result))
         return false;
 
-    _cseq = String_Functions::str_to_ul(result);
-    if (_cseq == INVALID_CSEQ)
+    if (!set_cseq(result))
         return false;
 
     String_Functions::trim(sip_msg);
@@ -2437,6 +4206,133 @@ bool SIP_Header_RAck::encode(std::string &sip_msg)
     sip_msg += std::to_string(_cseq);
     sip_msg += " ";
     sip_msg += _method;
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_RAck::query_header(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    Query query_type(query);
+    if (query_type._command == "RSeq")
+    {
+        if (cmd == QUERY_SET)
+        {
+            if (!set_rseq(query_type._remaining))
+            {
+                _logger.warning("Failed to query: set rseq failed (cmd=%d, query=%s)", cmd, query.c_str());
+                return false;
+            }
+
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            std::string rseq;
+            if (!get_rseq(rseq))
+            {
+                _logger.warning("Failed to query: get rseq failed (cmd=%d, query=%s)", cmd, query.c_str());
+                return false;
+            }
+
+            result = rseq;
+            return true;
+        }
+    }else if (query_type._command == "CSeq")
+    {
+        if (cmd == QUERY_SET)
+        {
+            if (!set_cseq(query_type._remaining))
+            {
+                _logger.warning("Failed to query: set cseq failed (cmd=%d, query=%s)", cmd, query.c_str());
+                return false;
+            }
+
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            std::string cseq;
+            if (!get_cseq(cseq))
+            {
+                _logger.warning("Failed to query: get cseq failed (cmd=%d, query=%s)", cmd, query.c_str());
+                return false;
+            }
+
+            result = cseq;
+            return true;
+        }
+    }else if (query_type._command == "Method")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_method(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_method();
+            return true;
+        }
+    }
+
+    _logger.warning("Failed to query: invalid query (cmd=%d, query=%s)", cmd, query.c_str());
+    return false;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_RAck::set_rseq(std::string rseq)
+{
+    _rseq = String_Functions::str_to_ul(rseq);
+    if (_rseq == INVALID_RSEQ)
+    {
+        _logger.warning("Failed to set rseq: str to ul failed (rseq=%s)", rseq.c_str());
+        return false;
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_RAck::get_rseq(std::string &rseq)
+{
+    if (_rseq == INVALID_RSEQ)
+    {
+        _logger.warning("Failed to get rseq: invalid rseq");
+        return false;
+    }
+
+    rseq = std::to_string(_rseq);
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_RAck::set_cseq(std::string cseq)
+{
+    _cseq = String_Functions::str_to_ul(cseq);
+    if (_cseq == INVALID_CSEQ)
+    {
+        _logger.warning("Failed to set cseq: str to ul failed (cseq=%s)", cseq.c_str());
+        return false;
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_RAck::get_cseq(std::string &cseq)
+{
+    if (_cseq == INVALID_CSEQ)
+    {
+        _logger.warning("Failed to get cseq: invalid cseq");
+        return false;
+    }
+
+    cseq = std::to_string(_cseq);
     return true;
 }
 
@@ -2469,7 +4365,7 @@ bool SIP_Header_Record_Route::decode(std::string &sip_msg)
     {
         matched = String_Functions::match(sip_msg, ";", result);
         String_Functions::trim(result);
-        _parameters.push_back(result);
+        _parameters.add_parameter(result);
     }
 
     return true;
@@ -2482,14 +4378,33 @@ bool SIP_Header_Record_Route::encode(std::string &sip_msg)
     if (!_address.encode(sip_msg))
         return false;
 
-    std::list<std::string>::const_iterator it = _parameters.begin();
-    while (it != _parameters.end())
+    std::list<std::string> &parameters = _parameters.get_parameters();
+    std::list<std::string>::const_iterator it = parameters.begin();
+    while (it != parameters.end())
     {
         sip_msg += ";";
         sip_msg += *it++;
     }
 
     return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Record_Route::query_header(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    Query query_type(query);
+    if (query_type._command == "Address")
+    {
+        return _address.query(cmd, query_type._remaining, result);
+
+    }else if (query_type._command == "Parameters")
+    {
+        return _parameters.query(cmd, query_type._remaining, result);
+    }
+
+    _logger.warning("Failed to query: invalid query (cmd=%d, query=%s)", cmd, query.c_str());
+    return false;
 }
 
 //-------------------------------------------
@@ -2507,7 +4422,7 @@ bool SIP_Header_Refer_To::decode(std::string &sip_msg)
     {
         matched = String_Functions::match(sip_msg, ";", result);
         String_Functions::trim(result);
-        _parameters.push_back(result);
+        _parameters.add_parameter(result);
     }
 
     return true;
@@ -2520,14 +4435,33 @@ bool SIP_Header_Refer_To::encode(std::string &sip_msg)
     if (!_address.encode(sip_msg))
         return false;
 
-    std::list<std::string>::const_iterator it = _parameters.begin();
-    while (it != _parameters.end())
+    std::list<std::string> &parameters = _parameters.get_parameters();
+    std::list<std::string>::const_iterator it = parameters.begin();
+    while (it != parameters.end())
     {
         sip_msg += ";";
         sip_msg += *it++;
     }
 
     return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Refer_To::query_header(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    Query query_type(query);
+    if (query_type._command == "Address")
+    {
+        return _address.query(cmd, query_type._remaining, result);
+
+    }else if (query_type._command == "Parameters")
+    {
+        return _parameters.query(cmd, query_type._remaining, result);
+    }
+
+    _logger.warning("Failed to query: invalid query (cmd=%d, query=%s)", cmd, query.c_str());
+    return false;
 }
 
 //-------------------------------------------
@@ -2554,7 +4488,7 @@ bool SIP_Header_Referred_By::decode(std::string &sip_msg)
                 return false;
 
         }else
-            _parameters.push_back(result);
+            _parameters.add_parameter(result);
     }
 
     return true;
@@ -2573,14 +4507,45 @@ bool SIP_Header_Referred_By::encode(std::string &sip_msg)
         sip_msg += _cid;
     }
 
-    std::list<std::string>::const_iterator it = _parameters.begin();
-    while (it != _parameters.end())
+    std::list<std::string> &parameters = _parameters.get_parameters();
+    std::list<std::string>::const_iterator it = parameters.begin();
+    while (it != parameters.end())
     {
         sip_msg += ";";
         sip_msg += *it++;
     }
 
     return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Referred_By::query_header(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    Query query_type(query);
+    if (query_type._command == "Address")
+    {
+        return _address.query(cmd, query_type._remaining, result);
+
+    }else if (query_type._command == "CID")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_cid(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_cid();
+            return true;
+        }
+    }else if (query_type._command == "Parameters")
+    {
+        return _parameters.query(cmd, query_type._remaining, result);
+    }
+
+    _logger.warning("Failed to query: invalid query (cmd=%d, query=%s)", cmd, query.c_str());
+    return false;
 }
 
 //-------------------------------------------
@@ -2598,7 +4563,7 @@ bool SIP_Header_Reply_To::decode(std::string &sip_msg)
     {
         matched = String_Functions::match(sip_msg, ";", result);
         String_Functions::trim(result);
-        _parameters.push_back(result);
+        _parameters.add_parameter(result);
     }
 
     return true;
@@ -2611,14 +4576,33 @@ bool SIP_Header_Reply_To::encode(std::string &sip_msg)
     if (!_address.encode(sip_msg))
         return false;
 
-    std::list<std::string>::const_iterator it = _parameters.begin();
-    while (it != _parameters.end())
+    std::list<std::string> &parameters = _parameters.get_parameters();
+    std::list<std::string>::const_iterator it = parameters.begin();
+    while (it != parameters.end())
     {
         sip_msg += ";";
         sip_msg += *it++;
     }
 
     return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Reply_To::query_header(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    Query query_type(query);
+    if (query_type._command == "Address")
+    {
+        return _address.query(cmd, query_type._remaining, result);
+
+    }else if (query_type._command == "Parameters")
+    {
+        return _parameters.query(cmd, query_type._remaining, result);
+    }
+
+    _logger.warning("Failed to query: invalid query (cmd=%d, query=%s)", cmd, query.c_str());
+    return false;
 }
 
 //-------------------------------------------
@@ -2646,6 +4630,29 @@ bool SIP_Header_Require::encode(std::string &sip_msg)
 }
 
 //-------------------------------------------
+
+bool SIP_Header_Require::query_header(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    Query query_type(query);
+    if (query_type._command == "Option-Tag")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_option_tag(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_option_tag();
+            return true;
+        }
+    }
+
+    _logger.warning("Failed to query: invalid query (cmd=%d, query=%s)", cmd, query.c_str());
+    return false;
+}
+
+//-------------------------------------------
 //-------------------------------------------
 
 bool SIP_Header_Retry_After::decode(std::string &sip_msg)
@@ -2660,8 +4667,7 @@ bool SIP_Header_Retry_After::decode(std::string &sip_msg)
     if (retry.empty())
         return false;
 
-    _retry_after = String_Functions::str_to_ul(retry);
-    if (_retry_after == INVALID_RETRY_AFTER)
+    if (!set_retry_after(retry))
         return false;
 
     if (has_comment)
@@ -2691,11 +4697,10 @@ bool SIP_Header_Retry_After::decode(std::string &sip_msg)
             if (duration.empty())
                 return false;
 
-            _duration = String_Functions::str_to_ul(duration);
-            if (_duration == INVALID_DURATION)
+            if (!set_duration(duration))
                 return false;
         }else
-            _parameters.push_back(result);
+            _parameters.add_parameter(result);
     }
 
     return true;
@@ -2723,13 +4728,144 @@ bool SIP_Header_Retry_After::encode(std::string &sip_msg)
         sip_msg += std::to_string(_duration);
     }
 
-    std::list<std::string>::const_iterator it = _parameters.begin();
-    while (it != _parameters.end())
+    std::list<std::string> &parameters = _parameters.get_parameters();
+    std::list<std::string>::const_iterator it = parameters.begin();
+    while (it != parameters.end())
     {
         sip_msg += ";";
         sip_msg += *it++;
     }
 
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Retry_After::query_header(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    Query query_type(query);
+    if (query_type._command == "Retry-After")
+    {
+        if (cmd == QUERY_SET)
+        {
+            if (!set_retry_after(query_type._remaining))
+            {
+                _logger.warning("Failed to query: set retry after failed (cmd=%d, query=%s)", cmd, query.c_str());
+                return false;
+            }
+
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            std::string retry_after;
+            if (!get_retry_after(retry_after))
+            {
+                _logger.warning("Failed to query: get retry after failed (cmd=%d, query=%s)", cmd, query.c_str());
+                return false;
+            }
+
+            result = retry_after;
+            return true;
+        }
+    }else if (query_type._command == "Comment")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_comment(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_comment();
+            return true;
+        }
+    }else if (query_type._command == "Duration")
+    {
+        if (cmd == QUERY_SET)
+        {
+            if (!set_duration(query_type._remaining))
+            {
+                _logger.warning("Failed to query: set duration failed (cmd=%d, query=%s)", cmd, query.c_str());
+                return false;
+            }
+
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            std::string duration;
+            if (!get_duration(duration))
+            {
+                _logger.warning("Failed to query: get duration failed (cmd=%d, query=%s)", cmd, query.c_str());
+                return false;
+            }
+
+            result = duration;
+            return true;
+        }
+    }else if (query_type._command == "Parameters")
+    {
+        return _parameters.query(cmd, query_type._remaining, result);
+    }
+
+    _logger.warning("Failed to query: invalid query (cmd=%d, query=%s)", cmd, query.c_str());
+    return false;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Retry_After::set_retry_after(std::string retry_after)
+{
+    _retry_after = String_Functions::str_to_ul(retry_after);
+    if (_retry_after == INVALID_RETRY_AFTER)
+    {
+        _logger.warning("Failed to set retry after: str to ul failed (retry_after=%s)", retry_after.c_str());
+        return false;
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Retry_After::get_retry_after(std::string &retry_after)
+{
+    if (_retry_after == INVALID_RETRY_AFTER)
+    {
+        _logger.warning("Failed to get retry after: invalid retry after");
+        return false;
+    }
+
+    retry_after = std::to_string(_retry_after);
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Retry_After::set_duration(std::string duration)
+{
+    _duration = String_Functions::str_to_ul(duration);
+    if (_duration == INVALID_DURATION)
+    {
+        _logger.warning("Failed to set duration: str to ul failed (duration=%s)", duration.c_str());
+        return false;
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Retry_After::get_duration(std::string &duration)
+{
+    if (_duration == INVALID_DURATION)
+    {
+        _logger.warning("Failed to get duration: invalid duration");
+        return false;
+    }
+
+    duration = std::to_string(_duration);
     return true;
 }
 
@@ -2748,7 +4884,7 @@ bool SIP_Header_Route::decode(std::string &sip_msg)
     {
         matched = String_Functions::match(sip_msg, ";", result);
         String_Functions::trim(result);
-        _parameters.push_back(result);
+        _parameters.add_parameter(result);
     }
 
     return true;
@@ -2761,8 +4897,9 @@ bool SIP_Header_Route::encode(std::string &sip_msg)
     if (!_address.encode(sip_msg))
         return false;
 
-    std::list<std::string>::const_iterator it = _parameters.begin();
-    while (it != _parameters.end())
+    std::list<std::string> &parameters = _parameters.get_parameters();
+    std::list<std::string>::const_iterator it = parameters.begin();
+    while (it != parameters.end())
     {
         sip_msg += ";";
         sip_msg += *it++;
@@ -2772,14 +4909,31 @@ bool SIP_Header_Route::encode(std::string &sip_msg)
 }
 
 //-------------------------------------------
+
+bool SIP_Header_Route::query_header(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    Query query_type(query);
+    if (query_type._command == "Address")
+    {
+        return _address.query(cmd, query_type._remaining, result);
+
+    }else if (query_type._command == "Parameters")
+    {
+        return _parameters.query(cmd, query_type._remaining, result);
+    }
+
+    _logger.warning("Failed to query: invalid query (cmd=%d, query=%s)", cmd, query.c_str());
+    return false;
+}
+
+//-------------------------------------------
 //-------------------------------------------
 
 bool SIP_Header_RSeq::decode(std::string &sip_msg)
 {
     String_Functions::trim(sip_msg);
 
-    _rseq = String_Functions::str_to_ul(sip_msg);
-    if (_rseq == INVALID_RSEQ)
+    if (!set_rseq(sip_msg))
         return false;
 
     return true;
@@ -2793,6 +4947,69 @@ bool SIP_Header_RSeq::encode(std::string &sip_msg)
         return false;
 
     sip_msg += std::to_string(_rseq);
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_RSeq::query_header(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    Query query_type(query);
+    if (query_type._command == "RSeq")
+    {
+        if (cmd == QUERY_SET)
+        {
+            if (!set_rseq(query_type._remaining))
+            {
+                _logger.warning("Failed to query: set rseq failed (cmd=%d, query=%s)", cmd, query.c_str());
+                return false;
+            }
+
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            std::string rseq;
+            if (!get_rseq(rseq))
+            {
+                _logger.warning("Failed to query: get rseq failed (cmd=%d, query=%s)", cmd, query.c_str());
+                return false;
+            }
+
+            result = rseq;
+            return true;
+        }
+    }
+
+    _logger.warning("Failed to query: invalid query (cmd=%d, query=%s)", cmd, query.c_str());
+    return false;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_RSeq::set_rseq(std::string rseq)
+{
+    _rseq = String_Functions::str_to_ul(rseq);
+    if (_rseq == INVALID_RSEQ)
+    {
+        _logger.warning("Failed to set rseq: str to ul failed (rseq=%s)", rseq.c_str());
+        return false;
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_RSeq::get_rseq(std::string &rseq)
+{
+    if (_rseq == INVALID_RSEQ)
+    {
+        _logger.warning("Failed to get rseq: invalid rseq");
+        return false;
+    }
+
+    rseq = std::to_string(_rseq);
     return true;
 }
 
@@ -2821,6 +5038,29 @@ bool SIP_Header_Server::encode(std::string &sip_msg)
 }
 
 //-------------------------------------------
+
+bool SIP_Header_Server::query_header(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    Query query_type(query);
+    if (query_type._command == "Server")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_server(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_server();
+            return true;
+        }
+    }
+
+    _logger.warning("Failed to query: invalid query (cmd=%d, query=%s)", cmd, query.c_str());
+    return false;
+}
+
+//-------------------------------------------
 //-------------------------------------------
 
 bool SIP_Header_Subject::decode(std::string &sip_msg)
@@ -2844,6 +5084,29 @@ bool SIP_Header_Subject::encode(std::string &sip_msg)
 
     sip_msg += _subject;
     return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Subject::query_header(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    Query query_type(query);
+    if (query_type._command == "Subject")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_subject(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_subject();
+            return true;
+        }
+    }
+
+    _logger.warning("Failed to query: invalid query (cmd=%d, query=%s)", cmd, query.c_str());
+    return false;
 }
 
 //-------------------------------------------
@@ -2879,8 +5142,7 @@ bool SIP_Header_Subscription_State::decode(std::string &sip_msg)
             if (exp.empty())
                 return false;
 
-            _expires = String_Functions::str_to_ul(exp);
-            if (_expires == INVALID_EXPIRES)
+            if (!set_expires(exp))
                 return false;
 
         }else if (String_Functions::start_with(result, "retry-after="))
@@ -2890,11 +5152,10 @@ bool SIP_Header_Subscription_State::decode(std::string &sip_msg)
             if (retry.empty())
                 return false;
 
-            _retry_after = String_Functions::str_to_ul(retry);
-            if (_retry_after == INVALID_RETRY_AFTER)
+            if (!set_retry_after(retry))
                 return false;
         }else
-            _parameters.push_back(result);
+            _parameters.add_parameter(result);
     }
 
     return true;
@@ -2927,14 +5188,101 @@ bool SIP_Header_Subscription_State::encode(std::string &sip_msg)
         sip_msg += std::to_string(_retry_after);
     }
 
-    std::list<std::string>::const_iterator it = _parameters.begin();
-    while (it != _parameters.end())
+    std::list<std::string> &parameters = _parameters.get_parameters();
+    std::list<std::string>::const_iterator it = parameters.begin();
+    while (it != parameters.end())
     {
         sip_msg += ";";
         sip_msg += *it++;
     }
 
     return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Subscription_State::query_header(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    Query query_type(query);
+    if (query_type._command == "State")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_state(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_state();
+            return true;
+        }
+    }else if (query_type._command == "Reason")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_reason(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_reason();
+            return true;
+        }
+    }else if (query_type._command == "Expires")
+    {
+        if (cmd == QUERY_SET)
+        {
+            if (!set_expires(query_type._remaining))
+            {
+                _logger.warning("Failed to query: set expires failed (cmd=%d, query=%s)", cmd, query.c_str());
+                return false;
+            }
+
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            std::string expires;
+            if (!get_expires(expires))
+            {
+                _logger.warning("Failed to query: get expires failed (cmd=%d, query=%s)", cmd, query.c_str());
+                return false;
+            }
+
+            result = expires;
+            return true;
+        }
+    }else if (query_type._command == "Retry-After")
+    {
+        if (cmd == QUERY_SET)
+        {
+            if (!set_retry_after(query_type._remaining))
+            {
+                _logger.warning("Failed to query: set retry after failed (cmd=%d, query=%s)", cmd, query.c_str());
+                return false;
+            }
+
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            std::string retry_after;
+            if (!get_retry_after(retry_after))
+            {
+                _logger.warning("Failed to query: get retry after failed (cmd=%d, query=%s)", cmd, query.c_str());
+                return false;
+            }
+
+            result = retry_after;
+            return true;
+        }
+    }else if (query_type._command == "Parameters")
+    {
+        return _parameters.query(cmd, query_type._remaining, result);
+    }
+
+    _logger.warning("Failed to query: invalid query (cmd=%d, query=%s)", cmd, query.c_str());
+    return false;
 }
 
 //-------------------------------------------
@@ -3004,6 +5352,62 @@ SIP_Header_Subscription_State::Reason SIP_Header_Subscription_State::get_reason_
 }
 
 //-------------------------------------------
+
+bool SIP_Header_Subscription_State::set_expires(std::string expires)
+{
+    _expires = String_Functions::str_to_ul(expires);
+    if (_expires == INVALID_EXPIRES)
+    {
+        _logger.warning("Failed to set expires: str to ul failed (expires=%s)", expires.c_str());
+        return false;
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Subscription_State::get_expires(std::string &expires)
+{
+    if (_expires == INVALID_EXPIRES)
+    {
+        _logger.warning("Failed to get expires: invalid expires");
+        return false;
+    }
+
+    expires = std::to_string(_expires);
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Subscription_State::set_retry_after(std::string retry_after)
+{
+    _retry_after = String_Functions::str_to_ul(retry_after);
+    if (_retry_after == INVALID_RETRY_AFTER)
+    {
+        _logger.warning("Failed to set retry after: str to ul failed (retry_after=%s)", retry_after.c_str());
+        return false;
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Subscription_State::get_retry_after(std::string &retry_after)
+{
+    if (_retry_after == INVALID_RETRY_AFTER)
+    {
+        _logger.warning("Failed to get retry after: invalid retry after");
+        return false;
+    }
+
+    retry_after = std::to_string(_retry_after);
+    return true;
+}
+
+//-------------------------------------------
 //-------------------------------------------
 
 bool SIP_Header_Supported::decode(std::string &sip_msg)
@@ -3027,6 +5431,29 @@ bool SIP_Header_Supported::encode(std::string &sip_msg)
 
     sip_msg += _option_tag;
     return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Supported::query_header(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    Query query_type(query);
+    if (query_type._command == "Option-Tag")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_option_tag(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_option_tag();
+            return true;
+        }
+    }
+
+    _logger.warning("Failed to query: invalid query (cmd=%d, query=%s)", cmd, query.c_str());
+    return false;
 }
 
 //-------------------------------------------
@@ -3073,6 +5500,41 @@ bool SIP_Header_Timestamp::encode(std::string &sip_msg)
 }
 
 //-------------------------------------------
+
+bool SIP_Header_Timestamp::query_header(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    Query query_type(query);
+    if (query_type._command == "Timestamp")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_timestamp(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_timestamp();
+            return true;
+        }
+    }else if (query_type._command == "Delay")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_delay(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_delay();
+            return true;
+        }
+    }
+
+    _logger.warning("Failed to query: invalid query (cmd=%d, query=%s)", cmd, query.c_str());
+    return false;
+}
+
+//-------------------------------------------
 //-------------------------------------------
 
 bool SIP_Header_To::decode(std::string &sip_msg)
@@ -3095,7 +5557,7 @@ bool SIP_Header_To::decode(std::string &sip_msg)
             if (_tag.empty())
                 return false;
         }else
-            _parameters.push_back(result);
+            _parameters.add_parameter(result);
     }
 
     return true;
@@ -3114,14 +5576,45 @@ bool SIP_Header_To::encode(std::string &sip_msg)
         sip_msg += _tag;
     }
 
-    std::list<std::string>::const_iterator it = _parameters.begin();
-    while (it != _parameters.end())
+    std::list<std::string> &parameters = _parameters.get_parameters();
+    std::list<std::string>::const_iterator it = parameters.begin();
+    while (it != parameters.end())
     {
         sip_msg += ";";
         sip_msg += *it++;
     }
 
     return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_To::query_header(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    Query query_type(query);
+    if (query_type._command == "Address")
+    {
+        return _address.query(cmd, query_type._remaining, result);
+
+    }else if (query_type._command == "Tag")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_tag(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_tag();
+            return true;
+        }
+    }else if (query_type._command == "Parameters")
+    {
+        return _parameters.query(cmd, query_type._remaining, result);
+    }
+
+    _logger.warning("Failed to query: invalid query (cmd=%d, query=%s)", cmd, query.c_str());
+    return false;
 }
 
 //-------------------------------------------
@@ -3169,6 +5662,41 @@ bool SIP_Header_Unknown::encode(std::string &sip_msg)
 }
 
 //-------------------------------------------
+
+bool SIP_Header_Unknown::query_header(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    Query query_type(query);
+    if (query_type._command == "Header")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_header(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_header();
+            return true;
+        }
+    }else if (query_type._command == "Value")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_value(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_value();
+            return true;
+        }
+    }
+
+    _logger.warning("Failed to query: invalid query (cmd=%d, query=%s)", cmd, query.c_str());
+    return false;
+}
+
+//-------------------------------------------
 //-------------------------------------------
 
 bool SIP_Header_Unsupported::decode(std::string &sip_msg)
@@ -3193,6 +5721,29 @@ bool SIP_Header_Unsupported::encode(std::string &sip_msg)
 }
 
 //-------------------------------------------
+
+bool SIP_Header_Unsupported::query_header(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    Query query_type(query);
+    if (query_type._command == "Option-Tag")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_option_tag(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_option_tag();
+            return true;
+        }
+    }
+
+    _logger.warning("Failed to query: invalid query (cmd=%d, query=%s)", cmd, query.c_str());
+    return false;
+}
+
+//-------------------------------------------
 //-------------------------------------------
 
 bool SIP_Header_User_Agent::decode(std::string &sip_msg)
@@ -3214,6 +5765,29 @@ bool SIP_Header_User_Agent::encode(std::string &sip_msg)
 
     sip_msg += _user_agent;
     return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_User_Agent::query_header(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    Query query_type(query);
+    if (query_type._command == "User-Agent")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_user_agent(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_user_agent();
+            return true;
+        }
+    }
+
+    _logger.warning("Failed to query: invalid query (cmd=%d, query=%s)", cmd, query.c_str());
+    return false;
 }
 
 //-------------------------------------------
@@ -3267,8 +5841,7 @@ bool SIP_Header_Via::decode(std::string &sip_msg)
         matched = String_Functions::match(sip_msg, ";", result);
         String_Functions::trim(result);
 
-        _port = String_Functions::str_to_us(result);
-        if (_port == INVALID_PORT)
+        if (!set_port(result))
             return false;
     }else
     {
@@ -3310,8 +5883,7 @@ bool SIP_Header_Via::decode(std::string &sip_msg)
             if (ttl.empty())
                 return false;
 
-            _ttl = String_Functions::str_to_us(ttl);
-            if (_ttl == INVALID_TTL)
+            if (!set_ttl(ttl))
                 return false;
 
         }else if (String_Functions::start_with(result, "maddr="))
@@ -3324,7 +5896,10 @@ bool SIP_Header_Via::decode(std::string &sip_msg)
             if (!_maddr.decode(maddr))
                 return false;
         }else
-            _parameters.push_back(result);
+        {
+            if (!_parameters.add_parameter(result))
+                return false;
+        }
     }
 
     return true;
@@ -3378,14 +5953,145 @@ bool SIP_Header_Via::encode(std::string &sip_msg)
             return false;
     }
 
-    std::list<std::string>::const_iterator it = _parameters.begin();
-    while (it != _parameters.end())
+    std::list<std::string> &parameters = _parameters.get_parameters();
+    std::list<std::string>::const_iterator it = parameters.begin();
+    while (it != parameters.end())
     {
         sip_msg += ";";
         sip_msg += *it++;
     }
 
     return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Via::query_header(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    Query query_type(query);
+    if (query_type._command == "Protocol-Name")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_protocol_name(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_protocol_name();
+            return true;
+        }
+    }else if (query_type._command == "Protocol-Version")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_protocol_version(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_protocol_version();
+            return true;
+        }
+    }else if (query_type._command == "Transport")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_transport(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_transport();
+            return true;
+        }
+    }else if (query_type._command == "Host")
+    {
+        return _host.query(cmd, query_type._remaining, result);
+
+    }else if (query_type._command == "Port")
+    {
+        if (cmd == QUERY_SET)
+        {
+            if (!set_port(query_type._remaining))
+            {
+                _logger.warning("Failed to query: set port failed (cmd=%d, query=%s)", cmd, query.c_str());
+                return false;
+            }
+
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            std::string port;
+            if (!get_port(port))
+            {
+                _logger.warning("Failed to query: get port failed (cmd=%d, query=%s)", cmd, query.c_str());
+                return false;
+            }
+
+            result = port;
+            return true;
+        }
+    }else if (query_type._command == "Branch")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_branch(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_branch();
+            return true;
+        }
+    }else if (query_type._command == "Received")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_received(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_received();
+            return true;
+        }
+    }else if (query_type._command == "TTL")
+    {
+        if (cmd == QUERY_SET)
+        {
+            if (!set_ttl(query_type._remaining))
+            {
+                _logger.warning("Failed to query: set ttl failed (cmd=%d, query=%s)", cmd, query.c_str());
+                return false;
+            }
+
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            std::string ttl;
+            if (!get_ttl(ttl))
+            {
+                _logger.warning("Failed to query: get ttl failed (cmd=%d, query=%s)", cmd, query.c_str());
+                return false;
+            }
+
+            result = ttl;
+            return true;
+        }
+    }else if (query_type._command == "Multicast-Address")
+    {
+        return _maddr.query(cmd, query_type._remaining, result);
+
+    }else if (query_type._command == "Parameters")
+    {
+        return _parameters.query(cmd, query_type._remaining, result);
+    }
+
+    _logger.warning("Failed to query: invalid query (cmd=%d, query=%s)", cmd, query.c_str());
+    return false;
 }
 
 //-------------------------------------------
@@ -3404,9 +6110,65 @@ SIP_Transport_Type SIP_Header_Via::get_transport_enum()
 
 //-------------------------------------------
 
+bool SIP_Header_Via::set_port(std::string port)
+{
+    _port = String_Functions::str_to_us(port);
+    if (_port == INVALID_PORT)
+    {
+        _logger.warning("Failed to set port: str to us failed (port=%s)", port.c_str());
+        return false;
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Via::get_port(std::string &port)
+{
+    if (_port == INVALID_PORT)
+    {
+        _logger.warning("Failed to get port: invalid port");
+        return false;
+    }
+
+    port = std::to_string(_port);
+    return true;
+}
+
+//-------------------------------------------
+
 void SIP_Header_Via::set_random_branch()
 {
     _branch = "z9hG4bK" + String_Functions::random(20);
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Via::set_ttl(std::string ttl)
+{
+    _ttl = String_Functions::str_to_us(ttl);
+    if (_ttl == INVALID_TTL)
+    {
+        _logger.warning("Failed to set ttl: str to us failed (ttl=%s)", ttl.c_str());
+        return false;
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Via::get_ttl(std::string &ttl)
+{
+    if (_ttl == INVALID_TTL)
+    {
+        _logger.warning("Failed to get ttl: invalid ttl");
+        return false;
+    }
+
+    ttl = std::to_string(_ttl);
+    return true;
 }
 
 //-------------------------------------------
@@ -3424,8 +6186,7 @@ bool SIP_Header_Warning::decode(std::string &sip_msg)
     if (result.empty())
         return false;
 
-    _code = String_Functions::str_to_us(result);
-    if (_code == INVALID_CODE)
+    if (!set_code(result))
         return false;
 
     String_Functions::trim(sip_msg);
@@ -3462,6 +6223,93 @@ bool SIP_Header_Warning::encode(std::string &sip_msg)
 }
 
 //-------------------------------------------
+
+bool SIP_Header_Warning::query_header(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    Query query_type(query);
+    if (query_type._command == "Code")
+    {
+        if (cmd == QUERY_SET)
+        {
+            if (!set_code(query_type._remaining))
+            {
+                _logger.warning("Failed to query: set code failed (cmd=%d, query=%s)", cmd, query.c_str());
+                return false;
+            }
+
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            std::string code;
+            if (!get_code(code))
+            {
+                _logger.warning("Failed to query: get code failed (cmd=%d, query=%s)", cmd, query.c_str());
+                return false;
+            }
+
+            result = code;
+            return true;
+        }
+    }else if (query_type._command == "Agent")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_agent(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_agent();
+            return true;
+        }
+    }else if (query_type._command == "Text")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_text(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_text();
+            return true;
+        }
+    }
+
+    _logger.warning("Failed to query: invalid query (cmd=%d, query=%s)", cmd, query.c_str());
+    return false;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Warning::set_code(std::string code)
+{
+    _code = String_Functions::str_to_us(code);
+    if (_code == INVALID_CODE)
+    {
+        _logger.warning("Failed to set code: str to us failed (code=%s)", code.c_str());
+        return false;
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Header_Warning::get_code(std::string &code)
+{
+    if (_code == INVALID_CODE)
+    {
+        _logger.warning("Failed to get code: invalid code");
+        return false;
+    }
+
+    code = std::to_string(_code);
+    return true;
+}
+
+//-------------------------------------------
 //-------------------------------------------
 
 bool SIP_Header_WWW_Authenticate::decode(std::string &sip_msg)
@@ -3474,6 +6322,20 @@ bool SIP_Header_WWW_Authenticate::decode(std::string &sip_msg)
 bool SIP_Header_WWW_Authenticate::encode(std::string &sip_msg)
 {
     return _challenge.encode(sip_msg);
+}
+
+//-------------------------------------------
+
+bool SIP_Header_WWW_Authenticate::query_header(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    Query query_type(query);
+    if (query_type._command == "Challenge")
+    {
+        return _challenge.query(cmd, query_type._remaining, result);
+    }
+
+    _logger.warning("Failed to query: invalid query (cmd=%d, query=%s)", cmd, query.c_str());
+    return false;
 }
 
 //-------------------------------------------

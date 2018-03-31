@@ -15,6 +15,7 @@
 #include "sip_address.h"
 #include "util/util_defs.h"
 #include "util/log_manager.h"
+#include "util/parameter_list.h"
 #include <string>
 #include <list>
 
@@ -39,12 +40,15 @@ public:
     static bool decode_headers(std::string &sip_msg, sip_header_list &headers);
     static bool encode_headers(std::string &sip_msg, sip_header_list &headers);
 
+    bool query(QueryCommand cmd, const std::string &query, std::string &result);
+
     // Virtual pure functions
     virtual SIP_Header_Type get_header_type() = 0;
     virtual Header_Separator decode_separator() = 0;
     virtual Header_Separator encode_separator() = 0;
     virtual bool decode(std::string &sip_msg) = 0;
     virtual bool encode(std::string &sip_msg) = 0;
+    virtual bool query_header(QueryCommand cmd, const std::string &query, std::string &result) = 0;
 
 protected:
     std::string _header_line;
@@ -64,6 +68,7 @@ public:
 
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
+    bool query(QueryCommand cmd, const std::string &query, std::string &result);
 
     void set_scheme(std::string scheme) { _scheme = scheme; }
     std::string get_scheme() { return _scheme; }
@@ -89,8 +94,8 @@ public:
     void set_qop(std::string qop) { _qop = qop; }
     std::string get_qop() { return _qop; }
 
-    void set_parameters(std::list<std::string> &parameters) { _parameters = parameters; }
-    std::list<std::string> &get_parameters() { return _parameters; }
+    void set_parameters(Parameter_List &parameters) { _parameters = parameters; }
+    Parameter_List &get_parameters() { return _parameters; }
 
 private:
     std::string _scheme;
@@ -101,7 +106,9 @@ private:
     std::string _stale;
     std::string _algorithm;
     std::string _qop;
-    std::list<std::string> _parameters;
+    Parameter_List _parameters;
+
+    static Logger _logger;
 };
 
 //-------------------------------------------
@@ -115,6 +122,7 @@ public:
 
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
+    bool query(QueryCommand cmd, const std::string &query, std::string &result);
 
     void set_scheme(std::string scheme) { _scheme = scheme; }
     std::string get_scheme() { return _scheme; }
@@ -149,8 +157,8 @@ public:
     void set_nonce_count(std::string nonce_count) { _nonce_count = nonce_count; }
     std::string get_nonce_count() { return _nonce_count; }
 
-    void set_parameters(std::list<std::string> &parameters) { _parameters = parameters; }
-    std::list<std::string> &get_parameters() { return _parameters; }
+    void set_parameters(Parameter_List &parameters) { _parameters = parameters; }
+    Parameter_List &get_parameters() { return _parameters; }
 
 private:
     std::string _scheme;
@@ -164,7 +172,9 @@ private:
     std::string _opaque;
     std::string _qop;
     std::string _nonce_count;
-    std::list<std::string> _parameters;
+    Parameter_List _parameters;
+
+    static Logger _logger;
 };
 
 //-------------------------------------------
@@ -199,6 +209,7 @@ public:
 
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
+    bool query(QueryCommand cmd, const std::string &query, std::string &result);
 
     void set_type(Type type);
     void set_type(std::string type) { _type = type; }
@@ -213,14 +224,16 @@ public:
     void set_q(std::string q) { _q = q; }
     std::string get_q() { return _q; }
 
-    void set_parameters(std::list<std::string> &parameters) { _parameters = parameters; }
-    std::list<std::string> &get_parameters() { return _parameters; }
+    void set_parameters(Parameter_List &parameters) { _parameters = parameters; }
+    Parameter_List &get_parameters() { return _parameters; }
 
 private:
     std::string _type;
     std::string _subtype;
     std::string _q;
-    std::list<std::string> _parameters;
+    Parameter_List _parameters;
+
+    static Logger _logger;
 };
 
 //-------------------------------------------
@@ -241,17 +254,21 @@ public:
 
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
+    bool query(QueryCommand cmd, const std::string &query, std::string &result);
 
     void set_package(Package package);
     void set_package(std::string package) { _package = package; }
     Package get_package_enum();
     std::string get_package() { return _package; }
 
-    std::list<std::string> &get_templates() { return _templates; }
+    void set_templates(Parameter_List &templates) { _templates = templates; }
+    Parameter_List &get_templates() { return _templates; }
 
 private:
     std::string _package;
-    std::list<std::string> _templates;
+    Parameter_List _templates;
+
+    static Logger _logger;
 };
 
 //-------------------------------------------
@@ -270,6 +287,7 @@ public:
     Header_Separator encode_separator() { return HEADER_SEPARATOR_COMMA; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
+    bool query_header(QueryCommand cmd, const std::string &query, std::string &result);
 
     SIP_Media_Range &get_media_range() { return _media_range; }
 
@@ -292,6 +310,7 @@ public:
     Header_Separator encode_separator() { return HEADER_SEPARATOR_COMMA; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
+    bool query_header(QueryCommand cmd, const std::string &query, std::string &result);
 
     void set_coding(std::string coding) { _coding = coding; }
     std::string get_coding() { return _coding; }
@@ -299,13 +318,13 @@ public:
     void set_q(std::string q) { _q = q; }
     std::string get_q() { return _q; }
 
-    void set_parameters(std::list<std::string> &parameters) { _parameters = parameters; }
-    std::list<std::string> &get_parameters() { return _parameters; }
+    void set_parameters(Parameter_List &parameters) { _parameters = parameters; }
+    Parameter_List &get_parameters() { return _parameters; }
 
 private:
     std::string _coding;
     std::string _q;
-    std::list<std::string> _parameters;
+    Parameter_List _parameters;
 };
 
 //-------------------------------------------
@@ -323,6 +342,7 @@ public:
     Header_Separator encode_separator() { return HEADER_SEPARATOR_COMMA; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
+    bool query_header(QueryCommand cmd, const std::string &query, std::string &result);
 
     void set_language(std::string language) { _language = language; }
     std::string get_language() { return _language; }
@@ -330,13 +350,13 @@ public:
     void set_q(std::string q) { _q = q; }
     std::string get_q() { return _q; }
 
-    void set_parameters(std::list<std::string> &parameters) { _parameters = parameters; }
-    std::list<std::string> &get_parameters() { return _parameters; }
+    void set_parameters(Parameter_List &parameters) { _parameters = parameters; }
+    Parameter_List &get_parameters() { return _parameters; }
 
 private:
     std::string _language;
     std::string _q;
-    std::list<std::string> _parameters;
+    Parameter_List _parameters;
 };
 
 //-------------------------------------------
@@ -354,16 +374,17 @@ public:
     Header_Separator encode_separator() { return HEADER_SEPARATOR_COMMA; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
+    bool query_header(QueryCommand cmd, const std::string &query, std::string &result);
 
     void set_address(const SIP_Address &address) { _address = address; }
     SIP_Address &get_address() { return _address; }
 
-    void set_parameters(std::list<std::string> &parameters) { _parameters = parameters; }
-    std::list<std::string> &get_parameters() { return _parameters; }
+    void set_parameters(Parameter_List &parameters) { _parameters = parameters; }
+    Parameter_List &get_parameters() { return _parameters; }
 
 private:
     SIP_Address _address;
-    std::list<std::string> _parameters;
+    Parameter_List _parameters;
 };
 
 //-------------------------------------------
@@ -381,6 +402,7 @@ public:
     Header_Separator encode_separator() { return HEADER_SEPARATOR_COMMA; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
+    bool query_header(QueryCommand cmd, const std::string &query, std::string &result);
 
     void set_method(SIP_Method_Type method);
     void set_method(std::string method) { _method = method; }
@@ -406,7 +428,9 @@ public:
     Header_Separator encode_separator() { return HEADER_SEPARATOR_COMMA; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
+    bool query_header(QueryCommand cmd, const std::string &query, std::string &result);
 
+    void get_event_type(const SIP_Event_Type &event_type) { _event_type = event_type; }
     SIP_Event_Type &get_event_type() { return _event_type; }
 
 private:
@@ -428,6 +452,7 @@ public:
     Header_Separator encode_separator() { return HEADER_SEPARATOR_CRLF; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
+    bool query_header(QueryCommand cmd, const std::string &query, std::string &result);
 
     void set_next_nonce(std::string next_nonce) { _next_nonce = next_nonce; }
     std::string get_next_nonce() { return _next_nonce; }
@@ -444,8 +469,8 @@ public:
     void set_nonce_count(std::string nonce_count) { _nonce_count = nonce_count; }
     std::string get_nonce_count() { return _nonce_count; }
 
-    void set_parameters(std::list<std::string> &parameters) { _parameters = parameters; }
-    std::list<std::string> &get_parameters() { return _parameters; }
+    void set_parameters(Parameter_List &parameters) { _parameters = parameters; }
+    Parameter_List &get_parameters() { return _parameters; }
 
 private:
     std::string _next_nonce;
@@ -453,7 +478,7 @@ private:
     std::string _response;
     std::string _cnonce;
     std::string _nonce_count;
-    std::list<std::string> _parameters;
+    Parameter_List _parameters;
 };
 
 //-------------------------------------------
@@ -471,7 +496,9 @@ public:
     Header_Separator encode_separator() { return HEADER_SEPARATOR_CRLF; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
+    bool query_header(QueryCommand cmd, const std::string &query, std::string &result);
 
+    void set_credential(const SIP_Credential &credential) { _credential = credential; }
     SIP_Credential &get_credential() { return _credential; }
 
 private:
@@ -493,6 +520,7 @@ public:
     Header_Separator encode_separator() { return HEADER_SEPARATOR_NONE; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
+    bool query_header(QueryCommand cmd, const std::string &query, std::string &result);
 
     void set_call_id(std::string call_id) { _call_id = call_id; }
     void set_random_call_id(std::string host);
@@ -526,6 +554,7 @@ public:
     Header_Separator encode_separator() { return HEADER_SEPARATOR_COMMA; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
+    bool query_header(QueryCommand cmd, const std::string &query, std::string &result);
 
     void set_address(const SIP_Address &address) { _address = address; }
     SIP_Address &get_address() { return _address; }
@@ -535,13 +564,13 @@ public:
     Purpose get_purpose_enum();
     std::string get_purpose() { return _purpose; }
 
-    void set_parameters(std::list<std::string> &parameters) { _parameters = parameters; }
-    std::list<std::string> &get_parameters() { return _parameters; }
+    void set_parameters(Parameter_List &parameters) { _parameters = parameters; }
+    Parameter_List &get_parameters() { return _parameters; }
 
 private:
     SIP_Address _address;
     std::string _purpose;
-    std::list<std::string> _parameters;
+    Parameter_List _parameters;
 };
 
 //-------------------------------------------
@@ -562,6 +591,7 @@ public:
     Header_Separator encode_separator() { return HEADER_SEPARATOR_CRLF; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
+    bool query_header(QueryCommand cmd, const std::string &query, std::string &result);
 
     void set_star(bool star) { _star = star; }
     bool is_star() { return _star; }
@@ -570,20 +600,22 @@ public:
     SIP_Address &get_address() { return _address; }
 
     void set_expires(unsigned long expires) { _expires = expires; }
+    bool set_expires(std::string expires);
     unsigned long get_expires() { return _expires; }
+    bool get_expires(std::string &expires);
 
     void set_q(std::string q) { _q = q; }
     std::string get_q() { return _q; }
 
-    void set_parameters(std::list<std::string> &parameters) { _parameters = parameters; }
-    std::list<std::string> &get_parameters() { return _parameters; }
+    void set_parameters(Parameter_List &parameters) { _parameters = parameters; }
+    Parameter_List &get_parameters() { return _parameters; }
 
 private:
     bool _star;
     SIP_Address _address;
     unsigned long _expires;
     std::string _q;
-    std::list<std::string> _parameters;
+    Parameter_List _parameters;
 };
 
 //-------------------------------------------
@@ -618,6 +650,7 @@ public:
     Header_Separator encode_separator() { return HEADER_SEPARATOR_NONE; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
+    bool query_header(QueryCommand cmd, const std::string &query, std::string &result);
 
     void set_type(Type type);
     void set_type(std::string type) { _type = type; }
@@ -629,13 +662,13 @@ public:
     Handling get_handling_enum();
     std::string get_handling() { return _handling; }
 
-    void set_parameters(std::list<std::string> &parameters) { _parameters = parameters; }
-    std::list<std::string> &get_parameters() { return _parameters; }
+    void set_parameters(Parameter_List &parameters) { _parameters = parameters; }
+    Parameter_List &get_parameters() { return _parameters; }
 
 private:
     std::string _type;
     std::string _handling;
-    std::list<std::string> _parameters;
+    Parameter_List _parameters;
 };
 
 //-------------------------------------------
@@ -653,6 +686,7 @@ public:
     Header_Separator encode_separator() { return HEADER_SEPARATOR_COMMA; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
+    bool query_header(QueryCommand cmd, const std::string &query, std::string &result);
 
     void set_coding(std::string coding) { _coding = coding; }
     std::string get_coding() { return _coding; }
@@ -676,6 +710,7 @@ public:
     Header_Separator encode_separator() { return HEADER_SEPARATOR_COMMA; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
+    bool query_header(QueryCommand cmd, const std::string &query, std::string &result);
 
     void set_language(std::string language) { _language = language; }
     std::string get_language() { return _language; }
@@ -702,9 +737,12 @@ public:
     Header_Separator encode_separator() { return HEADER_SEPARATOR_NONE; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
+    bool query_header(QueryCommand cmd, const std::string &query, std::string &result);
 
     void set_length(unsigned long length) { _length = length; }
+    bool set_length(std::string length);
     unsigned long get_length() { return _length; }
+    bool get_length(std::string &length);
 
 private:
     unsigned long _length;
@@ -725,6 +763,7 @@ public:
     Header_Separator encode_separator() { return HEADER_SEPARATOR_NONE; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
+    bool query_header(QueryCommand cmd, const std::string &query, std::string &result);
 
     SIP_Media_Range &get_media_type() { return _media_type; }
 
@@ -750,9 +789,12 @@ public:
     Header_Separator encode_separator() { return HEADER_SEPARATOR_NONE; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
+    bool query_header(QueryCommand cmd, const std::string &query, std::string &result);
 
     void set_sequence(unsigned long sequence) { _sequence = sequence; }
+    bool set_sequence(std::string sequence);
     unsigned long get_sequence() { return _sequence; }
+    bool get_sequence(std::string &sequence);
 
     void set_method(SIP_Method_Type method);
     void set_method(std::string method) { _method = method; }
@@ -815,6 +857,7 @@ public:
     Header_Separator encode_separator() { return HEADER_SEPARATOR_NONE; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
+    bool query_header(QueryCommand cmd, const std::string &query, std::string &result);
 
     void set_weekday(Weekday weekday);
     void set_weekday(std::string weekday) { _weekday = weekday; }
@@ -822,7 +865,9 @@ public:
     std::string get_weekday() { return _weekday; }
 
     void set_day(unsigned short day) { _day = day; }
+    bool set_day(std::string day);
     unsigned short get_day() { return _day; }
+    bool get_day(std::string &day);
 
     void set_month(Month month);
     void set_month(std::string month) { _month = month; }
@@ -830,16 +875,24 @@ public:
     std::string get_month() { return _month; }
 
     void set_year(unsigned short year) { _year = year; }
+    bool set_year(std::string year);
     unsigned short get_year() { return _year; }
+    bool get_year(std::string &year);
 
     void set_hour(unsigned short hour) { _hour = hour; }
+    bool set_hour(std::string hour);
     unsigned short get_hour() { return _hour; }
+    bool get_hour(std::string &hour);
 
     void set_minute(unsigned short minute) { _minute = minute; }
+    bool set_minute(std::string _minute);
     unsigned short get_minute() { return _minute; }
+    bool get_minute(std::string &_minute);
 
     void set_second(unsigned short second) { _second = second; }
+    bool set_second(std::string second);
     unsigned short get_second() { return _second; }
+    bool get_second(std::string &second);
 
     void set_time_zone(std::string time_zone) { _time_zone = time_zone; }
     std::string get_time_zone() { return _time_zone; }
@@ -870,16 +923,17 @@ public:
     Header_Separator encode_separator() { return HEADER_SEPARATOR_COMMA; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
+    bool query_header(QueryCommand cmd, const std::string &query, std::string &result);
 
     void set_address(const SIP_Address &address) { _address = address; }
     SIP_Address &get_address() { return _address; }
 
-    void set_parameters(std::list<std::string> &parameters) { _parameters = parameters; }
-    std::list<std::string> &get_parameters() { return _parameters; }
+    void set_parameters(Parameter_List &parameters) { _parameters = parameters; }
+    Parameter_List &get_parameters() { return _parameters; }
 
 private:
     SIP_Address _address;
-    std::list<std::string> _parameters;
+    Parameter_List _parameters;
 };
 
 //-------------------------------------------
@@ -897,19 +951,21 @@ public:
     Header_Separator encode_separator() { return HEADER_SEPARATOR_NONE; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
+    bool query_header(QueryCommand cmd, const std::string &query, std::string &result);
 
+    void get_event_type(const SIP_Event_Type &event_type) { _event_type = event_type; }
     SIP_Event_Type &get_event_type() { return _event_type; }
 
     void set_id(std::string id) { _id = id; }
     std::string get_id() { return _id; }
 
-    void set_parameters(std::list<std::string> &parameters) { _parameters = parameters; }
-    std::list<std::string> &get_parameters() { return _parameters; }
+    void set_parameters(Parameter_List &parameters) { _parameters = parameters; }
+    Parameter_List &get_parameters() { return _parameters; }
 
 private:
     SIP_Event_Type _event_type;
     std::string _id;
-    std::list<std::string> _parameters;
+    Parameter_List _parameters;
 };
 
 //-------------------------------------------
@@ -930,9 +986,12 @@ public:
     Header_Separator encode_separator() { return HEADER_SEPARATOR_NONE; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
+    bool query_header(QueryCommand cmd, const std::string &query, std::string &result);
 
     void set_expires(unsigned long expires) { _expires = expires; }
+    bool set_expires(std::string expires);
     unsigned long get_expires() { return _expires; }
+    bool get_expires(std::string &expires);
 
 private:
     unsigned long _expires;
@@ -953,6 +1012,7 @@ public:
     Header_Separator encode_separator() { return HEADER_SEPARATOR_NONE; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
+    bool query_header(QueryCommand cmd, const std::string &query, std::string &result);
 
     void set_address(const SIP_Address &address) { _address = address; }
     SIP_Address &get_address() { return _address; }
@@ -961,13 +1021,13 @@ public:
     void set_random_tag();
     std::string get_tag() { return _tag; }
 
-    void set_parameters(std::list<std::string> &parameters) { _parameters = parameters; }
-    std::list<std::string> &get_parameters() { return _parameters; }
+    void set_parameters(Parameter_List &parameters) { _parameters = parameters; }
+    Parameter_List &get_parameters() { return _parameters; }
 
 private:
     SIP_Address _address;
     std::string _tag;
-    std::list<std::string> _parameters;
+    Parameter_List _parameters;
 };
 
 //-------------------------------------------
@@ -985,6 +1045,7 @@ public:
     Header_Separator encode_separator() { return HEADER_SEPARATOR_COMMA; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
+    bool query_header(QueryCommand cmd, const std::string &query, std::string &result);
 
     void set_call_id(std::string call_id) { _call_id = call_id; }
     std::string get_call_id() { return _call_id; }
@@ -1011,9 +1072,12 @@ public:
     Header_Separator encode_separator() { return HEADER_SEPARATOR_NONE; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
+    bool query_header(QueryCommand cmd, const std::string &query, std::string &result);
 
     void set_max_forwards(unsigned short max_forwards) { _max_forwards = max_forwards; }
+    bool set_max_forwards(std::string max_forwards);
     unsigned short get_max_forwards() { return _max_forwards; }
+    bool get_max_forwards(std::string &max_forwards);
 
 private:
     unsigned short _max_forwards;
@@ -1037,12 +1101,17 @@ public:
     Header_Separator encode_separator() { return HEADER_SEPARATOR_NONE; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
+    bool query_header(QueryCommand cmd, const std::string &query, std::string &result);
 
     void set_major_version(unsigned long major_version) { _major_version = major_version; }
+    bool set_major_version(std::string major_version);
     unsigned long get_major_version() { return _major_version; }
+    bool get_major_version(std::string &major_version);
 
     void set_minor_version(unsigned long minor_version) { _minor_version = minor_version; }
+    bool set_minor_version(std::string minor_version);
     unsigned long get_minor_version() { return _minor_version; }
+    bool get_minor_version(std::string &minor_version);
 
 private:
     unsigned long _major_version;
@@ -1067,9 +1136,12 @@ public:
     Header_Separator encode_separator() { return HEADER_SEPARATOR_NONE; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
+    bool query_header(QueryCommand cmd, const std::string &query, std::string &result);
 
     void set_min_expires(unsigned long min_expires) { _min_expires = min_expires; }
+    bool set_min_expires(std::string min_expires);
     unsigned long get_min_expires() { return _min_expires; }
+    bool get_min_expires(std::string &min_expires);
 
 private:
     unsigned long _min_expires;
@@ -1090,6 +1162,7 @@ public:
     Header_Separator encode_separator() { return HEADER_SEPARATOR_NONE; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
+    bool query_header(QueryCommand cmd, const std::string &query, std::string &result);
 
     void set_organization(std::string organization) { _organization = organization; }
     std::string get_organization() { return _organization; }
@@ -1123,6 +1196,7 @@ public:
     Header_Separator encode_separator() { return HEADER_SEPARATOR_NONE; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
+    bool query_header(QueryCommand cmd, const std::string &query, std::string &result);
 
     void set_priority(Priority priority);
     void set_priority(std::string priority) { _priority = priority; }
@@ -1148,7 +1222,9 @@ public:
     Header_Separator encode_separator() { return HEADER_SEPARATOR_CRLF; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
+    bool query_header(QueryCommand cmd, const std::string &query, std::string &result);
 
+    void set_challenge(const SIP_Challenge &challenge) { _challenge = challenge; }
     SIP_Challenge &get_challenge() { return _challenge; }
 
 private:
@@ -1170,7 +1246,9 @@ public:
     Header_Separator encode_separator() { return HEADER_SEPARATOR_CRLF; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
+    bool query_header(QueryCommand cmd, const std::string &query, std::string &result);
 
+    void set_credential(const SIP_Credential &credential) { _credential = credential; }
     SIP_Credential &get_credential() { return _credential; }
 
 private:
@@ -1192,6 +1270,7 @@ public:
     Header_Separator encode_separator() { return HEADER_SEPARATOR_COMMA; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
+    bool query_header(QueryCommand cmd, const std::string &query, std::string &result);
 
     void set_option_tag(std::string option_tag) { _option_tag = option_tag; }
     std::string get_option_tag() { return _option_tag; }
@@ -1219,12 +1298,17 @@ public:
     Header_Separator encode_separator() { return HEADER_SEPARATOR_NONE; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
+    bool query_header(QueryCommand cmd, const std::string &query, std::string &result);
 
     void set_rseq(unsigned long rseq) { _rseq = rseq; }
+    bool set_rseq(std::string rseq);
     unsigned long get_rseq() { return _rseq; }
+    bool get_rseq(std::string &rseq);
 
     void set_cseq(unsigned long cseq) { _cseq = cseq; }
+    bool set_cseq(std::string cseq);
     unsigned long get_cseq() { return _cseq; }
+    bool get_cseq(std::string &rseq);
 
     void set_method(SIP_Method_Type method);
     void set_method(std::string method) { _method = method; }
@@ -1252,16 +1336,17 @@ public:
     Header_Separator encode_separator() { return HEADER_SEPARATOR_CRLF; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
+    bool query_header(QueryCommand cmd, const std::string &query, std::string &result);
 
     void set_address(const SIP_Address &address) { _address = address; }
     SIP_Address &get_address() { return _address; }
 
-    void set_parameters(std::list<std::string> &parameters) { _parameters = parameters; }
-    std::list<std::string> &get_parameters() { return _parameters; }
+    void set_parameters(Parameter_List &parameters) { _parameters = parameters; }
+    Parameter_List &get_parameters() { return _parameters; }
 
 private:
     SIP_Address _address;
-    std::list<std::string> _parameters;
+    Parameter_List _parameters;
 };
 
 //-------------------------------------------
@@ -1279,16 +1364,17 @@ public:
     Header_Separator encode_separator() { return HEADER_SEPARATOR_NONE; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
+    bool query_header(QueryCommand cmd, const std::string &query, std::string &result);
 
     void set_address(const SIP_Address &address) { _address = address; }
     SIP_Address &get_address() { return _address; }
 
-    void set_parameters(std::list<std::string> &parameters) { _parameters = parameters; }
-    std::list<std::string> &get_parameters() { return _parameters; }
+    void set_parameters(Parameter_List &parameters) { _parameters = parameters; }
+    Parameter_List &get_parameters() { return _parameters; }
 
 private:
     SIP_Address _address;
-    std::list<std::string> _parameters;
+    Parameter_List _parameters;
 };
 
 //-------------------------------------------
@@ -1306,6 +1392,7 @@ public:
     Header_Separator encode_separator() { return HEADER_SEPARATOR_NONE; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
+    bool query_header(QueryCommand cmd, const std::string &query, std::string &result);
 
     void set_address(const SIP_Address &address) { _address = address; }
     SIP_Address &get_address() { return _address; }
@@ -1313,13 +1400,13 @@ public:
     void set_cid(std::string cid) { _cid = cid; }
     std::string get_cid() { return _cid; }
 
-    void set_parameters(std::list<std::string> &parameters) { _parameters = parameters; }
-    std::list<std::string> &get_parameters() { return _parameters; }
+    void set_parameters(Parameter_List &parameters) { _parameters = parameters; }
+    Parameter_List &get_parameters() { return _parameters; }
 
 private:
     SIP_Address _address;
     std::string _cid;
-    std::list<std::string> _parameters;
+    Parameter_List _parameters;
 };
 
 //-------------------------------------------
@@ -1337,16 +1424,17 @@ public:
     Header_Separator encode_separator() { return HEADER_SEPARATOR_NONE; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
+    bool query_header(QueryCommand cmd, const std::string &query, std::string &result);
 
     void set_address(const SIP_Address &address) { _address = address; }
     SIP_Address &get_address() { return _address; }
 
-    void set_parameters(std::list<std::string> &parameters) { _parameters = parameters; }
-    std::list<std::string> &get_parameters() { return _parameters; }
+    void set_parameters(Parameter_List &parameters) { _parameters = parameters; }
+    Parameter_List &get_parameters() { return _parameters; }
 
 private:
     SIP_Address _address;
-    std::list<std::string> _parameters;
+    Parameter_List _parameters;
 };
 
 //-------------------------------------------
@@ -1364,6 +1452,7 @@ public:
     Header_Separator encode_separator() { return HEADER_SEPARATOR_COMMA; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
+    bool query_header(QueryCommand cmd, const std::string &query, std::string &result);
 
     void set_option_tag(std::string option_tag) { _option_tag = option_tag; }
     std::string get_option_tag() { return _option_tag; }
@@ -1391,24 +1480,29 @@ public:
     Header_Separator encode_separator() { return HEADER_SEPARATOR_NONE; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
+    bool query_header(QueryCommand cmd, const std::string &query, std::string &result);
 
     void set_retry_after(unsigned long retry_after) { _retry_after = retry_after; }
+    bool set_retry_after(std::string retry_after);
     unsigned long get_retry_after() { return _retry_after; }
+    bool get_retry_after(std::string &retry_after);
 
     void set_comment(std::string comment) { _comment = comment; }
     std::string get_comment() { return _comment; }
 
     void set_duration(unsigned long duration) { _duration = duration; }
+    bool set_duration(std::string duration);
     unsigned long get_duration() { return _duration; }
+    bool get_duration(std::string &duration);
 
-    void set_parameters(std::list<std::string> &parameters) { _parameters = parameters; }
-    std::list<std::string> &get_parameters() { return _parameters; }
+    void set_parameters(Parameter_List &parameters) { _parameters = parameters; }
+    Parameter_List &get_parameters() { return _parameters; }
 
 private:
     unsigned long _retry_after;
     std::string _comment;
     unsigned long _duration;
-    std::list<std::string> _parameters;
+    Parameter_List _parameters;
 };
 
 //-------------------------------------------
@@ -1426,16 +1520,17 @@ public:
     Header_Separator encode_separator() { return HEADER_SEPARATOR_CRLF; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
+    bool query_header(QueryCommand cmd, const std::string &query, std::string &result);
 
     void set_address(const SIP_Address &address) { _address = address; }
     SIP_Address &get_address() { return _address; }
 
-    void set_parameters(std::list<std::string> &parameters) { _parameters = parameters; }
-    std::list<std::string> &get_parameters() { return _parameters; }
+    void set_parameters(Parameter_List &parameters) { _parameters = parameters; }
+    Parameter_List &get_parameters() { return _parameters; }
 
 private:
     SIP_Address _address;
-    std::list<std::string> _parameters;
+    Parameter_List _parameters;
 };
 
 //-------------------------------------------
@@ -1456,9 +1551,12 @@ public:
     Header_Separator encode_separator() { return HEADER_SEPARATOR_NONE; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
+    bool query_header(QueryCommand cmd, const std::string &query, std::string &result);
 
     void set_rseq(unsigned long rseq) { _rseq = rseq; }
+    bool set_rseq(std::string rseq);
     unsigned long get_rseq() { return _rseq; }
+    bool get_rseq(std::string &rseq);
 
 private:
     unsigned long _rseq;
@@ -1479,6 +1577,7 @@ public:
     Header_Separator encode_separator() { return HEADER_SEPARATOR_NONE; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
+    bool query_header(QueryCommand cmd, const std::string &query, std::string &result);
 
     void set_server(std::string server) { _server = server; }
     std::string get_server() { return _server; }
@@ -1502,6 +1601,7 @@ public:
     Header_Separator encode_separator() { return HEADER_SEPARATOR_NONE; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
+    bool query_header(QueryCommand cmd, const std::string &query, std::string &result);
 
     void set_subject(std::string subject) { _subject = subject; }
     std::string get_subject() { return _subject; }
@@ -1549,6 +1649,7 @@ public:
     Header_Separator encode_separator() { return HEADER_SEPARATOR_NONE; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
+    bool query_header(QueryCommand cmd, const std::string &query, std::string &result);
 
     void set_state(State state);
     void set_state(std::string state) { _state = state; }
@@ -1561,20 +1662,24 @@ public:
     std::string get_reason() { return _reason; }
 
     void set_expires(unsigned long expires) { _expires = expires; }
+    bool set_expires(std::string expires);
     unsigned long get_expires() { return _expires; }
+    bool get_expires(std::string &expires);
 
     void set_retry_after(unsigned long retry_after) { _retry_after = retry_after; }
+    bool set_retry_after(std::string retry_after);
     unsigned long get_retry_after() { return _retry_after; }
+    bool get_retry_after(std::string &retry_after);
 
-    void set_parameters(std::list<std::string> &parameters) { _parameters = parameters; }
-    std::list<std::string> &get_parameters() { return _parameters; }
+    void set_parameters(Parameter_List &parameters) { _parameters = parameters; }
+    Parameter_List &get_parameters() { return _parameters; }
 
 private:
     std::string _state;
     std::string _reason;
     unsigned long _expires;
     unsigned long _retry_after;
-    std::list<std::string> _parameters;
+    Parameter_List _parameters;
 };
 
 //-------------------------------------------
@@ -1592,6 +1697,7 @@ public:
     Header_Separator encode_separator() { return HEADER_SEPARATOR_COMMA; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
+    bool query_header(QueryCommand cmd, const std::string &query, std::string &result);
 
     void set_option_tag(std::string option_tag) { _option_tag = option_tag; }
     std::string get_option_tag() { return _option_tag; }
@@ -1615,6 +1721,7 @@ public:
     Header_Separator encode_separator() { return HEADER_SEPARATOR_NONE; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
+    bool query_header(QueryCommand cmd, const std::string &query, std::string &result);
 
     void set_timestamp(std::string timestamp) { _timestamp = timestamp; }
     std::string get_timestamp() { return _timestamp; }
@@ -1642,6 +1749,7 @@ public:
     Header_Separator encode_separator() { return HEADER_SEPARATOR_NONE; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
+    bool query_header(QueryCommand cmd, const std::string &query, std::string &result);
 
     void set_address(const SIP_Address &address) { _address = address; }
     SIP_Address &get_address() { return _address; }
@@ -1650,13 +1758,13 @@ public:
     void set_random_tag();
     std::string get_tag() { return _tag; }
 
-    void set_parameters(std::list<std::string> &parameters) { _parameters = parameters; }
-    std::list<std::string> &get_parameters() { return _parameters; }
+    void set_parameters(Parameter_List &parameters) { _parameters = parameters; }
+    Parameter_List &get_parameters() { return _parameters; }
 
 private:
     SIP_Address _address;
     std::string _tag;
-    std::list<std::string> _parameters;
+    Parameter_List _parameters;
 };
 
 //-------------------------------------------
@@ -1674,6 +1782,7 @@ public:
     Header_Separator encode_separator() { return HEADER_SEPARATOR_CRLF; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
+    bool query_header(QueryCommand cmd, const std::string &query, std::string &result);
 
     void set_header(std::string header) { _header = header; }
     std::string get_header() { return _header; }
@@ -1701,6 +1810,7 @@ public:
     Header_Separator encode_separator() { return HEADER_SEPARATOR_COMMA; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
+    bool query_header(QueryCommand cmd, const std::string &query, std::string &result);
 
     void set_option_tag(std::string option_tag) { _option_tag = option_tag; }
     std::string get_option_tag() { return _option_tag; }
@@ -1724,6 +1834,7 @@ public:
     Header_Separator encode_separator() { return HEADER_SEPARATOR_NONE; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
+    bool query_header(QueryCommand cmd, const std::string &query, std::string &result);
 
     void set_user_agent(std::string user_agent) { _user_agent = user_agent; }
     std::string get_user_agent() { return _user_agent; }
@@ -1753,6 +1864,7 @@ public:
     Header_Separator encode_separator() { return HEADER_SEPARATOR_CRLF; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
+    bool query_header(QueryCommand cmd, const std::string &query, std::string &result);
 
     void set_protocol_name(std::string protocol_name) { _protocol_name = protocol_name; }
     std::string get_protocol_name() { return _protocol_name; }
@@ -1769,7 +1881,9 @@ public:
     SIP_Host &get_host() { return _host; }
 
     void set_port(unsigned short port) { _port = port; }
+    bool set_port(std::string port);
     unsigned short get_port() { return _port; }
+    bool get_port(std::string &port);
 
     void set_branch(std::string branch) { _branch = branch; }
     void set_random_branch();
@@ -1779,13 +1893,15 @@ public:
     std::string get_received() { return _received; }
 
     void set_ttl(unsigned short ttl) { _ttl = ttl; }
+    bool set_ttl(std::string ttl);
     unsigned short get_ttl() { return _ttl; }
+    bool get_ttl(std::string &ttl);
 
     void set_maddr(const SIP_Host &maddr) { _maddr = maddr; }
     SIP_Host &get_maddr() { return _maddr; }
 
-    void set_parameters(std::list<std::string> &parameters) { _parameters = parameters; }
-    std::list<std::string> &get_parameters() { return _parameters; }
+    void set_parameters(const Parameter_List &parameters) { _parameters = parameters; }
+    Parameter_List &get_parameters() { return _parameters; }
 
 private:
     std::string _protocol_name;
@@ -1797,7 +1913,7 @@ private:
     std::string _received;
     unsigned short _ttl;
     SIP_Host _maddr;
-    std::list<std::string> _parameters;
+    Parameter_List _parameters;
 };
 
 //-------------------------------------------
@@ -1818,9 +1934,12 @@ public:
     Header_Separator encode_separator() { return HEADER_SEPARATOR_CRLF; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
+    bool query_header(QueryCommand cmd, const std::string &query, std::string &result);
 
     void set_code(unsigned short code) { _code = code; }
+    bool set_code(std::string code);
     unsigned short get_code() { return _code; }
+    bool get_code(std::string &code);
 
     void set_agent(std::string agent) { _agent = agent; }
     std::string get_agent() { return _agent; }
@@ -1849,7 +1968,9 @@ public:
     Header_Separator encode_separator() { return HEADER_SEPARATOR_CRLF; }
     bool decode(std::string &sip_msg);
     bool encode(std::string &sip_msg);
+    bool query_header(QueryCommand cmd, const std::string &query, std::string &result);
 
+    void set_challenge(const SIP_Challenge &challenge) { _challenge = challenge; }
     SIP_Challenge &get_challenge() { return _challenge; }
 
 private:
