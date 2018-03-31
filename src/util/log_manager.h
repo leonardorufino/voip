@@ -38,6 +38,7 @@ public:
     {
         LOG_TIMER           = 0x00000001,
         LOG_SOCKET          = 0x00000002,
+        LOG_PARAMETER_LIST  = 0x00000004,
         LOG_SIP_ADDRESS     = 0x00000010,
         LOG_SIP_HEADER      = 0x00000020,
         LOG_SIP_BODY        = 0x00000040,

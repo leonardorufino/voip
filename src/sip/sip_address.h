@@ -13,32 +13,11 @@
 
 #include "sip_defs.h"
 #include "util/util_defs.h"
+#include "util/log_manager.h"
+#include "util/parameter_list.h"
 #include "util/socket.h"
 #include <string>
 #include <list>
-
-class SIP_Parameter_List
-{
-public:
-    SIP_Parameter_List() {}
-    SIP_Parameter_List(const SIP_Parameter_List &value) { *this = value; }
-    ~SIP_Parameter_List() {}
-
-    void set_parameters(std::list<std::string> &parameters) { _parameters = parameters; }
-    bool add_parameter(std::string parameter, unsigned short pos = 0xFFFF);
-    bool remove_parameter(unsigned short pos);
-    void clear_parameters() { _parameters.clear(); }
-    std::list<std::string> &get_parameters() { return _parameters; }
-    std::string get_parameter(unsigned short pos = 0);
-    unsigned short get_parameter_size() { return (unsigned short) _parameters.size(); }
-
-private:
-    std::list<std::string> _parameters;
-
-    static Logger _logger;
-};
-
-//-------------------------------------------
 
 class SIP_Host
 {
@@ -122,11 +101,11 @@ public:
     void set_lr(bool lr) { _lr = lr; }
     bool is_lr() { return _lr; }
 
-    void set_parameters(const SIP_Parameter_List &parameters) { _parameters = parameters; }
-    SIP_Parameter_List &get_parameters() { return _parameters; }
+    void set_parameters(const Parameter_List &parameters) { _parameters = parameters; }
+    Parameter_List &get_parameters() { return _parameters; }
 
-    void set_headers(const SIP_Parameter_List &headers) { _headers = headers; }
-    SIP_Parameter_List &get_headers() { return _headers; }
+    void set_headers(const Parameter_List &headers) { _headers = headers; }
+    Parameter_List &get_headers() { return _headers; }
 
 private:
     std::string _user;
@@ -140,8 +119,8 @@ private:
     unsigned short _ttl;
     SIP_Host _maddr;
     bool _lr;
-    SIP_Parameter_List _parameters;
-    SIP_Parameter_List _headers;
+    Parameter_List _parameters;
+    Parameter_List _headers;
 
     static Logger _logger;
 };
