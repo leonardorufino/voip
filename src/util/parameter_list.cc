@@ -25,6 +25,19 @@ bool Parameter_List::query(QueryCommand cmd, const std::string &query, std::stri
         return false;
     }
 
+    if (query == "Size")
+    {
+        if (cmd == QUERY_GET)
+        {
+            result = std::to_string(get_parameter_size());
+            return true;
+        }else
+        {
+            _logger.warning("Failed to query: invalid query command (cmd=%d, query=%s)", cmd, query.c_str());
+            return false;
+        }
+    }
+
     Query query_position(query);
     unsigned short pos = String_Functions::str_to_us(query_position._command);
     if (pos == INVALID_UNSIGNED_SHORT)
