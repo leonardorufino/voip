@@ -9,6 +9,7 @@
  * Written by Leonardo Maccari Rufino
  */
 
+#include "sip_address_test.h"
 #include "sip_header_test.h"
 #include "sip_message_test.h"
 #include "sip_transaction_test.h"
@@ -23,6 +24,12 @@
 int main()
 {
     std::cout << "SIP test initialized\n";
+
+    if (!SIP_Address_Test::init())
+    {
+        std::cout << "SIP address test FAILED!\n";
+        return 1;
+    }
 
     if (!SIP_Header_Test::init())
     {
