@@ -14,6 +14,7 @@
 #include "sdp_defs.h"
 #include "util/util_defs.h"
 #include "util/log_manager.h"
+#include "util/parameter_list.h"
 #include <string>
 #include <list>
 
@@ -30,10 +31,13 @@ public:
     static bool decode_fields(std::string &msg, sdp_field_list &fields);
     static bool encode_fields(std::string &msg, sdp_field_list &fields);
 
+    bool query(QueryCommand cmd, const std::string &query, std::string &result);
+
     // Virtual pure functions
     virtual SDP_Field_Type get_field_type() = 0;
     virtual bool decode(std::string &msg) = 0;
     virtual bool encode(std::string &msg) = 0;
+    virtual bool query_field(QueryCommand cmd, const std::string &query, std::string &result) = 0;
 
 protected:
     std::string _field_line;
@@ -58,6 +62,7 @@ public:
     SDP_Field_Type get_field_type() { return SDP_FIELD_PROTOCOL_VERSION; }
     bool decode(std::string &msg);
     bool encode(std::string &msg);
+    bool query_field(QueryCommand cmd, const std::string &query, std::string &result);
 
     void set_version(unsigned short version) { _version = version; }
     bool set_version(std::string version);
@@ -81,6 +86,7 @@ public:
     SDP_Field_Type get_field_type() { return SDP_FIELD_ORIGIN; }
     bool decode(std::string &msg);
     bool encode(std::string &msg);
+    bool query_field(QueryCommand cmd, const std::string &query, std::string &result);
 
     void set_username(std::string username) { _username = username; }
     std::string get_username() { return _username; }
@@ -122,6 +128,7 @@ public:
     SDP_Field_Type get_field_type() { return SDP_FIELD_SESSION_NAME; }
     bool decode(std::string &msg);
     bool encode(std::string &msg);
+    bool query_field(QueryCommand cmd, const std::string &query, std::string &result);
 
     void set_session_name(std::string name) { _session_name = name; }
     std::string get_session_name() { return _session_name; }
@@ -143,6 +150,7 @@ public:
     SDP_Field_Type get_field_type() { return SDP_FIELD_SESSION_INFORMATION; }
     bool decode(std::string &msg);
     bool encode(std::string &msg);
+    bool query_field(QueryCommand cmd, const std::string &query, std::string &result);
 
     void set_session_information(std::string information) { _session_information = information; }
     std::string get_session_information() { return _session_information; }
@@ -164,6 +172,7 @@ public:
     SDP_Field_Type get_field_type() { return SDP_FIELD_URI; }
     bool decode(std::string &msg);
     bool encode(std::string &msg);
+    bool query_field(QueryCommand cmd, const std::string &query, std::string &result);
 
     void set_uri(std::string uri) { _uri = uri; }
     std::string get_uri() { return _uri; }
@@ -185,6 +194,7 @@ public:
     SDP_Field_Type get_field_type() { return SDP_FIELD_EMAIL_ADDRESS; }
     bool decode(std::string &msg);
     bool encode(std::string &msg);
+    bool query_field(QueryCommand cmd, const std::string &query, std::string &result);
 
     void set_email(std::string email) { _email = email; }
     std::string get_email() { return _email; }
@@ -206,6 +216,7 @@ public:
     SDP_Field_Type get_field_type() { return SDP_FIELD_PHONE_NUMBER; }
     bool decode(std::string &msg);
     bool encode(std::string &msg);
+    bool query_field(QueryCommand cmd, const std::string &query, std::string &result);
 
     void set_phone(std::string phone) { _phone = phone; }
     std::string get_phone() { return _phone; }
@@ -231,6 +242,7 @@ public:
     SDP_Field_Type get_field_type() { return SDP_FIELD_CONNECTION_DATA; }
     bool decode(std::string &msg);
     bool encode(std::string &msg);
+    bool query_field(QueryCommand cmd, const std::string &query, std::string &result);
 
     void set_network_type(std::string type) { _network_type = type; }
     std::string get_network_type() { return _network_type; }
@@ -275,6 +287,7 @@ public:
     SDP_Field_Type get_field_type() { return SDP_FIELD_BANDWIDTH; }
     bool decode(std::string &msg);
     bool encode(std::string &msg);
+    bool query_field(QueryCommand cmd, const std::string &query, std::string &result);
 
     void set_type(std::string type) { _type = type; }
     std::string get_type() { return _type; }
@@ -305,6 +318,7 @@ public:
     SDP_Field_Type get_field_type() { return SDP_FIELD_TIMING; }
     bool decode(std::string &msg);
     bool encode(std::string &msg);
+    bool query_field(QueryCommand cmd, const std::string &query, std::string &result);
 
     void set_start(unsigned long long start) { _start = start; }
     bool set_start(std::string start);
@@ -334,6 +348,7 @@ public:
     SDP_Field_Type get_field_type() { return SDP_FIELD_REPEAT_TIME; }
     bool decode(std::string &msg);
     bool encode(std::string &msg);
+    bool query_field(QueryCommand cmd, const std::string &query, std::string &result);
 
     void set_interval(std::string interval) { _interval = interval; }
     std::string get_interval() { return _interval; }
@@ -341,13 +356,13 @@ public:
     void set_duration(std::string duration) { _duration = duration; }
     std::string get_duration() { return _duration; }
 
-    void set_offsets(std::list<std::string> &offsets) { _offsets = offsets; }
-    std::list<std::string> &get_offsets() { return _offsets; }
+    void set_offsets(Parameter_List &offsets) { _offsets = offsets; }
+    Parameter_List &get_offsets() { return _offsets; }
 
 private:
     std::string _interval;
     std::string _duration;
-    std::list<std::string> _offsets;
+    Parameter_List _offsets;
 };
 
 //-------------------------------------------
@@ -363,16 +378,17 @@ public:
     SDP_Field_Type get_field_type() { return SDP_FIELD_TIME_ZONE; }
     bool decode(std::string &msg);
     bool encode(std::string &msg);
+    bool query_field(QueryCommand cmd, const std::string &query, std::string &result);
 
-    void set_adjustments(std::list<std::string> &adjustments) { _adjustments = adjustments; }
-    std::list<std::string> &get_adjustments() { return _adjustments; }
+    void set_adjustments(Parameter_List &adjustments) { _adjustments = adjustments; }
+    Parameter_List &get_adjustments() { return _adjustments; }
 
-    void set_offsets(std::list<std::string> &offsets) { _offsets = offsets; }
-    std::list<std::string> &get_offsets() { return _offsets; }
+    void set_offsets(Parameter_List &offsets) { _offsets = offsets; }
+    Parameter_List &get_offsets() { return _offsets; }
 
 private:
-    std::list<std::string> _adjustments;
-    std::list<std::string> _offsets;
+    Parameter_List _adjustments;
+    Parameter_List _offsets;
 };
 
 //-------------------------------------------
@@ -398,6 +414,7 @@ public:
     SDP_Field_Type get_field_type() { return SDP_FIELD_ENCRYPTION_KEY; }
     bool decode(std::string &msg);
     bool encode(std::string &msg);
+    bool query_field(QueryCommand cmd, const std::string &query, std::string &result);
 
     void set_method(Method method);
     void set_method(std::string method) { _method = method; }
@@ -449,6 +466,7 @@ public:
     SDP_Field_Type get_field_type() { return SDP_FIELD_ATTRIBUTE; }
     bool decode(std::string &msg);
     bool encode(std::string &msg);
+    bool query_field(QueryCommand cmd, const std::string &query, std::string &result);
 
     void set_attribute(Attribute attribute);
     void set_attribute(std::string attribute) { _attribute = attribute; }
@@ -498,6 +516,7 @@ public:
     SDP_Field_Type get_field_type() { return SDP_FIELD_MEDIA_DESCRIPTION; }
     bool decode(std::string &msg);
     bool encode(std::string &msg);
+    bool query_field(QueryCommand cmd, const std::string &query, std::string &result);
 
     void set_media(Media media);
     void set_media(std::string media) { _media = media; }
@@ -519,15 +538,15 @@ public:
     Protocol get_protocol_enum();
     std::string get_protocol() { return _protocol; }
 
-    void set_formats(std::list<std::string> &formats) { _formats = formats; }
-    std::list<std::string> &get_formats() { return _formats; }
+    void set_formats(Parameter_List &formats) { _formats = formats; }
+    Parameter_List &get_formats() { return _formats; }
 
 private:
     std::string _media;
     unsigned short _port;
     unsigned short _number_ports;
     std::string _protocol;
-    std::list<std::string> _formats;
+    Parameter_List _formats;
 };
 
 //-------------------------------------------

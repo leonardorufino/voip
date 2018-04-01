@@ -12,6 +12,7 @@
 #include "sdp_field.h"
 #include "sdp_functions.h"
 #include "util/string_functions.h"
+#include "util/query.h"
 
 Logger SDP_Field::_logger(Log_Manager::LOG_SDP_FIELD);
 
@@ -166,6 +167,19 @@ bool SDP_Field::encode_fields(std::string &msg, sdp_field_list &fields)
 }
 
 //-------------------------------------------
+
+bool SDP_Field::query(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    if (query.empty())
+    {
+        _logger.warning("Failed to query: invalid query (cmd=%d)", cmd);
+        return false;
+    }
+
+    return query_field(cmd, query, result);
+}
+
+//-------------------------------------------
 //-------------------------------------------
 
 bool SDP_Field_Protocol_Version::decode(std::string &msg)
@@ -188,6 +202,41 @@ bool SDP_Field_Protocol_Version::encode(std::string &msg)
 
     msg += std::to_string(_version);
     return true;
+}
+
+//-------------------------------------------
+
+bool SDP_Field_Protocol_Version::query_field(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    Query query_type(query);
+    if (query_type._command == "Version")
+    {
+        if (cmd == QUERY_SET)
+        {
+            if (!set_version(query_type._remaining))
+            {
+                _logger.warning("Failed to query: set version failed (cmd=%d, query=%s)", cmd, query.c_str());
+                return false;
+            }
+
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            std::string version;
+            if (!get_version(version))
+            {
+                _logger.warning("Failed to query: get version failed (cmd=%d, query=%s)", cmd, query.c_str());
+                return false;
+            }
+
+            result = version;
+            return true;
+        }
+    }
+
+    _logger.warning("Failed to query: invalid query (cmd=%d, query=%s)", cmd, query.c_str());
+    return false;
 }
 
 //-------------------------------------------
@@ -295,6 +344,89 @@ bool SDP_Field_Origin::encode(std::string &msg)
 }
 
 //-------------------------------------------
+
+bool SDP_Field_Origin::query_field(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    Query query_type(query);
+    if (query_type._command == "Username")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_username(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_username();
+            return true;
+        }
+    }else if (query_type._command == "Session-ID")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_session_id(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_session_id();
+            return true;
+        }
+    }else if (query_type._command == "Session-Version")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_session_version(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_session_version();
+            return true;
+        }
+    }else if (query_type._command == "Network-Type")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_network_type(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_network_type();
+            return true;
+        }
+    }else if (query_type._command == "Address-Type")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_address_type(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_address_type();
+            return true;
+        }
+    }else if (query_type._command == "Unicast-Address")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_unicast_address(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_unicast_address();
+            return true;
+        }
+    }
+
+    _logger.warning("Failed to query: invalid query (cmd=%d, query=%s)", cmd, query.c_str());
+    return false;
+}
+
+//-------------------------------------------
 //-------------------------------------------
 
 bool SDP_Field_Session_Name::decode(std::string &msg)
@@ -318,6 +450,29 @@ bool SDP_Field_Session_Name::encode(std::string &msg)
 }
 
 //-------------------------------------------
+
+bool SDP_Field_Session_Name::query_field(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    Query query_type(query);
+    if (query_type._command == "Session-Name")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_session_name(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_session_name();
+            return true;
+        }
+    }
+
+    _logger.warning("Failed to query: invalid query (cmd=%d, query=%s)", cmd, query.c_str());
+    return false;
+}
+
+//-------------------------------------------
 //-------------------------------------------
 
 bool SDP_Field_Session_Information::decode(std::string &msg)
@@ -332,6 +487,29 @@ bool SDP_Field_Session_Information::encode(std::string &msg)
 {
     msg += _session_information;
     return true;
+}
+
+//-------------------------------------------
+
+bool SDP_Field_Session_Information::query_field(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    Query query_type(query);
+    if (query_type._command == "Session-Information")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_session_information(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_session_information();
+            return true;
+        }
+    }
+
+    _logger.warning("Failed to query: invalid query (cmd=%d, query=%s)", cmd, query.c_str());
+    return false;
 }
 
 //-------------------------------------------
@@ -352,6 +530,29 @@ bool SDP_Field_URI::encode(std::string &msg)
 }
 
 //-------------------------------------------
+
+bool SDP_Field_URI::query_field(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    Query query_type(query);
+    if (query_type._command == "URI")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_uri(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_uri();
+            return true;
+        }
+    }
+
+    _logger.warning("Failed to query: invalid query (cmd=%d, query=%s)", cmd, query.c_str());
+    return false;
+}
+
+//-------------------------------------------
 //-------------------------------------------
 
 bool SDP_Field_Email_Address::decode(std::string &msg)
@@ -369,6 +570,29 @@ bool SDP_Field_Email_Address::encode(std::string &msg)
 }
 
 //-------------------------------------------
+
+bool SDP_Field_Email_Address::query_field(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    Query query_type(query);
+    if (query_type._command == "Email")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_email(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_email();
+            return true;
+        }
+    }
+
+    _logger.warning("Failed to query: invalid query (cmd=%d, query=%s)", cmd, query.c_str());
+    return false;
+}
+
+//-------------------------------------------
 //-------------------------------------------
 
 bool SDP_Field_Phone_Number::decode(std::string &msg)
@@ -383,6 +607,29 @@ bool SDP_Field_Phone_Number::encode(std::string &msg)
 {
     msg += _phone;
     return true;
+}
+
+//-------------------------------------------
+
+bool SDP_Field_Phone_Number::query_field(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    Query query_type(query);
+    if (query_type._command == "Phone")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_phone(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_phone();
+            return true;
+        }
+    }
+
+    _logger.warning("Failed to query: invalid query (cmd=%d, query=%s)", cmd, query.c_str());
+    return false;
 }
 
 //-------------------------------------------
@@ -471,6 +718,101 @@ bool SDP_Field_Connection_Data::encode(std::string &msg)
     }
 
     return true;
+}
+
+//-------------------------------------------
+
+bool SDP_Field_Connection_Data::query_field(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    Query query_type(query);
+    if (query_type._command == "Network-Type")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_network_type(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_network_type();
+            return true;
+        }
+    }else if (query_type._command == "Address-Type")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_address_type(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_address_type();
+            return true;
+        }
+    }else if (query_type._command == "Connection-Address")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_connection_address(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_connection_address();
+            return true;
+        }
+    }else if (query_type._command == "TTL")
+    {
+        if (cmd == QUERY_SET)
+        {
+            if (!set_ttl(query_type._remaining))
+            {
+                _logger.warning("Failed to query: set ttl failed (cmd=%d, query=%s)", cmd, query.c_str());
+                return false;
+            }
+
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            std::string ttl;
+            if (!get_ttl(ttl))
+            {
+                _logger.warning("Failed to query: get ttl failed (cmd=%d, query=%s)", cmd, query.c_str());
+                return false;
+            }
+
+            result = ttl;
+            return true;
+        }
+    }else if (query_type._command == "Number-Addresses")
+    {
+        if (cmd == QUERY_SET)
+        {
+            if (!set_number_addresses(query_type._remaining))
+            {
+                _logger.warning("Failed to query: set number addresses failed (cmd=%d, query=%s)", cmd, query.c_str());
+                return false;
+            }
+
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            std::string addresses;
+            if (!get_number_addresses(addresses))
+            {
+                _logger.warning("Failed to query: get number addresses failed (cmd=%d, query=%s)", cmd, query.c_str());
+                return false;
+            }
+
+            result = addresses;
+            return true;
+        }
+    }
+
+    _logger.warning("Failed to query: invalid query (cmd=%d, query=%s)", cmd, query.c_str());
+    return false;
 }
 
 //-------------------------------------------
@@ -568,6 +910,53 @@ bool SDP_Field_Bandwidth::encode(std::string &msg)
 
 //-------------------------------------------
 
+bool SDP_Field_Bandwidth::query_field(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    Query query_type(query);
+    if (query_type._command == "Type")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_type(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_type();
+            return true;
+        }
+    }else if (query_type._command == "Bandwidth")
+    {
+        if (cmd == QUERY_SET)
+        {
+            if (!set_bandwidth(query_type._remaining))
+            {
+                _logger.warning("Failed to query: set bandwidth failed (cmd=%d, query=%s)", cmd, query.c_str());
+                return false;
+            }
+
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            std::string bandwidth;
+            if (!get_bandwidth(bandwidth))
+            {
+                _logger.warning("Failed to query: get bandwidth failed (cmd=%d, query=%s)", cmd, query.c_str());
+                return false;
+            }
+
+            result = bandwidth;
+            return true;
+        }
+    }
+
+    _logger.warning("Failed to query: invalid query (cmd=%d, query=%s)", cmd, query.c_str());
+    return false;
+}
+
+//-------------------------------------------
+
 bool SDP_Field_Bandwidth::set_bandwidth(std::string bandwidth)
 {
     _bandwidth = String_Functions::str_to_ul(bandwidth);
@@ -630,6 +1019,65 @@ bool SDP_Field_Timing::encode(std::string &msg)
     msg += " ";
     msg += std::to_string(_stop);
     return true;
+}
+
+//-------------------------------------------
+
+bool SDP_Field_Timing::query_field(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    Query query_type(query);
+    if (query_type._command == "Start")
+    {
+        if (cmd == QUERY_SET)
+        {
+            if (!set_start(query_type._remaining))
+            {
+                _logger.warning("Failed to query: set start failed (cmd=%d, query=%s)", cmd, query.c_str());
+                return false;
+            }
+
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            std::string start;
+            if (!get_start(start))
+            {
+                _logger.warning("Failed to query: get start failed (cmd=%d, query=%s)", cmd, query.c_str());
+                return false;
+            }
+
+            result = start;
+            return true;
+        }
+    }else if (query_type._command == "Stop")
+    {
+        if (cmd == QUERY_SET)
+        {
+            if (!set_stop(query_type._remaining))
+            {
+                _logger.warning("Failed to query: set stop failed (cmd=%d, query=%s)", cmd, query.c_str());
+                return false;
+            }
+
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            std::string stop;
+            if (!get_stop(stop))
+            {
+                _logger.warning("Failed to query: get stop failed (cmd=%d, query=%s)", cmd, query.c_str());
+                return false;
+            }
+
+            result = stop;
+            return true;
+        }
+    }
+
+    _logger.warning("Failed to query: invalid query (cmd=%d, query=%s)", cmd, query.c_str());
+    return false;
 }
 
 //-------------------------------------------
@@ -723,7 +1171,7 @@ bool SDP_Field_Repeat_Time::decode(std::string &msg)
         if (result.empty())
             return false;
 
-        _offsets.push_back(result);
+        _offsets.add_parameter(result);
     }while (matched);
 
     return true;
@@ -733,21 +1181,60 @@ bool SDP_Field_Repeat_Time::decode(std::string &msg)
 
 bool SDP_Field_Repeat_Time::encode(std::string &msg)
 {
-    if ((_interval.empty()) || (_duration.empty()) || (_offsets.empty()))
+    if ((_interval.empty()) || (_duration.empty()) || (_offsets.get_parameter_size() == 0))
         return false;
 
     msg += _interval;
     msg += " ";
     msg += _duration;
 
-    std::list<std::string>::const_iterator it = _offsets.begin();
-    while (it != _offsets.end())
+    std::list<std::string> &offsets = _offsets.get_parameters();
+    std::list<std::string>::const_iterator it = offsets.begin();
+    while (it != offsets.end())
     {
         msg += " ";
         msg += *it++;
     }
 
     return true;
+}
+
+//-------------------------------------------
+
+bool SDP_Field_Repeat_Time::query_field(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    Query query_type(query);
+    if (query_type._command == "Interval")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_interval(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_interval();
+            return true;
+        }
+    }else if (query_type._command == "Duration")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_duration(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_duration();
+            return true;
+        }
+    }else if (query_type._command == "Offsets")
+    {
+        return _offsets.query(cmd, query_type._remaining, result);
+    }
+
+    _logger.warning("Failed to query: invalid query (cmd=%d, query=%s)", cmd, query.c_str());
+    return false;
 }
 
 //-------------------------------------------
@@ -766,14 +1253,14 @@ bool SDP_Field_Time_Zone::decode(std::string &msg)
         if (result.empty())
             return false;
 
-        _adjustments.push_back(result);
+        _adjustments.add_parameter(result);
 
         matched = String_Functions::match(msg, " ", result);
 
         if (result.empty())
             return false;
 
-        _offsets.push_back(result);
+        _offsets.add_parameter(result);
     }while (matched);
 
     return true;
@@ -783,14 +1270,17 @@ bool SDP_Field_Time_Zone::decode(std::string &msg)
 
 bool SDP_Field_Time_Zone::encode(std::string &msg)
 {
-    if ((_adjustments.empty()) || (_offsets.empty()) || (_adjustments.size() != _offsets.size()))
+    if ((_adjustments.get_parameter_size() == 0) || (_offsets.get_parameter_size() == 0) ||
+        (_adjustments.get_parameter_size() != _offsets.get_parameter_size()))
         return false;
 
-    std::list<std::string>::const_iterator it1 = _adjustments.begin();
-    std::list<std::string>::const_iterator it2 = _offsets.begin();
-    while ((it1 != _adjustments.end()) && (it2 != _offsets.end()))
+    std::list<std::string> &adjustments = _adjustments.get_parameters();
+    std::list<std::string> &offsets = _offsets.get_parameters();
+    std::list<std::string>::const_iterator it1 = adjustments.begin();
+    std::list<std::string>::const_iterator it2 = offsets.begin();
+    while ((it1 != adjustments.end()) && (it2 != offsets.end()))
     {
-        if (it1 != _adjustments.begin())
+        if (it1 != adjustments.begin())
             msg += " ";
 
         msg += *it1++;
@@ -799,6 +1289,24 @@ bool SDP_Field_Time_Zone::encode(std::string &msg)
     }
 
     return true;
+}
+
+//-------------------------------------------
+
+bool SDP_Field_Time_Zone::query_field(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    Query query_type(query);
+    if (query_type._command == "Adjustments")
+    {
+        return _adjustments.query(cmd, query_type._remaining, result);
+
+    }else if (query_type._command == "Offsets")
+    {
+        return _offsets.query(cmd, query_type._remaining, result);
+    }
+
+    _logger.warning("Failed to query: invalid query (cmd=%d, query=%s)", cmd, query.c_str());
+    return false;
 }
 
 //-------------------------------------------
@@ -842,6 +1350,41 @@ bool SDP_Field_Encryption_Key::encode(std::string &msg)
     }
 
     return true;
+}
+
+//-------------------------------------------
+
+bool SDP_Field_Encryption_Key::query_field(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    Query query_type(query);
+    if (query_type._command == "Method")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_method(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_method();
+            return true;
+        }
+    }else if (query_type._command == "Key")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_key(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_key();
+            return true;
+        }
+    }
+
+    _logger.warning("Failed to query: invalid query (cmd=%d, query=%s)", cmd, query.c_str());
+    return false;
 }
 
 //-------------------------------------------
@@ -915,6 +1458,41 @@ bool SDP_Field_Attribute::encode(std::string &msg)
     }
 
     return true;
+}
+
+//-------------------------------------------
+
+bool SDP_Field_Attribute::query_field(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    Query query_type(query);
+    if (query_type._command == "Attribute")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_attribute(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_attribute();
+            return true;
+        }
+    }else if (query_type._command == "Value")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_value(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_value();
+            return true;
+        }
+    }
+
+    _logger.warning("Failed to query: invalid query (cmd=%d, query=%s)", cmd, query.c_str());
+    return false;
 }
 
 //-------------------------------------------
@@ -1045,7 +1623,7 @@ bool SDP_Field_Media_Description::decode(std::string &msg)
         if (result.empty())
             return false;
 
-        _formats.push_back(result);
+        _formats.add_parameter(result);
     }while (matched);
 
     return true;
@@ -1055,7 +1633,7 @@ bool SDP_Field_Media_Description::decode(std::string &msg)
 
 bool SDP_Field_Media_Description::encode(std::string &msg)
 {
-    if ((_media.empty()) || (_port == INVALID_PORT) || (_protocol.empty()) || (_formats.empty()))
+    if ((_media.empty()) || (_port == INVALID_PORT) || (_protocol.empty()) || (_formats.get_parameter_size() == 0))
         return false;
 
     msg += _media;
@@ -1071,14 +1649,101 @@ bool SDP_Field_Media_Description::encode(std::string &msg)
     msg += " ";
     msg += _protocol;
 
-    std::list<std::string>::const_iterator it = _formats.begin();
-    while (it != _formats.end())
+    std::list<std::string> &formats = _formats.get_parameters();
+    std::list<std::string>::const_iterator it = formats.begin();
+    while (it != formats.end())
     {
         msg += " ";
         msg += *it++;
     }
 
     return true;
+}
+
+//-------------------------------------------
+
+bool SDP_Field_Media_Description::query_field(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    Query query_type(query);
+    if (query_type._command == "Media")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_media(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_media();
+            return true;
+        }
+    }else if (query_type._command == "Port")
+    {
+        if (cmd == QUERY_SET)
+        {
+            if (!set_port(query_type._remaining))
+            {
+                _logger.warning("Failed to query: set port failed (cmd=%d, query=%s)", cmd, query.c_str());
+                return false;
+            }
+
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            std::string port;
+            if (!get_port(port))
+            {
+                _logger.warning("Failed to query: get port failed (cmd=%d, query=%s)", cmd, query.c_str());
+                return false;
+            }
+
+            result = port;
+            return true;
+        }
+    }else if (query_type._command == "Number-Ports")
+    {
+        if (cmd == QUERY_SET)
+        {
+            if (!set_number_ports(query_type._remaining))
+            {
+                _logger.warning("Failed to query: set number ports failed (cmd=%d, query=%s)", cmd, query.c_str());
+                return false;
+            }
+
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            std::string ports;
+            if (!get_number_ports(ports))
+            {
+                _logger.warning("Failed to query: get number ports failed (cmd=%d, query=%s)", cmd, query.c_str());
+                return false;
+            }
+
+            result = ports;
+            return true;
+        }
+    }else if (query_type._command == "Protocol")
+    {
+        if (cmd == QUERY_SET)
+        {
+            set_protocol(query_type._remaining);
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            result = get_protocol();
+            return true;
+        }
+    }else if (query_type._command == "Formats")
+    {
+        return _formats.query(cmd, query_type._remaining, result);
+    }
+
+    _logger.warning("Failed to query: invalid query (cmd=%d, query=%s)", cmd, query.c_str());
+    return false;
 }
 
 //-------------------------------------------
