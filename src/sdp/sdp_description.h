@@ -41,9 +41,11 @@ public:
     SDP_Description_Session *get_session() { return _session; }
     void clear_session();
 
-    void add_media(SDP_Description_Media *media);
-    std::list<SDP_Description_Media *> &get_medias() { return _medias; }
+    bool add_media(SDP_Description_Media *media, unsigned short pos = 0xFFFF);
+    bool remove_media(unsigned short pos);
     void clear_medias();
+    SDP_Description_Media *get_media(unsigned short pos = 0);
+    unsigned short get_media_size() { return (unsigned short) _medias.size(); }
 
 protected:
     SDP_Description_Session *_session;
@@ -64,8 +66,9 @@ public:
     virtual bool decode(std::string &msg);
     virtual bool encode(std::string &msg);
 
-    void add_field(SDP_Field *field);
-    void add_fields(sdp_field_list &fields);
+    bool add_field(SDP_Field *field, unsigned short pos = 0xFFFF);
+    bool add_fields(sdp_field_list &fields);
+    bool remove_field(SDP_Field_Type field_type, unsigned short pos);
     void clear_fields();
     SDP_Field *get_field(SDP_Field_Type field_type, unsigned short pos = 0);
     unsigned short get_field_size(SDP_Field_Type field_type);

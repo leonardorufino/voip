@@ -176,12 +176,68 @@ void SDP_Description::clear_session()
 
 //-------------------------------------------
 
-void SDP_Description::add_media(SDP_Description_Media *media)
+bool SDP_Description::add_media(SDP_Description_Media *media, unsigned short pos)
 {
     if (!media)
-        return;
+    {
+        _logger.warning("Failed to add media: invalid media");
+        return false;
+    }
 
-    _medias.push_back(media);
+    unsigned short count = 0;
+
+    std::list<SDP_Description_Media *>::iterator it = _medias.begin();
+    while (it != _medias.end())
+    {
+        if (count++ == pos)
+            break;
+
+        it++;
+    }
+
+    _medias.insert(it, media);
+    return true;
+}
+
+//-------------------------------------------
+
+SDP_Description_Media *SDP_Description::get_media(unsigned short pos)
+{
+    unsigned short count = 0;
+
+    std::list<SDP_Description_Media *>::const_iterator it = _medias.begin();
+    while (it != _medias.end())
+    {
+        if (count++ == pos)
+            return *it;
+
+        it++;
+    }
+
+    _logger.warning("Failed to get media: invalid position (pos=%d, count=%d)", pos, count);
+    return NULL;
+}
+
+//-------------------------------------------
+
+bool SDP_Description::remove_media(unsigned short pos)
+{
+    unsigned short count = 0;
+
+    std::list<SDP_Description_Media *>::iterator it = _medias.begin();
+    while (it != _medias.end())
+    {
+        if (count++ == pos)
+        {
+            _medias.erase(it);
+            return true;
+        }
+
+        it++;
+    }
+
+    _logger.warning("Failed to remove media: invalid position (pos=%d, count=%d)", pos, count);
+    return false;
 }
 
 //-------------------------------------------
@@ -280,31 +336,50 @@ bool SDP_Description_Fields::encode(std::string &msg)
 
 //-------------------------------------------
 
-void SDP_Description_Fields::add_field(SDP_Field *field)
+bool SDP_Description_Fields::add_field(SDP_Field *field, unsigned short pos)
 {
     if (!field)
-        return;
+    {
+        _logger.warning("Failed to add field: invalid field");
+        return false;
+    }
 
     SDP_Field_Type field_type = field->get_field_type();
 
     if (_fields.count(field_type) > 0)
     {
+        unsigned short count = 0;
+
         sdp_field_list &fields = _fields.at(field_type);
-        fields.push_back(field);
+        sdp_field_list::iterator it = fields.begin();
+        while (it != fields.end())
+        {
+            if (count++ == pos)
+                break;
+
+            it++;
+        }
+
+        fields.insert(it, field);
     }else
     {
         sdp_field_list fields;
         fields.push_back(field);
         _fields[field_type] = fields;
     }
+
+    return true;
 }
 
 //-------------------------------------------
 
-void SDP_Description_Fields::add_fields(sdp_field_list &fields)
+bool SDP_Description_Fields::add_fields(sdp_field_list &fields)
 {
     if (fields.empty())
-        return;
+    {
+        _logger.warning("Failed to add fields: invalid fields");
+        return false;
+    }
 
     sdp_field_list::const_iterator it = fields.begin();
     while (it != fields.end())
@@ -312,6 +387,37 @@ void SDP_Description_Fields::add_fields(sdp_field_list &fields)
         SDP_Field *field = *it++;
         add_field(field);
     }
+
+    return true;
+}
+
+//-------------------------------------------
+
+bool SDP_Description_Fields::remove_field(SDP_Field_Type field_type, unsigned short pos)
+{
+    if (_fields.count(field_type) == 0)
+    {
+        _logger.warning("Failed to remove field: invalid field type (type=%d)", field_type);
+        return false;
+    }
+
+    unsigned short count = 0;
+
+    sdp_field_list &fields = _fields.at(field_type);
+    sdp_field_list::iterator it = fields.begin();
+    while (it != fields.end())
+    {
+        if (count++ == pos)
+        {
+            fields.erase(it);
+            return true;
+        }
+
+        it++;
+    }
+
+    _logger.warning("Failed to remove field: invalid position (type=%d, pos=%d, count=%d)", field_type, pos, count);
+    return false;
 }
 
 //-------------------------------------------
@@ -340,7 +446,10 @@ void SDP_Description_Fields::clear_fields()
 SDP_Field *SDP_Description_Fields::get_field(SDP_Field_Type field_type, unsigned short pos)
 {
     if (_fields.count(field_type) == 0)
+    {
+        //_logger.warning("Failed to get field: invalid field type (type=%d)", field_type);
         return NULL;
+    }
 
     unsigned short count = 0;
 
@@ -348,12 +457,13 @@ SDP_Field *SDP_Description_Fields::get_field(SDP_Field_Type field_type, unsigned
     sdp_field_list::const_iterator it = fields.begin();
     while (it != fields.end())
     {
-        SDP_Field *field = *it++;
-
         if (count++ == pos)
-            return field;
+            return *it;
+
+        it++;
     }
 
+    _logger.warning("Failed to get field: invalid position (type=%d, pos=%d, count=%d)", field_type, pos, count);
     return NULL;
 }
 
