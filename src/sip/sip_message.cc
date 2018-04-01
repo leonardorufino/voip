@@ -472,12 +472,49 @@ unsigned short SIP_Message::get_header_size(SIP_Header_Type header_type)
 
 //-------------------------------------------
 
-void SIP_Message::add_body(SIP_Body *body)
+bool SIP_Message::add_body(SIP_Body *body, unsigned short pos)
 {
     if (!body)
-        return;
+    {
+        _logger.warning("Failed to add body: invalid body");
+        return false;
+    }
 
-    _bodies.push_back(body);
+    unsigned short count = 0;
+
+    sip_body_list::iterator it = _bodies.begin();
+    while (it != _bodies.end())
+    {
+        if (count++ == pos)
+            break;
+
+        it++;
+    }
+
+    _bodies.insert(it, body);
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Message::remove_body(unsigned short pos)
+{
+    unsigned short count = 0;
+
+    sip_body_list::iterator it = _bodies.begin();
+    while (it != _bodies.end())
+    {
+        if (count++ == pos)
+        {
+            _bodies.erase(it);
+            return true;
+        }
+
+        it++;
+    }
+
+    _logger.warning("Failed to remove body: invalid position (pos=%d, count=%d)", pos, count);
+    return false;
 }
 
 //-------------------------------------------
@@ -492,6 +529,25 @@ void SIP_Message::clear_bodies()
     }
 
     _bodies.clear();
+}
+
+//-------------------------------------------
+
+SIP_Body *SIP_Message::get_body(unsigned short pos)
+{
+    unsigned short count = 0;
+
+    sip_body_list::const_iterator it = _bodies.begin();
+    while (it != _bodies.end())
+    {
+        if (count++ == pos)
+            return *it;
+
+        it++;
+    }
+
+    _logger.warning("Failed to get body: invalid position (pos=%d, count=%d)", pos, count);
+    return NULL;
 }
 
 //-------------------------------------------

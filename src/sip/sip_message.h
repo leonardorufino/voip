@@ -51,8 +51,11 @@ public:
     SIP_Header *get_header(SIP_Header_Type header_type, unsigned short pos = 0);
     unsigned short get_header_size(SIP_Header_Type header_type);
 
-    void add_body(SIP_Body *body);
+    bool add_body(SIP_Body *body, unsigned short pos = 0xFFFF);
+    bool remove_body(unsigned short pos);
     void clear_bodies();
+    SIP_Body *get_body(unsigned short pos = 0);
+    unsigned short get_body_size() { return (unsigned short) _bodies.size(); }
 
 private:
     sip_header_map _headers;
