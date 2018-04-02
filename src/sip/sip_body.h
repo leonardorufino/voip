@@ -45,6 +45,12 @@ public:
     bool decode(const char *body, unsigned short size);
     bool encode(char *body, unsigned short &size);
 
+    void set_body(const char *body, unsigned short size);
+    bool set_body(std::string body);
+    char *get_body() { return _body; }
+    bool get_body(std::string &body);
+    unsigned short get_size() { return _size; }
+
 protected:
     char *_body;
     unsigned short _size;

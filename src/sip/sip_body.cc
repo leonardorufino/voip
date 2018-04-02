@@ -11,6 +11,7 @@
 
 #include "sip_body.h"
 #include "sdp/sdp_description.h"
+#include "util/util_functions.h"
 
 Logger SIP_Body::_logger(Log_Manager::LOG_SIP_BODY);
 
@@ -41,12 +42,9 @@ SIP_Body *SIP_Body::create_body(SIP_Body_Type body_type, const SIP_Body *copy)
 //-------------------------------------------
 //-------------------------------------------
 
-SIP_Body_Unknown::SIP_Body_Unknown(const SIP_Body_Unknown &body)
+SIP_Body_Unknown::SIP_Body_Unknown(const SIP_Body_Unknown &body) : _body(NULL)
 {
-    _size = body._size;
-    _body = new char[_size + 1];
-    memcpy(_body, body._body, _size);
-    _body[_size] = 0;
+    set_body(body._body, body._size);
 }
 
 //-------------------------------------------
@@ -67,10 +65,7 @@ bool SIP_Body_Unknown::decode(const char *body, unsigned short size)
         return false;
     }
 
-    _size = size;
-    _body = new char[_size + 1];
-    memcpy(_body, body, _size);
-    _body[_size] = 0;
+    set_body(body, size);
     return true;
 }
 
@@ -87,6 +82,96 @@ bool SIP_Body_Unknown::encode(char *body, unsigned short &size)
     size = _size;
     memcpy(body, _body, size);
     body[size] = 0;
+    return true;
+}
+
+//-------------------------------------------
+
+void SIP_Body_Unknown::set_body(const char *body, unsigned short size)
+{
+    if (_body)
+        delete _body;
+
+    if (size > 0)
+    {
+        _body = new char[size + 1];
+        memcpy(_body, body, size);
+        _body[size] = 0;
+        _size = size;
+    }else
+    {
+        _body = NULL;
+        _size = 0;
+    }
+}
+
+//-------------------------------------------
+
+bool SIP_Body_Unknown::set_body(std::string body)
+{
+    if (body.empty())
+    {
+        if (_body)
+        {
+            delete _body;
+            _body = NULL;
+        }
+
+        _size = 0;
+        return true;
+    }
+
+    std::vector<char> vector;
+    if (!Util_Functions::HexToVector(body, vector))
+    {
+        _logger.warning("Failed to set body: hex to vector failed (body=%s)", body.c_str());
+        return false;
+    }
+
+    if (vector.empty())
+    {
+        _logger.warning("Failed to set body: vector is empty (body=%s)", body.c_str());
+        return false;
+    }
+
+    if (_body)
+        delete _body;
+
+    _size = (unsigned short) vector.size();
+    _body = new char[_size];
+
+    for (unsigned int i = 0; i < _size; i++)
+        _body[i] = vector.at(i);
+
+    return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Body_Unknown::get_body(std::string &body)
+{
+    if (!_body)
+    {
+        body.clear();
+        return true;
+    }
+
+    std::vector<char> vector;
+    for (unsigned short i = 0; i < _size; i++)
+        vector.push_back(_body[i]);
+
+    if (!Util_Functions::VectorToHex(vector, body))
+    {
+        _logger.warning("Failed to get body: vector to hex failed");
+        return false;
+    }
+
+    if (body.empty())
+    {
+        _logger.warning("Failed to get body: body is empty");
+        return false;
+    }
+
     return true;
 }
 
