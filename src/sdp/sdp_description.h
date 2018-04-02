@@ -14,6 +14,7 @@
 #include "sdp_field.h"
 #include "sip/sip_defs.h"
 #include "sip/sip_body.h"
+#include "util/util_defs.h"
 #include "util/log_manager.h"
 #include <string>
 #include <cstring>
@@ -36,6 +37,7 @@ public:
     SIP_Body_Type get_body_type() { return SIP_BODY_SDP; }
     bool decode(const char *body, unsigned short size);
     bool encode(char *body, unsigned short &size);
+    bool query_body(QueryCommand cmd, const std::string &query, std::string &result);
 
     void set_session(SDP_Description_Session *session);
     SDP_Description_Session *get_session() { return _session; }
@@ -65,6 +67,7 @@ public:
 
     virtual bool decode(std::string &msg);
     virtual bool encode(std::string &msg);
+    bool query(QueryCommand cmd, const std::string &query, std::string &result);
 
     bool add_field(SDP_Field *field, unsigned short pos = 0xFFFF);
     bool add_fields(sdp_field_list &fields);

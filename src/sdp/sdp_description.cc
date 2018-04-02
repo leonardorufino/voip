@@ -10,7 +10,9 @@
  */
 
 #include "sdp_description.h"
+#include "sdp_functions.h"
 #include "util/string_functions.h"
+#include "util/query.h"
 
 Logger SDP_Description::_logger(Log_Manager::LOG_SDP_DESCRIPTION);
 Logger SDP_Description_Fields::_logger(Log_Manager::LOG_SDP_DESCRIPTION);
@@ -151,6 +153,131 @@ bool SDP_Description::encode(char *msg, unsigned short &size)
     size = (unsigned short) sdp.size();
     msg[size] = 0;
     return true;
+}
+
+//-------------------------------------------
+
+bool SDP_Description::query_body(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    Query query_type(query);
+    if (query_type._command == "Session")
+    {
+        if (query_type._remaining == "Size")
+        {
+            if (cmd == QUERY_GET)
+            {
+                result = _session ? "1" : "0";
+                return true;
+            }else
+            {
+                _logger.warning("Failed to query: invalid query command (cmd=%d, query=%s)", cmd, query.c_str());
+                return false;
+            }
+        }
+
+        if (query_type._remaining.empty())
+        {
+            if (cmd == QUERY_ADD)
+            {
+                if (_session)
+                {
+                    _logger.warning("Failed to query: session already exist (cmd=%d, query=%s)", cmd, query.c_str());
+                    return false;
+                }
+
+                _session = new SDP_Description_Session();
+                return true;
+
+            }else if (cmd == QUERY_DEL)
+            {
+                if (!_session)
+                {
+                    _logger.warning("Failed to query: invalid session (cmd=%d, query=%s)", cmd, query.c_str());
+                    return false;
+                }
+
+                clear_session();
+                return true;
+            }else
+            {
+                _logger.warning("Failed to query: invalid query command (cmd=%d, query=%s)", cmd, query.c_str());
+                return false;
+            }
+        }
+
+        if (!_session)
+        {
+            _logger.warning("Failed to query: invalid session (cmd=%d, query=%s)", cmd, query.c_str());
+            return false;
+        }
+
+        return _session->query(cmd, query_type._remaining, result);
+
+    }else if (query_type._command == "Media")
+    {
+        if (query_type._remaining == "Size")
+        {
+            if (cmd == QUERY_GET)
+            {
+                result = std::to_string(get_media_size());
+                return true;
+            }else
+            {
+                _logger.warning("Failed to query: invalid query command (cmd=%d, query=%s)", cmd, query.c_str());
+                return false;
+            }
+        }
+
+        Query query_media_position(query_type._remaining);
+        unsigned short pos = String_Functions::str_to_us(query_media_position._command);
+        if (pos == INVALID_UNSIGNED_SHORT)
+        {
+            _logger.warning("Failed to query: invalid media position (cmd=%d, query=%s)", cmd, query.c_str());
+            return false;
+        }
+
+        if (query_media_position._remaining.empty())
+        {
+            if (cmd == QUERY_ADD)
+            {
+                SDP_Description_Media *media = new SDP_Description_Media();
+                if (!add_media(media, pos))
+                {
+                    _logger.warning("Failed to query: add media failed (cmd=%d, query=%s)", cmd, query.c_str());
+                    delete media;
+                    return false;
+                }
+
+                return true;
+
+            }else if (cmd == QUERY_DEL)
+            {
+                if (!remove_media(pos))
+                {
+                    _logger.warning("Failed to query: remove media failed (cmd=%d, query=%s)", cmd, query.c_str());
+                    return false;
+                }
+
+                return true;
+            }else
+            {
+                _logger.warning("Failed to query: invalid query command (cmd=%d, query=%s)", cmd, query.c_str());
+                return false;
+            }
+        }
+
+        SDP_Description_Media *media = get_media(pos);
+        if (!media)
+        {
+            _logger.warning("Failed to query: invalid media (cmd=%d, query=%s)", cmd, query.c_str());
+            return false;
+        }
+
+        return media->query(cmd, query_media_position._remaining, result);
+    }
+
+    _logger.warning("Failed to query: invalid query (cmd=%d, query=%s)", cmd, query.c_str());
+    return false;
 }
 
 //-------------------------------------------
@@ -332,6 +459,87 @@ bool SDP_Description_Fields::encode(std::string &msg)
     }
 
     return true;
+}
+
+//-------------------------------------------
+
+bool SDP_Description_Fields::query(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    Query query_field_name(query);
+    std::string field_name = query_field_name._command;
+
+    SDP_Field_Type field_type = SDP_Functions::get_field_type(field_name);
+    if (field_type == SDP_FIELD_INVALID)
+    {
+        _logger.warning("Failed to query: invalid field type (cmd=%d, query=%s)", cmd, query.c_str());
+        return false;
+    }
+
+    if (query_field_name._remaining == "Size")
+    {
+        if (cmd == QUERY_GET)
+        {
+            result = std::to_string(get_field_size(field_type));
+            return true;
+        }else
+        {
+            _logger.warning("Failed to query: invalid query command (cmd=%d, query=%s)", cmd, query.c_str());
+            return false;
+        }
+    }
+
+    Query query_field_position(query_field_name._remaining);
+    unsigned short pos = String_Functions::str_to_us(query_field_position._command);
+    if (pos == INVALID_UNSIGNED_SHORT)
+    {
+        _logger.warning("Failed to query: invalid field position (cmd=%d, query=%s)", cmd, query.c_str());
+        return false;
+    }
+
+    if (query_field_position._remaining.empty())
+    {
+        if (cmd == QUERY_ADD)
+        {
+            SDP_Field *field = SDP_Field::create_field(field_type);
+            if (!field)
+            {
+                _logger.warning("Failed to query: create field failed (cmd=%d, query=%s)", cmd, query.c_str());
+                return false;
+            }
+
+            if (!add_field(field, pos))
+            {
+                _logger.warning("Failed to query: add field failed (cmd=%d, query=%s)", cmd, query.c_str());
+                delete field;
+                return false;
+            }
+
+            return true;
+
+        }else if (cmd == QUERY_DEL)
+        {
+            if (!remove_field(field_type, pos))
+            {
+                _logger.warning("Failed to query: remove field failed (cmd=%d, query=%s)", cmd, query.c_str());
+                return false;
+            }
+
+            return true;
+        }else
+        {
+            _logger.warning("Failed to query: invalid query command (cmd=%d, query=%s)", cmd, query.c_str());
+            return false;
+        }
+    }
+
+    SDP_Field *field = get_field(field_type, pos);
+    if (!field)
+    {
+        _logger.warning("Failed to query: invalid header (cmd=%d, query=%s)", cmd, query.c_str());
+        return false;
+    }
+
+    return field->query_field(cmd, query_field_position._remaining, result);
 }
 
 //-------------------------------------------
