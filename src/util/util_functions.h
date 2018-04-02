@@ -20,6 +20,9 @@
 
 #include <cstdlib>
 #include <ctime>
+#include <string>
+#include <sstream>
+#include <vector>
 
 class Util_Functions
 {
@@ -27,4 +30,6 @@ public:
     static void delay(unsigned int time);
     static unsigned long get_tick();
     static int random();
+    static bool Util_Functions::HexToVector(std::string hex, std::vector<char> &vector);
+    static bool Util_Functions::VectorToHex(const std::vector<char> &vector, std::string &hex);
 };

@@ -10,6 +10,8 @@
  */
 
 #include "util_functions.h"
+#include "util_defs.h"
+#include "string_functions.h"
 
 //-------------------------------------------
 
@@ -51,6 +53,56 @@ int Util_Functions::random()
     }
 
     return rand();
+}
+
+//-------------------------------------------
+
+bool Util_Functions::HexToVector(std::string hex, std::vector<char> &vector)
+{
+    if (hex.empty())
+        return false;
+
+    if ((hex.size() % 2) != 0)
+        return false;
+
+    for (unsigned int i = 0; i < (unsigned int) hex.size(); i += 2)
+    {
+        std::string str = hex.substr(i, 2);
+        unsigned short value;
+
+        std::stringstream ss;
+        ss << std::hex << str;
+        ss >> value;
+
+        vector.push_back((char) value);
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+
+bool Util_Functions::VectorToHex(const std::vector<char> &vector, std::string &hex)
+{
+    if (vector.empty())
+        return false;
+
+    for (unsigned int i = 0; i < vector.size(); i++)
+    {
+        unsigned short value = ((unsigned short) vector.at(i) & 0xff);
+        std::string str;
+
+        std::stringstream ss;
+        ss << std::hex << value;
+        ss >> str;
+
+        if (str.size() < 2)
+            str.insert(0, 2 - str.size(), '0');
+
+        hex += str;
+    }
+
+    return true;
 }
 
 //-------------------------------------------
