@@ -12,6 +12,7 @@
 #include "sip_body.h"
 #include "sdp/sdp_description.h"
 #include "util/util_functions.h"
+#include "util/query.h"
 
 Logger SIP_Body::_logger(Log_Manager::LOG_SIP_BODY);
 
@@ -37,6 +38,19 @@ SIP_Body *SIP_Body::create_body(SIP_Body_Type body_type, const SIP_Body *copy)
     }
 
     return body;
+}
+
+//-------------------------------------------
+
+bool SIP_Body::query(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    if (query.empty())
+    {
+        _logger.warning("Failed to query: invalid query (cmd=%d)", cmd);
+        return false;
+    }
+
+    return query_body(cmd, query, result);
 }
 
 //-------------------------------------------
@@ -83,6 +97,41 @@ bool SIP_Body_Unknown::encode(char *body, unsigned short &size)
     memcpy(body, _body, size);
     body[size] = 0;
     return true;
+}
+
+//-------------------------------------------
+
+bool SIP_Body_Unknown::query_body(QueryCommand cmd, const std::string &query, std::string &result)
+{
+    Query query_type(query);
+    if (query_type._command == "Body")
+    {
+        if (cmd == QUERY_SET)
+        {
+            if (!set_body(query_type._remaining))
+            {
+                _logger.warning("Failed to query: set body failed (cmd=%d, query=%s)", cmd, query.c_str());
+                return false;
+            }
+
+            return true;
+
+        }else if (cmd == QUERY_GET)
+        {
+            std::string body;
+            if (!get_body(body))
+            {
+                _logger.warning("Failed to query: get body failed (cmd=%d, query=%s)", cmd, query.c_str());
+                return false;
+            }
+
+            result = body;
+            return true;
+        }
+    }
+
+    _logger.warning("Failed to query: invalid query (cmd=%d, query=%s)", cmd, query.c_str());
+    return false;
 }
 
 //-------------------------------------------

@@ -12,6 +12,7 @@
 #pragma once
 
 #include "sip_defs.h"
+#include "util/util_defs.h"
 #include "util/log_manager.h"
 
 class SIP_Body
@@ -22,10 +23,13 @@ public:
 
     static SIP_Body *create_body(SIP_Body_Type body_type, const SIP_Body *copy = NULL);
 
+    bool query(QueryCommand cmd, const std::string &query, std::string &result);
+
     // Virtual functions
     virtual SIP_Body_Type get_body_type() = 0;
     virtual bool decode(const char *body, unsigned short size) = 0;
     virtual bool encode(char *body, unsigned short &size) = 0;
+    virtual bool query_body(QueryCommand cmd, const std::string &query, std::string &result) = 0;
 
 protected:
     static Logger _logger;
@@ -44,6 +48,7 @@ public:
     SIP_Body_Type get_body_type() { return SIP_BODY_UNKNOWN; }
     bool decode(const char *body, unsigned short size);
     bool encode(char *body, unsigned short &size);
+    bool query_body(QueryCommand cmd, const std::string &query, std::string &result);
 
     void set_body(const char *body, unsigned short size);
     bool set_body(std::string body);
