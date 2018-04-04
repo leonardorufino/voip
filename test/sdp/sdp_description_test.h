@@ -54,6 +54,33 @@ protected:
 };
 
 //-------------------------------------------
+
+class SDP_Description_Query_Test
+{
+public:
+    SDP_Description_Query_Test() {}
+    virtual ~SDP_Description_Query_Test() {}
+
+    bool run();
+
+protected:
+    class SDP_Description_Query
+    {
+    public:
+        QueryCommand _cmd;
+        std::string _query;
+        std::string _expected_result;
+        bool _success;
+
+    public:
+        SDP_Description_Query(QueryCommand cmd, std::string query, std::string expected_result, bool success)
+            : _cmd(cmd), _query(query), _expected_result(expected_result), _success(success) {}
+    };
+
+    std::list<SDP_Description_Query> _description_query;
+};
+
+//-------------------------------------------
 //-------------------------------------------
 
 class SDP_Description_Session_Decode_Encode_Test : public SDP_Description_Decode_Encode_Test
@@ -67,6 +94,14 @@ protected:
 
 //-------------------------------------------
 
+class SDP_Description_Session_Query_Test : public SDP_Description_Query_Test
+{
+public:
+    SDP_Description_Session_Query_Test();
+};
+
+//-------------------------------------------
+
 class SDP_Description_Media_Decode_Encode_Test : public SDP_Description_Decode_Encode_Test
 {
 public:
@@ -74,6 +109,14 @@ public:
 
 protected:
     bool execute(SDP_Description_Input_Output &description_input_output);
+};
+
+//-------------------------------------------
+
+class SDP_Description_Media_Query_Test : public SDP_Description_Query_Test
+{
+public:
+    SDP_Description_Media_Query_Test();
 };
 
 //-------------------------------------------

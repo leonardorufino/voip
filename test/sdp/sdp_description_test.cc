@@ -27,6 +27,13 @@ bool SDP_Description_Test::init()
     if (!run<SDP_Description_Complete_Decode_Encode_Test>())
         return false;
 
+
+    if (!run<SDP_Description_Session_Query_Test>())
+        return false;
+
+    if (!run<SDP_Description_Media_Query_Test>())
+        return false;
+
     std::cout << "SDP description test completed successfully\n";
     return true;
 }
@@ -53,6 +60,49 @@ bool SDP_Description_Decode_Encode_Test::run()
 
         if (!execute(description_input_output))
             return false;
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+bool SDP_Description_Query_Test::run()
+{
+    SDP_Description description;
+
+    std::list<SDP_Description_Query>::const_iterator it = _description_query.begin();
+    while (it != _description_query.end())
+    {
+        SDP_Description_Query description_query = *it++;
+
+        std::cout << "SDP description query test initialized\n";
+
+        std::string result;
+        bool success = description.query_body(description_query._cmd, description_query._query, result);
+
+        if (description_query._success != success)
+        {
+            std::cout << "SDP_Description_Query_Test::run -> Query failed:\n";
+            std::cout << std::setw(12) << "Cmd: " << description_query._cmd << "\n";
+            std::cout << std::setw(12) << "Query: " << description_query._query.c_str() << "\n";
+            std::cout << std::setw(12) << "Expected: " << (description_query._success ? "true" : "false") << "\n";
+            std::cout << std::setw(12) << "Success: " << (success ? "true" : "false") << "\n";
+            return false;
+        }
+
+        if ((!description_query._expected_result.empty()) && (result != description_query._expected_result))
+        {
+            std::cout << "SDP_Description_Query_Test::run -> Query result failed:\n";
+            std::cout << std::setw(12) << "Cmd: " << description_query._cmd << "\n";
+            std::cout << std::setw(12) << "Query: " << description_query._query.c_str() << "\n";
+            std::cout << std::setw(12) << "Expected: " << description_query._expected_result.c_str() << "\n";
+            std::cout << std::setw(12) << "Result: " << result.c_str() << "\n";
+            return false;
+        }
+
+        std::cout << "SDP description query test completed successfully\n";
     }
 
     return true;
@@ -191,6 +241,46 @@ bool SDP_Description_Session_Decode_Encode_Test::execute(SDP_Description_Input_O
 //-------------------------------------------
 //-------------------------------------------
 
+SDP_Description_Session_Query_Test::SDP_Description_Session_Query_Test()
+{
+    _description_query.emplace_back(QUERY_GET, "Session.Size", "0", true);
+    _description_query.emplace_back(QUERY_ADD, "Session", "", true);
+    _description_query.emplace_back(QUERY_GET, "Session.Size", "1", true);
+    _description_query.emplace_back(QUERY_ADD, "Session.v.0", "", true);
+    _description_query.emplace_back(QUERY_GET, "Session.v.Size", "1", true);
+    _description_query.emplace_back(QUERY_SET, "Session.v.0.Version.0", "", true);
+    _description_query.emplace_back(QUERY_GET, "Session.v.0.Version", "0", true);
+    _description_query.emplace_back(QUERY_DEL, "Session.v.0", "", true);
+    _description_query.emplace_back(QUERY_GET, "Session.v.Size", "0", true);
+    _description_query.emplace_back(QUERY_ADD, "Session.o.0", "", true);
+    _description_query.emplace_back(QUERY_GET, "Session.o.Size", "1", true);
+    _description_query.emplace_back(QUERY_SET, "Session.o.0.Username.-", "", true);
+    _description_query.emplace_back(QUERY_GET, "Session.o.0.Username", "-", true);
+    _description_query.emplace_back(QUERY_SET, "Session.o.0.Session-ID.0", "", true);
+    _description_query.emplace_back(QUERY_GET, "Session.o.0.Session-ID", "0", true);
+    _description_query.emplace_back(QUERY_SET, "Session.o.0.Session-Version.0", "", true);
+    _description_query.emplace_back(QUERY_GET, "Session.o.0.Session-Version", "0", true);
+    _description_query.emplace_back(QUERY_SET, "Session.o.0.Network-Type.IN", "", true);
+    _description_query.emplace_back(QUERY_GET, "Session.o.0.Network-Type", "IN", true);
+    _description_query.emplace_back(QUERY_SET, "Session.o.0.Address-Type.IP4", "", true);
+    _description_query.emplace_back(QUERY_GET, "Session.o.0.Address-Type", "IP4", true);
+    _description_query.emplace_back(QUERY_SET, "Session.o.0.Address-Type.IP6", "", true);
+    _description_query.emplace_back(QUERY_GET, "Session.o.0.Address-Type", "IP6", true);
+    _description_query.emplace_back(QUERY_SET, "Session.o.0.Unicast-Address.10.47.16.5", "", true);
+    _description_query.emplace_back(QUERY_GET, "Session.o.0.Unicast-Address", "10.47.16.5", true);
+    _description_query.emplace_back(QUERY_SET, "Session.o.0.Unicast-Address.domain.com", "", true);
+    _description_query.emplace_back(QUERY_GET, "Session.o.0.Unicast-Address", "domain.com", true);
+    _description_query.emplace_back(QUERY_SET, "Session.o.0.Unicast-Address.2200:05FF::1111:2222:EEFC", "", true);
+    _description_query.emplace_back(QUERY_GET, "Session.o.0.Unicast-Address", "2200:05FF::1111:2222:EEFC", true);
+    _description_query.emplace_back(QUERY_DEL, "Session.o.0", "", true);
+    _description_query.emplace_back(QUERY_GET, "Session.o.Size", "0", true);
+    _description_query.emplace_back(QUERY_DEL, "Session", "", true);
+    _description_query.emplace_back(QUERY_GET, "Session.Size", "0", true);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
 SDP_Description_Media_Decode_Encode_Test::SDP_Description_Media_Decode_Encode_Test()
 {
     SDP_Description_Input_Output msg1;
@@ -290,6 +380,88 @@ bool SDP_Description_Media_Decode_Encode_Test::execute(SDP_Description_Input_Out
 
     std::cout << "SDP description media decode encode test completed successfully\n";
     return true;
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+SDP_Description_Media_Query_Test::SDP_Description_Media_Query_Test()
+{
+    _description_query.emplace_back(QUERY_GET, "Media.Size", "0", true);
+    _description_query.emplace_back(QUERY_ADD, "Media.0", "", true);
+    _description_query.emplace_back(QUERY_GET, "Media.Size", "1", true);
+    _description_query.emplace_back(QUERY_ADD, "Media.0.m.0", "", true);
+    _description_query.emplace_back(QUERY_GET, "Media.0.m.Size", "1", true);
+    _description_query.emplace_back(QUERY_SET, "Media.0.m.0.Media.audio", "", true);
+    _description_query.emplace_back(QUERY_GET, "Media.0.m.0.Media", "audio", true);
+    _description_query.emplace_back(QUERY_SET, "Media.0.m.0.Port.10000", "", true);
+    _description_query.emplace_back(QUERY_GET, "Media.0.m.0.Port", "10000", true);
+    _description_query.emplace_back(QUERY_SET, "Media.0.m.0.Number-Ports.2", "", true);
+    _description_query.emplace_back(QUERY_GET, "Media.0.m.0.Number-Ports", "2", true);
+    _description_query.emplace_back(QUERY_SET, "Media.0.m.0.Protocol.RTP/AVP", "", true);
+    _description_query.emplace_back(QUERY_GET, "Media.0.m.0.Protocol", "RTP/AVP", true);
+    _description_query.emplace_back(QUERY_ADD, "Media.0.m.0.Formats.0.0", "", true);
+    _description_query.emplace_back(QUERY_GET, "Media.0.m.0.Formats.Size", "1", true);
+    _description_query.emplace_back(QUERY_GET, "Media.0.m.0.Formats.0", "0", true);
+    _description_query.emplace_back(QUERY_ADD, "Media.0.m.0.Formats.1.101", "", true);
+    _description_query.emplace_back(QUERY_GET, "Media.0.m.0.Formats.Size", "2", true);
+    _description_query.emplace_back(QUERY_GET, "Media.0.m.0.Formats.1", "101", true);
+    _description_query.emplace_back(QUERY_DEL, "Media.0.m.0.Formats.0", "", true);
+    _description_query.emplace_back(QUERY_GET, "Media.0.m.0.Formats.Size", "1", true);
+    _description_query.emplace_back(QUERY_GET, "Media.0.m.0.Formats.0", "101", true);
+    _description_query.emplace_back(QUERY_DEL, "Media.0.m.0.Formats.0", "", true);
+    _description_query.emplace_back(QUERY_GET, "Media.0.m.0.Formats.Size", "0", true);
+    _description_query.emplace_back(QUERY_ADD, "Media.0.a.0", "", true);
+    _description_query.emplace_back(QUERY_GET, "Media.0.a.Size", "1", true);
+    _description_query.emplace_back(QUERY_SET, "Media.0.a.0.Attribute.recvonly", "", true);
+    _description_query.emplace_back(QUERY_GET, "Media.0.a.0.Attribute", "recvonly", true);
+    _description_query.emplace_back(QUERY_ADD, "Media.0.a.1", "", true);
+    _description_query.emplace_back(QUERY_GET, "Media.0.a.Size", "2", true);
+    _description_query.emplace_back(QUERY_SET, "Media.0.a.1.Attribute.rtpmap", "", true);
+    _description_query.emplace_back(QUERY_GET, "Media.0.a.1.Attribute", "rtpmap", true);
+    _description_query.emplace_back(QUERY_SET, "Media.0.a.1.Value.0 PCMU/8000", "", true);
+    _description_query.emplace_back(QUERY_GET, "Media.0.a.1.Value", "0 PCMU/8000", true);
+    _description_query.emplace_back(QUERY_DEL, "Media.0.a.0", "", true);
+    _description_query.emplace_back(QUERY_GET, "Media.0.a.Size", "1", true);
+    _description_query.emplace_back(QUERY_GET, "Media.0.a.0.Attribute", "rtpmap", true);
+    _description_query.emplace_back(QUERY_DEL, "Media.0.a.0", "", true);
+    _description_query.emplace_back(QUERY_GET, "Media.0.a.Size", "0", true);
+    _description_query.emplace_back(QUERY_ADD, "Media.1", "", true);
+    _description_query.emplace_back(QUERY_GET, "Media.Size", "2", true);
+    _description_query.emplace_back(QUERY_ADD, "Media.1.m.0", "", true);
+    _description_query.emplace_back(QUERY_GET, "Media.1.m.Size", "1", true);
+    _description_query.emplace_back(QUERY_SET, "Media.1.m.0.Media.video", "", true);
+    _description_query.emplace_back(QUERY_GET, "Media.1.m.0.Media", "video", true);
+    _description_query.emplace_back(QUERY_SET, "Media.1.m.0.Port.65000", "", true);
+    _description_query.emplace_back(QUERY_GET, "Media.1.m.0.Port", "65000", true);
+    _description_query.emplace_back(QUERY_SET, "Media.1.m.0.Protocol.udp", "", true);
+    _description_query.emplace_back(QUERY_GET, "Media.1.m.0.Protocol", "udp", true);
+    _description_query.emplace_back(QUERY_ADD, "Media.1.a.0", "", true);
+    _description_query.emplace_back(QUERY_GET, "Media.1.a.Size", "1", true);
+    _description_query.emplace_back(QUERY_SET, "Media.1.a.0.Attribute.rtpmap", "", true);
+    _description_query.emplace_back(QUERY_GET, "Media.1.a.0.Attribute", "rtpmap", true);
+    _description_query.emplace_back(QUERY_SET, "Media.1.a.0.Value.99 h263-1998/90000", "", true);
+    _description_query.emplace_back(QUERY_GET, "Media.1.a.0.Value", "99 h263-1998/90000", true);
+    _description_query.emplace_back(QUERY_ADD, "Media.1.a.1", "", true);
+    _description_query.emplace_back(QUERY_GET, "Media.1.a.Size", "2", true);
+    _description_query.emplace_back(QUERY_SET, "Media.1.a.1.Attribute.charset", "", true);
+    _description_query.emplace_back(QUERY_GET, "Media.1.a.1.Attribute", "charset", true);
+    _description_query.emplace_back(QUERY_SET, "Media.1.a.1.Value.ISO-8859-1", "", true);
+    _description_query.emplace_back(QUERY_GET, "Media.1.a.1.Value", "ISO-8859-1", true);
+    _description_query.emplace_back(QUERY_DEL, "Media.1.a.1", "", true);
+    _description_query.emplace_back(QUERY_GET, "Media.1.a.Size", "1", true);
+    _description_query.emplace_back(QUERY_GET, "Media.1.a.0.Attribute", "rtpmap", true);
+    _description_query.emplace_back(QUERY_DEL, "Media.1.a.0", "", true);
+    _description_query.emplace_back(QUERY_GET, "Media.1.a.Size", "0", true);
+    _description_query.emplace_back(QUERY_DEL, "Media.0.m.0", "", true);
+    _description_query.emplace_back(QUERY_GET, "Media.0.m.Size", "0", true);
+    _description_query.emplace_back(QUERY_DEL, "Media.0", "", true);
+    _description_query.emplace_back(QUERY_GET, "Media.Size", "1", true);
+    _description_query.emplace_back(QUERY_GET, "Media.0.m.0.Media", "video", true);
+    _description_query.emplace_back(QUERY_DEL, "Media.0.m.0", "", true);
+    _description_query.emplace_back(QUERY_GET, "Media.0.m.Size", "0", true);
+    _description_query.emplace_back(QUERY_DEL, "Media.0", "", true);
+    _description_query.emplace_back(QUERY_GET, "Media.Size", "0", true);
 }
 
 //-------------------------------------------
