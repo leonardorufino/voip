@@ -173,6 +173,163 @@ bool SIP_Header_Test::init()
     if (!run<SIP_Header_WWW_Authenticate_Decode_Encode_Test>())
         return false;
 
+
+    if (!run<SIP_Header_Accept_Query_Test>())
+        return false;
+
+    if (!run<SIP_Header_Accept_Encoding_Query_Test>())
+        return false;
+
+    if (!run<SIP_Header_Accept_Language_Query_Test>())
+        return false;
+
+    if (!run<SIP_Header_Alert_Info_Query_Test>())
+        return false;
+
+    if (!run<SIP_Header_Allow_Query_Test>())
+        return false;
+
+    if (!run<SIP_Header_Allow_Events_Query_Test>())
+        return false;
+
+    if (!run<SIP_Header_Authentication_Info_Query_Test>())
+        return false;
+
+    if (!run<SIP_Header_Authorization_Query_Test>())
+        return false;
+
+    if (!run<SIP_Header_Call_ID_Query_Test>())
+        return false;
+
+    if (!run<SIP_Header_Call_Info_Query_Test>())
+        return false;
+
+    if (!run<SIP_Header_Contact_Query_Test>())
+        return false;
+
+    if (!run<SIP_Header_Content_Disposition_Query_Test>())
+        return false;
+
+    if (!run<SIP_Header_Content_Encoding_Query_Test>())
+        return false;
+
+    if (!run<SIP_Header_Content_Language_Query_Test>())
+        return false;
+
+    if (!run<SIP_Header_Content_Length_Query_Test>())
+        return false;
+
+    if (!run<SIP_Header_Content_Type_Query_Test>())
+        return false;
+
+    if (!run<SIP_Header_CSeq_Query_Test>())
+        return false;
+
+    if (!run<SIP_Header_Date_Query_Test>())
+        return false;
+
+    if (!run<SIP_Header_Error_Info_Query_Test>())
+        return false;
+
+    if (!run<SIP_Header_Event_Query_Test>())
+        return false;
+
+    if (!run<SIP_Header_Expires_Query_Test>())
+        return false;
+
+    if (!run<SIP_Header_From_Query_Test>())
+        return false;
+
+    if (!run<SIP_Header_In_Reply_To_Query_Test>())
+        return false;
+
+    if (!run<SIP_Header_Max_Forwards_Query_Test>())
+        return false;
+
+    if (!run<SIP_Header_Mime_Version_Query_Test>())
+        return false;
+
+    if (!run<SIP_Header_Min_Expires_Query_Test>())
+        return false;
+
+    if (!run<SIP_Header_Organization_Query_Test>())
+        return false;
+
+    if (!run<SIP_Header_Priority_Query_Test>())
+        return false;
+
+    if (!run<SIP_Header_Proxy_Authenticate_Query_Test>())
+        return false;
+
+    if (!run<SIP_Header_Proxy_Authorization_Query_Test>())
+        return false;
+
+    if (!run<SIP_Header_Proxy_Require_Query_Test>())
+        return false;
+
+    if (!run<SIP_Header_RAck_Query_Test>())
+        return false;
+
+    if (!run<SIP_Header_Record_Route_Query_Test>())
+        return false;
+
+    if (!run<SIP_Header_Refer_To_Query_Test>())
+        return false;
+
+    if (!run<SIP_Header_Referred_By_Query_Test>())
+        return false;
+
+    if (!run<SIP_Header_Reply_To_Query_Test>())
+        return false;
+
+    if (!run<SIP_Header_Require_Query_Test>())
+        return false;
+
+    if (!run<SIP_Header_Retry_After_Query_Test>())
+        return false;
+
+    if (!run<SIP_Header_Route_Query_Test>())
+        return false;
+
+    if (!run<SIP_Header_RSeq_Query_Test>())
+        return false;
+
+    if (!run<SIP_Header_Server_Query_Test>())
+        return false;
+
+    if (!run<SIP_Header_Subject_Query_Test>())
+        return false;
+
+    if (!run<SIP_Header_Subscription_State_Query_Test>())
+        return false;
+
+    if (!run<SIP_Header_Supported_Query_Test>())
+        return false;
+
+    if (!run<SIP_Header_Timestamp_Query_Test>())
+        return false;
+
+    if (!run<SIP_Header_To_Query_Test>())
+        return false;
+
+    if (!run<SIP_Header_Unknown_Query_Test>())
+        return false;
+
+    if (!run<SIP_Header_Unsupported_Query_Test>())
+        return false;
+
+    if (!run<SIP_Header_User_Agent_Query_Test>())
+        return false;
+
+    if (!run<SIP_Header_Via_Query_Test>())
+        return false;
+
+    if (!run<SIP_Header_Warning_Query_Test>())
+        return false;
+
+    if (!run<SIP_Header_WWW_Authenticate_Query_Test>())
+        return false;
+
     std::cout << "SIP header test completed successfully\n";
     return true;
 }
@@ -332,6 +489,60 @@ void SIP_Header_Decode_Encode_Test::clear(sip_header_list &headers)
 //-------------------------------------------
 //-------------------------------------------
 
+bool SIP_Header_Query_Test::run()
+{
+    SIP_Header *header = SIP_Header::create_header(_header_type);
+    if (!header)
+    {
+        std::cout << "SIP_Header_Query_Test::run -> create header failed:\n";
+        std::cout << std::setw(12) << "Type: " << _header_type << "\n";
+        return false;
+    }
+
+    std::list<SIP_Header_Query>::const_iterator it = _header_query.begin();
+    while (it != _header_query.end())
+    {
+        SIP_Header_Query header_query = *it++;
+
+        std::cout << "SIP header query test initialized (type: " << _header_type << ")\n";
+
+        std::string result;
+        bool success = header->query(header_query._cmd, header_query._query, result);
+
+        if (header_query._success != success)
+        {
+            std::cout << "SIP_Header_Query_Test::run -> Query failed:\n";
+            std::cout << std::setw(12) << "Type: " << _header_type << "\n";
+            std::cout << std::setw(12) << "Cmd: " << header_query._cmd << "\n";
+            std::cout << std::setw(12) << "Query: " << header_query._query.c_str() << "\n";
+            std::cout << std::setw(12) << "Expected: " << (header_query._success ? "true" : "false") << "\n";
+            std::cout << std::setw(12) << "Success: " << (success ? "true" : "false") << "\n";
+            delete header;
+            return false;
+        }
+
+        if ((!header_query._expected_result.empty()) && (result != header_query._expected_result))
+        {
+            std::cout << "SIP_Header_Query_Test::run -> Query result failed:\n";
+            std::cout << std::setw(12) << "Type: " << _header_type << "\n";
+            std::cout << std::setw(12) << "Cmd: " << header_query._cmd << "\n";
+            std::cout << std::setw(12) << "Query: " << header_query._query.c_str() << "\n";
+            std::cout << std::setw(12) << "Expected: " << header_query._expected_result.c_str() << "\n";
+            std::cout << std::setw(12) << "Result: " << result.c_str() << "\n";
+            delete header;
+            return false;
+        }
+
+        std::cout << "SIP header query test completed successfully (type: " << _header_type << ")\n";
+    }
+
+    delete header;
+    return true;
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
 SIP_Header_Accept_Decode_Encode_Test::SIP_Header_Accept_Decode_Encode_Test()
 {
     SIP_Header_Input_Output hdr1;
@@ -369,6 +580,30 @@ SIP_Header_Accept_Decode_Encode_Test::SIP_Header_Accept_Decode_Encode_Test()
     hdr4._decode_success = true;
     hdr4._encode_success = true;
     _header_input_output.push_back(hdr4);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+SIP_Header_Accept_Query_Test::SIP_Header_Accept_Query_Test() : SIP_Header_Query_Test(SIP_HEADER_ACCEPT)
+{
+    _header_query.emplace_back(QUERY_SET, "Media-Range.Type.application", "", true);
+    _header_query.emplace_back(QUERY_GET, "Media-Range.Type", "application", true);
+    _header_query.emplace_back(QUERY_SET, "Media-Range.Type.*", "", true);
+    _header_query.emplace_back(QUERY_GET, "Media-Range.Type", "*", true);
+    _header_query.emplace_back(QUERY_SET, "Media-Range.Subtype.sdp", "", true);
+    _header_query.emplace_back(QUERY_GET, "Media-Range.Subtype", "sdp", true);
+    _header_query.emplace_back(QUERY_SET, "Media-Range.Subtype.*", "", true);
+    _header_query.emplace_back(QUERY_GET, "Media-Range.Subtype", "*", true);
+    _header_query.emplace_back(QUERY_SET, "Media-Range.Q.0.001", "", true);
+    _header_query.emplace_back(QUERY_GET, "Media-Range.Q", "0.001", true);
+    _header_query.emplace_back(QUERY_SET, "Media-Range.Q.1.000", "", true);
+    _header_query.emplace_back(QUERY_GET, "Media-Range.Q", "1.000", true);
+    _header_query.emplace_back(QUERY_ADD, "Media-Range.Parameters.0.level=1", "", true);
+    _header_query.emplace_back(QUERY_GET, "Media-Range.Parameters.Size", "1", true);
+    _header_query.emplace_back(QUERY_GET, "Media-Range.Parameters.0", "level=1", true);
+    _header_query.emplace_back(QUERY_DEL, "Media-Range.Parameters.0", "", true);
+    _header_query.emplace_back(QUERY_GET, "Media-Range.Parameters.Size", "0", true);
 }
 
 //-------------------------------------------
@@ -425,6 +660,28 @@ SIP_Header_Accept_Encoding_Decode_Encode_Test::SIP_Header_Accept_Encoding_Decode
 //-------------------------------------------
 //-------------------------------------------
 
+SIP_Header_Accept_Encoding_Query_Test::SIP_Header_Accept_Encoding_Query_Test() : SIP_Header_Query_Test(SIP_HEADER_ACCEPT_ENCODING)
+{
+    _header_query.emplace_back(QUERY_SET, "Coding.text/plain", "", true);
+    _header_query.emplace_back(QUERY_GET, "Coding", "text/plain", true);
+    _header_query.emplace_back(QUERY_SET, "Coding.gzip", "", true);
+    _header_query.emplace_back(QUERY_GET, "Coding", "gzip", true);
+    _header_query.emplace_back(QUERY_SET, "Coding.", "", true);
+    _header_query.emplace_back(QUERY_GET, "Coding", "", true);
+    _header_query.emplace_back(QUERY_SET, "Q.1.0", "", true);
+    _header_query.emplace_back(QUERY_GET, "Q", "1.0", true);
+    _header_query.emplace_back(QUERY_SET, "Q.0.3", "", true);
+    _header_query.emplace_back(QUERY_GET, "Q", "0.3", true);
+    _header_query.emplace_back(QUERY_ADD, "Parameters.0.parameter1", "", true);
+    _header_query.emplace_back(QUERY_GET, "Parameters.Size", "1", true);
+    _header_query.emplace_back(QUERY_GET, "Parameters.0", "parameter1", true);
+    _header_query.emplace_back(QUERY_DEL, "Parameters.0", "", true);
+    _header_query.emplace_back(QUERY_GET, "Parameters.Size", "0", true);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
 SIP_Header_Accept_Language_Decode_Encode_Test::SIP_Header_Accept_Language_Decode_Encode_Test()
 {
     SIP_Header_Input_Output hdr1;
@@ -467,6 +724,28 @@ SIP_Header_Accept_Language_Decode_Encode_Test::SIP_Header_Accept_Language_Decode
 //-------------------------------------------
 //-------------------------------------------
 
+SIP_Header_Accept_Language_Query_Test::SIP_Header_Accept_Language_Query_Test() : SIP_Header_Query_Test(SIP_HEADER_ACCEPT_LANGUAGE)
+{
+    _header_query.emplace_back(QUERY_SET, "Language.en-us", "", true);
+    _header_query.emplace_back(QUERY_GET, "Language", "en-us", true);
+    _header_query.emplace_back(QUERY_SET, "Language.fr", "", true);
+    _header_query.emplace_back(QUERY_GET, "Language", "fr", true);
+    _header_query.emplace_back(QUERY_SET, "Language.", "", true);
+    _header_query.emplace_back(QUERY_GET, "Language", "", true);
+    _header_query.emplace_back(QUERY_SET, "Q.0.1", "", true);
+    _header_query.emplace_back(QUERY_GET, "Q", "0.1", true);
+    _header_query.emplace_back(QUERY_SET, "Q.0.999", "", true);
+    _header_query.emplace_back(QUERY_GET, "Q", "0.999", true);
+    _header_query.emplace_back(QUERY_ADD, "Parameters.0.parameter1=test", "", true);
+    _header_query.emplace_back(QUERY_GET, "Parameters.Size", "1", true);
+    _header_query.emplace_back(QUERY_GET, "Parameters.0", "parameter1=test", true);
+    _header_query.emplace_back(QUERY_DEL, "Parameters.0", "", true);
+    _header_query.emplace_back(QUERY_GET, "Parameters.Size", "0", true);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
 SIP_Header_Alert_Info_Decode_Encode_Test::SIP_Header_Alert_Info_Decode_Encode_Test()
 {
     SIP_Header_Input_Output hdr1;
@@ -495,6 +774,57 @@ SIP_Header_Alert_Info_Decode_Encode_Test::SIP_Header_Alert_Info_Decode_Encode_Te
     hdr3._decode_success = true;
     hdr3._encode_success = true;
     _header_input_output.push_back(hdr3);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+SIP_Header_Alert_Info_Query_Test::SIP_Header_Alert_Info_Query_Test() : SIP_Header_Query_Test(SIP_HEADER_ALERT_INFO)
+{
+    _header_query.emplace_back(QUERY_SET, "Address.Display-Name-Double-Quote.False", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.Display-Name-Double-Quote", "False", true);
+    _header_query.emplace_back(QUERY_SET, "Address.Display-Name-Double-Quote.True", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.Display-Name-Double-Quote", "True", true);
+    _header_query.emplace_back(QUERY_SET, "Address.Display-Name.Bob", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.Display-Name", "Bob", true);
+    _header_query.emplace_back(QUERY_SET, "Address.Scheme.mailto", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.Scheme", "mailto", true);
+    _header_query.emplace_back(QUERY_SET, "Address.URI-Angle-Quote.False", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.URI-Angle-Quote", "False", true);
+    _header_query.emplace_back(QUERY_SET, "Address.URI-Angle-Quote.True", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.URI-Angle-Quote", "True", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.User.bob", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.User", "bob", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.Password.mypass", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Password", "mypass", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.Host.Address.host.com", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Host.Address", "host.com", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.Port.7700", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Port", "7700", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.Transport.UDP", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Transport", "UDP", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.User-Param.phone", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.User-Param", "phone", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.Method.INFO", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Method", "INFO", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.TTL.1", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.TTL", "1", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.Multicast-Address.Address.1111::2222", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Multicast-Address.Address", "1111::2222", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.LR.False", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.LR", "False", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.LR.True", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.LR", "True", true);
+    _header_query.emplace_back(QUERY_ADD, "Address.SIP-URI.Parameters.0.par1", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Parameters.Size", "1", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Parameters.0", "par1", true);
+    _header_query.emplace_back(QUERY_DEL, "Address.SIP-URI.Parameters.0", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Parameters.Size", "0", true);
+    _header_query.emplace_back(QUERY_ADD, "Parameters.0.par=1234", "", true);
+    _header_query.emplace_back(QUERY_GET, "Parameters.Size", "1", true);
+    _header_query.emplace_back(QUERY_GET, "Parameters.0", "par=1234", true);
+    _header_query.emplace_back(QUERY_DEL, "Parameters.0", "", true);
+    _header_query.emplace_back(QUERY_GET, "Parameters.Size", "0", true);
 }
 
 //-------------------------------------------
@@ -542,6 +872,19 @@ SIP_Header_Allow_Decode_Encode_Test::SIP_Header_Allow_Decode_Encode_Test()
 //-------------------------------------------
 //-------------------------------------------
 
+SIP_Header_Allow_Query_Test::SIP_Header_Allow_Query_Test() : SIP_Header_Query_Test(SIP_HEADER_ALLOW)
+{
+    _header_query.emplace_back(QUERY_SET, "Method.INVITE", "", true);
+    _header_query.emplace_back(QUERY_GET, "Method", "INVITE", true);
+    _header_query.emplace_back(QUERY_SET, "Method.TEST", "", true);
+    _header_query.emplace_back(QUERY_GET, "Method", "TEST", true);
+    _header_query.emplace_back(QUERY_SET, "Method.", "", true);
+    _header_query.emplace_back(QUERY_GET, "Method", "", true);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
 SIP_Header_Allow_Events_Decode_Encode_Test::SIP_Header_Allow_Events_Decode_Encode_Test()
 {
     SIP_Header_Input_Output hdr1;
@@ -570,6 +913,35 @@ SIP_Header_Allow_Events_Decode_Encode_Test::SIP_Header_Allow_Events_Decode_Encod
     hdr3._decode_success = true;
     hdr3._encode_success = true;
     _header_input_output.push_back(hdr3);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+SIP_Header_Allow_Events_Query_Test::SIP_Header_Allow_Events_Query_Test() : SIP_Header_Query_Test(SIP_HEADER_ALLOW_EVENTS)
+{
+    _header_query.emplace_back(QUERY_SET, "Event-Type.Package.presence", "", true);
+    _header_query.emplace_back(QUERY_GET, "Event-Type.Package", "presence", true);
+    _header_query.emplace_back(QUERY_SET, "Event-Type.Package.package1", "", true);
+    _header_query.emplace_back(QUERY_GET, "Event-Type.Package", "package1", true);
+    _header_query.emplace_back(QUERY_ADD, "Event-Type.Templates.0.template1", "", true);
+    _header_query.emplace_back(QUERY_GET, "Event-Type.Templates.Size", "1", true);
+    _header_query.emplace_back(QUERY_GET, "Event-Type.Templates.0", "template1", true);
+    _header_query.emplace_back(QUERY_ADD, "Event-Type.Templates.1.template2", "", true);
+    _header_query.emplace_back(QUERY_GET, "Event-Type.Templates.Size", "2", true);
+    _header_query.emplace_back(QUERY_GET, "Event-Type.Templates.1", "template2", true);
+    _header_query.emplace_back(QUERY_ADD, "Event-Type.Templates.0.template0", "", true);
+    _header_query.emplace_back(QUERY_GET, "Event-Type.Templates.Size", "3", true);
+    _header_query.emplace_back(QUERY_GET, "Event-Type.Templates.0", "template0", true);
+    _header_query.emplace_back(QUERY_DEL, "Event-Type.Templates.2", "", true);
+    _header_query.emplace_back(QUERY_GET, "Event-Type.Templates.Size", "2", true);
+    _header_query.emplace_back(QUERY_GET, "Event-Type.Templates.0", "template0", true);
+    _header_query.emplace_back(QUERY_GET, "Event-Type.Templates.1", "template1", true);
+    _header_query.emplace_back(QUERY_DEL, "Event-Type.Templates.0", "", true);
+    _header_query.emplace_back(QUERY_GET, "Event-Type.Templates.Size", "1", true);
+    _header_query.emplace_back(QUERY_GET, "Event-Type.Templates.0", "template1", true);
+    _header_query.emplace_back(QUERY_DEL, "Event-Type.Templates.0", "", true);
+    _header_query.emplace_back(QUERY_GET, "Event-Type.Templates.Size", "0", true);
 }
 
 //-------------------------------------------
@@ -605,6 +977,28 @@ SIP_Header_Authentication_Info_Decode_Encode_Test::SIP_Header_Authentication_Inf
     hdr3._decode_success = true;
     hdr3._encode_success = true;
     _header_input_output.push_back(hdr3);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+SIP_Header_Authentication_Info_Query_Test::SIP_Header_Authentication_Info_Query_Test() : SIP_Header_Query_Test(SIP_HEADER_AUTHENTICATION_INFO)
+{
+    _header_query.emplace_back(QUERY_SET, "Next-Nonce.47364c23432d2e131a5fb210812c", "", true);
+    _header_query.emplace_back(QUERY_GET, "Next-Nonce", "47364c23432d2e131a5fb210812c", true);
+    _header_query.emplace_back(QUERY_SET, "QoP.auth", "", true);
+    _header_query.emplace_back(QUERY_GET, "QoP", "auth", true);
+    _header_query.emplace_back(QUERY_SET, "Response.1234567890abcdef1234567890", "", true);
+    _header_query.emplace_back(QUERY_GET, "Response", "1234567890abcdef1234567890", true);
+    _header_query.emplace_back(QUERY_SET, "CNonce.11223344", "", true);
+    _header_query.emplace_back(QUERY_GET, "CNonce", "11223344", true);
+    _header_query.emplace_back(QUERY_SET, "Nonce-Count.00000001", "", true);
+    _header_query.emplace_back(QUERY_GET, "Nonce-Count", "00000001", true);
+    _header_query.emplace_back(QUERY_ADD, "Parameters.0.param1", "", true);
+    _header_query.emplace_back(QUERY_GET, "Parameters.Size", "1", true);
+    _header_query.emplace_back(QUERY_GET, "Parameters.0", "param1", true);
+    _header_query.emplace_back(QUERY_DEL, "Parameters.0", "", true);
+    _header_query.emplace_back(QUERY_GET, "Parameters.Size", "0", true);
 }
 
 //-------------------------------------------
@@ -686,6 +1080,40 @@ SIP_Header_Authorization_Decode_Encode_Test::SIP_Header_Authorization_Decode_Enc
 //-------------------------------------------
 //-------------------------------------------
 
+SIP_Header_Authorization_Query_Test::SIP_Header_Authorization_Query_Test() : SIP_Header_Query_Test(SIP_HEADER_AUTHORIZATION)
+{
+    _header_query.emplace_back(QUERY_SET, "Credential.Scheme.scheme1", "", true);
+    _header_query.emplace_back(QUERY_GET, "Credential.Scheme", "scheme1", true);
+    _header_query.emplace_back(QUERY_SET, "Credential.Username.1234", "", true);
+    _header_query.emplace_back(QUERY_GET, "Credential.Username", "1234", true);
+    _header_query.emplace_back(QUERY_SET, "Credential.Realm.myrealm.com", "", true);
+    _header_query.emplace_back(QUERY_GET, "Credential.Realm", "myrealm.com", true);
+    _header_query.emplace_back(QUERY_SET, "Credential.Nonce.123456789012345678901", "", true);
+    _header_query.emplace_back(QUERY_GET, "Credential.Nonce", "123456789012345678901", true);
+    _header_query.emplace_back(QUERY_SET, "Credential.URI.sip:myrealm.com", "", true);
+    _header_query.emplace_back(QUERY_GET, "Credential.URI", "sip:myrealm.com", true);
+    _header_query.emplace_back(QUERY_SET, "Credential.Response.12345678901234567890123456789012", "", true);
+    _header_query.emplace_back(QUERY_GET, "Credential.Response", "12345678901234567890123456789012", true);
+    _header_query.emplace_back(QUERY_SET, "Credential.Algorithm.MD5", "", true);
+    _header_query.emplace_back(QUERY_GET, "Credential.Algorithm", "MD5", true);
+    _header_query.emplace_back(QUERY_SET, "Credential.CNonce.0a4f113b", "", true);
+    _header_query.emplace_back(QUERY_GET, "Credential.CNonce", "0a4f113b", true);
+    _header_query.emplace_back(QUERY_SET, "Credential.Opaque.11223344556677889900aabbccddeeff", "", true);
+    _header_query.emplace_back(QUERY_GET, "Credential.Opaque", "11223344556677889900aabbccddeeff", true);
+    _header_query.emplace_back(QUERY_SET, "Credential.QoP.auth", "", true);
+    _header_query.emplace_back(QUERY_GET, "Credential.QoP", "auth", true);
+    _header_query.emplace_back(QUERY_SET, "Credential.Nonce-Count.00000001", "", true);
+    _header_query.emplace_back(QUERY_GET, "Credential.Nonce-Count", "00000001", true);
+    _header_query.emplace_back(QUERY_ADD, "Credential.Parameters.0.param1", "", true);
+    _header_query.emplace_back(QUERY_GET, "Credential.Parameters.Size", "1", true);
+    _header_query.emplace_back(QUERY_GET, "Credential.Parameters.0", "param1", true);
+    _header_query.emplace_back(QUERY_DEL, "Credential.Parameters.0", "", true);
+    _header_query.emplace_back(QUERY_GET, "Credential.Parameters.Size", "0", true);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
 SIP_Header_Call_ID_Decode_Encode_Test::SIP_Header_Call_ID_Decode_Encode_Test()
 {
     SIP_Header_Input_Output hdr1;
@@ -737,6 +1165,17 @@ SIP_Header_Call_ID_Decode_Encode_Test::SIP_Header_Call_ID_Decode_Encode_Test()
 //-------------------------------------------
 //-------------------------------------------
 
+SIP_Header_Call_ID_Query_Test::SIP_Header_Call_ID_Query_Test() : SIP_Header_Query_Test(SIP_HEADER_CALL_ID)
+{
+    _header_query.emplace_back(QUERY_SET, "Call-ID.123456789@my-domain.org", "", true);
+    _header_query.emplace_back(QUERY_GET, "Call-ID", "123456789@my-domain.org", true);
+    _header_query.emplace_back(QUERY_SET, "Call-ID.my-domain.org", "", true);
+    _header_query.emplace_back(QUERY_GET, "Call-ID", "my-domain.org", true);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
 SIP_Header_Call_Info_Decode_Encode_Test::SIP_Header_Call_Info_Decode_Encode_Test()
 {
     SIP_Header_Input_Output hdr1;
@@ -767,6 +1206,66 @@ SIP_Header_Call_Info_Decode_Encode_Test::SIP_Header_Call_Info_Decode_Encode_Test
     hdr3._decode_success = true;
     hdr3._encode_success = true;
     _header_input_output.push_back(hdr3);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+SIP_Header_Call_Info_Query_Test::SIP_Header_Call_Info_Query_Test() : SIP_Header_Query_Test(SIP_HEADER_CALL_INFO)
+{
+    _header_query.emplace_back(QUERY_SET, "Address.Display-Name-Double-Quote.False", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.Display-Name-Double-Quote", "False", true);
+    _header_query.emplace_back(QUERY_SET, "Address.Display-Name-Double-Quote.True", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.Display-Name-Double-Quote", "True", true);
+    _header_query.emplace_back(QUERY_SET, "Address.Display-Name.User123", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.Display-Name", "User123", true);
+    _header_query.emplace_back(QUERY_SET, "Address.Scheme.sip", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.Scheme", "sip", true);
+    _header_query.emplace_back(QUERY_SET, "Address.URI-Angle-Quote.False", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.URI-Angle-Quote", "False", true);
+    _header_query.emplace_back(QUERY_SET, "Address.URI-Angle-Quote.True", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.URI-Angle-Quote", "True", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.User.test1", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.User", "test1", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.Password.mypass", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Password", "mypass", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.Host.Address.10.10.10.10", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Host.Address", "10.10.10.10", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.Port.5000", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Port", "5000", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.Transport.UDP", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Transport", "UDP", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.User-Param.phone", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.User-Param", "phone", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.Method.INVITE", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Method", "INVITE", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.TTL.20", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.TTL", "20", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.Multicast-Address.Address.1111::2222", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Multicast-Address.Address", "1111::2222", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.LR.False", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.LR", "False", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.LR.True", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.LR", "True", true);
+    _header_query.emplace_back(QUERY_ADD, "Address.SIP-URI.Parameters.0.par1", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Parameters.Size", "1", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Parameters.0", "par1", true);
+    _header_query.emplace_back(QUERY_DEL, "Address.SIP-URI.Parameters.0", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Parameters.Size", "0", true);
+    _header_query.emplace_back(QUERY_ADD, "Address.SIP-URI.Headers.0.header1", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Headers.Size", "1", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Headers.0", "header1", true);
+    _header_query.emplace_back(QUERY_DEL, "Address.SIP-URI.Headers.0", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Headers.Size", "0", true);
+    _header_query.emplace_back(QUERY_SET, "Address.Absolute-URI.Address.11.22.33.44", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.Absolute-URI.Address", "11.22.33.44", true);
+    _header_query.emplace_back(QUERY_SET, "Purpose.info", "", true);
+    _header_query.emplace_back(QUERY_GET, "Purpose", "info", true);
+    _header_query.emplace_back(QUERY_ADD, "Parameters.0.par1234", "", true);
+    _header_query.emplace_back(QUERY_GET, "Parameters.Size", "1", true);
+    _header_query.emplace_back(QUERY_GET, "Parameters.0", "par1234", true);
+    _header_query.emplace_back(QUERY_DEL, "Parameters.0", "", true);
+    _header_query.emplace_back(QUERY_GET, "Parameters.Size", "0", true);
 }
 
 //-------------------------------------------
@@ -856,6 +1355,69 @@ SIP_Header_Contact_Decode_Encode_Test::SIP_Header_Contact_Decode_Encode_Test()
 //-------------------------------------------
 //-------------------------------------------
 
+SIP_Header_Contact_Query_Test::SIP_Header_Contact_Query_Test() : SIP_Header_Query_Test(SIP_HEADER_CONTACT)
+{
+    _header_query.emplace_back(QUERY_SET, "Star.True", "", true);
+    _header_query.emplace_back(QUERY_GET, "Star", "True", true);
+    _header_query.emplace_back(QUERY_SET, "Star.False", "", true);
+    _header_query.emplace_back(QUERY_GET, "Star", "False", true);
+    _header_query.emplace_back(QUERY_SET, "Address.Display-Name-Double-Quote.False", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.Display-Name-Double-Quote", "False", true);
+    _header_query.emplace_back(QUERY_SET, "Address.Display-Name-Double-Quote.True", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.Display-Name-Double-Quote", "True", true);
+    _header_query.emplace_back(QUERY_SET, "Address.Display-Name.Bob", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.Display-Name", "Bob", true);
+    _header_query.emplace_back(QUERY_SET, "Address.Scheme.mailto", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.Scheme", "mailto", true);
+    _header_query.emplace_back(QUERY_SET, "Address.URI-Angle-Quote.False", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.URI-Angle-Quote", "False", true);
+    _header_query.emplace_back(QUERY_SET, "Address.URI-Angle-Quote.True", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.URI-Angle-Quote", "True", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.User.bob", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.User", "bob", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.Password.mypass", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Password", "mypass", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.Host.Address.host.com", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Host.Address", "host.com", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.Port.7700", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Port", "7700", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.Transport.UDP", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Transport", "UDP", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.User-Param.phone", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.User-Param", "phone", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.Method.INFO", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Method", "INFO", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.TTL.1", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.TTL", "1", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.Multicast-Address.Address.1111::2222", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Multicast-Address.Address", "1111::2222", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.LR.False", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.LR", "False", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.LR.True", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.LR", "True", true);
+    _header_query.emplace_back(QUERY_ADD, "Address.SIP-URI.Parameters.0.par1", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Parameters.Size", "1", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Parameters.0", "par1", true);
+    _header_query.emplace_back(QUERY_DEL, "Address.SIP-URI.Parameters.0", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Parameters.Size", "0", true);
+    _header_query.emplace_back(QUERY_SET, "Expires.3600", "", true);
+    _header_query.emplace_back(QUERY_GET, "Expires", "3600", true);
+    _header_query.emplace_back(QUERY_SET, "Expires.0", "", true);
+    _header_query.emplace_back(QUERY_GET, "Expires", "0", true);
+    _header_query.emplace_back(QUERY_SET, "Q.1.0", "", true);
+    _header_query.emplace_back(QUERY_GET, "Q", "1.0", true);
+    _header_query.emplace_back(QUERY_SET, "Q.0.3", "", true);
+    _header_query.emplace_back(QUERY_GET, "Q", "0.3", true);
+    _header_query.emplace_back(QUERY_ADD, "Parameters.0.par=1234", "", true);
+    _header_query.emplace_back(QUERY_GET, "Parameters.Size", "1", true);
+    _header_query.emplace_back(QUERY_GET, "Parameters.0", "par=1234", true);
+    _header_query.emplace_back(QUERY_DEL, "Parameters.0", "", true);
+    _header_query.emplace_back(QUERY_GET, "Parameters.Size", "0", true);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
 SIP_Header_Content_Disposition_Decode_Encode_Test::SIP_Header_Content_Disposition_Decode_Encode_Test()
 {
     SIP_Header_Input_Output hdr1;
@@ -893,6 +1455,26 @@ SIP_Header_Content_Disposition_Decode_Encode_Test::SIP_Header_Content_Dispositio
     hdr4._decode_success = true;
     hdr4._encode_success = true;
     _header_input_output.push_back(hdr4);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+SIP_Header_Content_Disposition_Query_Test::SIP_Header_Content_Disposition_Query_Test() : SIP_Header_Query_Test(SIP_HEADER_CONTENT_DISPOSITION)
+{
+    _header_query.emplace_back(QUERY_SET, "Type.session", "", true);
+    _header_query.emplace_back(QUERY_GET, "Type", "session", true);
+    _header_query.emplace_back(QUERY_SET, "Type.alert", "", true);
+    _header_query.emplace_back(QUERY_GET, "Type", "alert", true);
+    _header_query.emplace_back(QUERY_SET, "Handling.required", "", true);
+    _header_query.emplace_back(QUERY_GET, "Handling", "required", true);
+    _header_query.emplace_back(QUERY_SET, "Handling.optional", "", true);
+    _header_query.emplace_back(QUERY_GET, "Handling", "optional", true);
+    _header_query.emplace_back(QUERY_ADD, "Parameters.0.filename=smime.p7s", "", true);
+    _header_query.emplace_back(QUERY_GET, "Parameters.Size", "1", true);
+    _header_query.emplace_back(QUERY_GET, "Parameters.0", "filename=smime.p7s", true);
+    _header_query.emplace_back(QUERY_DEL, "Parameters.0", "", true);
+    _header_query.emplace_back(QUERY_GET, "Parameters.Size", "0", true);
 }
 
 //-------------------------------------------
@@ -949,6 +1531,17 @@ SIP_Header_Content_Encoding_Decode_Encode_Test::SIP_Header_Content_Encoding_Deco
 //-------------------------------------------
 //-------------------------------------------
 
+SIP_Header_Content_Encoding_Query_Test::SIP_Header_Content_Encoding_Query_Test() : SIP_Header_Query_Test(SIP_HEADER_CONTENT_ENCODING)
+{
+    _header_query.emplace_back(QUERY_SET, "Coding.text/plain", "", true);
+    _header_query.emplace_back(QUERY_GET, "Coding", "text/plain", true);
+    _header_query.emplace_back(QUERY_SET, "Coding.gzip", "", true);
+    _header_query.emplace_back(QUERY_GET, "Coding", "gzip", true);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
 SIP_Header_Content_Language_Decode_Encode_Test::SIP_Header_Content_Language_Decode_Encode_Test()
 {
     SIP_Header_Input_Output hdr1;
@@ -977,6 +1570,17 @@ SIP_Header_Content_Language_Decode_Encode_Test::SIP_Header_Content_Language_Deco
     hdr3._decode_success = true;
     hdr3._encode_success = true;
     _header_input_output.push_back(hdr3);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+SIP_Header_Content_Language_Query_Test::SIP_Header_Content_Language_Query_Test() : SIP_Header_Query_Test(SIP_HEADER_CONTENT_LANGUAGE)
+{
+    _header_query.emplace_back(QUERY_SET, "Language.pt", "", true);
+    _header_query.emplace_back(QUERY_GET, "Language", "pt", true);
+    _header_query.emplace_back(QUERY_SET, "Language.en", "", true);
+    _header_query.emplace_back(QUERY_GET, "Language", "en", true);
 }
 
 //-------------------------------------------
@@ -1069,6 +1673,17 @@ SIP_Header_Content_Length_Decode_Encode_Test::SIP_Header_Content_Length_Decode_E
 //-------------------------------------------
 //-------------------------------------------
 
+SIP_Header_Content_Length_Query_Test::SIP_Header_Content_Length_Query_Test() : SIP_Header_Query_Test(SIP_HEADER_CONTENT_LENGTH)
+{
+    _header_query.emplace_back(QUERY_SET, "Length.365", "", true);
+    _header_query.emplace_back(QUERY_GET, "Length", "365", true);
+    _header_query.emplace_back(QUERY_SET, "Length.0", "", true);
+    _header_query.emplace_back(QUERY_GET, "Length", "0", true);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
 SIP_Header_Content_Type_Decode_Encode_Test::SIP_Header_Content_Type_Decode_Encode_Test()
 {
     SIP_Header_Input_Output hdr1;
@@ -1097,6 +1712,30 @@ SIP_Header_Content_Type_Decode_Encode_Test::SIP_Header_Content_Type_Decode_Encod
     hdr3._decode_success = true;
     hdr3._encode_success = true;
     _header_input_output.push_back(hdr3);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+SIP_Header_Content_Type_Query_Test::SIP_Header_Content_Type_Query_Test() : SIP_Header_Query_Test(SIP_HEADER_CONTENT_TYPE)
+{
+    _header_query.emplace_back(QUERY_SET, "Media-Type.Type.application", "", true);
+    _header_query.emplace_back(QUERY_GET, "Media-Type.Type", "application", true);
+    _header_query.emplace_back(QUERY_SET, "Media-Type.Type.text", "", true);
+    _header_query.emplace_back(QUERY_GET, "Media-Type.Type", "text", true);
+    _header_query.emplace_back(QUERY_SET, "Media-Type.Subtype.sdp", "", true);
+    _header_query.emplace_back(QUERY_GET, "Media-Type.Subtype", "sdp", true);
+    _header_query.emplace_back(QUERY_SET, "Media-Type.Subtype.html", "", true);
+    _header_query.emplace_back(QUERY_GET, "Media-Type.Subtype", "html", true);
+    _header_query.emplace_back(QUERY_SET, "Media-Type.Q.0.001", "", true);
+    _header_query.emplace_back(QUERY_GET, "Media-Type.Q", "0.001", true);
+    _header_query.emplace_back(QUERY_SET, "Media-Type.Q.1.000", "", true);
+    _header_query.emplace_back(QUERY_GET, "Media-Type.Q", "1.000", true);
+    _header_query.emplace_back(QUERY_ADD, "Media-Type.Parameters.0.charset=ISO-8859-4", "", true);
+    _header_query.emplace_back(QUERY_GET, "Media-Type.Parameters.Size", "1", true);
+    _header_query.emplace_back(QUERY_GET, "Media-Type.Parameters.0", "charset=ISO-8859-4", true);
+    _header_query.emplace_back(QUERY_DEL, "Media-Type.Parameters.0", "", true);
+    _header_query.emplace_back(QUERY_GET, "Media-Type.Parameters.Size", "0", true);
 }
 
 //-------------------------------------------
@@ -1144,6 +1783,21 @@ SIP_Header_CSeq_Decode_Encode_Test::SIP_Header_CSeq_Decode_Encode_Test()
 //-------------------------------------------
 //-------------------------------------------
 
+SIP_Header_CSeq_Query_Test::SIP_Header_CSeq_Query_Test() : SIP_Header_Query_Test(SIP_HEADER_CSEQ)
+{
+    _header_query.emplace_back(QUERY_SET, "Sequence.9876", "", true);
+    _header_query.emplace_back(QUERY_GET, "Sequence", "9876", true);
+    _header_query.emplace_back(QUERY_SET, "Sequence.0", "", true);
+    _header_query.emplace_back(QUERY_GET, "Sequence", "0", true);
+    _header_query.emplace_back(QUERY_SET, "Method.INVITE", "", true);
+    _header_query.emplace_back(QUERY_GET, "Method", "INVITE", true);
+    _header_query.emplace_back(QUERY_SET, "Method.TEST", "", true);
+    _header_query.emplace_back(QUERY_GET, "Method", "TEST", true);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
 SIP_Header_Date_Decode_Encode_Test::SIP_Header_Date_Decode_Encode_Test()
 {
     SIP_Header_Input_Output hdr1;
@@ -1186,6 +1840,29 @@ SIP_Header_Date_Decode_Encode_Test::SIP_Header_Date_Decode_Encode_Test()
 //-------------------------------------------
 //-------------------------------------------
 
+SIP_Header_Date_Query_Test::SIP_Header_Date_Query_Test() : SIP_Header_Query_Test(SIP_HEADER_DATE)
+{
+    _header_query.emplace_back(QUERY_SET, "Weekday.Fri", "", true);
+    _header_query.emplace_back(QUERY_GET, "Weekday", "Fri", true);
+    _header_query.emplace_back(QUERY_SET, "Day.13", "", true);
+    _header_query.emplace_back(QUERY_GET, "Day", "13", true);
+    _header_query.emplace_back(QUERY_SET, "Month.Nov", "", true);
+    _header_query.emplace_back(QUERY_GET, "Month", "Nov", true);
+    _header_query.emplace_back(QUERY_SET, "Year.2018", "", true);
+    _header_query.emplace_back(QUERY_GET, "Year", "2018", true);
+    _header_query.emplace_back(QUERY_SET, "Hour.12", "", true);
+    _header_query.emplace_back(QUERY_GET, "Hour", "12", true);
+    _header_query.emplace_back(QUERY_SET, "Minute.50", "", true);
+    _header_query.emplace_back(QUERY_GET, "Minute", "50", true);
+    _header_query.emplace_back(QUERY_SET, "Second.33", "", true);
+    _header_query.emplace_back(QUERY_GET, "Second", "33", true);
+    _header_query.emplace_back(QUERY_SET, "Time-Zone.GMT", "", true);
+    _header_query.emplace_back(QUERY_GET, "Time-Zone", "GMT", true);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
 SIP_Header_Error_Info_Decode_Encode_Test::SIP_Header_Error_Info_Decode_Encode_Test()
 {
     SIP_Header_Input_Output hdr1;
@@ -1221,6 +1898,57 @@ SIP_Header_Error_Info_Decode_Encode_Test::SIP_Header_Error_Info_Decode_Encode_Te
 //-------------------------------------------
 //-------------------------------------------
 
+SIP_Header_Error_Info_Query_Test::SIP_Header_Error_Info_Query_Test() : SIP_Header_Query_Test(SIP_HEADER_ERROR_INFO)
+{
+    _header_query.emplace_back(QUERY_SET, "Address.Display-Name-Double-Quote.False", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.Display-Name-Double-Quote", "False", true);
+    _header_query.emplace_back(QUERY_SET, "Address.Display-Name-Double-Quote.True", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.Display-Name-Double-Quote", "True", true);
+    _header_query.emplace_back(QUERY_SET, "Address.Display-Name.Bob", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.Display-Name", "Bob", true);
+    _header_query.emplace_back(QUERY_SET, "Address.Scheme.mailto", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.Scheme", "mailto", true);
+    _header_query.emplace_back(QUERY_SET, "Address.URI-Angle-Quote.False", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.URI-Angle-Quote", "False", true);
+    _header_query.emplace_back(QUERY_SET, "Address.URI-Angle-Quote.True", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.URI-Angle-Quote", "True", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.User.bob", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.User", "bob", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.Password.mypass", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Password", "mypass", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.Host.Address.host.com", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Host.Address", "host.com", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.Port.7700", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Port", "7700", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.Transport.UDP", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Transport", "UDP", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.User-Param.phone", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.User-Param", "phone", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.Method.INFO", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Method", "INFO", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.TTL.1", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.TTL", "1", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.Multicast-Address.Address.1111::2222", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Multicast-Address.Address", "1111::2222", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.LR.False", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.LR", "False", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.LR.True", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.LR", "True", true);
+    _header_query.emplace_back(QUERY_ADD, "Address.SIP-URI.Parameters.0.par1", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Parameters.Size", "1", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Parameters.0", "par1", true);
+    _header_query.emplace_back(QUERY_DEL, "Address.SIP-URI.Parameters.0", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Parameters.Size", "0", true);
+    _header_query.emplace_back(QUERY_ADD, "Parameters.0.par=1234", "", true);
+    _header_query.emplace_back(QUERY_GET, "Parameters.Size", "1", true);
+    _header_query.emplace_back(QUERY_GET, "Parameters.0", "par=1234", true);
+    _header_query.emplace_back(QUERY_DEL, "Parameters.0", "", true);
+    _header_query.emplace_back(QUERY_GET, "Parameters.Size", "0", true);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
 SIP_Header_Event_Decode_Encode_Test::SIP_Header_Event_Decode_Encode_Test()
 {
     SIP_Header_Input_Output hdr1;
@@ -1249,6 +1977,44 @@ SIP_Header_Event_Decode_Encode_Test::SIP_Header_Event_Decode_Encode_Test()
     hdr3._decode_success = true;
     hdr3._encode_success = true;
     _header_input_output.push_back(hdr3);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+SIP_Header_Event_Query_Test::SIP_Header_Event_Query_Test() : SIP_Header_Query_Test(SIP_HEADER_EVENT)
+{
+    _header_query.emplace_back(QUERY_SET, "Event-Type.Package.presence", "", true);
+    _header_query.emplace_back(QUERY_GET, "Event-Type.Package", "presence", true);
+    _header_query.emplace_back(QUERY_SET, "Event-Type.Package.package", "", true);
+    _header_query.emplace_back(QUERY_GET, "Event-Type.Package", "package", true);
+    _header_query.emplace_back(QUERY_ADD, "Event-Type.Templates.0.template1", "", true);
+    _header_query.emplace_back(QUERY_GET, "Event-Type.Templates.Size", "1", true);
+    _header_query.emplace_back(QUERY_GET, "Event-Type.Templates.0", "template1", true);
+    _header_query.emplace_back(QUERY_ADD, "Event-Type.Templates.1.template2", "", true);
+    _header_query.emplace_back(QUERY_GET, "Event-Type.Templates.Size", "2", true);
+    _header_query.emplace_back(QUERY_GET, "Event-Type.Templates.1", "template2", true);
+    _header_query.emplace_back(QUERY_ADD, "Event-Type.Templates.0.template0", "", true);
+    _header_query.emplace_back(QUERY_GET, "Event-Type.Templates.Size", "3", true);
+    _header_query.emplace_back(QUERY_GET, "Event-Type.Templates.0", "template0", true);
+    _header_query.emplace_back(QUERY_DEL, "Event-Type.Templates.2", "", true);
+    _header_query.emplace_back(QUERY_GET, "Event-Type.Templates.Size", "2", true);
+    _header_query.emplace_back(QUERY_GET, "Event-Type.Templates.0", "template0", true);
+    _header_query.emplace_back(QUERY_GET, "Event-Type.Templates.1", "template1", true);
+    _header_query.emplace_back(QUERY_DEL, "Event-Type.Templates.0", "", true);
+    _header_query.emplace_back(QUERY_GET, "Event-Type.Templates.Size", "1", true);
+    _header_query.emplace_back(QUERY_GET, "Event-Type.Templates.0", "template1", true);
+    _header_query.emplace_back(QUERY_DEL, "Event-Type.Templates.0", "", true);
+    _header_query.emplace_back(QUERY_GET, "Event-Type.Templates.Size", "0", true);
+    _header_query.emplace_back(QUERY_SET, "ID.1234", "", true);
+    _header_query.emplace_back(QUERY_GET, "ID", "1234", true);
+    _header_query.emplace_back(QUERY_SET, "ID.567", "", true);
+    _header_query.emplace_back(QUERY_GET, "ID", "567", true);
+    _header_query.emplace_back(QUERY_ADD, "Parameters.0.par=1234", "", true);
+    _header_query.emplace_back(QUERY_GET, "Parameters.Size", "1", true);
+    _header_query.emplace_back(QUERY_GET, "Parameters.0", "par=1234", true);
+    _header_query.emplace_back(QUERY_DEL, "Parameters.0", "", true);
+    _header_query.emplace_back(QUERY_GET, "Parameters.Size", "0", true);
 }
 
 //-------------------------------------------
@@ -1291,6 +2057,17 @@ SIP_Header_Expires_Decode_Encode_Test::SIP_Header_Expires_Decode_Encode_Test()
     hdr4._decode_success = false;
     hdr4._encode_success = false;
     _header_input_output.push_back(hdr4);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+SIP_Header_Expires_Query_Test::SIP_Header_Expires_Query_Test() : SIP_Header_Query_Test(SIP_HEADER_EXPIRES)
+{
+    _header_query.emplace_back(QUERY_SET, "Expires.3600", "", true);
+    _header_query.emplace_back(QUERY_GET, "Expires", "3600", true);
+    _header_query.emplace_back(QUERY_SET, "Expires.0", "", true);
+    _header_query.emplace_back(QUERY_GET, "Expires", "0", true);
 }
 
 //-------------------------------------------
@@ -1383,6 +2160,66 @@ SIP_Header_From_Decode_Encode_Test::SIP_Header_From_Decode_Encode_Test()
 //-------------------------------------------
 //-------------------------------------------
 
+SIP_Header_From_Query_Test::SIP_Header_From_Query_Test() : SIP_Header_Query_Test(SIP_HEADER_FROM)
+{
+    _header_query.emplace_back(QUERY_SET, "Address.Display-Name-Double-Quote.False", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.Display-Name-Double-Quote", "False", true);
+    _header_query.emplace_back(QUERY_SET, "Address.Display-Name-Double-Quote.True", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.Display-Name-Double-Quote", "True", true);
+    _header_query.emplace_back(QUERY_SET, "Address.Display-Name.User123", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.Display-Name", "User123", true);
+    _header_query.emplace_back(QUERY_SET, "Address.Scheme.sip", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.Scheme", "sip", true);
+    _header_query.emplace_back(QUERY_SET, "Address.URI-Angle-Quote.False", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.URI-Angle-Quote", "False", true);
+    _header_query.emplace_back(QUERY_SET, "Address.URI-Angle-Quote.True", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.URI-Angle-Quote", "True", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.User.test1", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.User", "test1", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.Password.mypass", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Password", "mypass", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.Host.Address.10.10.10.10", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Host.Address", "10.10.10.10", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.Port.5000", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Port", "5000", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.Transport.UDP", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Transport", "UDP", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.User-Param.phone", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.User-Param", "phone", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.Method.INVITE", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Method", "INVITE", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.TTL.20", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.TTL", "20", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.Multicast-Address.Address.1111::2222", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Multicast-Address.Address", "1111::2222", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.LR.False", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.LR", "False", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.LR.True", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.LR", "True", true);
+    _header_query.emplace_back(QUERY_ADD, "Address.SIP-URI.Parameters.0.par1", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Parameters.Size", "1", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Parameters.0", "par1", true);
+    _header_query.emplace_back(QUERY_DEL, "Address.SIP-URI.Parameters.0", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Parameters.Size", "0", true);
+    _header_query.emplace_back(QUERY_ADD, "Address.SIP-URI.Headers.0.header1", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Headers.Size", "1", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Headers.0", "header1", true);
+    _header_query.emplace_back(QUERY_DEL, "Address.SIP-URI.Headers.0", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Headers.Size", "0", true);
+    _header_query.emplace_back(QUERY_SET, "Address.Absolute-URI.Address.11.22.33.44", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.Absolute-URI.Address", "11.22.33.44", true);
+    _header_query.emplace_back(QUERY_SET, "Tag.83jewjd83", "", true);
+    _header_query.emplace_back(QUERY_GET, "Tag", "83jewjd83", true);
+    _header_query.emplace_back(QUERY_ADD, "Parameters.0.par1234", "", true);
+    _header_query.emplace_back(QUERY_GET, "Parameters.Size", "1", true);
+    _header_query.emplace_back(QUERY_GET, "Parameters.0", "par1234", true);
+    _header_query.emplace_back(QUERY_DEL, "Parameters.0", "", true);
+    _header_query.emplace_back(QUERY_GET, "Parameters.Size", "0", true);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
 SIP_Header_In_Reply_To_Decode_Encode_Test::SIP_Header_In_Reply_To_Decode_Encode_Test()
 {
     SIP_Header_Input_Output hdr1;
@@ -1411,6 +2248,17 @@ SIP_Header_In_Reply_To_Decode_Encode_Test::SIP_Header_In_Reply_To_Decode_Encode_
     hdr3._decode_success = true;
     hdr3._encode_success = true;
     _header_input_output.push_back(hdr3);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+SIP_Header_In_Reply_To_Query_Test::SIP_Header_In_Reply_To_Query_Test() : SIP_Header_Query_Test(SIP_HEADER_IN_REPLY_TO)
+{
+    _header_query.emplace_back(QUERY_SET, "Call-ID.17320@saturn.bell-tel.com", "", true);
+    _header_query.emplace_back(QUERY_GET, "Call-ID", "17320@saturn.bell-tel.com", true);
+    _header_query.emplace_back(QUERY_SET, "Call-ID.test@domain.com:1234", "", true);
+    _header_query.emplace_back(QUERY_GET, "Call-ID", "test@domain.com:1234", true);
 }
 
 //-------------------------------------------
@@ -1485,6 +2333,17 @@ SIP_Header_Max_Forwards_Decode_Encode_Test::SIP_Header_Max_Forwards_Decode_Encod
 //-------------------------------------------
 //-------------------------------------------
 
+SIP_Header_Max_Forwards_Query_Test::SIP_Header_Max_Forwards_Query_Test() : SIP_Header_Query_Test(SIP_HEADER_MAX_FORWARDS)
+{
+    _header_query.emplace_back(QUERY_SET, "Max-Forwards.70", "", true);
+    _header_query.emplace_back(QUERY_GET, "Max-Forwards", "70", true);
+    _header_query.emplace_back(QUERY_SET, "Max-Forwards.1", "", true);
+    _header_query.emplace_back(QUERY_GET, "Max-Forwards", "1", true);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
 SIP_Header_Mime_Version_Decode_Encode_Test::SIP_Header_Mime_Version_Decode_Encode_Test()
 {
     SIP_Header_Input_Output hdr1;
@@ -1513,6 +2372,21 @@ SIP_Header_Mime_Version_Decode_Encode_Test::SIP_Header_Mime_Version_Decode_Encod
     hdr3._decode_success = true;
     hdr3._encode_success = true;
     _header_input_output.push_back(hdr3);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+SIP_Header_Mime_Version_Query_Test::SIP_Header_Mime_Version_Query_Test() : SIP_Header_Query_Test(SIP_HEADER_MIME_VERSION)
+{
+    _header_query.emplace_back(QUERY_SET, "Major-Version.1", "", true);
+    _header_query.emplace_back(QUERY_GET, "Major-Version", "1", true);
+    _header_query.emplace_back(QUERY_SET, "Major-Version.0", "", true);
+    _header_query.emplace_back(QUERY_GET, "Major-Version", "0", true);
+    _header_query.emplace_back(QUERY_SET, "Minor-Version.1", "", true);
+    _header_query.emplace_back(QUERY_GET, "Minor-Version", "1", true);
+    _header_query.emplace_back(QUERY_SET, "Minor-Version.0", "", true);
+    _header_query.emplace_back(QUERY_GET, "Minor-Version", "0", true);
 }
 
 //-------------------------------------------
@@ -1569,6 +2443,17 @@ SIP_Header_Min_Expires_Decode_Encode_Test::SIP_Header_Min_Expires_Decode_Encode_
 //-------------------------------------------
 //-------------------------------------------
 
+SIP_Header_Min_Expires_Query_Test::SIP_Header_Min_Expires_Query_Test() : SIP_Header_Query_Test(SIP_HEADER_MIN_EXPIRES)
+{
+    _header_query.emplace_back(QUERY_SET, "Min-Expires.3600", "", true);
+    _header_query.emplace_back(QUERY_GET, "Min-Expires", "3600", true);
+    _header_query.emplace_back(QUERY_SET, "Min-Expires.120", "", true);
+    _header_query.emplace_back(QUERY_GET, "Min-Expires", "120", true);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
 SIP_Header_Organization_Decode_Encode_Test::SIP_Header_Organization_Decode_Encode_Test()
 {
     SIP_Header_Input_Output hdr1;
@@ -1611,6 +2496,19 @@ SIP_Header_Organization_Decode_Encode_Test::SIP_Header_Organization_Decode_Encod
 //-------------------------------------------
 //-------------------------------------------
 
+SIP_Header_Organization_Query_Test::SIP_Header_Organization_Query_Test() : SIP_Header_Query_Test(SIP_HEADER_ORGANIZATION)
+{
+    _header_query.emplace_back(QUERY_SET, "Organization.Boxes by Bob", "", true);
+    _header_query.emplace_back(QUERY_GET, "Organization", "Boxes by Bob", true);
+    _header_query.emplace_back(QUERY_SET, "Organization.TEST", "", true);
+    _header_query.emplace_back(QUERY_GET, "Organization", "TEST", true);
+    _header_query.emplace_back(QUERY_SET, "Organization.", "", true);
+    _header_query.emplace_back(QUERY_GET, "Organization", "", true);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
 SIP_Header_Priority_Decode_Encode_Test::SIP_Header_Priority_Decode_Encode_Test()
 {
     SIP_Header_Input_Output hdr1;
@@ -1648,6 +2546,17 @@ SIP_Header_Priority_Decode_Encode_Test::SIP_Header_Priority_Decode_Encode_Test()
     hdr4._decode_success = true;
     hdr4._encode_success = true;
     _header_input_output.push_back(hdr4);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+SIP_Header_Priority_Query_Test::SIP_Header_Priority_Query_Test() : SIP_Header_Query_Test(SIP_HEADER_PRIORITY)
+{
+    _header_query.emplace_back(QUERY_SET, "Priority.urgent", "", true);
+    _header_query.emplace_back(QUERY_GET, "Priority", "urgent", true);
+    _header_query.emplace_back(QUERY_SET, "Priority.normal", "", true);
+    _header_query.emplace_back(QUERY_GET, "Priority", "normal", true);
 }
 
 //-------------------------------------------
@@ -1718,6 +2627,34 @@ SIP_Header_Proxy_Authenticate_Decode_Encode_Test::SIP_Header_Proxy_Authenticate_
     hdr6._decode_success = true;
     hdr6._encode_success = true;
     _header_input_output.push_back(hdr6);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+SIP_Header_Proxy_Authenticate_Query_Test::SIP_Header_Proxy_Authenticate_Query_Test() : SIP_Header_Query_Test(SIP_HEADER_PROXY_AUTHENTICATE)
+{
+    _header_query.emplace_back(QUERY_SET, "Challenge.Scheme.scheme1", "", true);
+    _header_query.emplace_back(QUERY_GET, "Challenge.Scheme", "scheme1", true);
+    _header_query.emplace_back(QUERY_SET, "Challenge.Realm.myrealm.com", "", true);
+    _header_query.emplace_back(QUERY_GET, "Challenge.Realm", "myrealm.com", true);
+    _header_query.emplace_back(QUERY_SET, "Challenge.Domain.sip:server.com", "", true);
+    _header_query.emplace_back(QUERY_GET, "Challenge.Domain", "sip:server.com", true);
+    _header_query.emplace_back(QUERY_SET, "Challenge.Nonce.123456789012345678901", "", true);
+    _header_query.emplace_back(QUERY_GET, "Challenge.Nonce", "123456789012345678901", true);
+    _header_query.emplace_back(QUERY_SET, "Challenge.Opaque.11223344556677889900aabbccddeeff", "", true);
+    _header_query.emplace_back(QUERY_GET, "Challenge.Opaque", "11223344556677889900aabbccddeeff", true);
+    _header_query.emplace_back(QUERY_SET, "Challenge.Stale.true", "", true);
+    _header_query.emplace_back(QUERY_GET, "Challenge.Stale", "true", true);
+    _header_query.emplace_back(QUERY_SET, "Challenge.Algorithm.MD5", "", true);
+    _header_query.emplace_back(QUERY_GET, "Challenge.Algorithm", "MD5", true);
+    _header_query.emplace_back(QUERY_SET, "Challenge.QoP.auth, auth-int, value", "", true);
+    _header_query.emplace_back(QUERY_GET, "Challenge.QoP", "auth, auth-int, value", true);
+    _header_query.emplace_back(QUERY_ADD, "Challenge.Parameters.0.par1=test", "", true);
+    _header_query.emplace_back(QUERY_GET, "Challenge.Parameters.Size", "1", true);
+    _header_query.emplace_back(QUERY_GET, "Challenge.Parameters.0", "par1=test", true);
+    _header_query.emplace_back(QUERY_DEL, "Challenge.Parameters.0", "", true);
+    _header_query.emplace_back(QUERY_GET, "Challenge.Parameters.Size", "0", true);
 }
 
 //-------------------------------------------
@@ -1799,6 +2736,40 @@ SIP_Header_Proxy_Authorization_Decode_Encode_Test::SIP_Header_Proxy_Authorizatio
 //-------------------------------------------
 //-------------------------------------------
 
+SIP_Header_Proxy_Authorization_Query_Test::SIP_Header_Proxy_Authorization_Query_Test() : SIP_Header_Query_Test(SIP_HEADER_PROXY_AUTHORIZATION)
+{
+    _header_query.emplace_back(QUERY_SET, "Credential.Scheme.scheme1", "", true);
+    _header_query.emplace_back(QUERY_GET, "Credential.Scheme", "scheme1", true);
+    _header_query.emplace_back(QUERY_SET, "Credential.Username.1234", "", true);
+    _header_query.emplace_back(QUERY_GET, "Credential.Username", "1234", true);
+    _header_query.emplace_back(QUERY_SET, "Credential.Realm.myrealm.com", "", true);
+    _header_query.emplace_back(QUERY_GET, "Credential.Realm", "myrealm.com", true);
+    _header_query.emplace_back(QUERY_SET, "Credential.Nonce.123456789012345678901", "", true);
+    _header_query.emplace_back(QUERY_GET, "Credential.Nonce", "123456789012345678901", true);
+    _header_query.emplace_back(QUERY_SET, "Credential.URI.sip:myrealm.com", "", true);
+    _header_query.emplace_back(QUERY_GET, "Credential.URI", "sip:myrealm.com", true);
+    _header_query.emplace_back(QUERY_SET, "Credential.Response.12345678901234567890123456789012", "", true);
+    _header_query.emplace_back(QUERY_GET, "Credential.Response", "12345678901234567890123456789012", true);
+    _header_query.emplace_back(QUERY_SET, "Credential.Algorithm.MD5", "", true);
+    _header_query.emplace_back(QUERY_GET, "Credential.Algorithm", "MD5", true);
+    _header_query.emplace_back(QUERY_SET, "Credential.CNonce.0a4f113b", "", true);
+    _header_query.emplace_back(QUERY_GET, "Credential.CNonce", "0a4f113b", true);
+    _header_query.emplace_back(QUERY_SET, "Credential.Opaque.11223344556677889900aabbccddeeff", "", true);
+    _header_query.emplace_back(QUERY_GET, "Credential.Opaque", "11223344556677889900aabbccddeeff", true);
+    _header_query.emplace_back(QUERY_SET, "Credential.QoP.auth", "", true);
+    _header_query.emplace_back(QUERY_GET, "Credential.QoP", "auth", true);
+    _header_query.emplace_back(QUERY_SET, "Credential.Nonce-Count.00000001", "", true);
+    _header_query.emplace_back(QUERY_GET, "Credential.Nonce-Count", "00000001", true);
+    _header_query.emplace_back(QUERY_ADD, "Credential.Parameters.0.param1", "", true);
+    _header_query.emplace_back(QUERY_GET, "Credential.Parameters.Size", "1", true);
+    _header_query.emplace_back(QUERY_GET, "Credential.Parameters.0", "param1", true);
+    _header_query.emplace_back(QUERY_DEL, "Credential.Parameters.0", "", true);
+    _header_query.emplace_back(QUERY_GET, "Credential.Parameters.Size", "0", true);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
 SIP_Header_Proxy_Require_Decode_Encode_Test::SIP_Header_Proxy_Require_Decode_Encode_Test()
 {
     SIP_Header_Input_Output hdr1;
@@ -1832,6 +2803,17 @@ SIP_Header_Proxy_Require_Decode_Encode_Test::SIP_Header_Proxy_Require_Decode_Enc
 //-------------------------------------------
 //-------------------------------------------
 
+SIP_Header_Proxy_Require_Query_Test::SIP_Header_Proxy_Require_Query_Test() : SIP_Header_Query_Test(SIP_HEADER_PROXY_REQUIRE)
+{
+    _header_query.emplace_back(QUERY_SET, "Option-Tag.foo", "", true);
+    _header_query.emplace_back(QUERY_GET, "Option-Tag", "foo", true);
+    _header_query.emplace_back(QUERY_SET, "Option-Tag.req1", "", true);
+    _header_query.emplace_back(QUERY_GET, "Option-Tag", "req1", true);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
 SIP_Header_RAck_Decode_Encode_Test::SIP_Header_RAck_Decode_Encode_Test()
 {
     SIP_Header_Input_Output hdr1;
@@ -1860,6 +2842,25 @@ SIP_Header_RAck_Decode_Encode_Test::SIP_Header_RAck_Decode_Encode_Test()
     hdr3._decode_success = true;
     hdr3._encode_success = true;
     _header_input_output.push_back(hdr3);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+SIP_Header_RAck_Query_Test::SIP_Header_RAck_Query_Test() : SIP_Header_Query_Test(SIP_HEADER_RACK)
+{
+    _header_query.emplace_back(QUERY_SET, "RSeq.776656", "", true);
+    _header_query.emplace_back(QUERY_GET, "RSeq", "776656", true);
+    _header_query.emplace_back(QUERY_SET, "RSeq.349940055", "", true);
+    _header_query.emplace_back(QUERY_GET, "RSeq", "349940055", true);
+    _header_query.emplace_back(QUERY_SET, "CSeq.1", "", true);
+    _header_query.emplace_back(QUERY_GET, "CSeq", "1", true);
+    _header_query.emplace_back(QUERY_SET, "CSeq.23456", "", true);
+    _header_query.emplace_back(QUERY_GET, "CSeq", "23456", true);
+    _header_query.emplace_back(QUERY_SET, "Method.INVITE", "", true);
+    _header_query.emplace_back(QUERY_GET, "Method", "INVITE", true);
+    _header_query.emplace_back(QUERY_SET, "Method.TEST", "", true);
+    _header_query.emplace_back(QUERY_GET, "Method", "TEST", true);
 }
 
 //-------------------------------------------
@@ -1906,6 +2907,64 @@ SIP_Header_Record_Route_Decode_Encode_Test::SIP_Header_Record_Route_Decode_Encod
     hdr4._decode_success = true;
     hdr4._encode_success = true;
     _header_input_output.push_back(hdr4);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+SIP_Header_Record_Route_Query_Test::SIP_Header_Record_Route_Query_Test() : SIP_Header_Query_Test(SIP_HEADER_RECORD_ROUTE)
+{
+    _header_query.emplace_back(QUERY_SET, "Address.Display-Name-Double-Quote.False", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.Display-Name-Double-Quote", "False", true);
+    _header_query.emplace_back(QUERY_SET, "Address.Display-Name-Double-Quote.True", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.Display-Name-Double-Quote", "True", true);
+    _header_query.emplace_back(QUERY_SET, "Address.Display-Name.User123", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.Display-Name", "User123", true);
+    _header_query.emplace_back(QUERY_SET, "Address.Scheme.sip", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.Scheme", "sip", true);
+    _header_query.emplace_back(QUERY_SET, "Address.URI-Angle-Quote.False", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.URI-Angle-Quote", "False", true);
+    _header_query.emplace_back(QUERY_SET, "Address.URI-Angle-Quote.True", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.URI-Angle-Quote", "True", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.User.test1", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.User", "test1", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.Password.mypass", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Password", "mypass", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.Host.Address.10.10.10.10", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Host.Address", "10.10.10.10", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.Port.5000", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Port", "5000", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.Transport.UDP", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Transport", "UDP", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.User-Param.phone", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.User-Param", "phone", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.Method.INVITE", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Method", "INVITE", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.TTL.20", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.TTL", "20", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.Multicast-Address.Address.1111::2222", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Multicast-Address.Address", "1111::2222", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.LR.False", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.LR", "False", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.LR.True", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.LR", "True", true);
+    _header_query.emplace_back(QUERY_ADD, "Address.SIP-URI.Parameters.0.par1", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Parameters.Size", "1", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Parameters.0", "par1", true);
+    _header_query.emplace_back(QUERY_DEL, "Address.SIP-URI.Parameters.0", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Parameters.Size", "0", true);
+    _header_query.emplace_back(QUERY_ADD, "Address.SIP-URI.Headers.0.header1", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Headers.Size", "1", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Headers.0", "header1", true);
+    _header_query.emplace_back(QUERY_DEL, "Address.SIP-URI.Headers.0", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Headers.Size", "0", true);
+    _header_query.emplace_back(QUERY_SET, "Address.Absolute-URI.Address.11.22.33.44", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.Absolute-URI.Address", "11.22.33.44", true);
+    _header_query.emplace_back(QUERY_ADD, "Parameters.0.par1234", "", true);
+    _header_query.emplace_back(QUERY_GET, "Parameters.Size", "1", true);
+    _header_query.emplace_back(QUERY_GET, "Parameters.0", "par1234", true);
+    _header_query.emplace_back(QUERY_DEL, "Parameters.0", "", true);
+    _header_query.emplace_back(QUERY_GET, "Parameters.Size", "0", true);
 }
 
 //-------------------------------------------
@@ -1993,6 +3052,64 @@ SIP_Header_Refer_To_Decode_Encode_Test::SIP_Header_Refer_To_Decode_Encode_Test()
 //-------------------------------------------
 //-------------------------------------------
 
+SIP_Header_Refer_To_Query_Test::SIP_Header_Refer_To_Query_Test() : SIP_Header_Query_Test(SIP_HEADER_REFER_TO)
+{
+    _header_query.emplace_back(QUERY_SET, "Address.Display-Name-Double-Quote.False", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.Display-Name-Double-Quote", "False", true);
+    _header_query.emplace_back(QUERY_SET, "Address.Display-Name-Double-Quote.True", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.Display-Name-Double-Quote", "True", true);
+    _header_query.emplace_back(QUERY_SET, "Address.Display-Name.User123", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.Display-Name", "User123", true);
+    _header_query.emplace_back(QUERY_SET, "Address.Scheme.sip", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.Scheme", "sip", true);
+    _header_query.emplace_back(QUERY_SET, "Address.URI-Angle-Quote.False", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.URI-Angle-Quote", "False", true);
+    _header_query.emplace_back(QUERY_SET, "Address.URI-Angle-Quote.True", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.URI-Angle-Quote", "True", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.User.test1", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.User", "test1", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.Password.mypass", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Password", "mypass", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.Host.Address.10.10.10.10", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Host.Address", "10.10.10.10", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.Port.5000", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Port", "5000", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.Transport.UDP", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Transport", "UDP", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.User-Param.phone", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.User-Param", "phone", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.Method.INVITE", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Method", "INVITE", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.TTL.20", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.TTL", "20", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.Multicast-Address.Address.1111::2222", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Multicast-Address.Address", "1111::2222", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.LR.False", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.LR", "False", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.LR.True", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.LR", "True", true);
+    _header_query.emplace_back(QUERY_ADD, "Address.SIP-URI.Parameters.0.par1", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Parameters.Size", "1", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Parameters.0", "par1", true);
+    _header_query.emplace_back(QUERY_DEL, "Address.SIP-URI.Parameters.0", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Parameters.Size", "0", true);
+    _header_query.emplace_back(QUERY_ADD, "Address.SIP-URI.Headers.0.header1", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Headers.Size", "1", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Headers.0", "header1", true);
+    _header_query.emplace_back(QUERY_DEL, "Address.SIP-URI.Headers.0", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Headers.Size", "0", true);
+    _header_query.emplace_back(QUERY_SET, "Address.Absolute-URI.Address.11.22.33.44", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.Absolute-URI.Address", "11.22.33.44", true);
+    _header_query.emplace_back(QUERY_ADD, "Parameters.0.par1234", "", true);
+    _header_query.emplace_back(QUERY_GET, "Parameters.Size", "1", true);
+    _header_query.emplace_back(QUERY_GET, "Parameters.0", "par1234", true);
+    _header_query.emplace_back(QUERY_DEL, "Parameters.0", "", true);
+    _header_query.emplace_back(QUERY_GET, "Parameters.Size", "0", true);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
 SIP_Header_Referred_By_Decode_Encode_Test::SIP_Header_Referred_By_Decode_Encode_Test()
 {
     SIP_Header_Input_Output hdr1;
@@ -2071,6 +3188,68 @@ SIP_Header_Referred_By_Decode_Encode_Test::SIP_Header_Referred_By_Decode_Encode_
 //-------------------------------------------
 //-------------------------------------------
 
+SIP_Header_Referred_By_Query_Test::SIP_Header_Referred_By_Query_Test() : SIP_Header_Query_Test(SIP_HEADER_REFERRED_BY)
+{
+    _header_query.emplace_back(QUERY_SET, "Address.Display-Name-Double-Quote.False", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.Display-Name-Double-Quote", "False", true);
+    _header_query.emplace_back(QUERY_SET, "Address.Display-Name-Double-Quote.True", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.Display-Name-Double-Quote", "True", true);
+    _header_query.emplace_back(QUERY_SET, "Address.Display-Name.User123", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.Display-Name", "User123", true);
+    _header_query.emplace_back(QUERY_SET, "Address.Scheme.sip", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.Scheme", "sip", true);
+    _header_query.emplace_back(QUERY_SET, "Address.URI-Angle-Quote.False", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.URI-Angle-Quote", "False", true);
+    _header_query.emplace_back(QUERY_SET, "Address.URI-Angle-Quote.True", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.URI-Angle-Quote", "True", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.User.test1", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.User", "test1", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.Password.mypass", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Password", "mypass", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.Host.Address.10.10.10.10", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Host.Address", "10.10.10.10", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.Port.5000", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Port", "5000", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.Transport.UDP", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Transport", "UDP", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.User-Param.phone", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.User-Param", "phone", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.Method.INVITE", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Method", "INVITE", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.TTL.20", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.TTL", "20", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.Multicast-Address.Address.1111::2222", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Multicast-Address.Address", "1111::2222", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.LR.False", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.LR", "False", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.LR.True", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.LR", "True", true);
+    _header_query.emplace_back(QUERY_ADD, "Address.SIP-URI.Parameters.0.par1", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Parameters.Size", "1", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Parameters.0", "par1", true);
+    _header_query.emplace_back(QUERY_DEL, "Address.SIP-URI.Parameters.0", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Parameters.Size", "0", true);
+    _header_query.emplace_back(QUERY_ADD, "Address.SIP-URI.Headers.0.header1", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Headers.Size", "1", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Headers.0", "header1", true);
+    _header_query.emplace_back(QUERY_DEL, "Address.SIP-URI.Headers.0", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Headers.Size", "0", true);
+    _header_query.emplace_back(QUERY_SET, "Address.Absolute-URI.Address.11.22.33.44", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.Absolute-URI.Address", "11.22.33.44", true);
+    _header_query.emplace_back(QUERY_SET, "CID.2UWQFN309shb3@ref.example", "", true);
+    _header_query.emplace_back(QUERY_GET, "CID", "2UWQFN309shb3@ref.example", true);
+    _header_query.emplace_back(QUERY_SET, "CID.abc@123", "", true);
+    _header_query.emplace_back(QUERY_GET, "CID", "abc@123", true);
+    _header_query.emplace_back(QUERY_ADD, "Parameters.0.par1234", "", true);
+    _header_query.emplace_back(QUERY_GET, "Parameters.Size", "1", true);
+    _header_query.emplace_back(QUERY_GET, "Parameters.0", "par1234", true);
+    _header_query.emplace_back(QUERY_DEL, "Parameters.0", "", true);
+    _header_query.emplace_back(QUERY_GET, "Parameters.Size", "0", true);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
 SIP_Header_Reply_To_Decode_Encode_Test::SIP_Header_Reply_To_Decode_Encode_Test()
 {
     SIP_Header_Input_Output hdr1;
@@ -2108,6 +3287,64 @@ SIP_Header_Reply_To_Decode_Encode_Test::SIP_Header_Reply_To_Decode_Encode_Test()
     hdr4._decode_success = true;
     hdr4._encode_success = true;
     _header_input_output.push_back(hdr4);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+SIP_Header_Reply_To_Query_Test::SIP_Header_Reply_To_Query_Test() : SIP_Header_Query_Test(SIP_HEADER_REPLY_TO)
+{
+    _header_query.emplace_back(QUERY_SET, "Address.Display-Name-Double-Quote.False", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.Display-Name-Double-Quote", "False", true);
+    _header_query.emplace_back(QUERY_SET, "Address.Display-Name-Double-Quote.True", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.Display-Name-Double-Quote", "True", true);
+    _header_query.emplace_back(QUERY_SET, "Address.Display-Name.User123", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.Display-Name", "User123", true);
+    _header_query.emplace_back(QUERY_SET, "Address.Scheme.sip", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.Scheme", "sip", true);
+    _header_query.emplace_back(QUERY_SET, "Address.URI-Angle-Quote.False", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.URI-Angle-Quote", "False", true);
+    _header_query.emplace_back(QUERY_SET, "Address.URI-Angle-Quote.True", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.URI-Angle-Quote", "True", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.User.test1", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.User", "test1", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.Password.mypass", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Password", "mypass", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.Host.Address.10.10.10.10", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Host.Address", "10.10.10.10", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.Port.5000", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Port", "5000", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.Transport.UDP", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Transport", "UDP", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.User-Param.phone", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.User-Param", "phone", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.Method.INVITE", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Method", "INVITE", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.TTL.20", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.TTL", "20", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.Multicast-Address.Address.1111::2222", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Multicast-Address.Address", "1111::2222", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.LR.False", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.LR", "False", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.LR.True", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.LR", "True", true);
+    _header_query.emplace_back(QUERY_ADD, "Address.SIP-URI.Parameters.0.par1", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Parameters.Size", "1", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Parameters.0", "par1", true);
+    _header_query.emplace_back(QUERY_DEL, "Address.SIP-URI.Parameters.0", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Parameters.Size", "0", true);
+    _header_query.emplace_back(QUERY_ADD, "Address.SIP-URI.Headers.0.header1", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Headers.Size", "1", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Headers.0", "header1", true);
+    _header_query.emplace_back(QUERY_DEL, "Address.SIP-URI.Headers.0", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Headers.Size", "0", true);
+    _header_query.emplace_back(QUERY_SET, "Address.Absolute-URI.Address.11.22.33.44", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.Absolute-URI.Address", "11.22.33.44", true);
+    _header_query.emplace_back(QUERY_ADD, "Parameters.0.par1234", "", true);
+    _header_query.emplace_back(QUERY_GET, "Parameters.Size", "1", true);
+    _header_query.emplace_back(QUERY_GET, "Parameters.0", "par1234", true);
+    _header_query.emplace_back(QUERY_DEL, "Parameters.0", "", true);
+    _header_query.emplace_back(QUERY_GET, "Parameters.Size", "0", true);
 }
 
 //-------------------------------------------
@@ -2155,6 +3392,17 @@ SIP_Header_Require_Decode_Encode_Test::SIP_Header_Require_Decode_Encode_Test()
 //-------------------------------------------
 //-------------------------------------------
 
+SIP_Header_Require_Query_Test::SIP_Header_Require_Query_Test() : SIP_Header_Query_Test(SIP_HEADER_REQUIRE)
+{
+    _header_query.emplace_back(QUERY_SET, "Option-Tag.foo", "", true);
+    _header_query.emplace_back(QUERY_GET, "Option-Tag", "foo", true);
+    _header_query.emplace_back(QUERY_SET, "Option-Tag.100rel", "", true);
+    _header_query.emplace_back(QUERY_GET, "Option-Tag", "100rel", true);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
 SIP_Header_Retry_After_Decode_Encode_Test::SIP_Header_Retry_After_Decode_Encode_Test()
 {
     SIP_Header_Input_Output hdr1;
@@ -2192,6 +3440,30 @@ SIP_Header_Retry_After_Decode_Encode_Test::SIP_Header_Retry_After_Decode_Encode_
     hdr4._decode_success = true;
     hdr4._encode_success = true;
     _header_input_output.push_back(hdr4);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+SIP_Header_Retry_After_Query_Test::SIP_Header_Retry_After_Query_Test() : SIP_Header_Query_Test(SIP_HEADER_RETRY_AFTER)
+{
+    _header_query.emplace_back(QUERY_SET, "Retry-After.18000", "", true);
+    _header_query.emplace_back(QUERY_GET, "Retry-After", "18000", true);
+    _header_query.emplace_back(QUERY_SET, "Retry-After.10", "", true);
+    _header_query.emplace_back(QUERY_GET, "Retry-After", "10", true);
+    _header_query.emplace_back(QUERY_SET, "Comment.I'm in a meeting", "", true);
+    _header_query.emplace_back(QUERY_GET, "Comment", "I'm in a meeting", true);
+    _header_query.emplace_back(QUERY_SET, "Comment.This (\"is a\") comment", "", true);
+    _header_query.emplace_back(QUERY_GET, "Comment", "This (\"is a\") comment", true);
+    _header_query.emplace_back(QUERY_SET, "Duration.3600", "", true);
+    _header_query.emplace_back(QUERY_GET, "Duration", "3600", true);
+    _header_query.emplace_back(QUERY_SET, "Duration.100", "", true);
+    _header_query.emplace_back(QUERY_GET, "Duration", "100", true);
+    _header_query.emplace_back(QUERY_ADD, "Parameters.0.parameter=test", "", true);
+    _header_query.emplace_back(QUERY_GET, "Parameters.Size", "1", true);
+    _header_query.emplace_back(QUERY_GET, "Parameters.0", "parameter=test", true);
+    _header_query.emplace_back(QUERY_DEL, "Parameters.0", "", true);
+    _header_query.emplace_back(QUERY_GET, "Parameters.Size", "0", true);
 }
 
 //-------------------------------------------
@@ -2257,6 +3529,64 @@ SIP_Header_Route_Decode_Encode_Test::SIP_Header_Route_Decode_Encode_Test()
 //-------------------------------------------
 //-------------------------------------------
 
+SIP_Header_Route_Query_Test::SIP_Header_Route_Query_Test() : SIP_Header_Query_Test(SIP_HEADER_ROUTE)
+{
+    _header_query.emplace_back(QUERY_SET, "Address.Display-Name-Double-Quote.False", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.Display-Name-Double-Quote", "False", true);
+    _header_query.emplace_back(QUERY_SET, "Address.Display-Name-Double-Quote.True", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.Display-Name-Double-Quote", "True", true);
+    _header_query.emplace_back(QUERY_SET, "Address.Display-Name.User123", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.Display-Name", "User123", true);
+    _header_query.emplace_back(QUERY_SET, "Address.Scheme.sip", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.Scheme", "sip", true);
+    _header_query.emplace_back(QUERY_SET, "Address.URI-Angle-Quote.False", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.URI-Angle-Quote", "False", true);
+    _header_query.emplace_back(QUERY_SET, "Address.URI-Angle-Quote.True", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.URI-Angle-Quote", "True", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.User.test1", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.User", "test1", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.Password.mypass", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Password", "mypass", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.Host.Address.10.10.10.10", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Host.Address", "10.10.10.10", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.Port.5000", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Port", "5000", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.Transport.UDP", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Transport", "UDP", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.User-Param.phone", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.User-Param", "phone", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.Method.INVITE", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Method", "INVITE", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.TTL.20", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.TTL", "20", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.Multicast-Address.Address.1111::2222", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Multicast-Address.Address", "1111::2222", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.LR.False", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.LR", "False", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.LR.True", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.LR", "True", true);
+    _header_query.emplace_back(QUERY_ADD, "Address.SIP-URI.Parameters.0.par1", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Parameters.Size", "1", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Parameters.0", "par1", true);
+    _header_query.emplace_back(QUERY_DEL, "Address.SIP-URI.Parameters.0", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Parameters.Size", "0", true);
+    _header_query.emplace_back(QUERY_ADD, "Address.SIP-URI.Headers.0.header1", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Headers.Size", "1", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Headers.0", "header1", true);
+    _header_query.emplace_back(QUERY_DEL, "Address.SIP-URI.Headers.0", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Headers.Size", "0", true);
+    _header_query.emplace_back(QUERY_SET, "Address.Absolute-URI.Address.11.22.33.44", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.Absolute-URI.Address", "11.22.33.44", true);
+    _header_query.emplace_back(QUERY_ADD, "Parameters.0.par1234", "", true);
+    _header_query.emplace_back(QUERY_GET, "Parameters.Size", "1", true);
+    _header_query.emplace_back(QUERY_GET, "Parameters.0", "par1234", true);
+    _header_query.emplace_back(QUERY_DEL, "Parameters.0", "", true);
+    _header_query.emplace_back(QUERY_GET, "Parameters.Size", "0", true);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
 SIP_Header_RSeq_Decode_Encode_Test::SIP_Header_RSeq_Decode_Encode_Test()
 {
     SIP_Header_Input_Output hdr1;
@@ -2290,6 +3620,17 @@ SIP_Header_RSeq_Decode_Encode_Test::SIP_Header_RSeq_Decode_Encode_Test()
 //-------------------------------------------
 //-------------------------------------------
 
+SIP_Header_RSeq_Query_Test::SIP_Header_RSeq_Query_Test() : SIP_Header_Query_Test(SIP_HEADER_RSEQ)
+{
+    _header_query.emplace_back(QUERY_SET, "RSeq.988789", "", true);
+    _header_query.emplace_back(QUERY_GET, "RSeq", "988789", true);
+    _header_query.emplace_back(QUERY_SET, "RSeq.349940055", "", true);
+    _header_query.emplace_back(QUERY_GET, "RSeq", "349940055", true);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
 SIP_Header_Server_Decode_Encode_Test::SIP_Header_Server_Decode_Encode_Test()
 {
     SIP_Header_Input_Output hdr1;
@@ -2318,6 +3659,17 @@ SIP_Header_Server_Decode_Encode_Test::SIP_Header_Server_Decode_Encode_Test()
     hdr3._decode_success = true;
     hdr3._encode_success = true;
     _header_input_output.push_back(hdr3);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+SIP_Header_Server_Query_Test::SIP_Header_Server_Query_Test() : SIP_Header_Query_Test(SIP_HEADER_SERVER)
+{
+    _header_query.emplace_back(QUERY_SET, "Server.HomeServer v2", "", true);
+    _header_query.emplace_back(QUERY_GET, "Server", "HomeServer v2", true);
+    _header_query.emplace_back(QUERY_SET, "Server.My Server/1.5.0 Pro", "", true);
+    _header_query.emplace_back(QUERY_GET, "Server", "My Server/1.5.0 Pro", true);
 }
 
 //-------------------------------------------
@@ -2360,6 +3712,19 @@ SIP_Header_Subject_Decode_Encode_Test::SIP_Header_Subject_Decode_Encode_Test()
     hdr4._decode_success = true;
     hdr4._encode_success = true;
     _header_input_output.push_back(hdr4);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+SIP_Header_Subject_Query_Test::SIP_Header_Subject_Query_Test() : SIP_Header_Query_Test(SIP_HEADER_SUBJECT)
+{
+    _header_query.emplace_back(QUERY_SET, "Subject.lunch", "", true);
+    _header_query.emplace_back(QUERY_GET, "Subject", "lunch", true);
+    _header_query.emplace_back(QUERY_SET, "Subject.Need more boxes", "", true);
+    _header_query.emplace_back(QUERY_GET, "Subject", "Need more boxes", true);
+    _header_query.emplace_back(QUERY_SET, "Subject.", "", true);
+    _header_query.emplace_back(QUERY_GET, "Subject", "", true);
 }
 
 //-------------------------------------------
@@ -2425,6 +3790,34 @@ SIP_Header_Subscription_State_Decode_Encode_Test::SIP_Header_Subscription_State_
 //-------------------------------------------
 //-------------------------------------------
 
+SIP_Header_Subscription_State_Query_Test::SIP_Header_Subscription_State_Query_Test() : SIP_Header_Query_Test(SIP_HEADER_SUBSCRIPTION_STATE)
+{
+    _header_query.emplace_back(QUERY_SET, "State.active", "", true);
+    _header_query.emplace_back(QUERY_GET, "State", "active", true);
+    _header_query.emplace_back(QUERY_SET, "State.terminated", "", true);
+    _header_query.emplace_back(QUERY_GET, "State", "terminated", true);
+    _header_query.emplace_back(QUERY_SET, "Reason.timeout", "", true);
+    _header_query.emplace_back(QUERY_GET, "Reason", "timeout", true);
+    _header_query.emplace_back(QUERY_SET, "Reason.giveup", "", true);
+    _header_query.emplace_back(QUERY_GET, "Reason", "giveup", true);
+    _header_query.emplace_back(QUERY_SET, "Expires.600", "", true);
+    _header_query.emplace_back(QUERY_GET, "Expires", "600", true);
+    _header_query.emplace_back(QUERY_SET, "Expires.100", "", true);
+    _header_query.emplace_back(QUERY_GET, "Expires", "100", true);
+    _header_query.emplace_back(QUERY_SET, "Retry-After.9999", "", true);
+    _header_query.emplace_back(QUERY_GET, "Retry-After", "9999", true);
+    _header_query.emplace_back(QUERY_SET, "Retry-After.666", "", true);
+    _header_query.emplace_back(QUERY_GET, "Retry-After", "666", true);
+    _header_query.emplace_back(QUERY_ADD, "Parameters.0.parameter=111", "", true);
+    _header_query.emplace_back(QUERY_GET, "Parameters.Size", "1", true);
+    _header_query.emplace_back(QUERY_GET, "Parameters.0", "parameter=111", true);
+    _header_query.emplace_back(QUERY_DEL, "Parameters.0", "", true);
+    _header_query.emplace_back(QUERY_GET, "Parameters.Size", "0", true);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
 SIP_Header_Supported_Decode_Encode_Test::SIP_Header_Supported_Decode_Encode_Test()
 {
     SIP_Header_Input_Output hdr1;
@@ -2476,6 +3869,19 @@ SIP_Header_Supported_Decode_Encode_Test::SIP_Header_Supported_Decode_Encode_Test
 //-------------------------------------------
 //-------------------------------------------
 
+SIP_Header_Supported_Query_Test::SIP_Header_Supported_Query_Test() : SIP_Header_Query_Test(SIP_HEADER_SUPPORTED)
+{
+    _header_query.emplace_back(QUERY_SET, "Option-Tag.foo", "", true);
+    _header_query.emplace_back(QUERY_GET, "Option-Tag", "foo", true);
+    _header_query.emplace_back(QUERY_SET, "Option-Tag.100rel", "", true);
+    _header_query.emplace_back(QUERY_GET, "Option-Tag", "100rel", true);
+    _header_query.emplace_back(QUERY_SET, "Option-Tag.", "", true);
+    _header_query.emplace_back(QUERY_GET, "Option-Tag", "", true);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
 SIP_Header_Timestamp_Decode_Encode_Test::SIP_Header_Timestamp_Decode_Encode_Test()
 {
     SIP_Header_Input_Output hdr1;
@@ -2522,6 +3928,23 @@ SIP_Header_Timestamp_Decode_Encode_Test::SIP_Header_Timestamp_Decode_Encode_Test
     hdr5._decode_success = true;
     hdr5._encode_success = true;
     _header_input_output.push_back(hdr5);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+SIP_Header_Timestamp_Query_Test::SIP_Header_Timestamp_Query_Test() : SIP_Header_Query_Test(SIP_HEADER_TIMESTAMP)
+{
+    _header_query.emplace_back(QUERY_SET, "Timestamp.10.20", "", true);
+    _header_query.emplace_back(QUERY_GET, "Timestamp", "10.20", true);
+    _header_query.emplace_back(QUERY_SET, "Timestamp.12345678901234.1001", "", true);
+    _header_query.emplace_back(QUERY_GET, "Timestamp", "12345678901234.1001", true);
+    _header_query.emplace_back(QUERY_SET, "Delay.77.666", "", true);
+    _header_query.emplace_back(QUERY_GET, "Delay", "77.666", true);
+    _header_query.emplace_back(QUERY_SET, "Delay.55666778899.123", "", true);
+    _header_query.emplace_back(QUERY_GET, "Delay", "55666778899.123", true);
+    _header_query.emplace_back(QUERY_SET, "Delay.", "", true);
+    _header_query.emplace_back(QUERY_GET, "Delay", "", true);
 }
 
 //-------------------------------------------
@@ -2607,6 +4030,66 @@ SIP_Header_To_Decode_Encode_Test::SIP_Header_To_Decode_Encode_Test()
 //-------------------------------------------
 //-------------------------------------------
 
+SIP_Header_To_Query_Test::SIP_Header_To_Query_Test() : SIP_Header_Query_Test(SIP_HEADER_TO)
+{
+    _header_query.emplace_back(QUERY_SET, "Address.Display-Name-Double-Quote.False", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.Display-Name-Double-Quote", "False", true);
+    _header_query.emplace_back(QUERY_SET, "Address.Display-Name-Double-Quote.True", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.Display-Name-Double-Quote", "True", true);
+    _header_query.emplace_back(QUERY_SET, "Address.Display-Name.Test User", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.Display-Name", "Test User", true);
+    _header_query.emplace_back(QUERY_SET, "Address.Scheme.tel", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.Scheme", "tel", true);
+    _header_query.emplace_back(QUERY_SET, "Address.URI-Angle-Quote.False", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.URI-Angle-Quote", "False", true);
+    _header_query.emplace_back(QUERY_SET, "Address.URI-Angle-Quote.True", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.URI-Angle-Quote", "True", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.User.test1", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.User", "test1", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.Password.mypass", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Password", "mypass", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.Host.Address.10.10.10.10", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Host.Address", "10.10.10.10", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.Port.65000", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Port", "65000", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.Transport.TCP", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Transport", "TCP", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.User-Param.phone", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.User-Param", "phone", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.Method.BYE", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Method", "BYE", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.TTL.2", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.TTL", "2", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.Multicast-Address.Address.1111::2222", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Multicast-Address.Address", "1111::2222", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.LR.False", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.LR", "False", true);
+    _header_query.emplace_back(QUERY_SET, "Address.SIP-URI.LR.True", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.LR", "True", true);
+    _header_query.emplace_back(QUERY_ADD, "Address.SIP-URI.Parameters.0.transport=tcp", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Parameters.Size", "1", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Parameters.0", "transport=tcp", true);
+    _header_query.emplace_back(QUERY_DEL, "Address.SIP-URI.Parameters.0", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Parameters.Size", "0", true);
+    _header_query.emplace_back(QUERY_ADD, "Address.SIP-URI.Headers.0.header1=test", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Headers.Size", "1", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Headers.0", "header1=test", true);
+    _header_query.emplace_back(QUERY_DEL, "Address.SIP-URI.Headers.0", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.SIP-URI.Headers.Size", "0", true);
+    _header_query.emplace_back(QUERY_SET, "Address.Absolute-URI.Address.192.168.1.240", "", true);
+    _header_query.emplace_back(QUERY_GET, "Address.Absolute-URI.Address", "192.168.1.240", true);
+    _header_query.emplace_back(QUERY_SET, "Tag.jd3939dk", "", true);
+    _header_query.emplace_back(QUERY_GET, "Tag", "jd3939dk", true);
+    _header_query.emplace_back(QUERY_ADD, "Parameters.0.par1=1234", "", true);
+    _header_query.emplace_back(QUERY_GET, "Parameters.Size", "1", true);
+    _header_query.emplace_back(QUERY_GET, "Parameters.0", "par1=1234", true);
+    _header_query.emplace_back(QUERY_DEL, "Parameters.0", "", true);
+    _header_query.emplace_back(QUERY_GET, "Parameters.Size", "0", true);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
 SIP_Header_Unknown_Decode_Encode_Test::SIP_Header_Unknown_Decode_Encode_Test()
 {
     SIP_Header_Input_Output hdr1;
@@ -2635,6 +4118,21 @@ SIP_Header_Unknown_Decode_Encode_Test::SIP_Header_Unknown_Decode_Encode_Test()
     hdr3._decode_success = true;
     hdr3._encode_success = true;
     _header_input_output.push_back(hdr3);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+SIP_Header_Unknown_Query_Test::SIP_Header_Unknown_Query_Test() : SIP_Header_Query_Test(SIP_HEADER_UNKNOWN)
+{
+    _header_query.emplace_back(QUERY_SET, "Header.X-Header", "", true);
+    _header_query.emplace_back(QUERY_GET, "Header", "X-Header", true);
+    _header_query.emplace_back(QUERY_SET, "Header.Unknown", "", true);
+    _header_query.emplace_back(QUERY_GET, "Header", "Unknown", true);
+    _header_query.emplace_back(QUERY_SET, "Value.foo, bar, xyz", "", true);
+    _header_query.emplace_back(QUERY_GET, "Value", "foo, bar, xyz", true);
+    _header_query.emplace_back(QUERY_SET, "Value.123456", "", true);
+    _header_query.emplace_back(QUERY_GET, "Value", "123456", true);
 }
 
 //-------------------------------------------
@@ -2673,6 +4171,17 @@ SIP_Header_Unsupported_Decode_Encode_Test::SIP_Header_Unsupported_Decode_Encode_
 //-------------------------------------------
 //-------------------------------------------
 
+SIP_Header_Unsupported_Query_Test::SIP_Header_Unsupported_Query_Test() : SIP_Header_Query_Test(SIP_HEADER_UNSUPPORTED)
+{
+    _header_query.emplace_back(QUERY_SET, "Option-Tag.foo", "", true);
+    _header_query.emplace_back(QUERY_GET, "Option-Tag", "foo", true);
+    _header_query.emplace_back(QUERY_SET, "Option-Tag.100rel", "", true);
+    _header_query.emplace_back(QUERY_GET, "Option-Tag", "100rel", true);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
 SIP_Header_User_Agent_Decode_Encode_Test::SIP_Header_User_Agent_Decode_Encode_Test()
 {
     SIP_Header_Input_Output hdr1;
@@ -2701,6 +4210,17 @@ SIP_Header_User_Agent_Decode_Encode_Test::SIP_Header_User_Agent_Decode_Encode_Te
     hdr3._decode_success = true;
     hdr3._encode_success = true;
     _header_input_output.push_back(hdr3);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+SIP_Header_User_Agent_Query_Test::SIP_Header_User_Agent_Query_Test() : SIP_Header_Query_Test(SIP_HEADER_USER_AGENT)
+{
+    _header_query.emplace_back(QUERY_SET, "User-Agent.Softphone Beta1.5", "", true);
+    _header_query.emplace_back(QUERY_GET, "User-Agent", "Softphone Beta1.5", true);
+    _header_query.emplace_back(QUERY_SET, "User-Agent.UA/1.5.0 Pro", "", true);
+    _header_query.emplace_back(QUERY_GET, "User-Agent", "UA/1.5.0 Pro", true);
 }
 
 //-------------------------------------------
@@ -2788,6 +4308,54 @@ SIP_Header_Via_Decode_Encode_Test::SIP_Header_Via_Decode_Encode_Test()
 //-------------------------------------------
 //-------------------------------------------
 
+SIP_Header_Via_Query_Test::SIP_Header_Via_Query_Test() : SIP_Header_Query_Test(SIP_HEADER_VIA)
+{
+    _header_query.emplace_back(QUERY_SET, "Protocol-Name.SIP", "", true);
+    _header_query.emplace_back(QUERY_GET, "Protocol-Name", "SIP", true);
+    _header_query.emplace_back(QUERY_SET, "Protocol-Version.2.0", "", true);
+    _header_query.emplace_back(QUERY_GET, "Protocol-Version", "2.0", true);
+    _header_query.emplace_back(QUERY_SET, "Transport.TLS", "", true);
+    _header_query.emplace_back(QUERY_GET, "Transport", "TLS", true);
+    _header_query.emplace_back(QUERY_SET, "Host.Address.1111:2222:33::5555", "", true);
+    _header_query.emplace_back(QUERY_GET, "Host.Address", "1111:2222:33::5555", true);
+    _header_query.emplace_back(QUERY_SET, "Host.Address.10.0.10.2", "", true);
+    _header_query.emplace_back(QUERY_GET, "Host.Address", "10.0.10.2", true);
+    _header_query.emplace_back(QUERY_SET, "Port.12345", "", true);
+    _header_query.emplace_back(QUERY_GET, "Port", "12345", true);
+    _header_query.emplace_back(QUERY_SET, "Branch.z9hG4bKKw83ur", "", true);
+    _header_query.emplace_back(QUERY_GET, "Branch", "z9hG4bKKw83ur", true);
+    _header_query.emplace_back(QUERY_SET, "Received.1111:2222:33::5555", "", true);
+    _header_query.emplace_back(QUERY_GET, "Received", "1111:2222:33::5555", true);
+    _header_query.emplace_back(QUERY_SET, "TTL.40", "", true);
+    _header_query.emplace_back(QUERY_GET, "TTL", "40", true);
+    _header_query.emplace_back(QUERY_SET, "Multicast-Address.Address.1234:5678:90::999", "", true);
+    _header_query.emplace_back(QUERY_GET, "Multicast-Address.Address", "1234:5678:90::999", true);
+    _header_query.emplace_back(QUERY_ADD, "Parameters.0.parameter1", "", true);
+    _header_query.emplace_back(QUERY_GET, "Parameters.Size", "1", true);
+    _header_query.emplace_back(QUERY_GET, "Parameters.0", "parameter1", true);
+    _header_query.emplace_back(QUERY_ADD, "Parameters.1.par2=test", "", true);
+    _header_query.emplace_back(QUERY_GET, "Parameters.Size", "2", true);
+    _header_query.emplace_back(QUERY_GET, "Parameters.1", "par2=test", true);
+    _header_query.emplace_back(QUERY_ADD, "Parameters.0.parameter0", "", true);
+    _header_query.emplace_back(QUERY_GET, "Parameters.Size", "3", true);
+    _header_query.emplace_back(QUERY_GET, "Parameters.0", "parameter0", true);
+    _header_query.emplace_back(QUERY_GET, "Parameters.0", "parameter0", true);
+    _header_query.emplace_back(QUERY_GET, "Parameters.1", "parameter1", true);
+    _header_query.emplace_back(QUERY_GET, "Parameters.2", "par2=test", true);
+    _header_query.emplace_back(QUERY_DEL, "Parameters.1", "", true);
+    _header_query.emplace_back(QUERY_GET, "Parameters.Size", "2", true);
+    _header_query.emplace_back(QUERY_GET, "Parameters.0", "parameter0", true);
+    _header_query.emplace_back(QUERY_GET, "Parameters.1", "par2=test", true);
+    _header_query.emplace_back(QUERY_DEL, "Parameters.0", "", true);
+    _header_query.emplace_back(QUERY_GET, "Parameters.Size", "1", true);
+    _header_query.emplace_back(QUERY_GET, "Parameters.0", "par2=test", true);
+    _header_query.emplace_back(QUERY_DEL, "Parameters.0", "", true);
+    _header_query.emplace_back(QUERY_GET, "Parameters.Size", "0", true);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
 SIP_Header_Warning_Decode_Encode_Test::SIP_Header_Warning_Decode_Encode_Test()
 {
     SIP_Header_Input_Output hdr1;
@@ -2818,6 +4386,25 @@ SIP_Header_Warning_Decode_Encode_Test::SIP_Header_Warning_Decode_Encode_Test()
     hdr3._decode_success = true;
     hdr3._encode_success = true;
     _header_input_output.push_back(hdr3);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+SIP_Header_Warning_Query_Test::SIP_Header_Warning_Query_Test() : SIP_Header_Query_Test(SIP_HEADER_WARNING)
+{
+    _header_query.emplace_back(QUERY_SET, "Code.307", "", true);
+    _header_query.emplace_back(QUERY_GET, "Code", "307", true);
+    _header_query.emplace_back(QUERY_SET, "Code.370", "", true);
+    _header_query.emplace_back(QUERY_GET, "Code", "370", true);
+    _header_query.emplace_back(QUERY_SET, "Agent.isi.edu", "", true);
+    _header_query.emplace_back(QUERY_GET, "Agent", "isi.edu", true);
+    _header_query.emplace_back(QUERY_SET, "Agent.devnull", "", true);
+    _header_query.emplace_back(QUERY_GET, "Agent", "devnull", true);
+    _header_query.emplace_back(QUERY_SET, "Text.Session parameter 'foo' not understood", "", true);
+    _header_query.emplace_back(QUERY_GET, "Text", "Session parameter 'foo' not understood", true);
+    _header_query.emplace_back(QUERY_SET, "Text.Choose a bigger pipe", "", true);
+    _header_query.emplace_back(QUERY_GET, "Text", "Choose a bigger pipe", true);
 }
 
 //-------------------------------------------
@@ -2888,6 +4475,34 @@ SIP_Header_WWW_Authenticate_Decode_Encode_Test::SIP_Header_WWW_Authenticate_Deco
     hdr6._decode_success = true;
     hdr6._encode_success = true;
     _header_input_output.push_back(hdr6);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+SIP_Header_WWW_Authenticate_Query_Test::SIP_Header_WWW_Authenticate_Query_Test() : SIP_Header_Query_Test(SIP_HEADER_WWW_AUTHENTICATE)
+{
+    _header_query.emplace_back(QUERY_SET, "Challenge.Scheme.scheme1", "", true);
+    _header_query.emplace_back(QUERY_GET, "Challenge.Scheme", "scheme1", true);
+    _header_query.emplace_back(QUERY_SET, "Challenge.Realm.myrealm.com", "", true);
+    _header_query.emplace_back(QUERY_GET, "Challenge.Realm", "myrealm.com", true);
+    _header_query.emplace_back(QUERY_SET, "Challenge.Domain.sip:server.com", "", true);
+    _header_query.emplace_back(QUERY_GET, "Challenge.Domain", "sip:server.com", true);
+    _header_query.emplace_back(QUERY_SET, "Challenge.Nonce.123456789012345678901", "", true);
+    _header_query.emplace_back(QUERY_GET, "Challenge.Nonce", "123456789012345678901", true);
+    _header_query.emplace_back(QUERY_SET, "Challenge.Opaque.11223344556677889900aabbccddeeff", "", true);
+    _header_query.emplace_back(QUERY_GET, "Challenge.Opaque", "11223344556677889900aabbccddeeff", true);
+    _header_query.emplace_back(QUERY_SET, "Challenge.Stale.true", "", true);
+    _header_query.emplace_back(QUERY_GET, "Challenge.Stale", "true", true);
+    _header_query.emplace_back(QUERY_SET, "Challenge.Algorithm.MD5", "", true);
+    _header_query.emplace_back(QUERY_GET, "Challenge.Algorithm", "MD5", true);
+    _header_query.emplace_back(QUERY_SET, "Challenge.QoP.auth, auth-int, value", "", true);
+    _header_query.emplace_back(QUERY_GET, "Challenge.QoP", "auth, auth-int, value", true);
+    _header_query.emplace_back(QUERY_ADD, "Challenge.Parameters.0.par1=test", "", true);
+    _header_query.emplace_back(QUERY_GET, "Challenge.Parameters.Size", "1", true);
+    _header_query.emplace_back(QUERY_GET, "Challenge.Parameters.0", "par1=test", true);
+    _header_query.emplace_back(QUERY_DEL, "Challenge.Parameters.0", "", true);
+    _header_query.emplace_back(QUERY_GET, "Challenge.Parameters.Size", "0", true);
 }
 
 //-------------------------------------------
