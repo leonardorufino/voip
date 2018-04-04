@@ -20,6 +20,9 @@ bool SIP_Address_Test::init()
     if (!run<SIP_Address_Decode_Encode_Test>())
         return false;
 
+    if (!run<SIP_Address_Query_Test>())
+        return false;
+
     std::cout << "SIP address test completed successfully\n";
     return true;
 }
@@ -133,6 +136,117 @@ bool SIP_Address_Decode_Encode_Test::run()
         copy = NULL;
 
         std::cout << "SIP address decode encode test completed successfully\n";
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+SIP_Address_Query_Test::SIP_Address_Query_Test()
+{
+    _address_query.emplace_back(QUERY_SET, "Display-Name-Double-Quote.False", "", true);
+    _address_query.emplace_back(QUERY_GET, "Display-Name-Double-Quote", "False", true);
+    _address_query.emplace_back(QUERY_SET, "Display-Name-Double-Quote.True", "", true);
+    _address_query.emplace_back(QUERY_GET, "Display-Name-Double-Quote", "True", true);
+    _address_query.emplace_back(QUERY_SET, "Display-Name.Test User", "", true);
+    _address_query.emplace_back(QUERY_GET, "Display-Name", "Test User", true);
+    _address_query.emplace_back(QUERY_SET, "Scheme.tel", "", true);
+    _address_query.emplace_back(QUERY_GET, "Scheme", "tel", true);
+    _address_query.emplace_back(QUERY_SET, "URI-Angle-Quote.False", "", true);
+    _address_query.emplace_back(QUERY_GET, "URI-Angle-Quote", "False", true);
+    _address_query.emplace_back(QUERY_SET, "URI-Angle-Quote.True", "", true);
+    _address_query.emplace_back(QUERY_GET, "URI-Angle-Quote", "True", true);
+    _address_query.emplace_back(QUERY_SET, "SIP-URI.User.test1", "", true);
+    _address_query.emplace_back(QUERY_GET, "SIP-URI.User", "test1", true);
+    _address_query.emplace_back(QUERY_SET, "SIP-URI.Password.mypass", "", true);
+    _address_query.emplace_back(QUERY_GET, "SIP-URI.Password", "mypass", true);
+    _address_query.emplace_back(QUERY_SET, "SIP-URI.Host.Address.10.10.10.10", "", true);
+    _address_query.emplace_back(QUERY_GET, "SIP-URI.Host.Address", "10.10.10.10", true);
+    _address_query.emplace_back(QUERY_SET, "SIP-URI.Port.65000", "", true);
+    _address_query.emplace_back(QUERY_GET, "SIP-URI.Port", "65000", true);
+    _address_query.emplace_back(QUERY_SET, "SIP-URI.Transport.TCP", "", true);
+    _address_query.emplace_back(QUERY_GET, "SIP-URI.Transport", "TCP", true);
+    _address_query.emplace_back(QUERY_SET, "SIP-URI.User-Param.phone", "", true);
+    _address_query.emplace_back(QUERY_GET, "SIP-URI.User-Param", "phone", true);
+    _address_query.emplace_back(QUERY_SET, "SIP-URI.Method.BYE", "", true);
+    _address_query.emplace_back(QUERY_GET, "SIP-URI.Method", "BYE", true);
+    _address_query.emplace_back(QUERY_SET, "SIP-URI.TTL.2", "", true);
+    _address_query.emplace_back(QUERY_GET, "SIP-URI.TTL", "2", true);
+    _address_query.emplace_back(QUERY_SET, "SIP-URI.Multicast-Address.Address.1111::2222", "", true);
+    _address_query.emplace_back(QUERY_GET, "SIP-URI.Multicast-Address.Address", "1111::2222", true);
+    _address_query.emplace_back(QUERY_SET, "SIP-URI.LR.False", "", true);
+    _address_query.emplace_back(QUERY_GET, "SIP-URI.LR", "False", true);
+    _address_query.emplace_back(QUERY_SET, "SIP-URI.LR.True", "", true);
+    _address_query.emplace_back(QUERY_GET, "SIP-URI.LR", "True", true);
+    _address_query.emplace_back(QUERY_ADD, "SIP-URI.Parameters.0.parameter1", "", true);
+    _address_query.emplace_back(QUERY_GET, "SIP-URI.Parameters.Size", "1", true);
+    _address_query.emplace_back(QUERY_GET, "SIP-URI.Parameters.0", "parameter1", true);
+    _address_query.emplace_back(QUERY_ADD, "SIP-URI.Parameters.1.par2=test", "", true);
+    _address_query.emplace_back(QUERY_GET, "SIP-URI.Parameters.Size", "2", true);
+    _address_query.emplace_back(QUERY_GET, "SIP-URI.Parameters.1", "par2=test", true);
+    _address_query.emplace_back(QUERY_ADD, "SIP-URI.Parameters.0.parameter0", "", true);
+    _address_query.emplace_back(QUERY_GET, "SIP-URI.Parameters.Size", "3", true);
+    _address_query.emplace_back(QUERY_GET, "SIP-URI.Parameters.0", "parameter0", true);
+    _address_query.emplace_back(QUERY_GET, "SIP-URI.Parameters.0", "parameter0", true);
+    _address_query.emplace_back(QUERY_GET, "SIP-URI.Parameters.1", "parameter1", true);
+    _address_query.emplace_back(QUERY_GET, "SIP-URI.Parameters.2", "par2=test", true);
+    _address_query.emplace_back(QUERY_DEL, "SIP-URI.Parameters.1", "", true);
+    _address_query.emplace_back(QUERY_GET, "SIP-URI.Parameters.Size", "2", true);
+    _address_query.emplace_back(QUERY_GET, "SIP-URI.Parameters.0", "parameter0", true);
+    _address_query.emplace_back(QUERY_GET, "SIP-URI.Parameters.1", "par2=test", true);
+    _address_query.emplace_back(QUERY_DEL, "SIP-URI.Parameters.0", "", true);
+    _address_query.emplace_back(QUERY_GET, "SIP-URI.Parameters.Size", "1", true);
+    _address_query.emplace_back(QUERY_GET, "SIP-URI.Parameters.0", "par2=test", true);
+    _address_query.emplace_back(QUERY_DEL, "SIP-URI.Parameters.0", "", true);
+    _address_query.emplace_back(QUERY_GET, "SIP-URI.Parameters.Size", "0", true);
+    _address_query.emplace_back(QUERY_ADD, "SIP-URI.Headers.0.header1=test", "", true);
+    _address_query.emplace_back(QUERY_GET, "SIP-URI.Headers.Size", "1", true);
+    _address_query.emplace_back(QUERY_GET, "SIP-URI.Headers.0", "header1=test", true);
+    _address_query.emplace_back(QUERY_DEL, "SIP-URI.Headers.0", "", true);
+    _address_query.emplace_back(QUERY_GET, "SIP-URI.Headers.Size", "0", true);
+    _address_query.emplace_back(QUERY_SET, "Absolute-URI.Address.192.168.1.240", "", true);
+    _address_query.emplace_back(QUERY_GET, "Absolute-URI.Address", "192.168.1.240", true);
+}
+
+//-------------------------------------------
+
+bool SIP_Address_Query_Test::run()
+{
+    SIP_Address sip_address;
+
+    std::list<SIP_Address_Query>::const_iterator it = _address_query.begin();
+    while (it != _address_query.end())
+    {
+        SIP_Address_Query address_query = *it++;
+
+        std::cout << "SIP address query test initialized\n";
+
+        std::string result;
+        bool success = sip_address.query(address_query._cmd, address_query._query, result);
+
+        if (address_query._success != success)
+        {
+            std::cout << "SIP_Address_Query_Test::run -> Query failed:\n";
+            std::cout << std::setw(12) << "Cmd: " << address_query._cmd << "\n";
+            std::cout << std::setw(12) << "Query: " << address_query._query.c_str() << "\n";
+            std::cout << std::setw(12) << "Expected: " << (address_query._success ? "true" : "false") << "\n";
+            std::cout << std::setw(12) << "Success: " << (success ? "true" : "false") << "\n";
+            return false;
+        }
+
+        if ((!address_query._expected_result.empty()) && (result != address_query._expected_result))
+        {
+            std::cout << "SIP_Address_Query_Test::run -> Query result failed:\n";
+            std::cout << std::setw(12) << "Cmd: " << address_query._cmd << "\n";
+            std::cout << std::setw(12) << "Query: " << address_query._query.c_str() << "\n";
+            std::cout << std::setw(12) << "Expected: " << address_query._expected_result.c_str() << "\n";
+            std::cout << std::setw(12) << "Result: " << result.c_str() << "\n";
+            return false;
+        }
+
+        std::cout << "SIP address query test completed successfully\n";
     }
 
     return true;
