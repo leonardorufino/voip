@@ -62,6 +62,52 @@ bool SDP_Field_Test::init()
     if (!run<SDP_Field_Media_Description_Decode_Encode_Test>())
         return false;
 
+
+    if (!run<SDP_Field_Protocol_Version_Query_Test>())
+        return false;
+
+    if (!run<SDP_Field_Origin_Query_Test>())
+        return false;
+
+    if (!run<SDP_Field_Session_Name_Query_Test>())
+        return false;
+
+    if (!run<SDP_Field_Session_Information_Query_Test>())
+        return false;
+
+    if (!run<SDP_Field_URI_Query_Test>())
+        return false;
+
+    if (!run<SDP_Field_Email_Address_Query_Test>())
+        return false;
+
+    if (!run<SDP_Field_Phone_Number_Query_Test>())
+        return false;
+
+    if (!run<SDP_Field_Connection_Data_Query_Test>())
+        return false;
+
+    if (!run<SDP_Field_Bandwidth_Query_Test>())
+        return false;
+
+    if (!run<SDP_Field_Timing_Query_Test>())
+        return false;
+
+    if (!run<SDP_Field_Repeat_Time_Query_Test>())
+        return false;
+
+    if (!run<SDP_Field_Time_Zone_Query_Test>())
+        return false;
+
+    if (!run<SDP_Field_Encryption_Key_Query_Test>())
+        return false;
+
+    if (!run<SDP_Field_Attribute_Query_Test>())
+        return false;
+
+    if (!run<SDP_Field_Media_Description_Query_Test>())
+        return false;
+
     std::cout << "SDP field test completed successfully\n";
     return true;
 }
@@ -215,6 +261,60 @@ void SDP_Field_Decode_Encode_Test::clear(sdp_field_list &fields)
 //-------------------------------------------
 //-------------------------------------------
 
+bool SDP_Field_Query_Test::run()
+{
+    SDP_Field *field = SDP_Field::create_field(_field_type);
+    if (!field)
+    {
+        std::cout << "SDP_Field_Query_Test::run -> create field failed:\n";
+        std::cout << std::setw(12) << "Type: " << _field_type << "\n";
+        return false;
+    }
+
+    std::list<SDP_Field_Query>::const_iterator it = _field_query.begin();
+    while (it != _field_query.end())
+    {
+        SDP_Field_Query field_query = *it++;
+
+        std::cout << "SDP field query test initialized (type: " << _field_type << ")\n";
+
+        std::string result;
+        bool success = field->query(field_query._cmd, field_query._query, result);
+
+        if (field_query._success != success)
+        {
+            std::cout << "SDP_Field_Query_Test::run -> Query failed:\n";
+            std::cout << std::setw(12) << "Type: " << _field_type << "\n";
+            std::cout << std::setw(12) << "Cmd: " << field_query._cmd << "\n";
+            std::cout << std::setw(12) << "Query: " << field_query._query.c_str() << "\n";
+            std::cout << std::setw(12) << "Expected: " << (field_query._success ? "true" : "false") << "\n";
+            std::cout << std::setw(12) << "Success: " << (success ? "true" : "false") << "\n";
+            delete field;
+            return false;
+        }
+
+        if ((!field_query._expected_result.empty()) && (result != field_query._expected_result))
+        {
+            std::cout << "SDP_Field_Query_Test::run -> Query result failed:\n";
+            std::cout << std::setw(12) << "Type: " << _field_type << "\n";
+            std::cout << std::setw(12) << "Cmd: " << field_query._cmd << "\n";
+            std::cout << std::setw(12) << "Query: " << field_query._query.c_str() << "\n";
+            std::cout << std::setw(12) << "Expected: " << field_query._expected_result.c_str() << "\n";
+            std::cout << std::setw(12) << "Result: " << result.c_str() << "\n";
+            delete field;
+            return false;
+        }
+
+        std::cout << "SDP field query test completed successfully (type: " << _field_type << ")\n";
+    }
+
+    delete field;
+    return true;
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
 SDP_Field_Protocol_Version_Decode_Encode_Test::SDP_Field_Protocol_Version_Decode_Encode_Test()
 {
     SDP_Field_Input_Output field1;
@@ -243,6 +343,17 @@ SDP_Field_Protocol_Version_Decode_Encode_Test::SDP_Field_Protocol_Version_Decode
     field3._decode_success = true;
     field3._encode_success = true;
     _field_input_output.push_back(field3);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+SDP_Field_Protocol_Version_Query_Test::SDP_Field_Protocol_Version_Query_Test() : SDP_Field_Query_Test(SDP_FIELD_PROTOCOL_VERSION)
+{
+    _field_query.emplace_back(QUERY_SET, "Version.0", "", true);
+    _field_query.emplace_back(QUERY_GET, "Version", "0", true);
+    _field_query.emplace_back(QUERY_SET, "Version.9999", "", true);
+    _field_query.emplace_back(QUERY_GET, "Version", "9999", true);
 }
 
 //-------------------------------------------
@@ -281,6 +392,39 @@ SDP_Field_Origin_Decode_Encode_Test::SDP_Field_Origin_Decode_Encode_Test()
 //-------------------------------------------
 //-------------------------------------------
 
+SDP_Field_Origin_Query_Test::SDP_Field_Origin_Query_Test() : SDP_Field_Query_Test(SDP_FIELD_ORIGIN)
+{
+    _field_query.emplace_back(QUERY_SET, "Username.-", "", true);
+    _field_query.emplace_back(QUERY_GET, "Username", "-", true);
+    _field_query.emplace_back(QUERY_SET, "Username.jdoe", "", true);
+    _field_query.emplace_back(QUERY_GET, "Username", "jdoe", true);
+    _field_query.emplace_back(QUERY_SET, "Session-ID.0", "", true);
+    _field_query.emplace_back(QUERY_GET, "Session-ID", "0", true);
+    _field_query.emplace_back(QUERY_SET, "Session-ID.2890844526", "", true);
+    _field_query.emplace_back(QUERY_GET, "Session-ID", "2890844526", true);
+    _field_query.emplace_back(QUERY_SET, "Session-Version.0", "", true);
+    _field_query.emplace_back(QUERY_GET, "Session-Version", "0", true);
+    _field_query.emplace_back(QUERY_SET, "Session-Version.11223344556677889900", "", true);
+    _field_query.emplace_back(QUERY_GET, "Session-Version", "11223344556677889900", true);
+    _field_query.emplace_back(QUERY_SET, "Network-Type.IN", "", true);
+    _field_query.emplace_back(QUERY_GET, "Network-Type", "IN", true);
+    _field_query.emplace_back(QUERY_SET, "Network-Type.TEST", "", true);
+    _field_query.emplace_back(QUERY_GET, "Network-Type", "TEST", true);
+    _field_query.emplace_back(QUERY_SET, "Address-Type.IP4", "", true);
+    _field_query.emplace_back(QUERY_GET, "Address-Type", "IP4", true);
+    _field_query.emplace_back(QUERY_SET, "Address-Type.IP6", "", true);
+    _field_query.emplace_back(QUERY_GET, "Address-Type", "IP6", true);
+    _field_query.emplace_back(QUERY_SET, "Unicast-Address.10.47.16.5", "", true);
+    _field_query.emplace_back(QUERY_GET, "Unicast-Address", "10.47.16.5", true);
+    _field_query.emplace_back(QUERY_SET, "Unicast-Address.domain.com", "", true);
+    _field_query.emplace_back(QUERY_GET, "Unicast-Address", "domain.com", true);
+    _field_query.emplace_back(QUERY_SET, "Unicast-Address.2200:05FF::1111:2222:EEFC", "", true);
+    _field_query.emplace_back(QUERY_GET, "Unicast-Address", "2200:05FF::1111:2222:EEFC", true);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
 SDP_Field_Session_Name_Decode_Encode_Test::SDP_Field_Session_Name_Decode_Encode_Test()
 {
     SDP_Field_Input_Output field1;
@@ -309,6 +453,17 @@ SDP_Field_Session_Name_Decode_Encode_Test::SDP_Field_Session_Name_Decode_Encode_
     field3._decode_success = true;
     field3._encode_success = true;
     _field_input_output.push_back(field3);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+SDP_Field_Session_Name_Query_Test::SDP_Field_Session_Name_Query_Test() : SDP_Field_Query_Test(SDP_FIELD_SESSION_NAME)
+{
+    _field_query.emplace_back(QUERY_SET, "Session-Name.This is a session name", "", true);
+    _field_query.emplace_back(QUERY_GET, "Session-Name", "This is a session name", true);
+    _field_query.emplace_back(QUERY_SET, "Session-Name. ", "", true);
+    _field_query.emplace_back(QUERY_GET, "Session-Name", " ", true);
 }
 
 //-------------------------------------------
@@ -347,6 +502,17 @@ SDP_Field_Session_Information_Decode_Encode_Test::SDP_Field_Session_Information_
 //-------------------------------------------
 //-------------------------------------------
 
+SDP_Field_Session_Information_Query_Test::SDP_Field_Session_Information_Query_Test() : SDP_Field_Query_Test(SDP_FIELD_SESSION_INFORMATION)
+{
+    _field_query.emplace_back(QUERY_SET, "Session-Information.A Seminar on the session description protocol", "", true);
+    _field_query.emplace_back(QUERY_GET, "Session-Information", "A Seminar on the session description protocol", true);
+    _field_query.emplace_back(QUERY_SET, "Session-Information.", "", true);
+    _field_query.emplace_back(QUERY_GET, "Session-Information", "", true);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
 SDP_Field_URI_Decode_Encode_Test::SDP_Field_URI_Decode_Encode_Test()
 {
     SDP_Field_Input_Output field1;
@@ -375,6 +541,17 @@ SDP_Field_URI_Decode_Encode_Test::SDP_Field_URI_Decode_Encode_Test()
     field3._decode_success = true;
     field3._encode_success = true;
     _field_input_output.push_back(field3);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+SDP_Field_URI_Query_Test::SDP_Field_URI_Query_Test() : SDP_Field_Query_Test(SDP_FIELD_URI)
+{
+    _field_query.emplace_back(QUERY_SET, "URI.http://www.example.com/seminars/sdp.pdf", "", true);
+    _field_query.emplace_back(QUERY_GET, "URI", "http://www.example.com/seminars/sdp.pdf", true);
+    _field_query.emplace_back(QUERY_SET, "URI.", "", true);
+    _field_query.emplace_back(QUERY_GET, "URI", "", true);
 }
 
 //-------------------------------------------
@@ -413,6 +590,19 @@ SDP_Field_Email_Address_Decode_Encode_Test::SDP_Field_Email_Address_Decode_Encod
 //-------------------------------------------
 //-------------------------------------------
 
+SDP_Field_Email_Address_Query_Test::SDP_Field_Email_Address_Query_Test() : SDP_Field_Query_Test(SDP_FIELD_EMAIL_ADDRESS)
+{
+    _field_query.emplace_back(QUERY_SET, "Email.j.doe@example.com (Jane Doe)", "", true);
+    _field_query.emplace_back(QUERY_GET, "Email", "j.doe@example.com (Jane Doe)", true);
+    _field_query.emplace_back(QUERY_SET, "Email.Jane Doe <j.doe@example.com>", "", true);
+    _field_query.emplace_back(QUERY_GET, "Email", "Jane Doe <j.doe@example.com>", true);
+    _field_query.emplace_back(QUERY_SET, "Email.test@domain.com", "", true);
+    _field_query.emplace_back(QUERY_GET, "Email", "test@domain.com", true);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
 SDP_Field_Phone_Number_Decode_Encode_Test::SDP_Field_Phone_Number_Decode_Encode_Test()
 {
     SDP_Field_Input_Output field1;
@@ -441,6 +631,19 @@ SDP_Field_Phone_Number_Decode_Encode_Test::SDP_Field_Phone_Number_Decode_Encode_
     field3._decode_success = true;
     field3._encode_success = true;
     _field_input_output.push_back(field3);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+SDP_Field_Phone_Number_Query_Test::SDP_Field_Phone_Number_Query_Test() : SDP_Field_Query_Test(SDP_FIELD_PHONE_NUMBER)
+{
+    _field_query.emplace_back(QUERY_SET, "Phone.+1 617 555-6011", "", true);
+    _field_query.emplace_back(QUERY_GET, "Phone", "+1 617 555-6011", true);
+    _field_query.emplace_back(QUERY_SET, "Phone.9876543210 (Jane Doe)", "", true);
+    _field_query.emplace_back(QUERY_GET, "Phone", "9876543210 (Jane Doe)", true);
+    _field_query.emplace_back(QUERY_SET, "Phone.Jane Doe <+1 234 567-8900>", "", true);
+    _field_query.emplace_back(QUERY_GET, "Phone", "Jane Doe <+1 234 567-8900>", true);
 }
 
 //-------------------------------------------
@@ -497,6 +700,33 @@ SDP_Field_Connection_Data_Decode_Encode_Test::SDP_Field_Connection_Data_Decode_E
 //-------------------------------------------
 //-------------------------------------------
 
+SDP_Field_Connection_Data_Query_Test::SDP_Field_Connection_Data_Query_Test() : SDP_Field_Query_Test(SDP_FIELD_CONNECTION_DATA)
+{
+    _field_query.emplace_back(QUERY_SET, "Network-Type.IN", "", true);
+    _field_query.emplace_back(QUERY_GET, "Network-Type", "IN", true);
+    _field_query.emplace_back(QUERY_SET, "Network-Type.TEST", "", true);
+    _field_query.emplace_back(QUERY_GET, "Network-Type", "TEST", true);
+    _field_query.emplace_back(QUERY_SET, "Address-Type.IP4", "", true);
+    _field_query.emplace_back(QUERY_GET, "Address-Type", "IP4", true);
+    _field_query.emplace_back(QUERY_SET, "Address-Type.IP6", "", true);
+    _field_query.emplace_back(QUERY_GET, "Address-Type", "IP6", true);
+    _field_query.emplace_back(QUERY_SET, "Connection-Address.224.2.1.3", "", true);
+    _field_query.emplace_back(QUERY_GET, "Connection-Address", "224.2.1.3", true);
+    _field_query.emplace_back(QUERY_SET, "Connection-Address.FF15::101", "", true);
+    _field_query.emplace_back(QUERY_GET, "Connection-Address", "FF15::101", true);
+    _field_query.emplace_back(QUERY_SET, "TTL.127", "", true);
+    _field_query.emplace_back(QUERY_GET, "TTL", "127", true);
+    _field_query.emplace_back(QUERY_SET, "TTL.1", "", true);
+    _field_query.emplace_back(QUERY_GET, "TTL", "1", true);
+    _field_query.emplace_back(QUERY_SET, "Number-Addresses.3", "", true);
+    _field_query.emplace_back(QUERY_GET, "Number-Addresses", "3", true);
+    _field_query.emplace_back(QUERY_SET, "Number-Addresses.10", "", true);
+    _field_query.emplace_back(QUERY_GET, "Number-Addresses", "10", true);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
 SDP_Field_Bandwidth_Decode_Encode_Test::SDP_Field_Bandwidth_Decode_Encode_Test()
 {
     SDP_Field_Input_Output field1;
@@ -525,6 +755,21 @@ SDP_Field_Bandwidth_Decode_Encode_Test::SDP_Field_Bandwidth_Decode_Encode_Test()
     field3._decode_success = true;
     field3._encode_success = true;
     _field_input_output.push_back(field3);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+SDP_Field_Bandwidth_Query_Test::SDP_Field_Bandwidth_Query_Test() : SDP_Field_Query_Test(SDP_FIELD_BANDWIDTH)
+{
+    _field_query.emplace_back(QUERY_SET, "Type.CT", "", true);
+    _field_query.emplace_back(QUERY_GET, "Type", "CT", true);
+    _field_query.emplace_back(QUERY_SET, "Type.X-YZ", "", true);
+    _field_query.emplace_back(QUERY_GET, "Type", "X-YZ", true);
+    _field_query.emplace_back(QUERY_SET, "Bandwidth.64", "", true);
+    _field_query.emplace_back(QUERY_GET, "Bandwidth", "64", true);
+    _field_query.emplace_back(QUERY_SET, "Bandwidth.9999999", "", true);
+    _field_query.emplace_back(QUERY_GET, "Bandwidth", "9999999", true);
 }
 
 //-------------------------------------------
@@ -581,6 +826,21 @@ SDP_Field_Timing_Decode_Encode_Test::SDP_Field_Timing_Decode_Encode_Test()
 //-------------------------------------------
 //-------------------------------------------
 
+SDP_Field_Timing_Query_Test::SDP_Field_Timing_Query_Test() : SDP_Field_Query_Test(SDP_FIELD_TIMING)
+{
+    _field_query.emplace_back(QUERY_SET, "Start.2873397496", "", true);
+    _field_query.emplace_back(QUERY_GET, "Start", "2873397496", true);
+    _field_query.emplace_back(QUERY_SET, "Start.0", "", true);
+    _field_query.emplace_back(QUERY_GET, "Start", "0", true);
+    _field_query.emplace_back(QUERY_SET, "Stop.9999999999", "", true);
+    _field_query.emplace_back(QUERY_GET, "Stop", "9999999999", true);
+    _field_query.emplace_back(QUERY_SET, "Stop.0", "", true);
+    _field_query.emplace_back(QUERY_GET, "Stop", "0", true);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
 SDP_Field_Repeat_Time_Decode_Encode_Test::SDP_Field_Repeat_Time_Decode_Encode_Test()
 {
     SDP_Field_Input_Output field1;
@@ -618,6 +878,32 @@ SDP_Field_Repeat_Time_Decode_Encode_Test::SDP_Field_Repeat_Time_Decode_Encode_Te
     field4._decode_success = true;
     field4._encode_success = true;
     _field_input_output.push_back(field4);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+SDP_Field_Repeat_Time_Query_Test::SDP_Field_Repeat_Time_Query_Test() : SDP_Field_Query_Test(SDP_FIELD_REPEAT_TIME)
+{
+    _field_query.emplace_back(QUERY_SET, "Interval.604800", "", true);
+    _field_query.emplace_back(QUERY_GET, "Interval", "604800", true);
+    _field_query.emplace_back(QUERY_SET, "Interval.7d", "", true);
+    _field_query.emplace_back(QUERY_GET, "Interval", "7d", true);
+    _field_query.emplace_back(QUERY_SET, "Duration.3600", "", true);
+    _field_query.emplace_back(QUERY_GET, "Duration", "3600", true);
+    _field_query.emplace_back(QUERY_SET, "Duration.1h", "", true);
+    _field_query.emplace_back(QUERY_GET, "Duration", "1h", true);
+    _field_query.emplace_back(QUERY_ADD, "Offsets.0.0", "", true);
+    _field_query.emplace_back(QUERY_GET, "Offsets.Size", "1", true);
+    _field_query.emplace_back(QUERY_GET, "Offsets.0", "0", true);
+    _field_query.emplace_back(QUERY_ADD, "Offsets.1.90000", "", true);
+    _field_query.emplace_back(QUERY_GET, "Offsets.Size", "2", true);
+    _field_query.emplace_back(QUERY_GET, "Offsets.1", "90000", true);
+    _field_query.emplace_back(QUERY_DEL, "Offsets.0", "", true);
+    _field_query.emplace_back(QUERY_GET, "Offsets.Size", "1", true);
+    _field_query.emplace_back(QUERY_GET, "Offsets.0", "90000", true);
+    _field_query.emplace_back(QUERY_DEL, "Offsets.0", "", true);
+    _field_query.emplace_back(QUERY_GET, "Offsets.Size", "0", true);
 }
 
 //-------------------------------------------
@@ -665,6 +951,35 @@ SDP_Field_Time_Zone_Decode_Encode_Test::SDP_Field_Time_Zone_Decode_Encode_Test()
 //-------------------------------------------
 //-------------------------------------------
 
+SDP_Field_Time_Zone_Query_Test::SDP_Field_Time_Zone_Query_Test() : SDP_Field_Query_Test(SDP_FIELD_TIME_ZONE)
+{
+    _field_query.emplace_back(QUERY_ADD, "Adjustments.0.2882844526", "", true);
+    _field_query.emplace_back(QUERY_GET, "Adjustments.Size", "1", true);
+    _field_query.emplace_back(QUERY_GET, "Adjustments.0", "2882844526", true);
+    _field_query.emplace_back(QUERY_ADD, "Adjustments.1.999999999", "", true);
+    _field_query.emplace_back(QUERY_GET, "Adjustments.Size", "2", true);
+    _field_query.emplace_back(QUERY_GET, "Adjustments.1", "999999999", true);
+    _field_query.emplace_back(QUERY_DEL, "Adjustments.1", "", true);
+    _field_query.emplace_back(QUERY_GET, "Adjustments.Size", "1", true);
+    _field_query.emplace_back(QUERY_GET, "Adjustments.0", "2882844526", true);
+    _field_query.emplace_back(QUERY_DEL, "Adjustments.0", "", true);
+    _field_query.emplace_back(QUERY_GET, "Adjustments.Size", "0", true);
+    _field_query.emplace_back(QUERY_ADD, "Offsets.0.-1h", "", true);
+    _field_query.emplace_back(QUERY_GET, "Offsets.Size", "1", true);
+    _field_query.emplace_back(QUERY_GET, "Offsets.0", "-1h", true);
+    _field_query.emplace_back(QUERY_ADD, "Offsets.1.9", "", true);
+    _field_query.emplace_back(QUERY_GET, "Offsets.Size", "2", true);
+    _field_query.emplace_back(QUERY_GET, "Offsets.1", "9", true);
+    _field_query.emplace_back(QUERY_DEL, "Offsets.0", "", true);
+    _field_query.emplace_back(QUERY_GET, "Offsets.Size", "1", true);
+    _field_query.emplace_back(QUERY_GET, "Offsets.0", "9", true);
+    _field_query.emplace_back(QUERY_DEL, "Offsets.0", "", true);
+    _field_query.emplace_back(QUERY_GET, "Offsets.Size", "0", true);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
 SDP_Field_Encryption_Key_Decode_Encode_Test::SDP_Field_Encryption_Key_Decode_Encode_Test()
 {
     SDP_Field_Input_Output field1;
@@ -702,6 +1017,21 @@ SDP_Field_Encryption_Key_Decode_Encode_Test::SDP_Field_Encryption_Key_Decode_Enc
     field4._decode_success = true;
     field4._encode_success = true;
     _field_input_output.push_back(field4);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+SDP_Field_Encryption_Key_Query_Test::SDP_Field_Encryption_Key_Query_Test() : SDP_Field_Query_Test(SDP_FIELD_ENCRYPTION_KEY)
+{
+    _field_query.emplace_back(QUERY_SET, "Method.clear", "", true);
+    _field_query.emplace_back(QUERY_GET, "Method", "clear", true);
+    _field_query.emplace_back(QUERY_SET, "Method.base64", "", true);
+    _field_query.emplace_back(QUERY_GET, "Method", "base64", true);
+    _field_query.emplace_back(QUERY_SET, "Key.password", "", true);
+    _field_query.emplace_back(QUERY_GET, "Key", "password", true);
+    _field_query.emplace_back(QUERY_SET, "Key.cGFzc3dvcmQ=", "", true);
+    _field_query.emplace_back(QUERY_GET, "Key", "cGFzc3dvcmQ=", true);
 }
 
 //-------------------------------------------
@@ -767,6 +1097,23 @@ SDP_Field_Attribute_Decode_Encode_Test::SDP_Field_Attribute_Decode_Encode_Test()
 //-------------------------------------------
 //-------------------------------------------
 
+SDP_Field_Attribute_Query_Test::SDP_Field_Attribute_Query_Test() : SDP_Field_Query_Test(SDP_FIELD_ATTRIBUTE)
+{
+    _field_query.emplace_back(QUERY_SET, "Attribute.recvonly", "", true);
+    _field_query.emplace_back(QUERY_GET, "Attribute", "recvonly", true);
+    _field_query.emplace_back(QUERY_SET, "Attribute.rtpmap", "", true);
+    _field_query.emplace_back(QUERY_GET, "Attribute", "rtpmap", true);
+    _field_query.emplace_back(QUERY_SET, "Value.99 h263-1998/90000", "", true);
+    _field_query.emplace_back(QUERY_GET, "Value", "99 h263-1998/90000", true);
+    _field_query.emplace_back(QUERY_SET, "Value.", "", true);
+    _field_query.emplace_back(QUERY_GET, "Value", "", true);
+    _field_query.emplace_back(QUERY_SET, "Value.ISO-8859-1", "", true);
+    _field_query.emplace_back(QUERY_GET, "Value", "ISO-8859-1", true);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
 SDP_Field_Media_Description_Decode_Encode_Test::SDP_Field_Media_Description_Decode_Encode_Test()
 {
     SDP_Field_Input_Output field1;
@@ -813,6 +1160,40 @@ SDP_Field_Media_Description_Decode_Encode_Test::SDP_Field_Media_Description_Deco
     field5._decode_success = true;
     field5._encode_success = true;
     _field_input_output.push_back(field5);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+SDP_Field_Media_Description_Query_Test::SDP_Field_Media_Description_Query_Test() : SDP_Field_Query_Test(SDP_FIELD_MEDIA_DESCRIPTION)
+{
+    _field_query.emplace_back(QUERY_SET, "Media.audio", "", true);
+    _field_query.emplace_back(QUERY_GET, "Media", "audio", true);
+    _field_query.emplace_back(QUERY_SET, "Media.video", "", true);
+    _field_query.emplace_back(QUERY_GET, "Media", "video", true);
+    _field_query.emplace_back(QUERY_SET, "Port.10000", "", true);
+    _field_query.emplace_back(QUERY_GET, "Port", "10000", true);
+    _field_query.emplace_back(QUERY_SET, "Port.65000", "", true);
+    _field_query.emplace_back(QUERY_GET, "Port", "65000", true);
+    _field_query.emplace_back(QUERY_SET, "Number-Ports.2", "", true);
+    _field_query.emplace_back(QUERY_GET, "Number-Ports", "2", true);
+    _field_query.emplace_back(QUERY_SET, "Number-Ports.0", "", true);
+    _field_query.emplace_back(QUERY_GET, "Number-Ports", "0", true);
+    _field_query.emplace_back(QUERY_SET, "Protocol.RTP/AVP", "", true);
+    _field_query.emplace_back(QUERY_GET, "Protocol", "RTP/AVP", true);
+    _field_query.emplace_back(QUERY_SET, "Protocol.udp", "", true);
+    _field_query.emplace_back(QUERY_GET, "Protocol", "udp", true);
+    _field_query.emplace_back(QUERY_ADD, "Formats.0.0", "", true);
+    _field_query.emplace_back(QUERY_GET, "Formats.Size", "1", true);
+    _field_query.emplace_back(QUERY_GET, "Formats.0", "0", true);
+    _field_query.emplace_back(QUERY_ADD, "Formats.1.101", "", true);
+    _field_query.emplace_back(QUERY_GET, "Formats.Size", "2", true);
+    _field_query.emplace_back(QUERY_GET, "Formats.1", "101", true);
+    _field_query.emplace_back(QUERY_DEL, "Formats.0", "", true);
+    _field_query.emplace_back(QUERY_GET, "Formats.Size", "1", true);
+    _field_query.emplace_back(QUERY_GET, "Formats.0", "101", true);
+    _field_query.emplace_back(QUERY_DEL, "Formats.0", "", true);
+    _field_query.emplace_back(QUERY_GET, "Formats.Size", "0", true);
 }
 
 //-------------------------------------------
