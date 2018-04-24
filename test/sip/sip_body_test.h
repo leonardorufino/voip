@@ -52,3 +52,32 @@ protected:
 };
 
 //-------------------------------------------
+//-------------------------------------------
+
+class SIP_Body_Query_Test
+{
+public:
+    SIP_Body_Query_Test();
+    ~SIP_Body_Query_Test() {}
+
+    bool run();
+
+protected:
+    class SIP_Body_Query
+    {
+    public:
+        QueryCommand _cmd;
+        std::string _query;
+        std::string _expected_result;
+        bool _success;
+
+    public:
+        SIP_Body_Query(QueryCommand cmd, std::string query, std::string expected_result, bool success)
+            : _cmd(cmd), _query(query), _expected_result(expected_result), _success(success) {}
+    };
+
+    SIP_Body_Type _body_type;
+    std::list<SIP_Body_Query> _body_query;
+};
+
+//-------------------------------------------

@@ -20,6 +20,9 @@ bool SIP_Body_Test::init()
     if (!run<SIP_Body_Decode_Encode_Test>())
         return false;
 
+    if (!run<SIP_Body_Query_Test>())
+        return false;
+
     std::cout << "SIP body test completed successfully\n";
     return true;
 }
@@ -114,6 +117,70 @@ bool SIP_Body_Decode_Encode_Test::run()
         copy = NULL;
 
         std::cout << "SIP body decode encode test completed successfully (type: " << body_input_output._body_type << ")\n";
+    }
+
+    return true;
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+SIP_Body_Query_Test::SIP_Body_Query_Test() : _body_type(SIP_BODY_UNKNOWN)
+{
+    _body_query.emplace_back(QUERY_GET, "Body.", "", true);
+    _body_query.emplace_back(QUERY_SET, "Body.00010210111220213031404150516061707180819091a0aab1bbc0c5cfd0d9dfeeeff0f1faff", "", true);
+    _body_query.emplace_back(QUERY_GET, "Body", "00010210111220213031404150516061707180819091a0aab1bbc0c5cfd0d9dfeeeff0f1faff", true);
+    _body_query.emplace_back(QUERY_SET, "Body.414243303132", "", true);
+    _body_query.emplace_back(QUERY_GET, "Body", "414243303132", true);
+    _body_query.emplace_back(QUERY_SET, "Body.", "", true);
+    _body_query.emplace_back(QUERY_GET, "Body", "", true);
+}
+
+//-------------------------------------------
+
+bool SIP_Body_Query_Test::run()
+{
+    SIP_Body *body = SIP_Body::create_body(_body_type);
+    if (!body)
+    {
+        std::cout << "SIP_Body_Query_Test::run -> create body failed:\n";
+        std::cout << std::setw(12) << "Type: " << _body_type << "\n";
+        return false;
+    }
+
+    std::list<SIP_Body_Query>::const_iterator it = _body_query.begin();
+    while (it != _body_query.end())
+    {
+        SIP_Body_Query body_query = *it++;
+
+        std::cout << "SIP body query test initialized (type: " << _body_type << ")\n";
+
+        std::string result;
+        bool success = body->query(body_query._cmd, body_query._query, result);
+
+        if (body_query._success != success)
+        {
+            std::cout << "SIP_Body_Query_Test::run -> Query failed:\n";
+            std::cout << std::setw(12) << "Type: " << _body_type << "\n";
+            std::cout << std::setw(12) << "Cmd: " << body_query._cmd << "\n";
+            std::cout << std::setw(12) << "Query: " << body_query._query.c_str() << "\n";
+            std::cout << std::setw(12) << "Expected: " << (body_query._success ? "true" : "false") << "\n";
+            std::cout << std::setw(12) << "Success: " << (success ? "true" : "false") << "\n";
+            return false;
+        }
+
+        if ((!body_query._expected_result.empty()) && (result != body_query._expected_result))
+        {
+            std::cout << "SIP_Body_Query_Test::run -> Query result failed:\n";
+            std::cout << std::setw(12) << "Type: " << _body_type << "\n";
+            std::cout << std::setw(12) << "Cmd: " << body_query._cmd << "\n";
+            std::cout << std::setw(12) << "Query: " << body_query._query.c_str() << "\n";
+            std::cout << std::setw(12) << "Expected: " << body_query._expected_result.c_str() << "\n";
+            std::cout << std::setw(12) << "Result: " << result.c_str() << "\n";
+            return false;
+        }
+
+        std::cout << "SIP body query test completed successfully (type: " << _body_type << ")\n";
     }
 
     return true;
