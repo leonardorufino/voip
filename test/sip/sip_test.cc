@@ -12,6 +12,7 @@
 #include "sip_address_test.h"
 #include "sip_header_test.h"
 #include "sip_message_test.h"
+#include "sip_body_test.h"
 #include "sip_transaction_test.h"
 #include "sip_transport_test.h"
 #include "sip_call_test.h"
@@ -40,6 +41,12 @@ int main()
     if (!SIP_Message_Test::init())
     {
         std::cout << "SIP message test FAILED!\n";
+        return 1;
+    }
+
+    if (!SIP_Body_Test::init())
+    {
+        std::cout << "SIP body test FAILED!\n";
         return 1;
     }
 
