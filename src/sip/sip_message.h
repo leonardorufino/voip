@@ -44,6 +44,9 @@ public:
     bool encode_header(std::string &msg);
     bool encode_body(char *body, unsigned short &size);
 
+    bool query(QueryCommand cmd, const std::string &query, std::string &result);
+    virtual bool query_start_line(QueryCommand cmd, const std::string &query, std::string &result) = 0;
+
     bool add_header(SIP_Header *header, unsigned short pos = 0xFFFF);
     bool add_headers(sip_header_list &headers);
     bool remove_header(SIP_Header_Type header_type, unsigned short pos);
@@ -78,6 +81,7 @@ public:
     SIP_Method_Type get_message_type() { return get_method_enum(); }
     bool decode_start_line(std::string &msg);
     bool encode_start_line(std::string &msg);
+    bool query_start_line(QueryCommand cmd, const std::string &query, std::string &result);
 
     void set_request_line(SIP_Method_Type method, const SIP_Address &request_uri, std::string sip_version);
 
@@ -116,6 +120,7 @@ public:
     SIP_Method_Type get_message_type() { return SIP_RESPONSE; }
     bool decode_start_line(std::string &msg);
     bool encode_start_line(std::string &msg);
+    bool query_start_line(QueryCommand cmd, const std::string &query, std::string &result);
 
     void set_status_line(const std::string sip_version, unsigned short status_code, const std::string reason_phrase);
 
