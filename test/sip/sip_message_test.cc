@@ -27,6 +27,13 @@ bool SIP_Message_Test::init()
     if (!run<SIP_Response_Answer_Decode_Encode_Test>())
         return false;
 
+
+    if (!run<SIP_Request_Query_Test>())
+        return false;
+
+    if (!run<SIP_Response_Query_Test>())
+        return false;
+
     std::cout << "SIP message test completed successfully\n";
     return true;
 }
@@ -41,6 +48,7 @@ template<class T> bool SIP_Message_Test::run()
     return true;
 }
 
+//-------------------------------------------
 //-------------------------------------------
 
 bool SIP_Message_Decode_Encode_Test::run()
@@ -149,6 +157,87 @@ SIP_Message *SIP_Message_Decode_Encode_Test::copy_message(SIP_Message &message, 
     }
 
     return copy;
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+bool SIP_Message_Query_Test::run()
+{
+    SIP_Message *message = create_message();
+    if (!message)
+    {
+        std::cout << "SIP_Message_Query_Test::run -> create message failed:\n";
+        std::cout << std::setw(12) << "Type: " << _method_type << "\n";
+        return false;
+    }
+
+    std::list<SIP_Message_Query>::const_iterator it = _message_query.begin();
+    while (it != _message_query.end())
+    {
+        SIP_Message_Query message_query = *it++;
+
+        std::cout << "SIP message query test initialized (type: " << _method_type << ")\n";
+
+        std::string result;
+        bool success = message->query(message_query._cmd, message_query._query, result);
+
+        if (message_query._success != success)
+        {
+            std::cout << "SIP_Message_Query_Test::run -> Query failed:\n";
+            std::cout << std::setw(12) << "Type: " << _method_type << "\n";
+            std::cout << std::setw(12) << "Cmd: " << message_query._cmd << "\n";
+            std::cout << std::setw(12) << "Query: " << message_query._query.c_str() << "\n";
+            std::cout << std::setw(12) << "Expected: " << (message_query._success ? "true" : "false") << "\n";
+            std::cout << std::setw(12) << "Success: " << (success ? "true" : "false") << "\n";
+            delete message;
+            return false;
+        }
+
+        if ((!message_query._expected_result.empty()) && (result != message_query._expected_result))
+        {
+            std::cout << "SIP_Message_Query_Test::run -> Query result failed:\n";
+            std::cout << std::setw(12) << "Type: " << _method_type << "\n";
+            std::cout << std::setw(12) << "Cmd: " << message_query._cmd << "\n";
+            std::cout << std::setw(12) << "Query: " << message_query._query.c_str() << "\n";
+            std::cout << std::setw(12) << "Expected: " << message_query._expected_result.c_str() << "\n";
+            std::cout << std::setw(12) << "Result: " << result.c_str() << "\n";
+            delete message;
+            return false;
+        }
+
+        std::cout << "SIP message query test completed successfully (type: " << _method_type << ")\n";
+    }
+
+    delete message;
+    return true;
+}
+
+//-------------------------------------------
+
+SIP_Message *SIP_Message_Query_Test::create_message()
+{
+    SIP_Message *message = NULL;
+
+    switch (_method_type)
+    {
+        case SIP_RESPONSE:
+        {
+            message = new SIP_Response();
+            break;
+        }
+
+        case SIP_METHOD_INVALID:
+            break;
+
+        default:
+        {
+            message = new SIP_Request(_method_type);
+            break;
+        }
+    }
+
+    return message;
 }
 
 //-------------------------------------------
@@ -284,6 +373,88 @@ SIP_Request_Decode_Encode_Test::SIP_Request_Decode_Encode_Test()
 //-------------------------------------------
 //-------------------------------------------
 
+SIP_Request_Query_Test::SIP_Request_Query_Test() : SIP_Message_Query_Test(SIP_REQUEST_INVITE)
+{
+    _message_query.emplace_back(QUERY_SET, "Request-Line.Method.INVITE", "", true);
+    _message_query.emplace_back(QUERY_GET, "Request-Line.Method", "INVITE", true);
+    _message_query.emplace_back(QUERY_SET, "Request-Line.Method.ACK", "", true);
+    _message_query.emplace_back(QUERY_GET, "Request-Line.Method", "ACK", true);
+    _message_query.emplace_back(QUERY_SET, "Request-Line.Request-URI.Display-Name-Double-Quote.False", "", true);
+    _message_query.emplace_back(QUERY_GET, "Request-Line.Request-URI.Display-Name-Double-Quote", "False", true);
+    _message_query.emplace_back(QUERY_SET, "Request-Line.Request-URI.Scheme.sip", "", true);
+    _message_query.emplace_back(QUERY_GET, "Request-Line.Request-URI.Scheme", "sip", true);
+    _message_query.emplace_back(QUERY_SET, "Request-Line.Request-URI.URI-Angle-Quote.False", "", true);
+    _message_query.emplace_back(QUERY_GET, "Request-Line.Request-URI.URI-Angle-Quote", "False", true);
+    _message_query.emplace_back(QUERY_SET, "Request-Line.Request-URI.SIP-URI.User.user1", "", true);
+    _message_query.emplace_back(QUERY_GET, "Request-Line.Request-URI.SIP-URI.User", "user1", true);
+    _message_query.emplace_back(QUERY_SET, "Request-Line.Request-URI.SIP-URI.Host.Address.10.110.120.2", "", true);
+    _message_query.emplace_back(QUERY_GET, "Request-Line.Request-URI.SIP-URI.Host.Address", "10.110.120.2", true);
+    _message_query.emplace_back(QUERY_SET, "Request-Line.Request-URI.SIP-URI.Port.10000", "", true);
+    _message_query.emplace_back(QUERY_GET, "Request-Line.Request-URI.SIP-URI.Port", "10000", true);
+    _message_query.emplace_back(QUERY_SET, "Request-Line.Request-URI.SIP-URI.Transport.UDP", "", true);
+    _message_query.emplace_back(QUERY_GET, "Request-Line.Request-URI.SIP-URI.Transport", "UDP", true);
+    _message_query.emplace_back(QUERY_SET, "Request-Line.Request-URI.SIP-URI.User-Param.ip", "", true);
+    _message_query.emplace_back(QUERY_GET, "Request-Line.Request-URI.SIP-URI.User-Param", "ip", true);
+    _message_query.emplace_back(QUERY_ADD, "Request-Line.Request-URI.SIP-URI.Parameters.0.par1=test", "", true);
+    _message_query.emplace_back(QUERY_GET, "Request-Line.Request-URI.SIP-URI.Parameters.Size", "1", true);
+    _message_query.emplace_back(QUERY_GET, "Request-Line.Request-URI.SIP-URI.Parameters.0", "par1=test", true);
+    _message_query.emplace_back(QUERY_DEL, "Request-Line.Request-URI.SIP-URI.Parameters.0", "", true);
+    _message_query.emplace_back(QUERY_GET, "Request-Line.Request-URI.SIP-URI.Parameters.Size", "0", true);
+    _message_query.emplace_back(QUERY_SET, "Request-Line.SIP-Version.SIP/2.0", "", true);
+    _message_query.emplace_back(QUERY_GET, "Request-Line.SIP-Version", "SIP/2.0", true);
+    _message_query.emplace_back(QUERY_SET, "Request-Line.SIP-Version.SIP/2.1", "", true);
+    _message_query.emplace_back(QUERY_GET, "Request-Line.SIP-Version", "SIP/2.1", true);
+    _message_query.emplace_back(QUERY_GET, "Header.Via.Size", "0", true);
+    _message_query.emplace_back(QUERY_ADD, "Header.Via.0", "", true);
+    _message_query.emplace_back(QUERY_GET, "Header.Via.Size", "1", true);
+    _message_query.emplace_back(QUERY_SET, "Header.Via.0.Protocol-Name.SIP", "", true);
+    _message_query.emplace_back(QUERY_GET, "Header.Via.0.Protocol-Name", "SIP", true);
+    _message_query.emplace_back(QUERY_SET, "Header.Via.0.Protocol-Version.2.0", "", true);
+    _message_query.emplace_back(QUERY_GET, "Header.Via.0.Protocol-Version", "2.0", true);
+    _message_query.emplace_back(QUERY_SET, "Header.Via.0.Transport.TLS", "", true);
+    _message_query.emplace_back(QUERY_GET, "Header.Via.0.Transport", "TLS", true);
+    _message_query.emplace_back(QUERY_SET, "Header.Via.0.Host.Address.1111:2222:33::5555", "", true);
+    _message_query.emplace_back(QUERY_GET, "Header.Via.0.Host.Address", "1111:2222:33::5555", true);
+    _message_query.emplace_back(QUERY_SET, "Header.Via.0.Host.Address.10.0.10.2", "", true);
+    _message_query.emplace_back(QUERY_GET, "Header.Via.0.Host.Address", "10.0.10.2", true);
+    _message_query.emplace_back(QUERY_SET, "Header.Via.0.Port.12345", "", true);
+    _message_query.emplace_back(QUERY_GET, "Header.Via.0.Port", "12345", true);
+    _message_query.emplace_back(QUERY_SET, "Header.Via.0.Branch.z9hG4bKKw83ur", "", true);
+    _message_query.emplace_back(QUERY_GET, "Header.Via.0.Branch", "z9hG4bKKw83ur", true);
+    _message_query.emplace_back(QUERY_SET, "Header.Via.0.Received.1111:2222:33::5555", "", true);
+    _message_query.emplace_back(QUERY_GET, "Header.Via.0.Received", "1111:2222:33::5555", true);
+    _message_query.emplace_back(QUERY_SET, "Header.Via.0.TTL.40", "", true);
+    _message_query.emplace_back(QUERY_GET, "Header.Via.0.TTL", "40", true);
+    _message_query.emplace_back(QUERY_SET, "Header.Via.0.Multicast-Address.Address.1234:5678:90::999", "", true);
+    _message_query.emplace_back(QUERY_GET, "Header.Via.0.Multicast-Address.Address", "1234:5678:90::999", true);
+    _message_query.emplace_back(QUERY_ADD, "Header.Via.0.Parameters.0.parameter1", "", true);
+    _message_query.emplace_back(QUERY_GET, "Header.Via.0.Parameters.Size", "1", true);
+    _message_query.emplace_back(QUERY_GET, "Header.Via.0.Parameters.0", "parameter1", true);
+    _message_query.emplace_back(QUERY_ADD, "Header.Via.0.Parameters.1.par2=test", "", true);
+    _message_query.emplace_back(QUERY_GET, "Header.Via.0.Parameters.Size", "2", true);
+    _message_query.emplace_back(QUERY_GET, "Header.Via.0.Parameters.1", "par2=test", true);
+    _message_query.emplace_back(QUERY_ADD, "Header.Via.0.Parameters.0.parameter0", "", true);
+    _message_query.emplace_back(QUERY_GET, "Header.Via.0.Parameters.Size", "3", true);
+    _message_query.emplace_back(QUERY_GET, "Header.Via.0.Parameters.0", "parameter0", true);
+    _message_query.emplace_back(QUERY_GET, "Header.Via.0.Parameters.0", "parameter0", true);
+    _message_query.emplace_back(QUERY_GET, "Header.Via.0.Parameters.1", "parameter1", true);
+    _message_query.emplace_back(QUERY_GET, "Header.Via.0.Parameters.2", "par2=test", true);
+    _message_query.emplace_back(QUERY_DEL, "Header.Via.0.Parameters.1", "", true);
+    _message_query.emplace_back(QUERY_GET, "Header.Via.0.Parameters.Size", "2", true);
+    _message_query.emplace_back(QUERY_GET, "Header.Via.0.Parameters.0", "parameter0", true);
+    _message_query.emplace_back(QUERY_GET, "Header.Via.0.Parameters.1", "par2=test", true);
+    _message_query.emplace_back(QUERY_DEL, "Header.Via.0.Parameters.0", "", true);
+    _message_query.emplace_back(QUERY_GET, "Header.Via.0.Parameters.Size", "1", true);
+    _message_query.emplace_back(QUERY_GET, "Header.Via.0.Parameters.0", "par2=test", true);
+    _message_query.emplace_back(QUERY_DEL, "Header.Via.0.Parameters.0", "", true);
+    _message_query.emplace_back(QUERY_GET, "Header.Via.0.Parameters.Size", "0", true);
+    _message_query.emplace_back(QUERY_DEL, "Header.Via.0", "", true);
+    _message_query.emplace_back(QUERY_GET, "Header.Via.Size", "0", true);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
 SIP_Response_Decode_Encode_Test::SIP_Response_Decode_Encode_Test()
 {
     SIP_Message_Input_Output msg1;
@@ -361,6 +532,93 @@ SIP_Response_Decode_Encode_Test::SIP_Response_Decode_Encode_Test()
 
     msg2._response_answer = false;
     _message_input_output.push_back(msg2);
+}
+
+//-------------------------------------------
+//-------------------------------------------
+
+SIP_Response_Query_Test::SIP_Response_Query_Test() : SIP_Message_Query_Test(SIP_RESPONSE)
+{
+    _message_query.emplace_back(QUERY_SET, "Status-Line.SIP-Version.SIP/2.0", "", true);
+    _message_query.emplace_back(QUERY_GET, "Status-Line.SIP-Version", "SIP/2.0", true);
+    _message_query.emplace_back(QUERY_SET, "Status-Line.Status-Code.200", "", true);
+    _message_query.emplace_back(QUERY_GET, "Status-Line.Status-Code", "200", true);
+    _message_query.emplace_back(QUERY_SET, "Status-Line.Status-Code.488", "", true);
+    _message_query.emplace_back(QUERY_GET, "Status-Line.Status-Code", "488", true);
+    _message_query.emplace_back(QUERY_SET, "Status-Line.Reason-Phrase.OK", "", true);
+    _message_query.emplace_back(QUERY_GET, "Status-Line.Reason-Phrase", "OK", true);
+    _message_query.emplace_back(QUERY_SET, "Status-Line.Reason-Phrase.Not Acceptable Here", "", true);
+    _message_query.emplace_back(QUERY_GET, "Status-Line.Reason-Phrase", "Not Acceptable Here", true);
+    _message_query.emplace_back(QUERY_GET, "Header.To.Size", "0", true);
+    _message_query.emplace_back(QUERY_ADD, "Header.To.0", "", true);
+    _message_query.emplace_back(QUERY_GET, "Header.To.Size", "1", true);
+    _message_query.emplace_back(QUERY_SET, "Header.To.0.Address.Display-Name-Double-Quote.False", "", true);
+    _message_query.emplace_back(QUERY_GET, "Header.To.0.Address.Display-Name-Double-Quote", "False", true);
+    _message_query.emplace_back(QUERY_SET, "Header.To.0.Address.Display-Name-Double-Quote.True", "", true);
+    _message_query.emplace_back(QUERY_GET, "Header.To.0.Address.Display-Name-Double-Quote", "True", true);
+    _message_query.emplace_back(QUERY_SET, "Header.To.0.Address.Display-Name.User123", "", true);
+    _message_query.emplace_back(QUERY_GET, "Header.To.0.Address.Display-Name", "User123", true);
+    _message_query.emplace_back(QUERY_SET, "Header.To.0.Address.Scheme.sip", "", true);
+    _message_query.emplace_back(QUERY_GET, "Header.To.0.Address.Scheme", "sip", true);
+    _message_query.emplace_back(QUERY_SET, "Header.To.0.Address.URI-Angle-Quote.False", "", true);
+    _message_query.emplace_back(QUERY_GET, "Header.To.0.Address.URI-Angle-Quote", "False", true);
+    _message_query.emplace_back(QUERY_SET, "Header.To.0.Address.URI-Angle-Quote.True", "", true);
+    _message_query.emplace_back(QUERY_GET, "Header.To.0.Address.URI-Angle-Quote", "True", true);
+    _message_query.emplace_back(QUERY_SET, "Header.To.0.Address.SIP-URI.User.test1", "", true);
+    _message_query.emplace_back(QUERY_GET, "Header.To.0.Address.SIP-URI.User", "test1", true);
+    _message_query.emplace_back(QUERY_SET, "Header.To.0.Address.SIP-URI.Password.mypass", "", true);
+    _message_query.emplace_back(QUERY_GET, "Header.To.0.Address.SIP-URI.Password", "mypass", true);
+    _message_query.emplace_back(QUERY_SET, "Header.To.0.Address.SIP-URI.Host.Address.10.10.10.10", "", true);
+    _message_query.emplace_back(QUERY_GET, "Header.To.0.Address.SIP-URI.Host.Address", "10.10.10.10", true);
+    _message_query.emplace_back(QUERY_SET, "Header.To.0.Address.SIP-URI.Port.5000", "", true);
+    _message_query.emplace_back(QUERY_GET, "Header.To.0.Address.SIP-URI.Port", "5000", true);
+    _message_query.emplace_back(QUERY_SET, "Header.To.0.Address.SIP-URI.Transport.UDP", "", true);
+    _message_query.emplace_back(QUERY_GET, "Header.To.0.Address.SIP-URI.Transport", "UDP", true);
+    _message_query.emplace_back(QUERY_SET, "Header.To.0.Address.SIP-URI.User-Param.phone", "", true);
+    _message_query.emplace_back(QUERY_GET, "Header.To.0.Address.SIP-URI.User-Param", "phone", true);
+    _message_query.emplace_back(QUERY_SET, "Header.To.0.Address.SIP-URI.Method.INVITE", "", true);
+    _message_query.emplace_back(QUERY_GET, "Header.To.0.Address.SIP-URI.Method", "INVITE", true);
+    _message_query.emplace_back(QUERY_SET, "Header.To.0.Address.SIP-URI.TTL.20", "", true);
+    _message_query.emplace_back(QUERY_GET, "Header.To.0.Address.SIP-URI.TTL", "20", true);
+    _message_query.emplace_back(QUERY_SET, "Header.To.0.Address.SIP-URI.Multicast-Address.Address.1111::2222", "", true);
+    _message_query.emplace_back(QUERY_GET, "Header.To.0.Address.SIP-URI.Multicast-Address.Address", "1111::2222", true);
+    _message_query.emplace_back(QUERY_SET, "Header.To.0.Address.SIP-URI.LR.False", "", true);
+    _message_query.emplace_back(QUERY_GET, "Header.To.0.Address.SIP-URI.LR", "False", true);
+    _message_query.emplace_back(QUERY_SET, "Header.To.0.Address.SIP-URI.LR.True", "", true);
+    _message_query.emplace_back(QUERY_GET, "Header.To.0.Address.SIP-URI.LR", "True", true);
+    _message_query.emplace_back(QUERY_ADD, "Header.To.0.Address.SIP-URI.Parameters.0.par1", "", true);
+    _message_query.emplace_back(QUERY_GET, "Header.To.0.Address.SIP-URI.Parameters.Size", "1", true);
+    _message_query.emplace_back(QUERY_GET, "Header.To.0.Address.SIP-URI.Parameters.0", "par1", true);
+    _message_query.emplace_back(QUERY_DEL, "Header.To.0.Address.SIP-URI.Parameters.0", "", true);
+    _message_query.emplace_back(QUERY_GET, "Header.To.0.Address.SIP-URI.Parameters.Size", "0", true);
+    _message_query.emplace_back(QUERY_ADD, "Header.To.0.Address.SIP-URI.Headers.0.header1", "", true);
+    _message_query.emplace_back(QUERY_GET, "Header.To.0.Address.SIP-URI.Headers.Size", "1", true);
+    _message_query.emplace_back(QUERY_GET, "Header.To.0.Address.SIP-URI.Headers.0", "header1", true);
+    _message_query.emplace_back(QUERY_DEL, "Header.To.0.Address.SIP-URI.Headers.0", "", true);
+    _message_query.emplace_back(QUERY_GET, "Header.To.0.Address.SIP-URI.Headers.Size", "0", true);
+    _message_query.emplace_back(QUERY_SET, "Header.To.0.Address.Absolute-URI.Address.11.22.33.44", "", true);
+    _message_query.emplace_back(QUERY_GET, "Header.To.0.Address.Absolute-URI.Address", "11.22.33.44", true);
+    _message_query.emplace_back(QUERY_SET, "Header.To.0.Tag.jd3939dk", "", true);
+    _message_query.emplace_back(QUERY_GET, "Header.To.0.Tag", "jd3939dk", true);
+    _message_query.emplace_back(QUERY_ADD, "Header.To.0.Parameters.0.par1234", "", true);
+    _message_query.emplace_back(QUERY_GET, "Header.To.0.Parameters.Size", "1", true);
+    _message_query.emplace_back(QUERY_GET, "Header.To.0.Parameters.0", "par1234", true);
+    _message_query.emplace_back(QUERY_DEL, "Header.To.0.Parameters.0", "", true);
+    _message_query.emplace_back(QUERY_GET, "Header.To.0.Parameters.Size", "0", true);
+    _message_query.emplace_back(QUERY_DEL, "Header.To.0", "", true);
+    _message_query.emplace_back(QUERY_GET, "Header.To.Size", "0", true);
+    _message_query.emplace_back(QUERY_GET, "Body.Size", "0", true);
+    _message_query.emplace_back(QUERY_ADD, "Body.0.Unknown", "", true);
+    _message_query.emplace_back(QUERY_GET, "Body.Size", "1", true);
+    _message_query.emplace_back(QUERY_GET, "Body.0.Unknown.Body.", "", true);
+    _message_query.emplace_back(QUERY_SET, "Body.0.Unknown.Body.000102101120303141505160617071808190a0aab1c0c5cfd0dfeeeff0f1faff", "", true);
+    _message_query.emplace_back(QUERY_GET, "Body.0.Unknown.Body", "000102101120303141505160617071808190a0aab1c0c5cfd0dfeeeff0f1faff", true);
+    _message_query.emplace_back(QUERY_SET, "Body.0.Unknown.Body.414243303132", "", true);
+    _message_query.emplace_back(QUERY_GET, "Body.0.Unknown.Body", "414243303132", true);
+    _message_query.emplace_back(QUERY_SET, "Body.0.Unknown.Body.", "", true);
+    _message_query.emplace_back(QUERY_GET, "Body.0.Unknown.Body", "", true);
+    _message_query.emplace_back(QUERY_DEL, "Body.0.Unknown", "", true);
+    _message_query.emplace_back(QUERY_GET, "Body.Size", "0", true);
 }
 
 //-------------------------------------------
