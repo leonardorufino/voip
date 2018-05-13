@@ -13,6 +13,7 @@
 
 #include "sip/sip_body.h"
 #include "util/util_defs.h"
+#include <cstring>
 #include <list>
 #include <iomanip>
 
